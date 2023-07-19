@@ -1,4 +1,5 @@
 ﻿using miniJob.Model;
+using miniJob.Services.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,14 @@ namespace miniJob.Services
 {
     public class PosaoService : IPosaoService
     {
-        List<Posao> poslovi = new List<Posao>()
+        miniJobsContext _db;
+      public  PosaoService(miniJobsContext db)
+        {
+            _db = db;
+        }
+        List<Model.Posao> poslovi = new List<Model.Posao>()
 {
-    new Posao()
+    new Model.Posao()
     {
         id = 1,
         naziv = "Software Engineer",
@@ -23,7 +29,7 @@ namespace miniJob.Services
         Cijena = 80000,
         brojAplikanata = 10
     },
-    new Posao()
+    new Model.Posao()
     {
         id = 2,
         naziv = "Marketing Manager",
@@ -35,7 +41,7 @@ namespace miniJob.Services
         Cijena = 90000,
         brojAplikanata = 8
     },
-    new Posao()
+    new Model.Posao()
     {
         id = 3,
         naziv = "Graphic Designer",
@@ -49,8 +55,9 @@ namespace miniJob.Services
     }
 };
 
-        public IList<Posao> Get()
+        public IList<Model.Posao> Get()
         {
+            var list= _db.Posaos.ToList();
             return poslovi;
         }
     }

@@ -4,7 +4,7 @@ using miniJob.Services;
 
 namespace miniJob.Controllers
 {
-    [ApiController]
+ /*   [ApiController]
     [Route("[controller]")]
     public class PosaoController : ControllerBase
     {
@@ -22,5 +22,5 @@ namespace miniJob.Controllers
             return _posaoService.Get();
         }
       
-    }
+    }*/
 }
