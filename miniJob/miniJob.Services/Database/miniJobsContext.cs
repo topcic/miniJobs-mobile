@@ -152,7 +152,8 @@ public partial class miniJobsContext : Microsoft.EntityFrameworkCore.DbContext
             entity.Property(e => e.EmailPotvrđen).HasColumnName("emailPotvrđen");
             entity.Property(e => e.IsAdmin).HasColumnName("isAdmin");
             entity.Property(e => e.KorisnickoIme).HasColumnName("korisnickoIme");
-            entity.Property(e => e.Lozinka).HasColumnName("lozinka");
+            entity.Property(e => e.LozinkaSalt).HasColumnName("lozinkaSalt");
+            entity.Property(e => e.LozinkaHash).HasColumnName("lozinkaHash");
             entity.Property(e => e.RefreshToken).HasColumnName("refreshToken");
             entity.Property(e => e.RefreshTokenExpiryTime).HasColumnName("refreshTokenExpiryTime");
             entity.Property(e => e.SlikaKorisnika).HasColumnName("slika_korisnika");

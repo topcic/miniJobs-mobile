@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,10 @@ namespace miniJob.Services
         public MappingProfile()
         {
             CreateMap<Database.KorisnickiNalog,Model.KorisnickiNalog>();
+           CreateMap<Model.Requests.KorisniciInsertRequest, Database.KorisnickiNalog>();
+            CreateMap<Model.Requests.KorisniciUpdateRequest, Database.KorisnickiNalog>();
+            CreateMap<Model.Requests.KorisniciInsertRequest,Database.Aplikant>();
+            CreateMap<Model.Requests.KorisniciInsertRequest, Database.Poslodavac>();
         }
     }
 }

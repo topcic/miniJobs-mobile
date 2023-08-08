@@ -31,7 +31,8 @@ public partial class KorisnickiNalog
 
     public DateTime RefreshTokenExpiryTime { get; set; }
 
-    public string? Lozinka { get; set; }
+    public string? LozinkaHash { get; set; }
+    public string? LozinkaSalt { get; set; }
 
     public string? SlikaKorisnika { get; set; }
 

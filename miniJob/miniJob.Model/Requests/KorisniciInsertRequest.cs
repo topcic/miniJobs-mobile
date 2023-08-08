@@ -9,18 +9,18 @@ namespace miniJob.Model.Requests
     public class KorisniciInsertRequest
     {
         public string role { get; set; }
-        public string ime { get; set; }
-        public string prezime { get; set; }
-        public string korisnickoIme { get; set; }
-        public string lozinka { get; set; }
-        public string lozinkaPotvrda { get; set; }
+        public string Ime { get; set; }
+        public string Prezime { get; set; }
+        public string KorisnickoIme { get; set; }
+        public string Lozinka { get; set; }
+        public string LozinkaPotvrda { get; set; }
         public int Status { get; set; }
-        public string email { get; set; }
+        public string Email { get; set; }
         public DateTime? DatumRegistracije { get; set; }
 
-        public string brojTelefona { get; set; }
-        public string lokacija { get; set; }
-        public string nazivFirme { get; set; }
+        public string BrojTelefona { get; set; }
+        public string Adresa { get; set; }
+        public string NazivFirme { get; set; }
        
 
     }

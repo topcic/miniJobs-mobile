@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "iRSBGCNxS4PCU/x1eARvfyMbauL2NZ7cMShon9H6PP/geUJ3RIhd5VJ/Kw/DAxuk9noeBiR7AbMVH+l83BEXXg==",
+  "dgSpecHash": "wT4p44J/Cys/5w05ujssmvfDh4YnkqU0qsZSh4W8236d6tIclWhZrRzr/fLFNV+vTGTaI80B9DqmLRfdX3m/jw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Mahir\\Desktop\\miniJobs-mobile\\miniJob\\miniJob.Services\\miniJob.Services.csproj",
+  "projectFilePath": "C:\\Users\\Mahir\\OneDrive - Faculty of Information Technologies\\Desktop\\seminarski RSII\\miniJobs-mobile\\miniJob\\miniJob.Services\\miniJob.Services.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Mahir\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
     "C:\\Users\\Mahir\\.nuget\\packages\\azure.core\\1.24.0\\azure.core.1.24.0.nupkg.sha512",

@@ -30,3 +30,37 @@ C:\Users\Mahir\Desktop\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0
 C:\Users\Mahir\Desktop\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\ref\miniJob.Services.dll
 C:\Users\Mahir\Desktop\miniJobs-mobile\miniJob\miniJob.Services\bin\Debug\net6.0\miniJob.Services.runtimeconfig.json
 C:\Users\Mahir\Desktop\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\miniJob.Services.genruntimeconfig.cache
+C:\Users\Mahir\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\miniJob.Services.csproj.AssemblyReference.cache
+C:\Users\Mahir\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\miniJob.Services.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Mahir\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\miniJob.Services.AssemblyInfoInputs.cache
+C:\Users\Mahir\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\miniJob.Services.AssemblyInfo.cs
+C:\Users\Mahir\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\miniJob.Services.csproj.CoreCompileInputs.cache
+C:\Users\Mahir\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\miniJob.Services.dll
+C:\Users\Mahir\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\refint\miniJob.Services.dll
+C:\Users\Mahir\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\miniJob.Services.pdb
+C:\Users\Mahir\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\bin\Debug\net6.0\miniJob.Services.deps.json
+C:\Users\Mahir\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\bin\Debug\net6.0\miniJob.Services.runtimeconfig.json
+C:\Users\Mahir\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\bin\Debug\net6.0\miniJob.Services.dll
+C:\Users\Mahir\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\bin\Debug\net6.0\miniJob.Services.pdb
+C:\Users\Mahir\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\bin\Debug\net6.0\miniJob.Model.dll
+C:\Users\Mahir\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\bin\Debug\net6.0\miniJob.Model.pdb
+C:\Users\Mahir\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\miniJob.Services.csproj.CopyComplete
+C:\Users\Mahir\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\miniJob.Services.genruntimeconfig.cache
+C:\Users\Mahir\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\ref\miniJob.Services.dll
+C:\Users\Mahir\OneDrive - Faculty of Information Technologies\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\bin\Debug\net6.0\miniJob.Services.deps.json
+C:\Users\Mahir\OneDrive - Faculty of Information Technologies\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\bin\Debug\net6.0\miniJob.Services.runtimeconfig.json
+C:\Users\Mahir\OneDrive - Faculty of Information Technologies\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\bin\Debug\net6.0\miniJob.Services.dll
+C:\Users\Mahir\OneDrive - Faculty of Information Technologies\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\bin\Debug\net6.0\miniJob.Services.pdb
+C:\Users\Mahir\OneDrive - Faculty of Information Technologies\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\bin\Debug\net6.0\miniJob.Model.dll
+C:\Users\Mahir\OneDrive - Faculty of Information Technologies\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\bin\Debug\net6.0\miniJob.Model.pdb
+C:\Users\Mahir\OneDrive - Faculty of Information Technologies\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\miniJob.Services.csproj.AssemblyReference.cache
+C:\Users\Mahir\OneDrive - Faculty of Information Technologies\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\miniJob.Services.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Mahir\OneDrive - Faculty of Information Technologies\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\miniJob.Services.AssemblyInfoInputs.cache
+C:\Users\Mahir\OneDrive - Faculty of Information Technologies\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\miniJob.Services.AssemblyInfo.cs
+C:\Users\Mahir\OneDrive - Faculty of Information Technologies\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\miniJob.Services.csproj.CoreCompileInputs.cache
+C:\Users\Mahir\OneDrive - Faculty of Information Technologies\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\miniJob.Services.csproj.CopyComplete
+C:\Users\Mahir\OneDrive - Faculty of Information Technologies\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\miniJob.Services.dll
+C:\Users\Mahir\OneDrive - Faculty of Information Technologies\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\refint\miniJob.Services.dll
+C:\Users\Mahir\OneDrive - Faculty of Information Technologies\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\miniJob.Services.pdb
+C:\Users\Mahir\OneDrive - Faculty of Information Technologies\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\miniJob.Services.genruntimeconfig.cache
+C:\Users\Mahir\OneDrive - Faculty of Information Technologies\Desktop\seminarski RSII\miniJobs-mobile\miniJob\miniJob.Services\obj\Debug\net6.0\ref\miniJob.Services.dll

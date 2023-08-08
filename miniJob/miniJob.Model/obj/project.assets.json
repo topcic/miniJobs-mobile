@@ -3228,11 +3228,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Mahir\\Desktop\\miniJobs-mobile\\miniJob\\miniJob.Model\\miniJob.Model.csproj",
+      "projectUniqueName": "C:\\Users\\Mahir\\OneDrive - Faculty of Information Technologies\\Desktop\\seminarski RSII\\miniJobs-mobile\\miniJob\\miniJob.Model\\miniJob.Model.csproj",
       "projectName": "miniJob.Model",
-      "projectPath": "C:\\Users\\Mahir\\Desktop\\miniJobs-mobile\\miniJob\\miniJob.Model\\miniJob.Model.csproj",
+      "projectPath": "C:\\Users\\Mahir\\OneDrive - Faculty of Information Technologies\\Desktop\\seminarski RSII\\miniJobs-mobile\\miniJob\\miniJob.Model\\miniJob.Model.csproj",
       "packagesPath": "C:\\Users\\Mahir\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Mahir\\Desktop\\miniJobs-mobile\\miniJob\\miniJob.Model\\obj\\",
+      "outputPath": "C:\\Users\\Mahir\\OneDrive - Faculty of Information Technologies\\Desktop\\seminarski RSII\\miniJobs-mobile\\miniJob\\miniJob.Model\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Mahir\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -3282,7 +3282,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.101\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.306\\RuntimeIdentifierGraph.json"
       }
     }
   }

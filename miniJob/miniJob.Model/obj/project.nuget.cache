@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "kXzUG1Kf83cAMCAmY3oX5Y1/WJsGKkdqTPdAjQ4UfHVsI9me+GA0zf2GA6AUCuQlDcV5lp49RcC1X3W7fYcfDw==",
+  "dgSpecHash": "Hzm2FR4WP6TG4iyB2EAm+jVphGoWKgJh640WsMHHzg4FsCaoIZu5ew4TErIYPyCNG1rWJqbzFkDwwetus9HAIQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Mahir\\Desktop\\miniJobs-mobile\\miniJob\\miniJob.Model\\miniJob.Model.csproj",
+  "projectFilePath": "C:\\Users\\Mahir\\OneDrive - Faculty of Information Technologies\\Desktop\\seminarski RSII\\miniJobs-mobile\\miniJob\\miniJob.Model\\miniJob.Model.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Mahir\\.nuget\\packages\\azure.core\\1.24.0\\azure.core.1.24.0.nupkg.sha512",
     "C:\\Users\\Mahir\\.nuget\\packages\\azure.identity\\1.6.0\\azure.identity.1.6.0.nupkg.sha512",

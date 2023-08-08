@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace miniJob.Services
 {
-    public interface IKorisniciService
+    public interface IKorisniciService:IService<Model.KorisnickiNalog,Model.SearchObjects.KorisnikSearchObject>
     {
-        List<Model.KorisnickiNalog> Get();
+
         Model.KorisnickiNalog Insert(KorisniciInsertRequest request);
-    
+        Model.KorisnickiNalog Update(int id, KorisniciUpdateRequest request);
     }
 }
