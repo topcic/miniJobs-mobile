@@ -24,6 +24,6 @@ public class LoggingBehavior<TRequest> : IRequestPreProcessor<TRequest> where TR
         //}
         //Check with cache
 
-        _logger.LogInformation("Arni.PublicCallBridge Request: {Name} {@Request}", requestName, request);
+        _logger.LogInformation("miniJobs Request: {Name} {@Request}", requestName, request);
     }
 }
