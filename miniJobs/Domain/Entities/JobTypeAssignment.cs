@@ -1,6 +1,6 @@
 ﻿namespace Domain.Entities;
 
-[Table("job_type_assigments")]
+[Table("job_type_assignments")]
 public class JobTypeAssignment
 {
     [Column("job_id")]

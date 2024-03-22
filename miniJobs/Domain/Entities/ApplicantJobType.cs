@@ -1,7 +1,7 @@
 ﻿namespace Domain.Entities;
 
 [Table("applicant_job_types")]
-public class ApplicantJobTypes
+public class ApplicantJobType
 {
     [Column("applicant_id")]
     public int ApplicantId { get; set; }

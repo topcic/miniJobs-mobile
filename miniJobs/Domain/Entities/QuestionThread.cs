@@ -1,19 +1,18 @@
 ﻿using Domain.Common;
-using Domain.Enums;
 using Domain.Interfaces;
 
 namespace Domain.Entities;
 
-[Table("job_applications")]
-public class JobApplication : BaseAuditableEntity, IEntity<int>
+[Table("question_threads")]
+public class QuestionThread :BaseAuditableEntity, IEntity<int>
 {
     [Key]
     [Column("id")]
     public int Id { get; set; }
 
+    [Column("name")]
+    public string Name { get; set; }
+
     [Column("job_id")]
     public int JobId { get; set; }
-
-    [Column("status")]
-    public JobApplicationStatus Status { get; set; }
 }

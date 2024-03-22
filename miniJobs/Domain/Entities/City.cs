@@ -1,7 +1,9 @@
-﻿namespace Domain.Entities;
+﻿using Domain.Interfaces;
+
+namespace Domain.Entities;
 
 [Table("cities")]
-public class City
+public class City : IEntity<int>
 {
     [Key]
     [Column("id")]

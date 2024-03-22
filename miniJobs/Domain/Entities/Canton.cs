@@ -1,10 +1,12 @@
-﻿namespace Domain.Entities;
+﻿using Domain.Interfaces;
+
+namespace Domain.Entities;
 [Table("cantons")]
-public class Canton
+public class Canton : IEntity<int>
 {
     [Key]
     [Column("id")]
-    public Guid Id { get; set; }
+    public int Id { get; set; }
 
     [Column("name")]
     public string Name { get; set; }
