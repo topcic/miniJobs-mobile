@@ -1,7 +1,9 @@
-﻿namespace Domain.Entities;
+﻿using Domain.Interfaces;
+
+namespace Domain.Entities;
 
 [Table("job_types")]
-public class JobType
+public class JobType : IEntity<int>
 {
     [Key]
     [Column("id")]

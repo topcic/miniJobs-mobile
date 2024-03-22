@@ -1,10 +1,11 @@
 ﻿using Domain.Enums;
+using Domain.Interfaces;
 
 namespace Domain.Entities;
 
 
 [Table("users")]
-public class User
+public class User : IEntity<int>
 {
     [Key]
     [Column("id")]

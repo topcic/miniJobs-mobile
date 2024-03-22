@@ -1,13 +1,14 @@
 ﻿using Domain.Enums;
+using Domain.Interfaces;
 
 namespace Domain.Entities;
 
 [Table("jobs")]
-public class Job
+public class Job : IEntity<int>
 {
     [Key]
     [Column("id")]
-    public Guid Id { get; set; }
+    public int Id { get; set; }
 
     [Column("name")]
     public string Name { get; set; }

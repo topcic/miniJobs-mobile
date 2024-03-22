@@ -1,6 +1,8 @@
-﻿namespace Domain.Entities;
+﻿using Domain.Interfaces;
+
+namespace Domain.Entities;
 [Table("employers")]
-public class Employer
+public class Employer : IEntity<int>
 {
     [Key]
     [Column("id")]

@@ -1,4 +1,6 @@
-﻿using Infrastructure.Persistence;
+﻿using Domain.Interfaces;
+using Infrastructure.Persistence;
+using Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -21,6 +23,26 @@ public static class ConfigureServices
            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
                builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
+        AddRepositories(services);
+
         return services;
+    }
+    private static void AddRepositories(IServiceCollection services)
+    {
+        services.AddScoped<IJobRepository, JobRepository>();
+        services.AddScoped<ICantonRepository, CantonRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IApplicantRepository, ApplicantRepository>();
+        services.AddScoped<IEmployerRepository, EmployerRepository>();
+        services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
+        services.AddScoped<IJobTypeRepository, JobTypeRepository>();
+        services.AddScoped<ISavedJobRepository, SavedJobRepository>();
+        services.AddScoped<IRatingRepository, RatingRepository>();
+        services.AddScoped<ICityRepository, CityRepository>();
+        services.AddScoped<ICountryRepository, CountryRepository>();
+        services.AddScoped<IMessageRepository, MessageRepository>();
+        services.AddScoped<IQuestionThreadRepository, QuestionThreadRepository>(); 
+        services.AddScoped<IJobTypeAssignmentRepository, JobTypeAssignmentRepository>();
+        services.AddScoped<IApplicantJobTypeRepository, ApplicantJobTypeRepository>();
     }
 }

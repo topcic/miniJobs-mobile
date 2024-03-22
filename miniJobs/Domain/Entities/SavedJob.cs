@@ -1,9 +1,10 @@
 ﻿using Domain.Common;
+using Domain.Interfaces;
 
 namespace Domain.Entities;
 [Table("saved_jobs")]
 
-public class SavedJob : BaseAuditableEntity
+public class SavedJob : BaseAuditableEntity, IEntity<int>
 {
     [Key]
     public int Id { get; set; }
