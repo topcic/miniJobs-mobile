@@ -33,10 +33,10 @@ public static class UserPrincipalExtensions
     /// </summary>
     /// <param name="user"></param>
     /// <returns></returns>
-    public static Guid? GetUserId(this System.Security.Principal.IPrincipal user)
+    public static int? GetUserId(this System.Security.Principal.IPrincipal user)
     {
         string userId = user.GetClaim(ClaimTypes.NameIdentifier);
-        return string.IsNullOrEmpty(userId) ? null : Guid.Parse(userId);
+        return string.IsNullOrEmpty(userId) ? null : int.Parse(userId);
     }
     /// <summary>
     /// Get email logged in user

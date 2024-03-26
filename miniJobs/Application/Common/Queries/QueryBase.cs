@@ -8,7 +8,7 @@ public abstract class QueryBase<TResult> : IRequest<TResult> where TResult : cla
     /// <summary>
     /// User id
     /// </summary>
-    public Guid? UserId
+    public int? UserId
     {
         get
         {

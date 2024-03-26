@@ -19,11 +19,11 @@ public class City : IEntity<int>
     public string MunicipalityCode { get; set; }
 
     [Column("country_id")]
-    public Guid? CountryId { get; set; }
+    public int? CountryId { get; set; }
 
     [NotMapped]
     public Country Country { get; set; }
 
     [Column("canton_id")]
-    public Guid? CantonId { get; set; }
+    public int? CantonId { get; set; }
 }

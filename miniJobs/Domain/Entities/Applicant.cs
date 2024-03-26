@@ -24,7 +24,7 @@ public class Applicant : IEntity<int>
     public string? WageProposal { get; set; }
 
     [Column("confirmation_code")]
-    public Guid? ConfirmationCode { get; set; }
+    public int? ConfirmationCode { get; set; }
 
     [Column("access_failed_count")]
     public int AccessFailedCount { get; set; }

@@ -5,7 +5,7 @@
 /// </summary>
 public static class UserContext
 {
-    private static readonly AsyncLocal<Guid?> UserId = new();
+    private static readonly AsyncLocal<int?> UserId = new();
     private static readonly AsyncLocal<string?> RoleId = new();
 
     /// <summary>
@@ -13,7 +13,7 @@ public static class UserContext
     /// </summary>
     /// <param name="userId"></param>
     /// <exception cref="InvalidOperationException"></exception>
-    public static void SetUserId(Guid? userId)
+    public static void SetUserId(int? userId)
     {
         if (userId is null)
         {
@@ -52,7 +52,7 @@ public static class UserContext
     /// Returns User Id if exists, otherwise it will be null
     /// </summary>
     /// <returns></returns>
-    public static Guid? GetUserId()
+    public static int? GetUserId()
     {
         return UserId.Value;
     }

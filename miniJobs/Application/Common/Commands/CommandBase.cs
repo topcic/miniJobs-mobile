@@ -12,7 +12,7 @@ public class CommandBase<T> : IRequest<T>
     /// <summary>
     /// User id
     /// </summary>
-    public Guid? UserId
+    public int? UserId
     {
         get
         {

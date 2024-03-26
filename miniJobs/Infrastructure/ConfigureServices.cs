@@ -1,7 +1,10 @@
-﻿using Domain.Interfaces;
+﻿using Application.Common.Interfaces;
+using Infrastructure.Authentication;
+using Infrastructure.OptionsSetup;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
-using Microsoft.EntityFrameworkCore;
+using Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -23,7 +26,11 @@ public static class ConfigureServices
            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
                builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
+
+        AddOptionSetups(services);
         AddRepositories(services);
+        AddServices(services);
 
         return services;
     }
@@ -31,7 +38,7 @@ public static class ConfigureServices
     {
         services.AddScoped<IJobRepository, JobRepository>();
         services.AddScoped<ICantonRepository, CantonRepository>();
-        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUserManagerRepository, UserManagerRepository>();
         services.AddScoped<IApplicantRepository, ApplicantRepository>();
         services.AddScoped<IEmployerRepository, EmployerRepository>();
         services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
@@ -44,5 +51,18 @@ public static class ConfigureServices
         services.AddScoped<IQuestionThreadRepository, QuestionThreadRepository>(); 
         services.AddScoped<IJobTypeAssignmentRepository, JobTypeAssignmentRepository>();
         services.AddScoped<IApplicantJobTypeRepository, ApplicantJobTypeRepository>();
+        services.AddScoped<IUserAuthCodeRepository, UserAuthCodeRepository>();
+        services.AddScoped<ITokenRepository, TokenRepository>();
+
+    }
+    private static void AddOptionSetups(IServiceCollection services)
+    {
+        services.ConfigureOptions<JwtOptionsSetup>();
+        services.ConfigureOptions<JwtBearerOptionsSetup>();
+    }
+    private static void AddServices(IServiceCollection services)
+    {
+        services.AddTransient<IJwtProvider, JwtProvider>();
+        services.AddScoped<ISecurityProvider, SecurityProvider>();
     }
 }
