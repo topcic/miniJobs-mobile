@@ -1,4 +1,6 @@
-﻿namespace Infrastructure.Persistence.Repositories;
+﻿using Domain.Entities;
+
+namespace Infrastructure.Persistence.Repositories;
 
 public class UserManagerRepository(ApplicationDbContext context) : GenericRepository<User, int, ApplicationDbContext>(context), IUserManagerRepository
 {
@@ -21,5 +23,17 @@ public class UserManagerRepository(ApplicationDbContext context) : GenericReposi
     public async Task<Role> TryFindRoleAsync(string roleId)
     {
         return await context.Set<Role>().FirstOrDefaultAsync(x => x.Id == roleId);
+    }
+
+    public async Task<UserRole> AssignUserRoleAsync(User user, Role role)
+    {
+        var userRole = new UserRole()
+        {
+            UserId = user.Id,
+            RoleId = role.Id,
+        };
+        await context.Set<UserRole>().AddAsync(userRole);
+        await context.SaveChangesAsync();
+        return userRole;
     }
 }
