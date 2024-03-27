@@ -21,12 +21,12 @@ public class Job :BaseAuditableEntity, IEntity<int>
     public string StreetAddressAndNumber { get; set; }
 
     [Column("applications_end_to", TypeName = "timestamp without time zone")]
-    public DateTime ApplicationsEndTo { get; set; }
+    public DateTime? ApplicationsEndTo { get; set; }
 
     [Column("status")]
     public JobStatus Status { get; set; }
     [Column("required_employees")]
-    public int RequiredEmployees { get; set; }
+    public int? RequiredEmployees { get; set; }
 
     [Column("wage")]
     public int? Wage { get; set; }
@@ -36,4 +36,7 @@ public class Job :BaseAuditableEntity, IEntity<int>
 
     [Column("city_id")]
     public int CityId { get; set; }
+
+    public JobState State { get; set; }
+
 }
