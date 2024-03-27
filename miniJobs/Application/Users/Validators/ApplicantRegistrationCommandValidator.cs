@@ -42,6 +42,6 @@ public class ApplicantRegistrationCommandValidator : AbstractValidator<Applicant
         RuleFor(x => x.Request.Gender)
           .NotNull().OverridePropertyName("Gender").WithMessage("Spol je obavezno polje");
 
-        //   RuleFor(x => x.Request.CityId).MustAsync(async (id, cancellation) => await cityRepository.TryFindAsync(id) != null).OverridePropertyName("CompanyCityId").WithMessage("Grad ne postoji.");
+        //   RuleFor(x => x.Request.CityId).MustAsync(async (id, cancellation) => await cityRepository.TryFindAsync(id) != null).OverridePropertyName("CityId").WithMessage("Grad ne postoji.");
     }
 }

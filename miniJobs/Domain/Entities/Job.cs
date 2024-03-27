@@ -1,10 +1,11 @@
-﻿using Domain.Enums;
+﻿using Domain.Common;
+using Domain.Enums;
 using Domain.Interfaces;
 
 namespace Domain.Entities;
 
 [Table("jobs")]
-public class Job : IEntity<int>
+public class Job :BaseAuditableEntity, IEntity<int>
 {
     [Key]
     [Column("id")]
