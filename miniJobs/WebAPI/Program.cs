@@ -22,6 +22,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors("miniJobsCors");
 
 app.MapControllers();
 

@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:minijobs_admin/providers/user_provider.dart';
+import 'package:provider/provider.dart';
+import './screens/users.dart';
+
 void main() {
-  runApp(const MyApp());
+  runApp(MultiProvider(
+    providers: [ChangeNotifierProvider(create: (_) => UserProvider())],
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -35,6 +42,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+// ignore: must_be_immutable
 class MyAppBar extends StatelessWidget {
   String title;
   MyAppBar({super.key, required this.title});
@@ -110,31 +118,35 @@ class MyMaterialApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         title: "My app",
-      theme: ThemeData(
-    useMaterial3: true,
+        theme: ThemeData(
+          useMaterial3: true,
 
-    // Define the default brightness and colors.
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: Colors.purple,
-      // ···
-      brightness: Brightness.dark,
-    ),
+          // Define the default brightness and colors.
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.blue,
+            // ···
+            brightness: Brightness.light,
+          ),
 
-    // Define the default `TextTheme`. Use this to specify the default
-    // text styling for headlines, titles, bodies of text, and more.
-    textTheme: TextTheme(
-      displayLarge: const TextStyle(
-        fontSize: 72,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-  ),
+          // Define the default `TextTheme`. Use this to specify the default
+          // text styling for headlines, titles, bodies of text, and more.
+          textTheme: TextTheme(
+            displayLarge: const TextStyle(
+              fontSize: 72,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
         home: LoginPage());
   }
 }
 
+// ignore: must_be_immutable
 class LoginPage extends StatelessWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  LoginPage({Key? key}) : super(key: key);
+
+  TextEditingController usernameController = new TextEditingController();
+  TextEditingController passwordController = new TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -149,13 +161,12 @@ class LoginPage extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
-                  Image.network(
-                      "https://www.fit.ba/content/public/images/og-image.jpg",
-                      height: 100,
-                      width: 100),
+                  Image.asset("assets/images/logo.jpg",
+                      height: 100, width: 100),
                   TextField(
                     decoration: InputDecoration(
                         labelText: "Email", prefixIcon: Icon(Icons.email)),
+                    controller: usernameController,
                   ),
                   SizedBox(
                     height: 20,
@@ -164,11 +175,20 @@ class LoginPage extends StatelessWidget {
                     decoration: InputDecoration(
                         labelText: "Password",
                         prefixIcon: Icon(Icons.password)),
+                    controller: passwordController,
                   ),
                   SizedBox(
                     height: 20,
                   ),
-                  ElevatedButton(onPressed: () {}, child: Text("Prijavi se")),
+                  ElevatedButton(
+                      onPressed: () {
+                        var username = usernameController.text;
+                        var password = passwordController.text;
+                        print("$username $password");
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const Users()));
+                      },
+                      child: Text("Prijavi se")),
                 ],
               ),
             ),
