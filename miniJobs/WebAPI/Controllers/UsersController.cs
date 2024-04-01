@@ -35,12 +35,14 @@ public class UsersController(IMediator mediator, BaseState state) : ControllerBa
                 Id = i,
                 FirstName = $"User{i}",
                 LastName = $"LastName{i}",
-                UserName = $"username{i}",
+                Role = $"username{i}",
                 Email = $"user{i}@example.com",
                 PhoneNumber = $"123456{i}",
                 Gender = Gender.Male, // or Gender.Female or Gender.Other
-                DateOfBirth = DateTime.Now.AddYears(-i)
-            });
+                DateOfBirth = DateTime.Now.AddYears(-i),
+                Deleted = i % 2 == 0,
+                AccountConfirmed = i % 2 != 0
+            }) ;
         }
 
         r.Count = 5;

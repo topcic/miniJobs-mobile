@@ -9,10 +9,14 @@ class User {
   String? userName;
   String? email;
   String? phoneNumber;
+  String? role;
+  bool? deleted;
+  bool? accountConfirmed;
 
-  User(this.id,this.firstName, this.lastName,this.userName, this.email, this.phoneNumber);
+  User(this.id, this.firstName, this.lastName, this.userName, this.email,
+      this.phoneNumber, this.role, this.deleted, this.accountConfirmed);
 
- factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
   Map<String, dynamic> toJson() => _$UserToJson(this);
 }

@@ -17,9 +17,6 @@ public class User : IEntity<int>
     [Column("last_name")]
     public string LastName { get; set; }
 
-    [Column("user_name")]
-    public string? UserName { get; set; }
-
     [Column("email")]
     public string Email { get; set; }
 
@@ -55,4 +52,10 @@ public class User : IEntity<int>
 
     [Column("created_by")]
     public int? CreatedBy { get; set; }
+
+    [Column("photo")]
+    public byte[]? Photo { get; set; }
+
+    [NotMapped]
+    public string Role { get; set; }
 }
