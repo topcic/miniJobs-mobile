@@ -8,14 +8,11 @@ public class Applicant : IEntity<int>
     [Column("id")]
     public int Id { get; set; }
 
-    [Column("cv_id")]
-    public int? CvId { get; set; }
+    [Column("cv")]
+    public byte[]? Cv { get; set; }
 
     [Column("experience")]
     public string? Experience { get; set; }
-
-    [Column("photo_id")]
-    public int? PhotoId { get; set; }
 
     [Column("description")]
     public string? Description { get; set; }

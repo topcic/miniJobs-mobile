@@ -1,5 +1,6 @@
 ﻿using Application.Common.Interfaces;
 using Infrastructure.Authentication;
+using Infrastructure.JobStateMachine;
 using Infrastructure.OptionsSetup;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
@@ -64,5 +65,10 @@ public static class ConfigureServices
     {
         services.AddTransient<IJwtProvider, JwtProvider>();
         services.AddScoped<ISecurityProvider, SecurityProvider>();
+        services.AddTransient<BaseState>();
+        services.AddTransient<InitialJobState>();
+        services.AddTransient<JobDetailsState>();
+        services.AddTransient<PaymentState>();
+        services.AddTransient<ActiveJobState>();
     }
 }
