@@ -46,24 +46,26 @@ class _UsersPageState extends State<UsersPage> {
     return MasterScreenWidget(
       title: "Korisnici",
       child: Container(
-       margin: EdgeInsets.symmetric(horizontal: 20.0),
+          margin: EdgeInsets.symmetric(horizontal: 20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-               children: [  ElevatedButton(
+             Align(
+              alignment: Alignment.centerRight,
+              child: ElevatedButton(
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => UserDetailsPage(), // Replace UserDetailsPage with your actual page
+                      builder: (context) =>
+                          UserDetailsPage(), // Replace UserDetailsPage with your actual page
                     ),
                   );
                 },
                 child: Text("Dodaj korisnika"),
               ),
-               ]
-              ),
+            ),
+            SizedBox(height: 20),
               Row(
                 children: [
                   Expanded(
@@ -97,7 +99,6 @@ class _UsersPageState extends State<UsersPage> {
                         DataColumn(label: Text('Prezime')),
                         DataColumn(label: Text('Email')),
                         DataColumn(label: Text('Broj telefona')),
-                        DataColumn(label: Text('Uloga')),
                         DataColumn(label: Text('Status')),
                       ],
                       rows: result != null && result!.result != null
@@ -123,8 +124,6 @@ class _UsersPageState extends State<UsersPage> {
                                         ),
                                       ),
                                       DataCell(Text(e.phoneNumber ?? '')),
-                                      DataCell(Text(e.role ??
-                                          '')), // Assuming role and status are properties of User
                                       DataCell(UserBadge(
                                           status: e.deleted!
                                               ? 'Obrisan'

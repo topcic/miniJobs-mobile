@@ -1,4 +1,6 @@
 ﻿using Application.Jobs.Models;
+using Application.Users.Commands;
+using Application.Users.Models;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.JobStateMachine;
@@ -22,6 +24,16 @@ public class UsersController(IMediator mediator, BaseState state) : ControllerBa
 
         var users = CreateDummyUsers(); // Call method to create dummy users
         return Ok(users);
+    }
+
+    [HttpPost("")]
+    [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> PostAsync([FromBody] UserSaveRequest request)
+    {
+        return Ok(await mediator.Send(new UserInsertCommand(request)));
     }
     private SearchResult CreateDummyUsers()
     {

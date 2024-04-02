@@ -83,8 +83,8 @@ class LoginPage extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
-                  Image.asset("assets/images/logo.jpg",
-                      height: 100, width: 100),
+                  Image.asset("assets/images/logo.png",
+                      height: 180, width: 180),
                   TextField(
                     decoration: InputDecoration(
                         labelText: "Email", prefixIcon: Icon(Icons.email)),
