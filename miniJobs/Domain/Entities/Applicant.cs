@@ -32,6 +32,4 @@ public class Applicant : IEntity<int>
     [Column("created", TypeName = "timestamp without time zone")]
     public DateTime Created { get; set; }
 
-    [Column("created_by")]
-    public int? CreatedBy { get; set; }
 }
