@@ -7,7 +7,5 @@ public class ApplicantEntityTypeConfiguration : IEntityTypeConfiguration<Applica
     public void Configure(EntityTypeBuilder<Applicant> builder)
     {
         builder.HasOne<User>().WithOne().HasForeignKey<Applicant>(x => x.Id);
-        builder.HasOne<Document>().WithMany().HasForeignKey(x => x.PhotoId).IsRequired();
-        builder.HasOne<Document>().WithMany().HasForeignKey(x => x.CvId).IsRequired();
     }
 }

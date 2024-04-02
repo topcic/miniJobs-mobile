@@ -26,6 +26,12 @@ public class ApplicationDbContext : DbContext
     public DbSet<UserRole> UserRoles => Set<UserRole>();
     public DbSet<User> Users => Set<User>();
     public DbSet<UserAuthCode> UserAuthCodes => Set<UserAuthCode>();
+    public DbSet<ProposedAnswer> ProposedAnswers => Set<ProposedAnswer>();
+    public DbSet<Question> Questions => Set<Question>();
+    public DbSet<QuestionAnswer> QuestionAnswers => Set<QuestionAnswer>();
+    public DbSet<JobQuestion> JobQuestions => Set<JobQuestion>();
+
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

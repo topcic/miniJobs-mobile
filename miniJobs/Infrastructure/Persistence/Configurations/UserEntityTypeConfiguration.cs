@@ -17,6 +17,7 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
         builder.HasMany<SavedJob>().WithOne().HasForeignKey(x => x.CreatedBy);
         builder.HasMany<SavedJob>().WithOne().HasForeignKey(x => x.LastModifiedBy);
         builder.HasMany<RefreshToken>().WithOne().HasForeignKey(x => x.UserId);
-        builder.HasMany<Document>().WithOne().HasForeignKey(x => x.CreatedBy).IsRequired();
+        builder.HasMany<QuestionThread>().WithOne().HasForeignKey(x => x.CreatedBy).IsRequired();
+        builder.HasMany<QuestionThread>().WithOne().HasForeignKey(x => x.LastModifiedBy).IsRequired();
     }
 }
