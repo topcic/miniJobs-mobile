@@ -7,7 +7,7 @@ public class QuestionAnswerEntityTypeConfiguration : IEntityTypeConfiguration<Qu
 {
     public void Configure(EntityTypeBuilder<QuestionAnswer> builder)
     {
-        builder.HasOne<ProposedAnswer>().WithOne().HasForeignKey<QuestionAnswer>(x => x.ProposedAnswerId);
-        builder.HasOne<Question>().WithOne().HasForeignKey<QuestionAnswer>(x => x.QuestionId);
+        builder.HasOne<ProposedAnswer>().WithOne().HasForeignKey<QuestionAnswer>(x => x.ProposedAnswerId).OnDelete(DeleteBehavior.NoAction);
+        builder.HasOne<Question>().WithOne().HasForeignKey<QuestionAnswer>(x => x.QuestionId).OnDelete(DeleteBehavior.NoAction);
     }
 }

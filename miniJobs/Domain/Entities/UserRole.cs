@@ -1,4 +1,6 @@
-﻿namespace Domain.Entities;
+﻿using Domain.Interfaces;
+
+namespace Domain.Entities;
 [Table("user_roles")]
 
 public class UserRole

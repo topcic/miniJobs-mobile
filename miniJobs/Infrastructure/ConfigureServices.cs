@@ -6,7 +6,9 @@ using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -70,5 +72,23 @@ public static class ConfigureServices
         services.AddTransient<JobDetailsState>();
         services.AddTransient<PaymentState>();
         services.AddTransient<ActiveJobState>();
+    }
+
+    public static void ExecuteMigrations(this WebApplication webApplication)
+    {
+        try
+        {
+            using (var scope = webApplication.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+
+                var context = services.GetRequiredService<ApplicationDbContext>();
+                context.Database.Migrate();
+            }
+        }
+        catch (Exception ex)
+        {
+            webApplication.Logger.LogError(ex, "Execute migrations fail");
+        }
     }
 }

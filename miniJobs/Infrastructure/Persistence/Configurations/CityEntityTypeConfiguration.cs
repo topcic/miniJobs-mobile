@@ -5,7 +5,7 @@ public class CityEntityTypeConfiguration : IEntityTypeConfiguration<City>
 {
     public void Configure(EntityTypeBuilder<City> builder)
     {
-        builder.HasOne<Country>().WithMany().HasForeignKey(x => x.CountryId);
-        builder.HasOne<Canton>().WithMany().HasForeignKey(x => x.CantonId);
+        builder.HasOne<Country>().WithMany().HasForeignKey(x => x.CountryId).OnDelete(DeleteBehavior.NoAction);
+        builder.HasOne<Canton>().WithMany().HasForeignKey(x => x.CantonId).OnDelete(DeleteBehavior.NoAction);
     }
 }

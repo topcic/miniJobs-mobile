@@ -7,7 +7,7 @@ public class JobTypeAssignmentEntityTypeConfiguration : IEntityTypeConfiguration
     public void Configure(EntityTypeBuilder<JobTypeAssignment> builder)
     {
         builder.HasKey(x => new { x.JobId, x.JobTypeId });
-        builder.HasOne<Job>().WithMany().HasForeignKey(x => x.JobId);
-        builder.HasOne<JobType>().WithMany().HasForeignKey(x => x.JobTypeId);
+        builder.HasOne<Job>().WithMany().HasForeignKey(x => x.JobId).OnDelete(DeleteBehavior.NoAction);
+        builder.HasOne<JobType>().WithMany().HasForeignKey(x => x.JobTypeId).OnDelete(DeleteBehavior.NoAction);
     }
 }

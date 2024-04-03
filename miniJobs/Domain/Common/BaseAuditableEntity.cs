@@ -4,14 +4,14 @@ namespace Domain.Common;
 
 public abstract class BaseAuditableEntity
 {
-    [Column("created", TypeName = "timestamp without time zone")]
+    [Column("created")]
     public DateTime Created { get; set; }
 
     [IgnoreDataMember]
     [Column("created_by")]
     public int? CreatedBy { get; set; }
 
-    [Column("last_modified", TypeName = "timestamp without time zone")]
+    [Column("last_modified")]
     public DateTime LastModified { get; set; }
 
     [IgnoreDataMember]

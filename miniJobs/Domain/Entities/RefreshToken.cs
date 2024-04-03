@@ -10,10 +10,10 @@ public class RefreshToken : IEntity<string>
     [Column("id")]
     public string Id { get; set; }
 
-    [Column("expire_in", TypeName = "timestamp without time zone")]
+    [Column("expire_in")]
     public DateTime ExpireIn { get; set; }
 
-    [Column("issued_at", TypeName = "timestamp without time zone")]
+    [Column("issued_at")]
     public DateTime IssuedAt { get; set; }
 
     [Column("user_id")]

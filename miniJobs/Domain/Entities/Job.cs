@@ -20,7 +20,7 @@ public class Job : BaseAuditableEntity, IEntity<int>
     [Column("street_address_and_number")]
     public string StreetAddressAndNumber { get; set; }
 
-    [Column("applications_end_to", TypeName = "timestamp without time zone")]
+    [Column("applications_end_to")]
     public DateTime? ApplicationsEndTo { get; set; }
 
     [Column("status")]

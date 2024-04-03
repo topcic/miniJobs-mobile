@@ -6,6 +6,6 @@ public class QuestionThreadEntityTypeConfiguration : IEntityTypeConfiguration<Qu
 {
     public void Configure(EntityTypeBuilder<QuestionThread> builder)
     {
-        builder.HasOne<Job>().WithMany().HasForeignKey(x => x.JobId);
+        builder.HasOne<Job>().WithMany().HasForeignKey(x => x.JobId).OnDelete(DeleteBehavior.NoAction);
     }
 }

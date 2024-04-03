@@ -19,7 +19,7 @@ namespace Data.Entities
         [Column("code")]
         public string Code { get; set; }
 
-        [Column("generated_at", TypeName = "timestamp without time zone")]
+        [Column("generated_at")]
         public DateTime GeneratedAt { get; set; }
 
         [Column("used")]

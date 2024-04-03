@@ -1,0 +1,10 @@
+﻿INSERT INTO cantons (name) VALUES('Unsko-sanski kanton');
+INSERT INTO cantons (name) VALUES('Posavski kanton');
+INSERT INTO cantons (name) VALUES('Tuzlanski kanton');
+INSERT INTO cantons (name) VALUES('Zeničko-dobojski kanton');
+INSERT INTO cantons (name) VALUES('Bosansko-podrinjski kanton');
+INSERT INTO cantons (name) VALUES('Srednjobosanski kanton');
+INSERT INTO cantons (name) VALUES('Hercegovačko-neretvanski kanton');
+INSERT INTO cantons (name) VALUES('Zapadnohercegovački kanton');
+INSERT INTO cantons (name) VALUES('Kanton Sarajevo');
+INSERT INTO cantons (name) VALUES('Kanton 10');

@@ -28,4 +28,7 @@ app.UseCors("miniJobsCors");
 
 app.MapControllers();
 
+app.ExecuteMigrations();
+
+
 app.Run();

@@ -6,6 +6,6 @@ public class ProposedAnswerEntityTypeConfiguration : IEntityTypeConfiguration<Pr
 {
     public void Configure(EntityTypeBuilder<ProposedAnswer> builder)
     {
-        builder.HasOne<Question>().WithOne().HasForeignKey<ProposedAnswer>(x => x.QuestionId);
+        builder.HasOne<Question>().WithOne().HasForeignKey<ProposedAnswer>(x => x.QuestionId).OnDelete(DeleteBehavior.NoAction);
     }
 }

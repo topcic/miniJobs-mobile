@@ -26,7 +26,7 @@ public class Applicant : IEntity<int>
     [Column("access_failed_count")]
     public int AccessFailedCount { get; set; }
 
-    [Column("created", TypeName = "timestamp without time zone")]
+    [Column("created")]
     public DateTime Created { get; set; }
 
 }
