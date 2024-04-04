@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:minijobs_admin/pages/login_page.dart';
+import 'package:minijobs_admin/providers/authentication_provider.dart';
 import 'package:minijobs_admin/providers/user_provider.dart';
 import 'package:provider/provider.dart';
-import 'pages/users.dart';
 
-void main() {
+void main() async {
+  await GetStorage.init();
   runApp(MultiProvider(
-    providers: [ChangeNotifierProvider(create: (_) => UserProvider())],
+    providers: [
+      ChangeNotifierProvider(create: (_) => AuthenticationProvider()),
+      ChangeNotifierProvider(create: (s) => UserProvider())
+    ],
     child: const MyApp(),
   ));
 }
@@ -62,61 +68,3 @@ class MyMaterialApp extends StatelessWidget {
   }
 }
 
-// ignore: must_be_immutable
-class LoginPage extends StatelessWidget {
-  LoginPage({Key? key}) : super(key: key);
-
-  TextEditingController usernameController = new TextEditingController();
-  TextEditingController passwordController = new TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Prijavi se")),
-      body: Center(
-        child: Container(
-          width: 400,
-          constraints: BoxConstraints(maxWidth: 400, maxHeight: 400),
-          child: Card(
-            color: Colors.white,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Image.asset("assets/images/logo.png",
-                      height: 180, width: 180),
-                  TextField(
-                    decoration: InputDecoration(
-                        labelText: "Email", prefixIcon: Icon(Icons.email)),
-                    controller: usernameController,
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TextField(
-                    decoration: InputDecoration(
-                        labelText: "Password",
-                        prefixIcon: Icon(Icons.password)),
-                    controller: passwordController,
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  ElevatedButton(
-                      onPressed: () {
-                        var username = usernameController.text;
-                        var password = passwordController.text;
-                        print("$username $password");
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const UsersPage()));
-                      },
-                      child: Text("Prijavi se")),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}

@@ -4,7 +4,7 @@ part 'auth_token_response.g.dart';
 @JsonSerializable()
 class AuthTokenResponse {
   String? accessToken;
-  String? expiresIn;
+  int? expiresIn;
   String? refreshToken;
 
   AuthTokenResponse(this.accessToken, this.expiresIn, this.refreshToken);

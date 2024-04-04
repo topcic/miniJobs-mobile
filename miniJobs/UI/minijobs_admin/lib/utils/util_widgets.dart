@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 void alertBox(BuildContext context, String title, String content) {
   showDialog(
@@ -67,6 +68,31 @@ Row rowMethod(Widget item, [CrossAxisAlignment? crossAxisAlignment]) {
     ));
   }
 
+Widget Spinner() {
+  return SpinKitRing(
+    color: Colors.blue,
+    lineWidth: 4,
+    size: 50, 
+  );
+}
+
+  Expanded _textField(String name, String label) {
+    return Expanded(
+      child: FormBuilderTextField(
+        name: name,
+        validator: ((value) {
+          if (value == null || value.isEmpty) {
+            return "$label je obavezno polje";
+          } else {
+            return null;
+          }
+        }),
+        decoration: InputDecoration(
+          label: Text(label),
+        ),
+      ),
+    );
+  }
 // napomene
 // za rabbit mq
 //za povećanje minisdkversion
