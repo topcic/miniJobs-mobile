@@ -22,9 +22,9 @@ class _UsersPageState extends State<UsersPage> {
   String searchTerm = '';
 
   @override
-  void initState() {
+  void initState()  {
     super.initState();
-    loadData();
+     loadData();
   }
 
   void loadData() async {

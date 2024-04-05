@@ -54,6 +54,8 @@ class _IndividualEmployerSignupPageState extends State<IndividualEmployerSignupP
                       padding: const EdgeInsets.all(20.0),
                       child: Column(
                         children: [
+                          Image.asset("assets/images/logo.png",
+                          height: 150, width: 150),
                           rowMethod(
                             _textField('firstName', "Ime"),
                             CrossAxisAlignment.center,

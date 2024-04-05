@@ -55,6 +55,8 @@ class _CompanyEmployerSignupPageState extends State<CompanyEmployerSignupPage> {
                       padding: const EdgeInsets.all(20.0),
                       child: Column(
                         children: [
+                          Image.asset("assets/images/logo.png",
+                          height: 150, width: 150),
                           Row(
                             children: [
                               Expanded(

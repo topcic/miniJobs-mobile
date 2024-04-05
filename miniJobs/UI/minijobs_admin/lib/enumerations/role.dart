@@ -1,0 +1,4 @@
+enum Role{
+ Applicant ,
+ Employer
+}

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:minijobs_admin/pages/applicant_signup.page.dart';
 import 'package:minijobs_admin/pages/company_employer_signup.page.dart';
+import 'package:minijobs_admin/pages/home_page.dart';
 import 'package:minijobs_admin/pages/users.dart';
 
 // ignore: must_be_immutable
@@ -37,7 +37,7 @@ class _MasterScreenWidgetState extends State<MasterScreenWidget> {
             title: Text("Kontrolna ploča"),
             onTap: () {
               Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const UsersPage()));
+                  MaterialPageRoute(builder: (context) =>  HomePage()));
             },
           ),
           ListTile(
@@ -70,13 +70,6 @@ class _MasterScreenWidgetState extends State<MasterScreenWidget> {
             onTap: () {
               Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => const UsersPage()));
-            },
-          ),
-          ListTile(
-            title: Text("Korisnici 2"),
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const ApplicantSignupPage()));
             },
           ),
           ListTile(

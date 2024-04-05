@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:minijobs_admin/pages/login_page.dart';
+import 'package:minijobs_admin/pages/login_sign_up_page.dart';
 import 'package:minijobs_admin/providers/authentication_provider.dart';
 import 'package:minijobs_admin/providers/user_provider.dart';
+import 'package:minijobs_admin/widgets/navbar.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
         useMaterial3: true,
       ),
       home: MyMaterialApp(),
@@ -63,7 +64,7 @@ class MyMaterialApp extends StatelessWidget {
           ),
         ),
       ),
-      home: LoginPage(),
+      home: Navbar(),
     );
   }
 }

@@ -2,22 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:minijobs_admin/enumerations/gender.dart';
+import 'package:minijobs_admin/enumerations/role.dart';
 import 'package:minijobs_admin/models/city.dart';
 import '../models/search_result.dart';
 import '../utils/util_widgets.dart';
 
-class ApplicantSignupPage extends StatefulWidget {
-  const ApplicantSignupPage({Key? key}) : super(key: key);
+class SignupPage extends StatefulWidget {
+   final Role role;
+  const SignupPage({Key? key,required this.role }) : super(key: key);
 
   @override
-  State<ApplicantSignupPage> createState() => _ApplicantSignupPageState();
+  State<SignupPage> createState() => _SignupPageState();
 }
 
-class _ApplicantSignupPageState extends State<ApplicantSignupPage> {
+class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormBuilderState>();
   SearchResult<City>? cityResult;
   bool isLoading = true;
-
+   late final String title = widget.role==Role.Applicant?"Registruj se kao aplikant":"Registruj se kao poslodavac";
   @override
   void initState() {
     super.initState();
@@ -39,7 +41,7 @@ class _ApplicantSignupPageState extends State<ApplicantSignupPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Registruj se kao aplikant"),
+        title: Text(title),
         centerTitle: true,
       ),
       body: isLoading
@@ -55,6 +57,8 @@ class _ApplicantSignupPageState extends State<ApplicantSignupPage> {
                       padding: const EdgeInsets.all(20.0),
                       child: Column(
                         children: [
+                          Image.asset("assets/images/logo.png",
+                          height: 150, width: 150),
                           rowMethod(
                             _textField('firstName', "Ime"),
                             CrossAxisAlignment.center,
@@ -200,7 +204,7 @@ class _ApplicantSignupPageState extends State<ApplicantSignupPage> {
                           ),
                           SizedBox(height: 20),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Container(
                                 margin: const EdgeInsets.only(top: 20.0),
@@ -225,10 +229,6 @@ class _ApplicantSignupPageState extends State<ApplicantSignupPage> {
                                         Navigator.pop(context);
                                       } else {}
                                     } catch (e) {
-                                      // alertBox(
-                                      //     context,
-                                      //     AppLocalizations.of(context).error,
-                                      //     e.toString());
                                     }
                                   },
                                   child: Text("Registruj se"),
