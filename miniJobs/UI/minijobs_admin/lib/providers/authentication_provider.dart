@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:minijobs_admin/models/auth_code_request.dart';
 import 'package:minijobs_admin/models/auth_token_response.dart';
 import 'package:minijobs_admin/providers/base_provider.dart';
 
@@ -12,13 +13,13 @@ class AuthenticationProvider extends BaseProvider<AuthTokenResponse> {
     return AuthTokenResponse.fromJson(data);
   }
 
-  Future<bool> tokens(String em, String ps) async {
+  Future<bool> tokens(AuthCodeRequest request) async {
     try {
       var url = baseUrl+"tokens";
       var uri = Uri.parse(url);
 
       var jsonRequest =
-          jsonEncode({'email': em, 'password': ps, 'grantType': "password"});
+          jsonEncode({'email': request.email, 'password': request.password, 'grantType': request.grantType,'authcode':request.authCode});
 
       Response response = await post(uri,
           headers: {

@@ -3,7 +3,7 @@ using Domain.Interfaces;
 using FluentValidation;
 
 namespace Application.Users.Validators;
-public class ApplicantRegistrationCommandValidator : AbstractValidator<ApplicantRegistrationCommand>
+public class ApplicantRegistrationCommandValidator : AbstractValidator<RegistrationCommand>
 {
     public ApplicantRegistrationCommandValidator(ICityRepository cityRepository)
     {
@@ -26,11 +26,6 @@ public class ApplicantRegistrationCommandValidator : AbstractValidator<Applicant
             .Cascade(CascadeMode.Stop)
             .NotEmpty().OverridePropertyName("Password").WithMessage("Lozinka je obavezno polje")
             .Length(8, 100).WithMessage("Nevalidna dužina");
-
-        RuleFor(x => x.Request.UserName)
-            .Cascade(CascadeMode.Stop)
-            .NotEmpty().OverridePropertyName("UserName").WithMessage("Korisničko ime je obavezno polje")
-            .Length(2, 40).WithMessage("Nevalidna dužina");
 
         RuleFor(x => x.Request.PhoneNumber).Cascade(CascadeMode.Stop)
             .NotEmpty().OverridePropertyName("PhoneNumber").WithMessage("Broj telefona je obavezno polje")

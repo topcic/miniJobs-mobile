@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
@@ -13,7 +14,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
   BaseProvider(String endpoint) {
     _endpoint = endpoint;
     _baseUrl = const String.fromEnvironment("baseUrl",
-        defaultValue: "https://localhost:44343/api/");
+        defaultValue: "https://localhost:44331/api/");
     _dio = Dio(BaseOptions(
       baseUrl: _baseUrl!,
       responseType: ResponseType.json,
@@ -24,7 +25,9 @@ abstract class BaseProvider<T> with ChangeNotifier {
       onRequest: (options, handler) async {
         options.headers["Accept"] = "application/json";
         String? token = _getStorage.read('accessToken');
-        options.headers["Authorization"] = "Bearer " + token!;
+        if (token != null) {
+          options.headers["Authorization"] = "Bearer " + token;
+        }
         return handler.next(options);
       },
       onError: (error, handler) async {
@@ -58,7 +61,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
     return null;
   }
 
-  Future<SearchResult<T>> get({dynamic filter}) async {
+  Future<SearchResult<T>> search({dynamic filter}) async {
     //var url = "https://localhost:44343/api/users/search?SearchText=&Limit=10&Offset=0&SortBy=&SortOrder=0";
     try {
       _endpoint =
@@ -87,9 +90,22 @@ abstract class BaseProvider<T> with ChangeNotifier {
     }
   }
 
+  Future<List<T>> get() async {
+    try {
+      var response = await _dio.get(_endpoint);
+      List<dynamic> responseData = response.data;
+      List<T> dataList = responseData.map((item) => fromJson(item)).toList();
+
+      return dataList;
+    } catch (err) {
+      throw Exception(err.toString());
+    }
+  }
+
   Future<T> insert(dynamic request) async {
     var jsonRequest = jsonEncode(request);
     var response = await _dio.post(_endpoint, data: jsonRequest);
+    
     var data = jsonDecode(response.data);
     return fromJson(data);
   }

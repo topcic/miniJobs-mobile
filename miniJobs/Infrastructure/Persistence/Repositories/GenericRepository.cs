@@ -53,4 +53,12 @@ public abstract class GenericRepository<TEntity, T, TContext> : IGenericReposito
         DbSet.Remove(entity);
         await Context.SaveChangesAsync();
     }
+
+    public async Task<IEnumerable<TEntity>> FindAllAsync()
+    {
+        List<TEntity> entities = await DbSet.ToListAsync();
+        IEnumerable<TEntity> result = entities.Cast<TEntity>();
+
+        return result;
+    }
 }

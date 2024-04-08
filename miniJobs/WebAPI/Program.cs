@@ -1,5 +1,3 @@
-using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 using NLog.Web;
 
 var builder = WebApplication.CreateBuilder(args);

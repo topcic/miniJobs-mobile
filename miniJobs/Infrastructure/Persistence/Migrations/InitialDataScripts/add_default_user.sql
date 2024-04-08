@@ -1,6 +1,15 @@
-INSERT INTO users(id, 
-	first_name, last_name, email, password_hash, two_factor_enabled, access_failed_count, lockout_enabled, deleted, account_confirmed)
-	VALUES (1 'Admin', 'Admin', 'admin@minijobs.ba', UPPER(MD5('Minijobs1234!')), false, 0, false, false, true)
-    ON CONFLICT DO NOTHING;
+BEGIN TRANSACTION;
 
-INSERT INTO user_roles (user_id, role_id) values (1, 'Administrator');
+IF NOT EXISTS (SELECT 1 FROM users WHERE id = 1)
+BEGIN
+    -- Insert the user only if it doesn't already exist
+    INSERT INTO users (first_name, last_name, email, password_hash, access_failed_count, deleted, account_confirmed, created)
+    VALUES ('Admin', 'Admin', 'admin@minijobs.ba', UPPER(CONVERT(varbinary, HASHBYTES('MD5', 'Minijobs1234!'), 2)), 0, 0, 1, GETUTCDATE());
+END;
+
+-- Insert role for the user (if user exists)
+INSERT INTO user_roles (user_id, role_id)
+SELECT 1, 'Administrator'
+WHERE EXISTS (SELECT 1 FROM users WHERE id = 1);
+
+COMMIT TRANSACTION;

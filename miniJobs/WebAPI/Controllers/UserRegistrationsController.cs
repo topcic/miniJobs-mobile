@@ -21,12 +21,12 @@ public class UserRegistrationsController(IMediator mediator) : ControllerBase
     /// <response code="200">User registration confirmation.</response>
     /// <response code="400">Bad request</response>
     /// <response code="500">Detailed exception for lower environments.</response>
-    [HttpPost("applicants")]
+    [HttpPost]
     [ProducesResponseType(typeof(UserRegistrationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> ApplicantRegisterAsync([FromBody] ApplicantRegistrationRequest request)
+    public async Task<IActionResult> ApplicantRegisterAsync([FromBody] RegistrationRequest request)
     {
-        return Ok(await mediator.Send(new ApplicantRegistrationCommand(request)));
+        return Ok(await mediator.Send(new RegistrationCommand(request)));
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Application.Common.Interfaces;
 using Infrastructure.Authentication;
+using Infrastructure.Common.Interfaces;
 using Infrastructure.JobStateMachine;
+using Infrastructure.MailSenders;
 using Infrastructure.OptionsSetup;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
@@ -62,11 +64,14 @@ public static class ConfigureServices
     {
         services.ConfigureOptions<JwtOptionsSetup>();
         services.ConfigureOptions<JwtBearerOptionsSetup>();
+        services.ConfigureOptions<EmailSenderOptionsSetup>();
     }
     private static void AddServices(IServiceCollection services)
     {
         services.AddTransient<IJwtProvider, JwtProvider>();
         services.AddScoped<ISecurityProvider, SecurityProvider>();
+        services.AddTransient<IEmailService, EmailService>();
+        services.AddTransient<IEmailSender, EmailSender>();
         services.AddTransient<BaseState>();
         services.AddTransient<InitialJobState>();
         services.AddTransient<JobDetailsState>();

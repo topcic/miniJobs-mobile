@@ -8,6 +8,6 @@ public class UserMapping : Profile
 {
     public UserMapping()
     {
-        CreateMap<ApplicantRegistrationRequest, User>();
+        CreateMap<RegistrationRequest, User>();
     }
 }

@@ -29,10 +29,10 @@ class _UsersPageState extends State<UsersPage> {
 
   void loadData() async {
     userProvider = context.read<UserProvider>();
-    var data = await userProvider.get();
-    setState(() {
-      result = data;
-    });
+    // var data = await userProvider.get();
+    // setState(() {
+    //   result = data;
+    // });
   }
 
   void search() async {

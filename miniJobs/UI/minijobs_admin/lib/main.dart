@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:minijobs_admin/pages/login_sign_up_page.dart';
+import 'package:minijobs_admin/pages/verification_page.dart';
 import 'package:minijobs_admin/providers/authentication_provider.dart';
+import 'package:minijobs_admin/providers/city_provider.dart';
+import 'package:minijobs_admin/providers/user_registration_provider.dart';
 import 'package:minijobs_admin/providers/user_provider.dart';
 import 'package:minijobs_admin/widgets/navbar.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +14,10 @@ void main() async {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => AuthenticationProvider()),
-      ChangeNotifierProvider(create: (s) => UserProvider())
+      ChangeNotifierProvider(create: (s) => UserProvider()),
+      ChangeNotifierProvider(create: (s) => CityProvider()),
+      ChangeNotifierProvider(create: (s) => UserRegistrationProvider()),
+
     ],
     child: const MyApp(),
   ));
@@ -64,7 +70,7 @@ class MyMaterialApp extends StatelessWidget {
           ),
         ),
       ),
-      home: Navbar(),
+      home: LoginSignupPage(),
     );
   }
 }

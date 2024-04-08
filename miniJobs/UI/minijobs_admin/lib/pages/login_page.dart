@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:minijobs_admin/models/auth_code_request.dart';
 import 'package:minijobs_admin/pages/users.dart';
 import 'package:minijobs_admin/providers/authentication_provider.dart';
 import 'package:minijobs_admin/utils/util_widgets.dart';
@@ -100,8 +101,9 @@ class _LoginPageState extends State<LoginPage> {
                               final String email = formValues?['email'] ?? '';
                               final String password =
                                   formValues?['password'] ?? '';
-                              var result = await _authenticationProvider.tokens(
-                                  email, password);
+                                  var autCodeRequest= AuthCodeRequest(email, password, 
+                                  "password", "","" );
+                              var result = await _authenticationProvider.tokens(autCodeRequest);
                               if (result) {
                                 Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) => const UsersPage()));

@@ -36,6 +36,6 @@ public static class ConfigureServices
         services.AddScoped<IRequestHandler<AuthTokenCommand, AuthTokenResponse>, AuthTokenHandler>();//ApplicantRegistrationCommandHandler
 
         //User related handlers
-        services.AddScoped<IRequestHandler<ApplicantRegistrationCommand, UserRegistrationResponse>, ApplicantRegistrationCommandHandler>();
+        services.AddScoped<IRequestHandler<RegistrationCommand, UserRegistrationResponse>, RegistrationCommandHandler>();
     }
 }

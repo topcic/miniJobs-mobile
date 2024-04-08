@@ -1,15 +1,20 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:minijobs_admin/enumerations/gender.dart';
 import 'package:minijobs_admin/enumerations/role.dart';
 import 'package:minijobs_admin/models/city.dart';
-import '../models/search_result.dart';
+import 'package:minijobs_admin/pages/verification_page.dart';
+import 'package:minijobs_admin/providers/city_provider.dart';
+import 'package:minijobs_admin/providers/user_registration_provider.dart';
+import 'package:provider/provider.dart';
 import '../utils/util_widgets.dart';
 
 class SignupPage extends StatefulWidget {
-   final Role role;
-  const SignupPage({Key? key,required this.role }) : super(key: key);
+  final Role role;
+  const SignupPage({Key? key, required this.role}) : super(key: key);
 
   @override
   State<SignupPage> createState() => _SignupPageState();
@@ -17,14 +22,33 @@ class SignupPage extends StatefulWidget {
 
 class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormBuilderState>();
-  SearchResult<City>? cityResult;
+  List<City>? cities;
   bool isLoading = true;
-   late final String title = widget.role==Role.Applicant?"Registruj se kao aplikant":"Registruj se kao poslodavac";
+  late final String title = widget.role == Role.Applicant
+      ? "Registruj se kao aplikant"
+      : "Registruj se kao poslodavac";
+  late CityProvider _cityProvider = CityProvider();
+  late UserRegistrationProvider _userRegistrationProvider =
+      UserRegistrationProvider();
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _cityProvider = context.read<CityProvider>();
+    _userRegistrationProvider = context.read<UserRegistrationProvider>();
+  }
+
   @override
   void initState() {
     super.initState();
 
     intiForm();
+    getCities();
+  }
+
+  Future<void> getCities() async {
+    cities = await _cityProvider.get();
+    setState(() {});
   }
 
   Future<void> intiForm() async {
@@ -58,7 +82,7 @@ class _SignupPageState extends State<SignupPage> {
                       child: Column(
                         children: [
                           Image.asset("assets/images/logo.png",
-                          height: 150, width: 150),
+                              height: 150, width: 150),
                           rowMethod(
                             _textField('firstName', "Ime"),
                             CrossAxisAlignment.center,
@@ -120,15 +144,16 @@ class _SignupPageState extends State<SignupPage> {
                                 decoration: InputDecoration(
                                   labelText: "Grad",
                                 ),
-                                items: cityResult?.result!
-                                        .map((g) => DropdownMenuItem(
-                                              alignment:
-                                                  AlignmentDirectional.center,
-                                              value: g.id.toString(),
-                                              child: Text(g.name ?? ''),
-                                            ))
-                                        .toList() ??
-                                    [],
+                                items: cities != null
+                                    ? cities!.map((g) {
+                                        return DropdownMenuItem(
+                                          alignment:
+                                              AlignmentDirectional.center,
+                                          value: g.id.toString(),
+                                          child: Text(g.name ?? ''),
+                                        );
+                                      }).toList()
+                                    : [],
                               ),
                             ),
                           ),
@@ -216,20 +241,24 @@ class _SignupPageState extends State<SignupPage> {
                                         Map<String, dynamic> request = Map.of(
                                             _formKey.currentState!.value);
 
-                                        request['isActive'] = true;
+                                        request['gender'] = 0;
+                                        request['roleId'] = widget.role.name;
 
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                                "AppLocalizations.of(context).su_sign_up"),
-                                          ),
-                                        );
-
-                                        Navigator.pop(context);
+                                        var result =
+                                        await _userRegistrationProvider
+                                            .insert(request);
+                                        if (result.isRegistered==true) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                                  content: Text(
+                                                      "Uspješno ste se registrovali. Molimo Vas provjerite Vaš email")));
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      VerificationPage()));
+                                        }
                                       } else {}
-                                    } catch (e) {
-                                    }
+                                    } catch (e) {}
                                   },
                                   child: Text("Registruj se"),
                                 ),

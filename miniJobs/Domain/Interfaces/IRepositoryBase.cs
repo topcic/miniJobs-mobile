@@ -8,7 +8,7 @@ public interface IRepositoryBase<T> where T : class
     /// Find all async
     /// </summary>
     /// <returns></returns>
-    IEnumerable<T> FindAll();
+    Task<IEnumerable<T>> FindAllAsync();
     /// <summary>
     /// Try find by Id async
     /// </summary>
