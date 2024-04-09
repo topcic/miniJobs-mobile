@@ -15,7 +15,7 @@ namespace Application.Tokens.Commands;
 public class AuthTokenHandler(IUserManagerRepository userManager, ISecurityProvider securityProvider, IUserAuthCodeRepository userAuthCodeRepository, IJwtProvider jwtProvider) : IRequestHandler<AuthTokenCommand, AuthTokenResponse>
 {
     private readonly IUserManagerRepository userManager = userManager;
-    private readonly IJwtProvider jwtProvider=jwtProvider;
+    private readonly IJwtProvider jwtProvider = jwtProvider;
     private readonly ISecurityProvider securityProvider = securityProvider;
     private readonly IUserAuthCodeRepository userAuthCodeRepository = userAuthCodeRepository;
     private const int authCodeExpirationTimeInMinutes = 5;
@@ -42,10 +42,6 @@ public class AuthTokenHandler(IUserManagerRepository userManager, ISecurityProvi
                     var role = await userManager.TryFindRoleAsync(userRoles.FirstOrDefault().RoleId);
                     ExceptionExtension.Validate("USERNAME_OR_PASSWORD_INVALID", () => role == null);
 
-
-                    //return authResult.PublicToken != Guid.Empty
-                    //    ? new AuthTokenResponse() { PublicToken = authResult.PublicToken.ToString() }
-                    //    : await jwtProvider.GenerateTokenAndRefreshToken(user, role);
                     return await jwtProvider.GenerateTokenAndRefreshToken(user, role);
                 }
             case "refresh":
@@ -68,7 +64,7 @@ public class AuthTokenHandler(IUserManagerRepository userManager, ISecurityProvi
                 {
                     ExceptionExtension.Validate("AUTH_CODE_IS_MISSING", () => string.IsNullOrEmpty(command.Request.AuthCode));
 
-                    UserAuthCode authCode = await userAuthCodeRepository.FindOneAsync(x => x.PublicToken == command.Request.PublicToken);
+                    UserAuthCode authCode = await userAuthCodeRepository.FindOneAsync(x => x.Code == command.Request.AuthCode);
 
                     ExceptionExtension.Validate("AUTH_CODE_NOT_VALID", () => authCode == null);
 
@@ -76,12 +72,11 @@ public class AuthTokenHandler(IUserManagerRepository userManager, ISecurityProvi
 
                     ExceptionExtension.Validate("AUTH_CODE_NOT_VALID", () => authCode.GeneratedAt.AddMinutes(authCodeExpirationTimeInMinutes) < DateTime.UtcNow);
 
-                    ExceptionExtension.Validate("AUTH_CODE_NOT_VALID", () => authCode.Code != command.Request.AuthCode);
-
                     authCode.Used = true;
                     await userAuthCodeRepository.UpdateAsync(authCode);
 
                     var user = await userManager.TryFindAsync(authCode.UserId);
+
                     ExceptionExtension.Validate("ACCOUNT_NOT_APPROVED", () => user == null);
 
                     var userRoles = await userManager.GetAllRolesAsync(authCode.UserId);
@@ -89,6 +84,12 @@ public class AuthTokenHandler(IUserManagerRepository userManager, ISecurityProvi
 
                     var role = await userManager.TryFindRoleAsync(userRoles.FirstOrDefault().RoleId);
                     ExceptionExtension.Validate("ACCOUNT_NOT_VALID", () => role == null);
+
+                    if (!user.AccountConfirmed)
+                    {
+                        user.AccountConfirmed = true;
+                        await userManager.UpdateAsync(user);
+                    }
 
                     return await jwtProvider.GenerateTokenAndRefreshToken(user, role);
                 }

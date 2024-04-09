@@ -105,17 +105,14 @@ abstract class BaseProvider<T> with ChangeNotifier {
   Future<T> insert(dynamic request) async {
     var jsonRequest = jsonEncode(request);
     var response = await _dio.post(_endpoint, data: jsonRequest);
-    
-    var data = jsonDecode(response.data);
-    return fromJson(data);
+    return fromJson(response.data);
   }
 
   Future<T> update(int id, [dynamic request]) async {
     var url = "$_endpoint/$id";
     var jsonRequest = jsonEncode(request);
     var response = await _dio.put(url, data: jsonRequest);
-    var data = jsonDecode(response.data);
-    return fromJson(data);
+    return fromJson(response.data);
   }
 
   T fromJson(data) {

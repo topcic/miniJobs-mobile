@@ -16,4 +16,7 @@ public class Employer : IEntity<int>
 
     [Column("company_phone_number")]
     public string? CompanyPhoneNumber { get; set; }
+
+    [NotMapped]
+    public User User { get; set; }
 }

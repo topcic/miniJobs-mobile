@@ -4,6 +4,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:minijobs_admin/pages/home_page.dart';
 import 'package:minijobs_admin/pages/job.step1.dart';
 import 'package:minijobs_admin/pages/job_list.dart';
+import 'package:minijobs_admin/pages/job_step2.dart';
 import 'package:minijobs_admin/pages/profile.dart';
 
 class Navbar extends StatefulWidget {
@@ -14,11 +15,12 @@ class Navbar extends StatefulWidget {
 class _NavbarState extends State<Navbar> {
   int _bottomNavIndex = 0;
   IconData _fabIcon = Icons.home; // Default FAB icon
-
+List<Widget> _pages = [];
   @override
   void initState() {
     super.initState();
     _initRole();
+    _initPages();
   }
 
   _initRole() async {
@@ -27,7 +29,19 @@ class _NavbarState extends State<Navbar> {
         _bottomNavIndex = 1; 
     });
   }
-
+  _initPages() {
+    String role = GetStorage().read('role') ?? '';
+    _pages = [
+      HomePage(),
+      JobStep1Page(onNextPressed: () {
+        setState(() {
+          _bottomNavIndex = 2; // Index of the next form page
+        });
+      }),
+      JobList(),
+      ProfilePage(),
+    ];
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,7 +122,15 @@ class _NavbarState extends State<Navbar> {
       pages.add(_buildPage("User Page"));
     } else {
       pages.add(HomePage());
-      pages.add(JobStep1Page());
+      pages.add(JobStep1Page(
+          onNextPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => JobStep2Page()),
+      );
+  
+    },
+      ));
       pages.add(JobList());
       pages.add(ProfilePage());
     }

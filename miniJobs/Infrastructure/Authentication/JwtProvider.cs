@@ -39,6 +39,8 @@ internal sealed class JwtProvider(IOptions<JwtOptions> options, ITokenRepository
 
         token.ExpiresIn = (validTo - issuedAt).TotalSeconds;
         token.AccessToken = new JwtSecurityTokenHandler().WriteToken(jwt);
+        token.RefreshToken = Guid.NewGuid().ToString("N");
+
 
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.Id = token.RefreshToken;

@@ -24,8 +24,5 @@ namespace Data.Entities
 
         [Column("used")]
         public bool Used { get; set; }
-
-        [Column("public_token")]
-        public int PublicToken { get; set; }
     }
 }

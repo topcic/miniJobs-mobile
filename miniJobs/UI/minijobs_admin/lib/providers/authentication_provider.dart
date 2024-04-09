@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:developer';
+import 'package:dio/dio.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -15,22 +17,28 @@ class AuthenticationProvider extends BaseProvider<AuthTokenResponse> {
 
   Future<bool> tokens(AuthCodeRequest request) async {
     try {
-      var url = baseUrl+"tokens";
-      var uri = Uri.parse(url);
+       var url = baseUrl + "tokens";
 
-      var jsonRequest =
-          jsonEncode({'email': request.email, 'password': request.password, 'grantType': request.grantType,'authcode':request.authCode});
+    var dio = Dio(); // Create Dio instance
 
-      Response response = await post(uri,
-          headers: {
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: jsonRequest);
+    var jsonRequest = jsonEncode({
+      'email': request.email,
+      'password': request.password,
+      'grantType': request.grantType,
+      'authcode': request.authCode
+    });
 
-      var data = jsonDecode(response.body);
+    var response = await dio.post(
+      url,
+      data: jsonRequest,
+      options: Options(
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      ),
+    );
 
-      var result = fromJson(data);
-
+   var result = fromJson(response.data);
 
       var tokenDecoded = JwtDecoder.decode(result.accessToken!);
       String? role;
@@ -50,7 +58,7 @@ class AuthenticationProvider extends BaseProvider<AuthTokenResponse> {
       });
         GetStorage().write('accessToken', result.accessToken);
           GetStorage().write('refreshToken', result.refreshToken);
-      return role == 'Administrator';
+      return true;
     } catch (e) {
       return false;
     }

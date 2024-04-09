@@ -41,9 +41,6 @@ public class User : IEntity<int>
     [Column("password_hash")]
     public string? PasswordHash { get; set; }
 
-    [Column("confirmation_code")]
-    public int? ConfirmationCode { get; set; }
-
     [Column("access_failed_count")]
     public int AccessFailedCount { get; set; }
 

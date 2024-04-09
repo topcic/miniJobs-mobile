@@ -1,8 +1,7 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:minijobs_admin/enumerations/gender.dart';
 import 'package:minijobs_admin/enumerations/role.dart';
 import 'package:minijobs_admin/models/city.dart';
@@ -30,6 +29,11 @@ class _SignupPageState extends State<SignupPage> {
   late CityProvider _cityProvider = CityProvider();
   late UserRegistrationProvider _userRegistrationProvider =
       UserRegistrationProvider();
+
+  final maskFormatter = MaskTextInputFormatter(
+    mask: '+387 ## #######',
+    filter: {'#': RegExp(r'[0-9]')},
+  );
 
   @override
   void didChangeDependencies() {
@@ -96,6 +100,7 @@ class _SignupPageState extends State<SignupPage> {
                           rowMethod(
                             Expanded(
                               child: FormBuilderTextField(
+                                inputFormatters: [maskFormatter],
                                 name: 'phoneNumber',
                                 decoration: InputDecoration(
                                   label: Text("Broj telefona"),
@@ -121,9 +126,10 @@ class _SignupPageState extends State<SignupPage> {
                                 ),
                                 items: Gender.values.map((gender) {
                                   return DropdownMenuItem<String>(
-                                    value: gender.toString(),
-                                    child:
-                                        Text(gender.toString().split('.').last),
+                                    value: gender.name,
+                                    child: Text(gender.name == 'Male'
+                                        ? 'Muški'
+                                        : 'Ženski'),
                                   );
                                 }).toList(),
                               ),
@@ -147,8 +153,6 @@ class _SignupPageState extends State<SignupPage> {
                                 items: cities != null
                                     ? cities!.map((g) {
                                         return DropdownMenuItem(
-                                          alignment:
-                                              AlignmentDirectional.center,
                                           value: g.id.toString(),
                                           child: Text(g.name ?? ''),
                                         );
@@ -241,13 +245,15 @@ class _SignupPageState extends State<SignupPage> {
                                         Map<String, dynamic> request = Map.of(
                                             _formKey.currentState!.value);
 
-                                        request['gender'] = 0;
+                                        request['gender'] = Gender.Male.name ==
+                                                request['gender']
+                                            ? 0
+                                            : 1;
                                         request['roleId'] = widget.role.name;
-
                                         var result =
-                                        await _userRegistrationProvider
-                                            .insert(request);
-                                        if (result.isRegistered==true) {
+                                            await _userRegistrationProvider
+                                                .insert(request);
+                                        if (result.isRegistered == true) {
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(SnackBar(
                                                   content: Text(
@@ -258,7 +264,12 @@ class _SignupPageState extends State<SignupPage> {
                                                       VerificationPage()));
                                         }
                                       } else {}
-                                    } catch (e) {}
+                                    } catch (e) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(
+                                              content: Text(
+                                                  " Email adresa se već koristi. Molimo izaberite drugu email adresu.")));
+                                    }
                                   },
                                   child: Text("Registruj se"),
                                 ),
