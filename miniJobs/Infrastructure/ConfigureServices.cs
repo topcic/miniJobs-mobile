@@ -58,7 +58,8 @@ public static class ConfigureServices
         services.AddScoped<IApplicantJobTypeRepository, ApplicantJobTypeRepository>();
         services.AddScoped<IUserAuthCodeRepository, UserAuthCodeRepository>();
         services.AddScoped<ITokenRepository, TokenRepository>();
-
+        services.AddScoped<IQuestionRepository, QuestionRepository>();
+        services.AddScoped<IProposedAnswerRepository, ProposedAnswerRepository>();
     }
     private static void AddOptionSetups(IServiceCollection services)
     {

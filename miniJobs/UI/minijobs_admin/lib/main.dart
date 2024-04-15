@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:minijobs_admin/pages/company_employer_signup.page.dart';
 import 'package:minijobs_admin/pages/job_step2.dart';
+import 'package:minijobs_admin/pages/job_step3.dart';
 import 'package:minijobs_admin/pages/login_sign_up_page.dart';
 import 'package:minijobs_admin/pages/verification_page.dart';
 import 'package:minijobs_admin/providers/authentication_provider.dart';
 import 'package:minijobs_admin/providers/city_provider.dart';
 import 'package:minijobs_admin/providers/employer_provider.dart';
 import 'package:minijobs_admin/providers/job_type_provider.dart';
+import 'package:minijobs_admin/providers/proposed_answer_provider.dart';
 import 'package:minijobs_admin/providers/user_registration_provider.dart';
 import 'package:minijobs_admin/providers/user_provider.dart';
 import 'package:minijobs_admin/widgets/navbar.dart';
@@ -23,6 +25,8 @@ void main() async {
       ChangeNotifierProvider(create: (s) => UserRegistrationProvider()),
       ChangeNotifierProvider(create: (s) => EmployerProvider()),
       ChangeNotifierProvider(create: (s) => JobTypeProvider()),
+      ChangeNotifierProvider(create: (s) => ProposedAnswerProvider()),
+
     ],
     child: const MyApp(),
   ));
@@ -75,7 +79,7 @@ class MyMaterialApp extends StatelessWidget {
           ),
         ),
       ),
-      home: Navbar(),
+      home: JobStep2Page(),
     );
   }
 }

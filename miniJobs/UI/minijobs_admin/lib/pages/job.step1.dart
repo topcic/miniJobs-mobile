@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:minijobs_admin/models/city.dart';
-import 'package:minijobs_admin/pages/job_step2.dart';
 import 'package:minijobs_admin/providers/city_provider.dart';
 import 'package:minijobs_admin/utils/util_widgets.dart';
 import 'package:provider/provider.dart';
 
 class JobStep1Page extends StatelessWidget {
-    final VoidCallback onNextPressed;
+  final VoidCallback onNextPressed;
   JobStep1Page({required this.onNextPressed});
   @override
   Widget build(BuildContext context) {
@@ -48,23 +47,8 @@ class JobStep1Page extends StatelessWidget {
             top: 100,
             left: 0,
             right: 0,
-            child: JobForm(),
-          ),
-          Positioned(
-            top: 400,
-            left: 0,
-            right: 10,
-            child:   Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                       onNextPressed();
-                  },
-                  child: Text('Dalje'),
-                ),
-              ],
-            ),
+            child: Container(
+                height: 400, child: JobForm(onNextPressed: onNextPressed)),
           ),
         ],
       ),
@@ -73,6 +57,8 @@ class JobStep1Page extends StatelessWidget {
 }
 
 class JobForm extends StatefulWidget {
+  final VoidCallback onNextPressed;
+  JobForm({required this.onNextPressed});
   @override
   _JobFormState createState() => _JobFormState();
 }
@@ -96,26 +82,28 @@ class _JobFormState extends State<JobForm> {
 
   Future<void> getCities() async {
     cities = await _cityProvider.get();
+    print(cities);
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
+        child: Padding(
       padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
       child: Container(
         padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-      BoxShadow(
-        color: Colors.grey.withOpacity(0.5), 
-        spreadRadius: 1, 
-        blurRadius: 1, 
-        offset: Offset(0, 3), 
-      ),
-    ],
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 1,
+              blurRadius: 1,
+              offset: Offset(0, 3),
+            ),
+          ],
         ),
         child: FormBuilder(
           key: _formKey,
@@ -126,6 +114,31 @@ class _JobFormState extends State<JobForm> {
               children: [
                 rowMethod(
                   _textField('title', "Naziv posla"),
+                  CrossAxisAlignment.center,
+                ),
+                SizedBox(height: 20),
+                rowMethod(
+                  Expanded(
+                    child: Container(
+                      child: FormBuilderTextField(
+                        maxLines: 8,
+                        keyboardType: TextInputType.multiline,
+                        name: 'description',
+                        decoration: InputDecoration(
+                          labelText: "Opis",
+                          hintText: "Unesite opis ovdje",
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: ((value) {
+                          if (value == null || value.isEmpty) {
+                            return "Opis je obavezno polje";
+                          }
+                          return null;
+                        }),
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ),
+                  ),
                   CrossAxisAlignment.center,
                 ),
                 SizedBox(height: 20),
@@ -163,12 +176,29 @@ class _JobFormState extends State<JobForm> {
                   _textField('address', "Adresa"),
                   CrossAxisAlignment.center,
                 ),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        _formKey.currentState?.save();
+                        if (_formKey.currentState!.validate()) {
+                          final Map<String, dynamic>? formValues =
+                              _formKey.currentState!.value;
+                          widget.onNextPressed();
+                        }
+                      },
+                      child: Text('Dalje'),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
         ),
       ),
-    );
+    ));
   }
 }
 
@@ -183,7 +213,7 @@ Expanded _textField(String name, String label) {
           return null;
         }
       }),
-       style: TextStyle(fontSize: 12),
+      style: TextStyle(fontSize: 12),
       decoration: InputDecoration(
         labelText: label,
         labelStyle: TextStyle(fontSize: 14),

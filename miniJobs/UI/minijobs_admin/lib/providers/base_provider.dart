@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
@@ -93,6 +92,10 @@ abstract class BaseProvider<T> with ChangeNotifier {
   Future<List<T>> get() async {
     try {
       var response = await _dio.get(_endpoint);
+      // List<dynamic> responseData = response.data;
+      // List<T> dataList = responseData.map((item) => fromJson(item)).toList();
+
+      // return dataList;
       List<dynamic> responseData = response.data;
       List<T> dataList = responseData.map((item) => fromJson(item)).toList();
 
