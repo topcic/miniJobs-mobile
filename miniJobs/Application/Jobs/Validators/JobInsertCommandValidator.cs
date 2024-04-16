@@ -10,6 +10,8 @@ public class JobInsertCommandValidator : AbstractValidator<JobInsertCommand>
     {
         RuleFor(x => x.Request.Name).Cascade(CascadeMode.Stop)
             .NotEmpty().OverridePropertyName("Name").WithMessage("Naziv je obavezno polje");
+        RuleFor(x => x.Request.Description).Cascade(CascadeMode.Stop)
+          .NotEmpty().OverridePropertyName("Description").WithMessage("Opis je obavezno polje");
         RuleFor(x => x.Request.StreetAddressAndNumber).Cascade(CascadeMode.Stop)
             .NotEmpty().OverridePropertyName("StreetAddressAndNumber").WithMessage("Adresa i broj ulice je obavezno polje");
         RuleFor(x => x.Request.CityId)

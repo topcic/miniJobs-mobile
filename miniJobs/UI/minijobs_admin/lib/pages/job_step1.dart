@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:minijobs_admin/models/city.dart';
+import 'package:minijobs_admin/models/job/job.dart';
 import 'package:minijobs_admin/providers/city_provider.dart';
+import 'package:minijobs_admin/providers/job_provider.dart';
 import 'package:minijobs_admin/utils/util_widgets.dart';
 import 'package:provider/provider.dart';
 
@@ -57,7 +59,8 @@ class JobStep1Page extends StatelessWidget {
 }
 
 class JobForm extends StatefulWidget {
-  final VoidCallback onNextPressed;
+     final VoidCallback onNextPressed;
+  
   JobForm({required this.onNextPressed});
   @override
   _JobFormState createState() => _JobFormState();
@@ -67,11 +70,12 @@ class _JobFormState extends State<JobForm> {
   final _formKey = GlobalKey<FormBuilderState>();
   List<City>? cities;
   late CityProvider _cityProvider = CityProvider();
-
+late JobProvider _jobProvider=JobProvider();
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _cityProvider = context.read<CityProvider>();
+    _jobProvider = context.read<JobProvider>();
   }
 
   @override
@@ -82,7 +86,7 @@ class _JobFormState extends State<JobForm> {
 
   Future<void> getCities() async {
     cities = await _cityProvider.get();
-    print(cities);
+
     setState(() {});
   }
 
@@ -113,7 +117,7 @@ class _JobFormState extends State<JobForm> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 rowMethod(
-                  _textField('title', "Naziv posla"),
+                  _textField('name', "Naziv posla"),
                   CrossAxisAlignment.center,
                 ),
                 SizedBox(height: 20),
@@ -173,7 +177,7 @@ class _JobFormState extends State<JobForm> {
                 ),
                 SizedBox(height: 20),
                 rowMethod(
-                  _textField('address', "Adresa"),
+                  _textField('streetAddressAndNumber', "Adresa"),
                   CrossAxisAlignment.center,
                 ),
                 SizedBox(height: 20),
@@ -181,12 +185,17 @@ class _JobFormState extends State<JobForm> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         _formKey.currentState?.save();
                         if (_formKey.currentState!.validate()) {
                           final Map<String, dynamic>? formValues =
                               _formKey.currentState!.value;
-                          widget.onNextPressed();
+                         
+                             var job = await _jobProvider.insert(formValues);
+                              if(job!=null){
+                                _jobProvider.setCurrentJob(job);
+                                widget.onNextPressed();
+                              }
                         }
                       },
                       child: Text('Dalje'),

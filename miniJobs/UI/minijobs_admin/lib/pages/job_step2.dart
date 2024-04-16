@@ -1,15 +1,20 @@
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:minijobs_admin/enumerations/questions.dart';
+import 'package:minijobs_admin/models/job/job.dart';
 import 'package:minijobs_admin/models/job_type.dart';
 import 'package:minijobs_admin/models/proposed_answer.dart';
+import 'package:minijobs_admin/providers/job_provider.dart';
 import 'package:minijobs_admin/providers/job_type_provider.dart';
 import 'package:minijobs_admin/providers/proposed_answer_provider.dart';
 import 'package:minijobs_admin/utils/util_widgets.dart';
 import 'package:provider/provider.dart';
 
 class JobStep2Page extends StatelessWidget {
+  final VoidCallback onNextPressed;
+  JobStep2Page({required this.onNextPressed});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,7 +54,8 @@ class JobStep2Page extends StatelessWidget {
             top: 100,
             left: 0,
             right: 0,
-            child: Container(height: 400, child: JobForm()),
+            child: Container(
+                height: 400, child: JobForm(onNextPressed: onNextPressed)),
           ),
         ],
       ),
@@ -58,6 +64,8 @@ class JobStep2Page extends StatelessWidget {
 }
 
 class JobForm extends StatefulWidget {
+  final VoidCallback onNextPressed;
+  JobForm({required this.onNextPressed});
   @override
   _JobFormState createState() => _JobFormState();
 }
@@ -66,9 +74,11 @@ class _JobFormState extends State<JobForm> {
   final _formKey = GlobalKey<FormBuilderState>();
   List<JobType>? cities;
   late JobTypeProvider _jobTypeProvider = JobTypeProvider();
-   late ProposedAnswerProvider _proposedAnswerProvider =
+  late ProposedAnswerProvider _proposedAnswerProvider =
       ProposedAnswerProvider();
-  List<ProposedAnswer>? jobSchedules ;
+      late JobProvider _jobProvider=JobProvider();
+       Job? currentJob ;
+  List<ProposedAnswer>? jobSchedules;
   String selectedOption = '';
   List<String> durationOptions = [
     '1-3 dana',
@@ -76,16 +86,21 @@ class _JobFormState extends State<JobForm> {
     '1 do 2 sedmice',
     '2 do 4 sedmice',
   ];
-   bool showAllSchedules = false;
-  List<String>? selectedJobSchedules = []; 
+  bool showAllSchedules = false;
+  List<String>? selectedJobSchedules = [];
   String? applicationsEndTo;
- bool isClickedBtnNext = false;
+  bool isClickedBtnNext = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _jobTypeProvider = context.read<JobTypeProvider>();
-     _proposedAnswerProvider = context.read<ProposedAnswerProvider>();
+    _proposedAnswerProvider = context.read<ProposedAnswerProvider>();
+    _jobProvider=Provider.of<JobProvider>(context);
+
+     setState(() {
+    currentJob = _jobProvider.getCurrentJob();
+  });
   }
 
   @override
@@ -94,11 +109,13 @@ class _JobFormState extends State<JobForm> {
     getCities();
     getScheduleOptions();
   }
-Future<void> getScheduleOptions() async {
+
+  Future<void> getScheduleOptions() async {
     jobSchedules = await _proposedAnswerProvider
         .getByQuestion(questionDescriptions[Questions.workingHours]!);
     setState(() {});
   }
+
   Future<void> getCities() async {
     cities = await _jobTypeProvider.get();
     setState(() {});
@@ -106,7 +123,7 @@ Future<void> getScheduleOptions() async {
 
   @override
   Widget build(BuildContext context) {
-     List<ProposedAnswer>? displayedSchedules =
+    List<ProposedAnswer>? displayedSchedules =
         showAllSchedules ? jobSchedules : jobSchedules?.take(6).toList();
     return SingleChildScrollView(
       child: Padding(
@@ -134,6 +151,7 @@ Future<void> getScheduleOptions() async {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                  //    Text(currentJob!.name!),
                       rowMethod(
                         Expanded(
                           child: Autocomplete<String>(
@@ -203,55 +221,82 @@ Future<void> getScheduleOptions() async {
                       SizedBox(height: 20),
                       rowMethod(Text("Raspored posla")),
                       SizedBox(height: 10),
-                    rowMethod(
-  Expanded(
-    child: Wrap(
-      spacing: 8.0,
-      children: displayedSchedules?.map(
-        (schedule) => Padding(
-          padding: EdgeInsets.all(2),
-          child: FilterChip(
-            label: Text(
-              schedule.answer ?? '',
-              style: TextStyle(fontSize: 10),
-            ),
-            selected: selectedJobSchedules!.contains(schedule.id.toString()),
-            onSelected: (bool selected) {
-              setState(() {
-                if (selected) {
-                  selectedJobSchedules!.add(schedule.id.toString());
-                } else {
-                  selectedJobSchedules!.remove(schedule.id.toString());
-                }
-              });
-            },
-          ),
-        ),
-      ).toList() ??
-          [],
-    ),
-  ),
-),
-if (!showAllSchedules)
-  ElevatedButton(
-    onPressed: () {
-      setState(() {
-        showAllSchedules = true;
-      });
-    },
-    child: Text("Show More"),
-  ),
-if (showAllSchedules)
-  ElevatedButton(
-    onPressed: () {
-      setState(() {
-        showAllSchedules = false;
-      });
-    },
-    child: Text("Show Less"),
-  ),
-                     if (isClickedBtnNext && (selectedJobSchedules == null || selectedJobSchedules!.isEmpty))
-                      rowMethod(Text("Rspored posla je obavezno polje",style: TextStyle(color: Colors.red[800],fontSize: 12)) ),
+                      rowMethod(
+                        Expanded(
+                          child: Wrap(
+                            spacing: 8.0,
+                            children: displayedSchedules
+                                    ?.map(
+                                      (schedule) => Padding(
+                                        padding: EdgeInsets.all(2),
+                                        child: FilterChip(
+                                          label: Text(
+                                            schedule.answer ?? '',
+                                            style: TextStyle(fontSize: 10),
+                                          ),
+                                          selected: selectedJobSchedules!
+                                              .contains(schedule.id.toString()),
+                                          onSelected: (bool selected) {
+                                            setState(() {
+                                              if (selected) {
+                                                selectedJobSchedules!.add(
+                                                    schedule.id.toString());
+                                              } else {
+                                                selectedJobSchedules!.remove(
+                                                    schedule.id.toString());
+                                              }
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    )
+                                    .toList() ??
+                                [],
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      if (!showAllSchedules)
+                        if (!showAllSchedules)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              ElevatedButton.icon(
+                                onPressed: () {
+                                  setState(() {
+                                    showAllSchedules = true;
+                                  });
+                                },
+                                icon: Text("više",
+                                    style: TextStyle(fontSize: 12)),
+                                label:
+                                    Icon(Icons.keyboard_arrow_down, size: 20),
+                              ),
+                            ],
+                          ),
+                      if (showAllSchedules)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            ElevatedButton.icon(
+                                onPressed: () {
+                                  setState(() {
+                                    showAllSchedules = false;
+                                  });
+                                },
+                                icon: Text("manje",
+                                    style: TextStyle(fontSize: 12)),
+                                label: Icon(Icons.keyboard_arrow_up, size: 20))
+                          ],
+                        ),
+                      if (isClickedBtnNext &&
+                          (selectedJobSchedules == null ||
+                              selectedJobSchedules!.isEmpty))
+                        rowMethod(Text("Rspored posla je obavezno polje",
+                            style: TextStyle(
+                                color: Colors.red[800], fontSize: 12))),
                       SizedBox(height: 20),
                       rowMethod(Text("Koliko brzo želite da pronađete?")),
                       SizedBox(height: 10),
@@ -285,10 +330,16 @@ if (showAllSchedules)
                           ),
                         ),
                       ),
-                      if (isClickedBtnNext && (applicationsEndTo == null || applicationsEndTo!.isEmpty))
-                      rowMethod(Text("Ovo je obavezno polje",style: TextStyle(color: Colors.red[800],fontSize: 12),) ),
+                      if (isClickedBtnNext &&
+                          (applicationsEndTo == null ||
+                              applicationsEndTo!.isEmpty))
+                        rowMethod(Text(
+                          "Ovo je obavezno polje",
+                          style:
+                              TextStyle(color: Colors.red[800], fontSize: 12),
+                        )),
                       SizedBox(height: 20),
-                        rowMethod(
+                      rowMethod(
                         Expanded(
                           child: FormBuilderTextField(
                               keyboardType: TextInputType.number,
@@ -308,32 +359,28 @@ if (showAllSchedules)
                         ),
                         CrossAxisAlignment.center,
                       ),
+                      SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              _formKey.currentState?.save();
+                              if (_formKey.currentState!.validate()) {
+                                final Map<String, dynamic>? formValues =
+                                    _formKey.currentState!.value;
+                                    print(currentJob);
+                                widget.onNextPressed();
+                              }
+                            },
+                            child: Text('Dalje'),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
               ),
-            ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-    print("before $isClickedBtnNext");
-    isClickedBtnNext = true;
-    print(isClickedBtnNext);
-  });
-                    _formKey.currentState?.save();
-                    if (_formKey.currentState!.validate()) {
-                      Map<String, dynamic> request =
-                          Map.of(_formKey.currentState!.value);
-                          print(request);
-                    }
-                  },
-                  child: Text('Dalje'),
-                ),
-              ],
             ),
           ],
         ),

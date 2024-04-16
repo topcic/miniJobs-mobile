@@ -37,6 +37,7 @@ public class Job : BaseAuditableEntity, IEntity<int>
     [Column("city_id")]
     public int CityId { get; set; }
 
+    [Column("state")]
     public JobState State { get; set; }
 
 }

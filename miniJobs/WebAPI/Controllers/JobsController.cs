@@ -23,7 +23,7 @@ public class JobsController(IMediator mediator, BaseState state) : ControllerBas
     {
         var initialState = JobState.Initial;
         var initialStateInstance = state.CreateState(initialState);
-        return Ok(initialStateInstance.Insert(request));
+        return Ok(await initialStateInstance.Insert(request));
     }
 
     

@@ -1,28 +1,38 @@
 ﻿using Application.Jobs.Commands;
 using AutoMapper;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.Interfaces;
 using MediatR;
+using System.Transactions;
 
-namespace Application.Jobs.Handlers;
-
-public class JobInsertCommandHandler(IJobRepository jobRepository, IMapper mapper) : IRequestHandler<JobInsertCommand, Job>
+namespace Application.Jobs.Handlers
 {
-    private readonly IJobRepository jobRepository = jobRepository;
-    private readonly IMapper mapper = mapper;
-
-
-    public async Task<Job> Handle(JobInsertCommand command, CancellationToken cancellationToken)
+    public class JobInsertCommandHandler : IRequestHandler<JobInsertCommand, Job>
     {
-        var job = mapper.Map<Job>(command.Request);
-        job.Created = DateTime.UtcNow;
-        job.CreatedBy = command.UserId;
-        job.LastModified = DateTime.UtcNow;
-        job.LastModifiedBy = command.UserId;
-        job.Status = Domain.Enums.JobStatus.Draft;
+        private readonly IJobRepository _jobRepository;
+        private readonly IMapper _mapper;
 
-        await jobRepository.InsertAsync(job);
+        public JobInsertCommandHandler(IJobRepository jobRepository, IMapper mapper)
+        {
+            _jobRepository = jobRepository;
+            _mapper = mapper;
+        }
 
-        return job;
+        public async Task<Job> Handle(JobInsertCommand command, CancellationToken cancellationToken)
+        {
+            using var ts = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+            var job = _mapper.Map<Job>(command.Request);
+            job.Created = DateTime.UtcNow;
+            job.CreatedBy = command.UserId;
+            job.Status = JobStatus.Draft;
+            job.State = JobState.Initial;
+
+            await _jobRepository.InsertAsync(job);
+            ts.Complete();
+
+            return job;
+        }
     }
 }

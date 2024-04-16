@@ -1,3 +1,4 @@
+using Application.Common.Middlewares;
 using NLog.Web;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +23,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<UserMiddleware>();
+app.UseMiddleware<UnhandledExceptionMiddleware>();
 app.UseCors("miniJobsCors");
 
 app.MapControllers();

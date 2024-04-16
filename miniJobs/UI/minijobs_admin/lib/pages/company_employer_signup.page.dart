@@ -311,7 +311,6 @@ class _CompanyEmployerSignupPageState extends State<CompanyEmployerSignupPage> {
                                         var result = await _userCompanyProvider
                                             .insert(request);
                                         if (result != null) {
-                                          debugger();
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(SnackBar(
                                                   content: Text(

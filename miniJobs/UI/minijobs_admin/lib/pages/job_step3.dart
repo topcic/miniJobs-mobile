@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:minijobs_admin/enumerations/questions.dart';
@@ -228,32 +226,27 @@ class _JobFormState extends State<JobForm> {
                                 : [],
                           ),
                         ),
-                      )
+                      ),
+                       Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        _formKey.currentState?.save();
+                        if (_formKey.currentState!.validate()) {
+                          final Map<String, dynamic>? formValues =
+                              _formKey.currentState!.value;
+                       //   widget.onNextPressed();
+                        }
+                      },
+                      child: Text('Dalje'),
+                    ),
+                  ],
+                ),
                     ],
                   ),
                 ),
               ),
-            ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      isClickedBtnNext = true;
-                    });
-                    _formKey.currentState?.save();
-                    if (_formKey.currentState!.validate()) {
-                      Map<String, dynamic> request =
-                          Map.of(_formKey.currentState!.value);
-                      print(
-                          "$request $paymentChoice $additionalPaymentOptions");
-                    }
-                  },
-                  child: Text('Dalje'),
-                ),
-              ],
             ),
           ],
         ),

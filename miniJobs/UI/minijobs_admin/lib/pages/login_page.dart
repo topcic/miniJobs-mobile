@@ -4,6 +4,7 @@ import 'package:minijobs_admin/models/auth_code_request.dart';
 import 'package:minijobs_admin/pages/users.dart';
 import 'package:minijobs_admin/providers/authentication_provider.dart';
 import 'package:minijobs_admin/utils/util_widgets.dart';
+import 'package:minijobs_admin/widgets/navbar.dart';
 import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
@@ -106,7 +107,7 @@ class _LoginPageState extends State<LoginPage> {
                               var result = await _authenticationProvider.tokens(autCodeRequest);
                               if (result) {
                                 Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => const UsersPage()));
+                                    builder: (context) => Navbar()));
                               } else {
                                 ScaffoldMessenger.of(context)
                                     .showSnackBar(SnackBar(

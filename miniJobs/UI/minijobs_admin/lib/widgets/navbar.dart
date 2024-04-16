@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:minijobs_admin/pages/home_page.dart';
-import 'package:minijobs_admin/pages/job.step1.dart';
 import 'package:minijobs_admin/pages/job_list.dart';
+import 'package:minijobs_admin/pages/job_step1.dart';
 import 'package:minijobs_admin/pages/job_step2.dart';
+import 'package:minijobs_admin/pages/job_step3.dart';
 import 'package:minijobs_admin/pages/profile.dart';
 
 class Navbar extends StatefulWidget {
@@ -14,8 +15,9 @@ class Navbar extends StatefulWidget {
 
 class _NavbarState extends State<Navbar> {
   int _bottomNavIndex = 0;
+  int _jobStep = 0;
   IconData _fabIcon = Icons.home; // Default FAB icon
-List<Widget> _pages = [];
+  List<Widget> _pages = [];
   @override
   void initState() {
     super.initState();
@@ -26,22 +28,24 @@ List<Widget> _pages = [];
   _initRole() async {
     String role = GetStorage().read('role') ?? '';
     setState(() {
-        _bottomNavIndex = 1; 
+      _bottomNavIndex = 1;
     });
   }
+
   _initPages() {
     String role = GetStorage().read('role') ?? '';
     _pages = [
       HomePage(),
       JobStep1Page(onNextPressed: () {
         setState(() {
-          _bottomNavIndex = 2; // Index of the next form page
+          _jobStep = 1; // Index of the next form page
         });
       }),
       JobList(),
       ProfilePage(),
     ];
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,8 +54,7 @@ List<Widget> _pages = [];
         children: _buildPages(),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-        },
+        onPressed: () {},
         child: Icon(_fabIcon),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -123,13 +126,25 @@ List<Widget> _pages = [];
     } else {
       pages.add(HomePage());
       pages.add(JobStep1Page(
-          onNextPressed: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => JobStep2Page()),
-      );
-  
-    },
+        onNextPressed: () {
+          setState(() {
+            _bottomNavIndex = 2;
+          });
+        },
+      ));
+      pages.add(JobStep2Page(
+        onNextPressed: () {
+          setState(() {
+            _bottomNavIndex = 3;
+          });
+        },
+      ));
+      pages.add(JobStep3Page(
+        // onNextPressed: () {
+        //   setState(() {
+        //     _bottomNavIndex = 4;
+        //   });
+        // },
       ));
       pages.add(JobList());
       pages.add(ProfilePage());

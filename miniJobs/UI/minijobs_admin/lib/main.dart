@@ -8,6 +8,7 @@ import 'package:minijobs_admin/pages/verification_page.dart';
 import 'package:minijobs_admin/providers/authentication_provider.dart';
 import 'package:minijobs_admin/providers/city_provider.dart';
 import 'package:minijobs_admin/providers/employer_provider.dart';
+import 'package:minijobs_admin/providers/job_provider.dart';
 import 'package:minijobs_admin/providers/job_type_provider.dart';
 import 'package:minijobs_admin/providers/proposed_answer_provider.dart';
 import 'package:minijobs_admin/providers/user_registration_provider.dart';
@@ -26,7 +27,7 @@ void main() async {
       ChangeNotifierProvider(create: (s) => EmployerProvider()),
       ChangeNotifierProvider(create: (s) => JobTypeProvider()),
       ChangeNotifierProvider(create: (s) => ProposedAnswerProvider()),
-
+      ChangeNotifierProvider(create: (s) => JobProvider()),
     ],
     child: const MyApp(),
   ));
@@ -79,7 +80,7 @@ class MyMaterialApp extends StatelessWidget {
           ),
         ),
       ),
-      home: JobStep2Page(),
+      home: LoginSignupPage(),
     );
   }
 }
