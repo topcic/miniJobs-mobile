@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
@@ -14,8 +13,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
   BaseProvider(String endpoint) {
     _endpoint = endpoint;
     _baseUrl = const String.fromEnvironment("baseUrl",
-        defaultValue: "http://10.0.2.2"
-            ":5020/api/");
+        defaultValue: "http://localhost:5020/api/");
     _dio = Dio(BaseOptions(
       baseUrl: _baseUrl!,
       responseType: ResponseType.json,
@@ -26,6 +24,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
       onRequest: (options, handler) async {
         options.headers["Accept"] = "application/json";
         String? token = _getStorage.read('accessToken');
+     // String? token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJFbXBsb3llciIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWVpZGVudGlmaWVyIjoiMiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6IjI3dG9wY2ljLm1haGlyQGdtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2dpdmVubmFtZSI6Ik1haGlyIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvc3VybmFtZSI6IlRvcGNpYyIsIm5iZiI6MTcxNjY0OTE4NCwiZXhwIjoxNzE2NjUwMzg0LCJpc3MiOiJtaW5pSm9icyIsImF1ZCI6Im1pbmlKb2JzIn0.bsw7BzIv_Hn02-LYnWNI1rw6yb1x84w2k3ZL49HEbEs";
         if (token != null) {
           options.headers["Authorization"] = "Bearer " + token;
         }
@@ -91,13 +90,10 @@ abstract class BaseProvider<T> with ChangeNotifier {
     }
   }
 
-  Future<List<T>> get() async {
+  Future<List<T>> getAll() async {
     try {
       var response = await _dio.get(_endpoint);
-      // List<dynamic> responseData = response.data;
-      // List<T> dataList = responseData.map((item) => fromJson(item)).toList();
 
-      // return dataList;
       List<dynamic> responseData = response.data;
       List<T> dataList = responseData.map((item) => fromJson(item)).toList();
 
@@ -106,7 +102,15 @@ abstract class BaseProvider<T> with ChangeNotifier {
       throw Exception(err.toString());
     }
   }
-
+Future<T> get(int id) async {
+    try {
+       var url = "$_endpoint/$id";
+      var response = await _dio.get(url);
+         return fromJson(response.data);
+    } catch (err) {
+      throw Exception(err.toString());
+    }
+  }
   Future<T> insert(dynamic request) async {
     var jsonRequest = jsonEncode(request);
     var response = await _dio.post(_endpoint, data: jsonRequest);

@@ -51,7 +51,7 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   Future<void> getCities() async {
-    cities = await _cityProvider.get();
+    cities = await _cityProvider.getAll();
     setState(() {});
   }
 

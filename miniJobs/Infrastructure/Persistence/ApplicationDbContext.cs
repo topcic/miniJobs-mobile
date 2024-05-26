@@ -17,7 +17,6 @@ public class ApplicationDbContext : DbContext
     public DbSet<Canton> Cantons => Set<Canton>();
     public DbSet<JobApplication> JobApplications => Set<JobApplication>();
     public DbSet<JobType> JobTypes => Set<JobType>();
-    public DbSet<JobTypeAssignment> JobTypeAssignments => Set<JobTypeAssignment>();
     public DbSet<Message> Messages => Set<Message>();
     public DbSet<QuestionThread> QuestionThreads => Set<QuestionThread>();
     public DbSet<Rating> Ratings => Set<Rating>();
@@ -28,7 +27,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<UserAuthCode> UserAuthCodes => Set<UserAuthCode>();
     public DbSet<ProposedAnswer> ProposedAnswers => Set<ProposedAnswer>();
     public DbSet<Question> Questions => Set<Question>();
-    public DbSet<QuestionAnswer> QuestionAnswers => Set<QuestionAnswer>();
+    public DbSet<JobQuestionAnswer> JobQuestionAnswers => Set<JobQuestionAnswer>();
     public DbSet<JobQuestion> JobQuestions => Set<JobQuestion>();
 
 

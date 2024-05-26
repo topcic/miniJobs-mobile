@@ -12,7 +12,7 @@ public abstract class BaseAuditableEntity
     public int? CreatedBy { get; set; }
 
     [Column("last_modified")]
-    public DateTime LastModified { get; set; }
+    public DateTime? LastModified { get; set; }
 
     [IgnoreDataMember]
     [Column("last_modified_by")]

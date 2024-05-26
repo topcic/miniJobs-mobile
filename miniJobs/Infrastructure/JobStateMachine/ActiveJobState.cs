@@ -10,7 +10,7 @@ public class ActiveJobState(IServiceProvider serviceProvider, IMediator mediator
     public override async Task<Job> Activate(int id, int status)
     {
         var job = await mediator.Send(new JobActivateCommand(id, status));
-        job.State = Domain.Enums.JobState.Active;
+        job.State = (int)Domain.Enums.JobState.Active;
         return job;
     }
 }

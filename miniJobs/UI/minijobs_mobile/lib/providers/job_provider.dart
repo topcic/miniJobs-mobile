@@ -12,10 +12,12 @@ class JobProvider extends BaseProvider<Job> {
     return Job.fromJson(data);
   }
  Future<void> setCurrentJob(Job job) async {
-  debugger();
+
     _currentJob = job;
     notifyListeners();
   }
+
+  
     Job? getCurrentJob() {
 
 

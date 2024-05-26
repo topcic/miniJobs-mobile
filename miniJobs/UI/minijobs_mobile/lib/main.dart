@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:minijobs_mobile/pages/company_employer_signup.page.dart';
-import 'package:minijobs_mobile/pages/job_step2.dart';
-import 'package:minijobs_mobile/pages/job_step3.dart';
 import 'package:minijobs_mobile/pages/login_sign_up_page.dart';
-import 'package:minijobs_mobile/pages/verification_page.dart';
 import 'package:minijobs_mobile/providers/authentication_provider.dart';
 import 'package:minijobs_mobile/providers/city_provider.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
@@ -12,7 +8,6 @@ import 'package:minijobs_mobile/providers/job_type_provider.dart';
 import 'package:minijobs_mobile/providers/proposed_answer_provider.dart';
 import 'package:minijobs_mobile/providers/user_registration_provider.dart';
 import 'package:minijobs_mobile/providers/user_provider.dart';
-import 'package:minijobs_mobile/widgets/navbar.dart';
 import 'package:provider/provider.dart';
 
 void main() async {

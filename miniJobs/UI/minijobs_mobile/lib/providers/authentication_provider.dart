@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -46,11 +45,9 @@ class AuthenticationProvider extends BaseProvider<AuthTokenResponse> {
 
       var tokenDecoded = JwtDecoder.decode(result.accessToken!);
 
-      String? role;
       tokenDecoded.forEach((key, value) {
         if (key.endsWith('claims/role')) {
           GetStorage().write('role', value);
-          role = value;
         } else if (key.endsWith('claims/nameidentifier')) {
           GetStorage().write('nameidentifier', value);
         } else if (key.endsWith('claims/givenname')) {

@@ -1,12 +1,22 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:minijobs_mobile/enumerations/questions.dart';
+import 'package:minijobs_mobile/models/job/job.dart';
+import 'package:minijobs_mobile/models/job/job_save_request.dart';
+import 'package:minijobs_mobile/providers/job_provider.dart';
 import 'package:minijobs_mobile/providers/proposed_answer_provider.dart';
 import 'package:minijobs_mobile/utils/util_widgets.dart';
 import 'package:provider/provider.dart';
-import '../models/proposed_answer.dart';
+import '../../../../models/proposed_answer.dart';
 
 class JobStep3Page extends StatelessWidget {
+  final VoidCallback onNextPressed;
+  final VoidCallback onPreviousPressed;
+
+  JobStep3Page({required this.onNextPressed, required this.onPreviousPressed});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +56,11 @@ class JobStep3Page extends StatelessWidget {
             top: 100,
             left: 0,
             right: 0,
-            child: Container(height: 400, child: JobForm()),
+            child: Container(
+                height: 400,
+                child: JobForm(
+                    onNextPressed: onNextPressed,
+                    onPreviousPressed: onPreviousPressed)),
           ),
         ],
       ),
@@ -55,6 +69,11 @@ class JobStep3Page extends StatelessWidget {
 }
 
 class JobForm extends StatefulWidget {
+  final VoidCallback onNextPressed;
+  final VoidCallback onPreviousPressed;
+
+  JobForm({required this.onNextPressed, required this.onPreviousPressed});
+
   @override
   _JobFormState createState() => _JobFormState();
 }
@@ -65,17 +84,23 @@ class _JobFormState extends State<JobForm> {
   String? paymentMethod;
   double? price;
   List<ProposedAnswer>? paymentOptions;
-
-  String? paymentChoice;
+  Job? currentJob;
+  int? paymentChoice;
   List<String> additionalPayments = [];
   List<ProposedAnswer>? additionalPaymentOptions;
+  Map<int, List<int>>? answersToPaymentQuestions = {};
+  late JobProvider _jobProvider = JobProvider();
   late ProposedAnswerProvider _proposedAnswerProvider =
       ProposedAnswerProvider();
-
+int? paymentChoiceQuestionId;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _proposedAnswerProvider = context.read<ProposedAnswerProvider>();
+    _jobProvider = Provider.of<JobProvider>(context);
+    setState(() {
+      currentJob = _jobProvider.getCurrentJob();
+    });
   }
 
   @override
@@ -96,6 +121,24 @@ class _JobFormState extends State<JobForm> {
     additionalPaymentOptions = await _proposedAnswerProvider
         .getByQuestion(questionDescriptions[Questions.additionalPayment]!);
     setState(() {});
+  }
+
+  void saveAnswersToPaymentQuestions() {
+    answersToPaymentQuestions = {};
+
+    if (paymentChoice != null && paymentOptions != null) {
+      setState(() {
+      paymentChoiceQuestionId=paymentOptions!.first.questionId!;
+        });
+      int questionId = paymentOptions!.first.questionId!;
+      answersToPaymentQuestions![questionId] = [paymentChoice!];
+    }
+
+    if (additionalPayments.isNotEmpty && additionalPaymentOptions != null) {
+      int questionId = additionalPaymentOptions!.first.questionId!;
+      answersToPaymentQuestions![questionId] =
+          additionalPayments.map(int.parse).toList();
+    }
   }
 
   @override
@@ -146,14 +189,14 @@ class _JobFormState extends State<JobForm> {
                                             style: TextStyle(fontSize: 10),
                                           ),
                                           selected: paymentChoice ==
-                                              option.id.toString(),
+                                              option.id,
                                           onSelected: (bool selected) {
                                             setState(() {
                                               if (selected) {
                                                 paymentChoice =
-                                                    option.id!.toString();
+                                                    option.id!;
                                               } else {
-                                                paymentChoice = "";
+                                                paymentChoice = null;
                                               }
                                             });
                                           },
@@ -173,7 +216,7 @@ class _JobFormState extends State<JobForm> {
                                   .answer !=
                               "po dogovoru")
                         FormBuilderTextField(
-                            name: 'wage"',
+                            name: 'wage',
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               labelText: 'Cijena',
@@ -189,6 +232,11 @@ class _JobFormState extends State<JobForm> {
                               }
                               return null;
                             })),
+                             if (isClickedBtnNext &&( answersToPaymentQuestions==null || paymentChoiceQuestionId==null ||
+                              answersToPaymentQuestions![paymentChoiceQuestionId!]!.isEmpty))
+                        rowMethod(Text("Način plaćanja je obavezno polje",
+                            style: TextStyle(
+                                color: Colors.red[800], fontSize: 12))),
                       SizedBox(height: 20),
                       rowMethod(Text("Plaćate li")),
                       SizedBox(height: 10),
@@ -227,22 +275,51 @@ class _JobFormState extends State<JobForm> {
                           ),
                         ),
                       ),
-                       Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        _formKey.currentState?.save();
-                        if (_formKey.currentState!.validate()) {
-                          final Map<String, dynamic>? formValues =
-                              _formKey.currentState!.value;
-                       //   widget.onNextPressed();
-                        }
-                      },
-                      child: Text('Dalje'),
-                    ),
-                  ],
-                ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              widget.onPreviousPressed();
+                            },
+                            child: Text('Nazad'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                                setState(() {
+                                isClickedBtnNext = true; // Set the flag to true
+                              });
+                              _formKey.currentState?.save();
+                              if (_formKey.currentState!.validate()) {
+                                final Map<String, dynamic>? formValues =
+                                    _formKey.currentState!.value;
+                                saveAnswersToPaymentQuestions();
+                                print(formValues);
+                               print(answersToPaymentQuestions);
+                          
+                                //  var saveRequest = JobSaveRequest(
+                                //       currentJob!.id!,
+                                //       currentJob!.name,
+                                //       currentJob!.description,
+                                //       currentJob!.streetAddressAndNumber,
+                                //       currentJob!.cityId,
+                                //       currentJob!.status,
+                                //       selectedJobType.id,
+                                //       int.tryParse(formValues!['requiredEmployees']),
+                                //       jobScheduleInfo,
+                                //       answersToPaymentQuestions,
+                                //       price,
+                                //     DateTime.now().add(Duration(days: applicationsEndTo!['days']!)));
+                                //    var job =
+                                //   await _jobProvider.update(currentJob!.id!,saveRequest);
+                                //   ;
+                                // widget.onNextPressed();
+                              }
+                            },
+                            child: Text('Dalje'),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),

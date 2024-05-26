@@ -1,6 +1,8 @@
 ﻿using Domain.Common;
 using Domain.Enums;
 using Domain.Interfaces;
+using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace Domain.Entities;
 
@@ -24,20 +26,35 @@ public class Job : BaseAuditableEntity, IEntity<int>
     public DateTime? ApplicationsEndTo { get; set; }
 
     [Column("status")]
-    public JobStatus Status { get; set; }
+    public int Status { get; set; }
     [Column("required_employees")]
     public int? RequiredEmployees { get; set; }
 
     [Column("wage")]
     public int? Wage { get; set; }
 
-    [Column("employer_id")]
-    public int EmployerId { get; set; }
-
     [Column("city_id")]
     public int CityId { get; set; }
 
     [Column("state")]
-    public JobState State { get; set; }
+    public int State { get; set; }
+
+    [Column("job_type_id")]
+    public int JobTypeId { get; set; }
+
+    [NotMapped]
+    public List<ProposedAnswer> Schedules { get; set; }
+
+    [NotMapped]
+    public ProposedAnswer PaymentQuestion { get; set; }
+
+    [NotMapped]
+    public List<ProposedAnswer> AdditionalPaymentOptions { get; set; }
+
+    [NotMapped]
+    public int NumberOfApplications { get; set; }
+
+    [NotMapped]
+    public JobType JobType { get; set; }
 
 }

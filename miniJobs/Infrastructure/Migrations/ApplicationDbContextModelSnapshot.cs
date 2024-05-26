@@ -243,11 +243,11 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("description");
 
-                    b.Property<int>("EmployerId")
+                    b.Property<int>("JobTypeId")
                         .HasColumnType("int")
-                        .HasColumnName("employer_id");
+                        .HasColumnName("job_type_id");
 
-                    b.Property<DateTime>("LastModified")
+                    b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2")
                         .HasColumnName("last_modified");
 
@@ -285,6 +285,8 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("JobTypeId");
+
                     b.HasIndex("LastModifiedBy");
 
                     b.ToTable("jobs");
@@ -312,7 +314,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("job_id");
 
-                    b.Property<DateTime>("LastModified")
+                    b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2")
                         .HasColumnName("last_modified");
 
@@ -352,13 +354,37 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("JobId")
-                        .IsUnique();
+                    b.HasIndex("JobId");
 
-                    b.HasIndex("QuestionId")
-                        .IsUnique();
+                    b.HasIndex("QuestionId");
 
                     b.ToTable("job_questions");
+                });
+
+            modelBuilder.Entity("Domain.Entities.JobQuestionAnswer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("JobQuestionId")
+                        .HasColumnType("int")
+                        .HasColumnName("job_question_id");
+
+                    b.Property<int>("ProposedAnswerId")
+                        .HasColumnType("int")
+                        .HasColumnName("proposed_answer_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JobQuestionId");
+
+                    b.HasIndex("ProposedAnswerId");
+
+                    b.ToTable("job_question_answers");
                 });
 
             modelBuilder.Entity("Domain.Entities.JobType", b =>
@@ -378,23 +404,6 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("job_types");
-                });
-
-            modelBuilder.Entity("Domain.Entities.JobTypeAssignment", b =>
-                {
-                    b.Property<int>("JobId")
-                        .HasColumnType("int")
-                        .HasColumnName("job_id");
-
-                    b.Property<int>("JobTypeId")
-                        .HasColumnType("int")
-                        .HasColumnName("job_type_id");
-
-                    b.HasKey("JobId", "JobTypeId");
-
-                    b.HasIndex("JobTypeId");
-
-                    b.ToTable("job_type_assignments");
                 });
 
             modelBuilder.Entity("Domain.Entities.Message", b =>
@@ -419,7 +428,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("created_by");
 
-                    b.Property<DateTime>("LastModified")
+                    b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2")
                         .HasColumnName("last_modified");
 
@@ -484,34 +493,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("questions");
                 });
 
-            modelBuilder.Entity("Domain.Entities.QuestionAnswer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ProposedAnswerId")
-                        .HasColumnType("int")
-                        .HasColumnName("proposed_answer_id");
-
-                    b.Property<int>("QuestionId")
-                        .HasColumnType("int")
-                        .HasColumnName("question_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProposedAnswerId")
-                        .IsUnique();
-
-                    b.HasIndex("QuestionId")
-                        .IsUnique();
-
-                    b.ToTable("question_answers");
-                });
-
             modelBuilder.Entity("Domain.Entities.QuestionThread", b =>
                 {
                     b.Property<int>("Id")
@@ -533,7 +514,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("job_id");
 
-                    b.Property<DateTime>("LastModified")
+                    b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2")
                         .HasColumnName("last_modified");
 
@@ -583,7 +564,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("job_application_id");
 
-                    b.Property<DateTime>("LastModified")
+                    b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2")
                         .HasColumnName("last_modified");
 
@@ -679,7 +660,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("job_id");
 
-                    b.Property<DateTime>("LastModified")
+                    b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2")
                         .HasColumnName("last_modified");
 
@@ -851,6 +832,12 @@ namespace Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("CreatedBy");
 
+                    b.HasOne("Domain.Entities.JobType", null)
+                        .WithMany()
+                        .HasForeignKey("JobTypeId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("LastModifiedBy");
@@ -874,29 +861,29 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.JobQuestion", b =>
                 {
                     b.HasOne("Domain.Entities.Job", null)
-                        .WithOne()
-                        .HasForeignKey("Domain.Entities.JobQuestion", "JobId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Question", null)
-                        .WithOne()
-                        .HasForeignKey("Domain.Entities.JobQuestion", "QuestionId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Domain.Entities.JobTypeAssignment", b =>
-                {
-                    b.HasOne("Domain.Entities.Job", null)
                         .WithMany()
                         .HasForeignKey("JobId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.JobType", null)
+                    b.HasOne("Domain.Entities.Question", null)
                         .WithMany()
-                        .HasForeignKey("JobTypeId")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.JobQuestionAnswer", b =>
+                {
+                    b.HasOne("Domain.Entities.JobQuestion", null)
+                        .WithMany()
+                        .HasForeignKey("JobQuestionId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.ProposedAnswer", null)
+                        .WithMany()
+                        .HasForeignKey("ProposedAnswerId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
@@ -917,21 +904,6 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.Question", null)
                         .WithMany()
                         .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Domain.Entities.QuestionAnswer", b =>
-                {
-                    b.HasOne("Domain.Entities.ProposedAnswer", null)
-                        .WithOne()
-                        .HasForeignKey("Domain.Entities.QuestionAnswer", "ProposedAnswerId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Question", null)
-                        .WithOne()
-                        .HasForeignKey("Domain.Entities.QuestionAnswer", "QuestionId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });

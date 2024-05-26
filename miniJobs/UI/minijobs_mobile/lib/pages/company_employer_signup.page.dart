@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -50,7 +48,7 @@ class _CompanyEmployerSignupPageState extends State<CompanyEmployerSignupPage> {
   }
 
   Future<void> getCities() async {
-    cities = await _cityProvider.get();
+    cities = await _cityProvider.getAll();
     setState(() {});
   }
 

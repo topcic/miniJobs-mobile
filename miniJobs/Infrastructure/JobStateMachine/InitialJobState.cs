@@ -11,7 +11,7 @@ public class InitialJobState(IServiceProvider serviceProvider, ApplicationDbCont
     public override async Task<Job> Insert(JobInsertRequest request)
     {
         var job = await mediator.Send(new JobInsertCommand(request));
-        job.State = Domain.Enums.JobState.JobDetails;
+        job.State = (int)Domain.Enums.JobState.JobDetails;
         return job;
     }
 }

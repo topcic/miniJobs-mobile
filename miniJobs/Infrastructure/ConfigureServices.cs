@@ -54,12 +54,15 @@ public static class ConfigureServices
         services.AddScoped<ICountryRepository, CountryRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddScoped<IQuestionThreadRepository, QuestionThreadRepository>(); 
-        services.AddScoped<IJobTypeAssignmentRepository, JobTypeAssignmentRepository>();
         services.AddScoped<IApplicantJobTypeRepository, ApplicantJobTypeRepository>();
         services.AddScoped<IUserAuthCodeRepository, UserAuthCodeRepository>();
         services.AddScoped<ITokenRepository, TokenRepository>();
         services.AddScoped<IQuestionRepository, QuestionRepository>();
         services.AddScoped<IProposedAnswerRepository, ProposedAnswerRepository>();
+        services.AddScoped<IJobQuestionRepository, JobQuestionRepository>();
+        services.AddScoped<IJobQuestionAnswerRepository, JobQuestionAnswerRepository>();
+
+
     }
     private static void AddOptionSetups(IServiceCollection services)
     {

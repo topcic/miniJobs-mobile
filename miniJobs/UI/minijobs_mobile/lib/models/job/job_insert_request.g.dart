@@ -11,7 +11,7 @@ JobInsertRequest _$JobInsertRequestFromJson(Map<String, dynamic> json) =>
       json['name'] as String?,
       json['description'] as String?,
       json['streetAddressAndNumber'] as String?,
-      json['cityId'] as int?,
+      (json['cityId'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$JobInsertRequestToJson(JobInsertRequest instance) =>

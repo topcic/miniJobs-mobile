@@ -8,9 +8,9 @@ part of 'proposed_answer.dart';
 
 ProposedAnswer _$ProposedAnswerFromJson(Map<String, dynamic> json) =>
     ProposedAnswer(
-      json['id'] as int?,
+      (json['id'] as num?)?.toInt(),
       json['answer'] as String?,
-      json['questionId'] as int?,
+      (json['questionId'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$ProposedAnswerToJson(ProposedAnswer instance) =>

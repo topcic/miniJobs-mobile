@@ -7,10 +7,10 @@ part of 'city.dart';
 // **************************************************************************
 
 City _$CityFromJson(Map<String, dynamic> json) => City(
-      json['id'] as int?,
+      (json['id'] as num?)?.toInt(),
       json['name'] as String?,
-      json['countryId'] as int?,
-      json['cantonId'] as int?,
+      (json['countryId'] as num?)?.toInt(),
+      (json['cantonId'] as num?)?.toInt(),
       json['municipalityCode'] as String?,
       json['postCode'] as String?,
     );

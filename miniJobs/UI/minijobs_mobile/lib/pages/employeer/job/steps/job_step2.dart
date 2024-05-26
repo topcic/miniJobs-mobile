@@ -1,9 +1,13 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:minijobs_mobile/enumerations/questions.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
+import 'package:minijobs_mobile/models/job/job_save_request.dart';
+import 'package:minijobs_mobile/models/job/job_schedule_info.dart';
 import 'package:minijobs_mobile/models/job_type.dart';
 import 'package:minijobs_mobile/models/proposed_answer.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
@@ -14,7 +18,8 @@ import 'package:provider/provider.dart';
 
 class JobStep2Page extends StatelessWidget {
   final VoidCallback onNextPressed;
-  JobStep2Page({required this.onNextPressed});
+  final VoidCallback onPreviousPressed;
+  JobStep2Page({required this.onNextPressed, required this.onPreviousPressed});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,7 +60,10 @@ class JobStep2Page extends StatelessWidget {
             left: 0,
             right: 0,
             child: Container(
-                height: 400, child: JobForm(onNextPressed: onNextPressed)),
+                height: 400,
+                child: JobForm(
+                    onNextPressed: onNextPressed,
+                    onPreviousPressed: onPreviousPressed)),
           ),
         ],
       ),
@@ -65,7 +73,9 @@ class JobStep2Page extends StatelessWidget {
 
 class JobForm extends StatefulWidget {
   final VoidCallback onNextPressed;
-  JobForm({required this.onNextPressed});
+  final VoidCallback onPreviousPressed;
+
+  JobForm({required this.onNextPressed, required this.onPreviousPressed});
   @override
   _JobFormState createState() => _JobFormState();
 }
@@ -76,19 +86,19 @@ class _JobFormState extends State<JobForm> {
   late JobTypeProvider _jobTypeProvider = JobTypeProvider();
   late ProposedAnswerProvider _proposedAnswerProvider =
       ProposedAnswerProvider();
-      late JobProvider _jobProvider=JobProvider();
-       Job? currentJob ;
+  late JobProvider _jobProvider = JobProvider();
+  Job? currentJob;
   List<ProposedAnswer>? jobSchedules;
   String selectedOption = '';
-  List<String> durationOptions = [
-    '1-3 dana',
-    '3 do 7 dana',
-    '1 do 2 sedmice',
-    '2 do 4 sedmice',
+  List<Map<String, dynamic>> durationOptions = [
+    {'label': '1-3 dana', 'days': 3},
+    {'label': '3 do 7 dana', 'days': 7},
+    {'label': '1 do 2 sedmice', 'days': 14},
+    {'label': '2 do 4 sedmice', 'days': 28},
   ];
   bool showAllSchedules = false;
-  List<String>? selectedJobSchedules = [];
-  String? applicationsEndTo;
+  List<int>? selectedJobSchedules = [];
+  Map<String, dynamic>? applicationsEndTo;
   bool isClickedBtnNext = false;
 
   @override
@@ -96,11 +106,11 @@ class _JobFormState extends State<JobForm> {
     super.didChangeDependencies();
     _jobTypeProvider = context.read<JobTypeProvider>();
     _proposedAnswerProvider = context.read<ProposedAnswerProvider>();
-    _jobProvider=Provider.of<JobProvider>(context);
+    _jobProvider = Provider.of<JobProvider>(context);
 
-     setState(() {
-    currentJob = _jobProvider.getCurrentJob();
-  });
+    setState(() {
+      currentJob = _jobProvider.getCurrentJob();
+    });
   }
 
   @override
@@ -117,7 +127,7 @@ class _JobFormState extends State<JobForm> {
   }
 
   Future<void> getCities() async {
-    cities = await _jobTypeProvider.get();
+    cities = await _jobTypeProvider.getAll();
     setState(() {});
   }
 
@@ -151,7 +161,7 @@ class _JobFormState extends State<JobForm> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                  //    Text(currentJob!.name!),
+                      //    Text(currentJob!.name!),
                       rowMethod(
                         Expanded(
                           child: Autocomplete<String>(
@@ -168,7 +178,14 @@ class _JobFormState extends State<JobForm> {
                                   .map((e) => e.name!);
                             },
                             onSelected: (String selection) {
-                              // Handle the selected option
+                              // Find the corresponding ID based on the selected name
+                              int selectedId = cities!
+                                  .firstWhere(
+                                      (element) => element.name == selection)
+                                  .id!;
+                              // Handle the selected option (name), while saving the corresponding ID
+                              _formKey.currentState?.fields['jobTypeId']
+                                  ?.didChange(selectedId);
                             },
                             optionsViewBuilder: (context,
                                 Function(String) onSelected,
@@ -185,7 +202,8 @@ class _JobFormState extends State<JobForm> {
                                           .map((option) => ListTile(
                                                 title: Text(option,
                                                     style: TextStyle(
-                                                        fontSize: 12)),
+                                                        fontSize:
+                                                            12)), // Display name
                                                 onTap: () => onSelected(option),
                                               ))
                                           .toList(),
@@ -207,7 +225,7 @@ class _JobFormState extends State<JobForm> {
                                     return null;
                                   }
                                 }),
-                                name: 'jobType',
+                                name: 'jobTypeId',
                                 decoration: InputDecoration(
                                   labelText: 'Tip posla',
                                   labelStyle: TextStyle(fontSize: 14),
@@ -235,15 +253,15 @@ class _JobFormState extends State<JobForm> {
                                             style: TextStyle(fontSize: 10),
                                           ),
                                           selected: selectedJobSchedules!
-                                              .contains(schedule.id.toString()),
+                                              .contains(schedule.id),
                                           onSelected: (bool selected) {
                                             setState(() {
                                               if (selected) {
-                                                selectedJobSchedules!.add(
-                                                    schedule.id.toString());
+                                                selectedJobSchedules!
+                                                    .add(schedule.id!);
                                               } else {
-                                                selectedJobSchedules!.remove(
-                                                    schedule.id.toString());
+                                                selectedJobSchedules!
+                                                    .remove(schedule.id);
                                               }
                                             });
                                           },
@@ -310,7 +328,7 @@ class _JobFormState extends State<JobForm> {
                                     padding: EdgeInsets.all(2),
                                     child: FilterChip(
                                       label: Text(
-                                        option,
+                                        option['label'],
                                         style: TextStyle(fontSize: 10),
                                       ),
                                       selected: applicationsEndTo == option,
@@ -319,7 +337,7 @@ class _JobFormState extends State<JobForm> {
                                           if (selected) {
                                             applicationsEndTo = option;
                                           } else {
-                                            applicationsEndTo = '';
+                                            applicationsEndTo = null;
                                           }
                                         });
                                       },
@@ -333,43 +351,87 @@ class _JobFormState extends State<JobForm> {
                       if (isClickedBtnNext &&
                           (applicationsEndTo == null ||
                               applicationsEndTo!.isEmpty))
-                        rowMethod(Text(
-                          "Ovo je obavezno polje",
-                          style:
-                              TextStyle(color: Colors.red[800], fontSize: 12),
-                        )),
+                        rowMethod(
+                          Text(
+                            "Ovo je obavezno polje",
+                            style:
+                                TextStyle(color: Colors.red[800], fontSize: 12),
+                          ),
+                        ),
                       SizedBox(height: 20),
                       rowMethod(
                         Expanded(
                           child: FormBuilderTextField(
-                              keyboardType: TextInputType.number,
-                              name: 'requiredEmployees',
-                              decoration: InputDecoration(
-                                label: Text(
-                                  "Koliko Vam je potrebno radnika za ovaj posao?",
-                                  style: TextStyle(fontSize: 12),
-                                ),
+                            keyboardType: TextInputType.number,
+                            name: 'requiredEmployees',
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
+                            decoration: InputDecoration(
+                              label: Text(
+                                "Koliko Vam je potrebno radnika za ovaj posao?",
+                                style: TextStyle(fontSize: 12),
                               ),
-                              validator: ((value) {
-                                if (value == null || value.isEmpty) {
-                                  return "Broj radnika je obavezno polje";
-                                }
-                                return null;
-                              })),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Broj radnika je obavezno polje";
+                              } else if (int.tryParse(value) == null ||
+                                  int.tryParse(value)! <= 0) {
+                                return "Broj radnika mora biti veći od 0";
+                              }
+                              return null;
+                            },
+                          ),
                         ),
-                        CrossAxisAlignment.center,
                       ),
                       SizedBox(height: 20),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           ElevatedButton(
                             onPressed: () {
+                              widget.onPreviousPressed();
+                            },
+                            child: Text('Nazad'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              setState(() {
+                                isClickedBtnNext = true; // Set the flag to true
+                              });
                               _formKey.currentState?.save();
                               if (_formKey.currentState!.validate()) {
                                 final Map<String, dynamic>? formValues =
                                     _formKey.currentState!.value;
-                                    print(currentJob);
+                                var selectedJobTypeName =
+                                    formValues!['jobTypeId'];
+                                var selectedJobType = cities!.firstWhere(
+                                    (jobType) =>
+                                        jobType.name == selectedJobTypeName);
+
+                                var jobScheduleInfo = JobScheduleInfo(
+                                    jobSchedules![0].questionId,
+                                    selectedJobSchedules);
+                                var saveRequest = JobSaveRequest(
+                                    currentJob!.id!,
+                                    currentJob!.name,
+                                    currentJob!.description,
+                                    currentJob!.streetAddressAndNumber,
+                                    currentJob!.cityId,
+                                    0,
+                                    selectedJobType.id,
+                                    int.tryParse(
+                                        formValues!['requiredEmployees']),
+                                    jobScheduleInfo,
+                                    null,
+                                    null,
+                                    DateTime.now().add(Duration(
+                                        days: applicationsEndTo!['days']!)));
+                                var job = await _jobProvider.update(
+                                    currentJob!.id!, saveRequest);
+                                ;
+                                _jobProvider.setCurrentJob(job);
                                 widget.onNextPressed();
                               }
                             },

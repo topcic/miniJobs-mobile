@@ -26,8 +26,8 @@ namespace Application.Jobs.Handlers
             var job = _mapper.Map<Job>(command.Request);
             job.Created = DateTime.UtcNow;
             job.CreatedBy = command.UserId;
-            job.Status = JobStatus.Draft;
-            job.State = JobState.Initial;
+            job.Status = (int)JobStatus.Draft;
+            job.State = (int)JobState.Initial;
 
             await _jobRepository.InsertAsync(job);
             ts.Complete();

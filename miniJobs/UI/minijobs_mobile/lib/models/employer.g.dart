@@ -7,7 +7,7 @@ part of 'employer.dart';
 // **************************************************************************
 
 Employer _$EmployerFromJson(Map<String, dynamic> json) => Employer(
-      json['id'] as int?,
+      (json['id'] as num?)?.toInt(),
       json['firstName'] as String?,
       json['lastName'] as String?,
       json['userName'] as String?,

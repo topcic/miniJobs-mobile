@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:minijobs_mobile/models/auth_code_request.dart';
-import 'package:minijobs_mobile/pages/users.dart';
 import 'package:minijobs_mobile/providers/authentication_provider.dart';
 import 'package:minijobs_mobile/utils/util_widgets.dart';
 import 'package:minijobs_mobile/widgets/navbar.dart';
@@ -18,6 +17,40 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormBuilderState>();
   late AuthenticationProvider _authenticationProvider =
   AuthenticationProvider();
+    void initState() {
+    super.initState();
+    // Access authentication provider
+    _authenticationProvider = context.read<AuthenticationProvider>();
+
+    // Run authentication process
+    authenticateUser();
+  }
+
+  // Method to authenticate user
+  Future<void> authenticateUser() async {
+    var autCodeRequest = AuthCodeRequest(
+      "27topcic.mahir@gmail.com",
+      "Arni1234",
+      "password",
+      "",
+      "",
+    );
+
+    var result = await _authenticationProvider.tokens(autCodeRequest);
+
+    // Check result of authentication
+    if (result) {
+      // Navigate to Navbar if authentication is successful
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => Navbar(),
+      ));
+    } else {
+      // Show SnackBar with error message if authentication fails
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Nevalidna lozinka ili email'),
+      ));
+    }
+  }
 
   @override
   void didChangeDependencies() {
@@ -102,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
                               final String email = formValues?['email'] ?? '';
                               final String password =
                                   formValues?['password'] ?? '';
-                              var autCodeRequest= AuthCodeRequest(email, password,
+                              var autCodeRequest= AuthCodeRequest("27topcic.mahir@gmail.com", "Arni1234",
                                   "password", "","" );
                               var result = await _authenticationProvider.tokens(autCodeRequest);
 

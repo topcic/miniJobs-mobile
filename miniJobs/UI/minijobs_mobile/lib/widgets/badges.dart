@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:minijobs_mobile/enumerations/job_statuses.dart';
 
 // Default Badge Widget
 class Badge extends StatelessWidget {
@@ -52,9 +53,7 @@ class UserBadge extends StatelessWidget {
     if (status == 'Obrisan') {
       backgroundColor = Colors.redAccent[100]!;
       textColor = Colors.redAccent[700]!;
-
-    } 
-    else if (status == 'Aktivan') {
+    } else if (status == 'Aktivan') {
       backgroundColor = Colors.greenAccent[100]!;
       textColor = Colors.greenAccent[700]!;
     }
@@ -67,9 +66,8 @@ class UserBadge extends StatelessWidget {
   }
 }
 
-// Job Badge Widget extending Badge
 class JobBadge extends StatelessWidget {
-  final String status;
+  final JobStatus status;
 
   const JobBadge({
     required this.status,
@@ -78,18 +76,33 @@ class JobBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color backgroundColor = Colors.grey[200]!;
-    Color textColor = Colors.grey[800]!;
+    String statusText;
+    Color backgroundColor;
+    Color textColor = Colors.white;
 
     // Customize appearance based on status
-    if (status == 'Active') {
-      backgroundColor = Colors.green[200]!;
-    } else if (status == 'Draft') {
-      backgroundColor = Colors.grey[200]!;
+    switch (status) {
+      case JobStatus.Kreiran:
+        statusText = 'Kreiran';
+        backgroundColor = Colors.blue[200]!;
+        break;
+      case JobStatus.Aktivan:
+        statusText = 'Aktivan';
+        backgroundColor = Colors.green[200]!;
+        break;
+      case JobStatus.Zavrsen:
+        statusText = 'Završen';
+        backgroundColor = Colors.grey[200]!;
+        textColor = Colors.black;
+        break;
+      case JobStatus.Izbrisan:
+        statusText = 'Izbrisan';
+        backgroundColor = Colors.red[200]!;
+        break;
     }
 
     return Badge(
-      text: status,
+      text: statusText,
       backgroundColor: backgroundColor,
       textColor: textColor,
     );

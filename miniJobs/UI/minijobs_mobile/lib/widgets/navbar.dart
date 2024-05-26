@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:minijobs_mobile/pages/home_page.dart';
-import 'package:minijobs_mobile/pages/job_list.dart';
-import 'package:minijobs_mobile/pages/job_step1.dart';
-import 'package:minijobs_mobile/pages/job_step2.dart';
-import 'package:minijobs_mobile/pages/job_step3.dart';
+import 'package:minijobs_mobile/pages/employeer/job_list.dart';
+import 'package:minijobs_mobile/pages/employeer/job/steps/job_step1.dart';
+import 'package:minijobs_mobile/pages/employeer/job/steps/job_step2.dart';
+import 'package:minijobs_mobile/pages/employeer/job/steps/job_step3.dart';
 import 'package:minijobs_mobile/pages/profile.dart';
 
 class Navbar extends StatefulWidget {
@@ -28,19 +28,21 @@ class _NavbarState extends State<Navbar> {
   _initRole() async {
     String role = GetStorage().read('role') ?? '';
     setState(() {
-      _bottomNavIndex = 1;
+      _bottomNavIndex = 0;
     });
   }
 
   _initPages() {
     String role = GetStorage().read('role') ?? '';
     _pages = [
-      HomePage(),
-      JobStep1Page(onNextPressed: () {
-        setState(() {
-          _jobStep = 1; // Index of the next form page
-        });
-      }),
+      JobList(),
+      JobStep1Page(
+        onNextPressed: () {
+          setState(() {
+            _bottomNavIndex = 2;
+          });
+        }
+      ),
       JobList(),
       ProfilePage(),
     ];
@@ -124,28 +126,42 @@ class _NavbarState extends State<Navbar> {
       pages.add(_buildPage("View List Page"));
       pages.add(_buildPage("User Page"));
     } else {
-      pages.add(HomePage());
-      pages.add(JobStep1Page(
+      pages.add(JobList());
+       pages.add(JobStep1Page(
         onNextPressed: () {
           setState(() {
-            _bottomNavIndex = 2;
+            _bottomNavIndex = 4;
           });
-        },
+        }
       ));
       pages.add(JobStep2Page(
         onNextPressed: () {
           setState(() {
             _bottomNavIndex = 3;
-          });
+          },
+          );
+        },
+          onPreviousPressed: () {
+          setState(() {
+            _bottomNavIndex = 1;
+          },
+          );
         },
       ));
       pages.add(JobStep3Page(
-        // onNextPressed: () {
-        //   setState(() {
-        //     _bottomNavIndex = 4;
-        //   });
-        // },
-      ));
+        onNextPressed: () {
+          setState(() {
+            _bottomNavIndex = 4;
+          });
+        },
+           onPreviousPressed: () {
+          setState(() {
+            _bottomNavIndex = 2;
+          },
+          );
+        },
+      )
+      );
       pages.add(JobList());
       pages.add(ProfilePage());
     }

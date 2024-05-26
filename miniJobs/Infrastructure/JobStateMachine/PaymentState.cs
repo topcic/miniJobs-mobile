@@ -11,7 +11,7 @@ public class PaymentState(IServiceProvider serviceProvider, IMediator mediator, 
     public override async Task<Job> SavePaymentDetails(JobSaveRequest request)
     {
         var job = await mediator.Send(new JobPaymentDetailsSaveCommand(request));
-        job.State = Domain.Enums.JobState.Active;
+        job.State = (int)Domain.Enums.JobState.Active;
         return job;
     }
 }
