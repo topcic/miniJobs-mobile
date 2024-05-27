@@ -1,8 +1,10 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
+import 'package:minijobs_mobile/models/job/job_save_request.dart';
 import 'package:minijobs_mobile/pages/employeer/job/steps/job_step_1.dart';
 import 'package:minijobs_mobile/pages/employeer/job/steps/job_step_2.dart';
+import 'package:minijobs_mobile/pages/employeer/job/steps/job_step_3.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -21,7 +23,8 @@ class _JobDetailsState extends State<JobDetails> {
   late Job _job = new Job();
   late JobProvider _jobProvider = JobProvider();
   final GlobalKey<JobStep1State> _jobStep1Key = GlobalKey<JobStep1State>();
-  final GlobalKey<JobStep2State> _jobStep2Key = GlobalKey<JobStep2State>();
+ JobSaveRequest? _jobSaveRequest;
+late Function() _validateAndSaveCallback;
   void _nextPressed(Job job) {
     setState(() {
       if (_currentStep < getSteps().length - 1) {
@@ -52,6 +55,18 @@ class _JobDetailsState extends State<JobDetails> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _jobProvider = Provider.of<JobProvider>(context);
+  }
+  void _onNextButton(bool isValid, JobSaveRequest? jobSaveRequest) async {
+    if (isValid) {
+        var saveRequest = jobSaveRequest;
+        var job = await _jobProvider.update(saveRequest!.id!, saveRequest);
+        if (job != null) {
+          _jobProvider.setCurrentJob(job);
+          setState(() {
+            _currentStep += 1;
+          });
+        }
+    } 
   }
 
   @override
@@ -119,7 +134,11 @@ class _JobDetailsState extends State<JobDetails> {
         ),
         Step(
           title: Text(''),
-          content: JobStep2(key: _jobStep2Key),
+         content: JobStep2(onNextButton:_onNextButton
+            ,
+            setValidateAndSaveCallback: (Function() validateAndSave) {
+              _validateAndSaveCallback = validateAndSave;
+            }),
           isActive: _currentStep >= 1,
           state: _currentStep == 0
               ? StepState.editing
@@ -129,7 +148,7 @@ class _JobDetailsState extends State<JobDetails> {
         ),
         Step(
           title: Text(''),
-          content: Container(),
+          content:  JobStep3(),
           isActive: _currentStep >= 2,
           state: _currentStep == 0
               ? StepState.editing
@@ -177,20 +196,7 @@ class _JobDetailsState extends State<JobDetails> {
         }
       }
     } else if (_currentStep == 1) {
-      debugger();
-      var jobStep2State = _jobStep2Key.currentState;
-
-      if (jobStep2State != null && jobStep2State.validateAndSave()) {
-        var saveRequest = jobStep2State.getUpdatedJob();
-
-        var job = await _jobProvider.update(saveRequest.id!, saveRequest);
-        if (job != null) {
-          _jobProvider.setCurrentJob(job);
-          setState(() {
-            _currentStep += 1;
-          });
-        }
-      }
+          _validateAndSaveCallback();
     } else {
       setState(() {
         isCompleted = true;

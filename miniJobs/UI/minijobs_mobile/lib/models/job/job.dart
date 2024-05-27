@@ -2,6 +2,8 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:minijobs_mobile/enumerations/job_statuses.dart';
 import 'package:minijobs_mobile/models/city.dart';
 import 'package:minijobs_mobile/models/employer.dart';
+import 'package:minijobs_mobile/models/job_type.dart';
+import 'package:minijobs_mobile/models/proposed_answer.dart';
 
 part 'job.g.dart';
 @JsonSerializable()
@@ -20,6 +22,9 @@ class Job {
   int? cityId;
   DateTime? created;
   int? numberOfApplications;
+  int? jobTypeId;
+  JobType? jobType;
+  List<ProposedAnswer>? schedules;
 
   Job();
   Job.withData(this.id, this.name, this.description, this.streetAddressAndNumber,

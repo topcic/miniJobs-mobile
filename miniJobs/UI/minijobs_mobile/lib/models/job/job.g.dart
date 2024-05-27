@@ -6,30 +6,35 @@ part of 'job.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Job _$JobFromJson(Map<String, dynamic> json) => Job.withData(
-      (json['id'] as num?)?.toInt(),
-      json['name'] as String?,
-      json['description'] as String?,
-      json['streetAddressAndNumber'] as String?,
-      json['city'] == null
-          ? null
-          : City.fromJson(json['city'] as Map<String, dynamic>),
-      json['applicationsEndTo'] == null
-          ? null
-          : DateTime.parse(json['applicationsEndTo'] as String),
-      jobStatusFromInt(json['status'] as int?),
-      (json['requiredEmployees'] as num?)?.toInt(),
-      (json['wage'] as num?)?.toInt(),
-      json['employer'] == null
-          ? null
-          : Employer.fromJson(json['employer'] as Map<String, dynamic>),
-      (json['state'] as num?)?.toInt(),
-      (json['cityId'] as num?)?.toInt(),
-    )
-      ..created = json['created'] == null
-          ? null
-          : DateTime.parse(json['created'] as String)
-      ..numberOfApplications = (json['numberOfApplications'] as num?)?.toInt();
+Job _$JobFromJson(Map<String, dynamic> json) => Job()
+  ..id = (json['id'] as num?)?.toInt()
+  ..name = json['name'] as String?
+  ..description = json['description'] as String?
+  ..streetAddressAndNumber = json['streetAddressAndNumber'] as String?
+  ..city = json['city'] == null
+      ? null
+      : City.fromJson(json['city'] as Map<String, dynamic>)
+  ..applicationsEndTo = json['applicationsEndTo'] == null
+      ? null
+      : DateTime.parse(json['applicationsEndTo'] as String)
+  ..status = jobStatusFromInt(json['status'] as int?)
+  ..requiredEmployees = (json['requiredEmployees'] as num?)?.toInt()
+  ..wage = (json['wage'] as num?)?.toInt()
+  ..employer = json['employer'] == null
+      ? null
+      : Employer.fromJson(json['employer'] as Map<String, dynamic>)
+  ..state = (json['state'] as num?)?.toInt()
+  ..cityId = (json['cityId'] as num?)?.toInt()
+  ..created =
+      json['created'] == null ? null : DateTime.parse(json['created'] as String)
+  ..numberOfApplications = (json['numberOfApplications'] as num?)?.toInt()
+  ..jobTypeId = (json['jobTypeId'] as num?)?.toInt()
+  ..jobType = json['jobType'] == null
+      ? null
+      : JobType.fromJson(json['jobType'] as Map<String, dynamic>)
+  ..schedules = (json['schedules'] as List<dynamic>?)
+      ?.map((e) => ProposedAnswer.fromJson(e as Map<String, dynamic>))
+      .toList();
 
 Map<String, dynamic> _$JobToJson(Job instance) => <String, dynamic>{
       'id': instance.id,
@@ -46,7 +51,11 @@ Map<String, dynamic> _$JobToJson(Job instance) => <String, dynamic>{
       'cityId': instance.cityId,
       'created': instance.created?.toIso8601String(),
       'numberOfApplications': instance.numberOfApplications,
+      'jobTypeId': instance.jobTypeId,
+      'jobType': instance.jobType,
+      'schedules': instance.schedules,
     };
+
 
 JobStatus? jobStatusFromInt(int? status) {
   if (status == null) return null;

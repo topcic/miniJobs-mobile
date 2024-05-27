@@ -4,6 +4,7 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240526185829_updated_jobs")]
+    partial class updated_jobs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -243,10 +246,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("description");
 
-                    b.Property<int?>("JobTypeId")
-                        .HasColumnType("int")
-                        .HasColumnName("job_type_id");
-
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2")
                         .HasColumnName("last_modified");
@@ -284,8 +283,6 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
-
-                    b.HasIndex("JobTypeId");
 
                     b.HasIndex("LastModifiedBy");
 
@@ -831,11 +828,6 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy");
-
-                    b.HasOne("Domain.Entities.JobType", null)
-                        .WithMany()
-                        .HasForeignKey("JobTypeId")
-                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.User", null)
                         .WithMany()

@@ -17,54 +17,84 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<Job> GetWithDetailsAsync(int id)
         {
-            var sqlQuery = FormattableStringFactory.Create(@"
-        WITH SchedulesCTE AS (
-            SELECT jq.job_id, pa.*
-            FROM job_questions AS jq
-            LEFT JOIN job_question_answers AS qa ON jq.id = qa.job_question_id
-            LEFT JOIN proposed_answers AS pa ON qa.proposed_answer_id = pa.id
-            WHERE jq.question_id = 1
-        ),
-        PaymentQuestionCTE AS (
-            SELECT jq.job_id, pa.*
-            FROM job_questions AS jq
-            LEFT JOIN job_question_answers AS qa ON jq.id = qa.job_question_id
-            LEFT JOIN proposed_answers AS pa ON qa.proposed_answer_id = pa.id
-            WHERE jq.question_id = 2
-        ),
-        AdditionalPaymentOptionsCTE AS (
-            SELECT jq.job_id, pa.*
-            FROM job_questions AS jq
-            LEFT JOIN job_question_answers AS qa ON jq.id = qa.job_question_id
-            LEFT JOIN proposed_answers AS pa ON qa.proposed_answer_id = pa.id
-            WHERE jq.question_id = 3
-        )
-        SELECT j.*,
-            (
-                SELECT pa.id, pa.answer, pa.question_id
-                FROM SchedulesCTE AS pa
-                WHERE pa.job_id = j.id
-                FOR JSON PATH
-            ) AS Schedules,
-            (
-                SELECT pa.id, pa.answer, pa.question_id
-                FROM PaymentQuestionCTE AS pa
-                WHERE pa.job_id = j.id
-                FOR JSON PATH
-            ) AS PaymentQuestion,
-            (
-                SELECT pa.id, pa.answer, pa.question_id
-                FROM AdditionalPaymentOptionsCTE AS pa
-                WHERE pa.job_id = j.id
-                FOR JSON PATH
-            ) AS AdditionalPaymentOptions
-        FROM jobs AS j
-        WHERE j.id = {0};
-    ", id);
+            var sqlQuery = @"
+                WITH SchedulesCTE AS (
+                    SELECT jq.job_id, pa.*
+                    FROM job_questions AS jq
+                    LEFT JOIN job_question_answers AS qa ON jq.id = qa.job_question_id
+                    LEFT JOIN proposed_answers AS pa ON qa.proposed_answer_id = pa.id
+                    WHERE jq.question_id = 1
+                ),
+                PaymentQuestionCTE AS (
+                    SELECT jq.job_id, pa.*
+                    FROM job_questions AS jq
+                    LEFT JOIN job_question_answers AS qa ON jq.id = qa.job_question_id
+                    LEFT JOIN proposed_answers AS pa ON qa.proposed_answer_id = pa.id
+                    WHERE jq.question_id = 2
+                ),
+                AdditionalPaymentOptionsCTE AS (
+                    SELECT jq.job_id, pa.*
+                    FROM job_questions AS jq
+                    LEFT JOIN job_question_answers AS qa ON jq.id = qa.job_question_id
+                    LEFT JOIN proposed_answers AS pa ON qa.proposed_answer_id = pa.id
+                    WHERE jq.question_id = 3
+                )
+                SELECT j.*,
+                    (
+                        SELECT pa.id, pa.answer, pa.question_id
+                        FROM SchedulesCTE AS pa
+                        WHERE pa.job_id = j.id
+                        FOR JSON PATH
+                    ) AS Schedules,
+                    (
+                        SELECT pa.id, pa.answer, pa.question_id
+                        FROM PaymentQuestionCTE AS pa
+                        WHERE pa.job_id = j.id
+                        FOR JSON PATH
+                    ) AS PaymentQuestion,
+                        (
+                        SELECT pa.id, pa.answer, pa.question_id
+                        FROM AdditionalPaymentOptionsCTE AS pa
+                        WHERE pa.job_id = j.id
+                        FOR JSON PATH
+                    ) AS AdditionalPaymentOptions
+                FROM jobs AS j
+                WHERE j.id = @JobId;
+            ";
 
-            var job = await _context.Database.SqlQuery<Job>(sqlQuery).FirstOrDefaultAsync();
+            await using var connection = _context.Database.GetDbConnection();
+            await connection.OpenAsync();
 
-            return job;
+            await using var command = connection.CreateCommand();
+            command.CommandText = sqlQuery;
+            command.Parameters.Add(new SqlParameter("@JobId", id));
+
+            await using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                var job = MapJob(reader);
+
+                if (!reader.IsDBNull(reader.GetOrdinal("Schedules")))
+                {
+                    job.Schedules = JsonConvert.DeserializeObject<List<ProposedAnswer>>(reader.GetString(reader.GetOrdinal("Schedules")));
+                }
+                if (!reader.IsDBNull(reader.GetOrdinal("PaymentQuestion")))
+                {
+                    var proposedAnswers = JsonConvert.DeserializeObject<List<ProposedAnswer>>(reader.GetString(reader.GetOrdinal("PaymentQuestion")));
+                    if (proposedAnswers.Any())
+                    {
+                        job.PaymentQuestion = proposedAnswers.FirstOrDefault();
+                    }
+                }
+                if (!reader.IsDBNull(reader.GetOrdinal("AdditionalPaymentOptions")))
+                {
+                    job.AdditionalPaymentOptions = JsonConvert.DeserializeObject<List<ProposedAnswer>>(reader.GetString(reader.GetOrdinal("AdditionalPaymentOptions")));
+                }
+
+                return job;
+            }
+
+            return null;
         }
 
         private static Job MapJob(DbDataReader reader)
@@ -96,7 +126,7 @@ namespace Infrastructure.Persistence.Repositories
     WHERE j.created_by = {0};
 ", employeerId);
             var jobs = await _context.Database
-             .SqlQuery<Job>( sqlQuery).ToListAsync();
+             .SqlQuery<Job>(sqlQuery).ToListAsync();
 
             return jobs;
         }

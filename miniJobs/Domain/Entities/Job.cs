@@ -40,7 +40,7 @@ public class Job : BaseAuditableEntity, IEntity<int>
     public int State { get; set; }
 
     [Column("job_type_id")]
-    public int JobTypeId { get; set; }
+    public int? JobTypeId { get; set; }
 
     [NotMapped]
     public List<ProposedAnswer> Schedules { get; set; }

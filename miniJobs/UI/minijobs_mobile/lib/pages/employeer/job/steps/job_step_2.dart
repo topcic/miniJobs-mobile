@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -14,8 +16,13 @@ import 'package:minijobs_mobile/utils/util_widgets.dart';
 import 'package:provider/provider.dart';
 
 class JobStep2 extends StatefulWidget {
-  const JobStep2({super.key});
-
+  final Function(bool,JobSaveRequest) onNextButton;
+    final Function(Function()) setValidateAndSaveCallback;
+  const JobStep2({
+    Key? key,
+    required this.onNextButton,
+    required this.setValidateAndSaveCallback,
+  }) : super(key: key);
   @override
   State<JobStep2> createState() => JobStep2State();
 }
@@ -41,6 +48,7 @@ class JobStep2State extends State<JobStep2> {
   late ProposedAnswerProvider _proposedAnswerProvider =
       ProposedAnswerProvider();
   late JobProvider _jobProvider = JobProvider();
+  TextEditingController _jobTypeController = TextEditingController();
 
   @override
   void didChangeDependencies() {
@@ -49,9 +57,11 @@ class JobStep2State extends State<JobStep2> {
     _proposedAnswerProvider = context.read<ProposedAnswerProvider>();
     _jobProvider = Provider.of<JobProvider>(context);
 
-    setState(() {
-      _job = _jobProvider.getCurrentJob();
-    });
+    _job = _jobProvider.getCurrentJob();
+    if (_job != null) {
+      _setInitialFormValues();
+    }
+       widget.setValidateAndSaveCallback(validateAndSave);
   }
 
   @override
@@ -72,6 +82,30 @@ class JobStep2State extends State<JobStep2> {
     setState(() {});
   }
 
+  void _setInitialFormValues() {
+    _formKey.currentState?.patchValue({
+      'requiredEmployees': _job!.requiredEmployees.toString(),
+      'jobTypeId': _job!.jobTypeId.toString(),
+    });
+    selectedJobSchedules =
+        _job!.schedules?.map((schedule) => schedule.id!).toList();
+    if (_job!.applicationsEndTo != null) {
+      Duration difference = _job!.applicationsEndTo!.difference(_job!.created!);
+      int days = difference.inDays;
+      if (difference.inHours % 24 > 0) {
+        days += 1;
+      }
+
+      applicationsEndTo = durationOptions
+          .firstWhere((option) => option['days'] == days, orElse: () => {});
+    }
+    JobType? selectedJobType =
+        _jobTypes?.firstWhere((jobType) => jobType.id == _job!.jobTypeId);
+    if (selectedJobType != null) {
+      _jobTypeController.text = selectedJobType.name!;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     List<ProposedAnswer>? displayedSchedules =
@@ -84,7 +118,6 @@ class JobStep2State extends State<JobStep2> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              //    Text(currentJob!.name!),
               rowMethod(
                 Expanded(
                   child: Autocomplete<String>(
@@ -99,13 +132,13 @@ class JobStep2State extends State<JobStep2> {
                           .map((e) => e.name!);
                     },
                     onSelected: (String selection) {
-                      // Find the corresponding ID based on the selected name
                       int selectedId = _jobTypes!
                           .firstWhere((element) => element.name == selection)
                           .id!;
-                      // Handle the selected option (name), while saving the corresponding ID
                       _formKey.currentState?.fields['jobTypeId']
-                          ?.didChange(selectedId);
+                          ?.didChange(selectedId.toString());
+                      _jobTypeController.text =
+                          selection; // Update the controller text to display the selected value
                     },
                     optionsViewBuilder: (context, Function(String) onSelected,
                         Iterable<String> options) {
@@ -120,8 +153,7 @@ class JobStep2State extends State<JobStep2> {
                               children: options
                                   .map((option) => ListTile(
                                         title: Text(option,
-                                            style: TextStyle(
-                                                fontSize: 12)), // Display name
+                                            style: TextStyle(fontSize: 12)),
                                         onTap: () => onSelected(option),
                                       ))
                                   .toList(),
@@ -132,18 +164,13 @@ class JobStep2State extends State<JobStep2> {
                     },
                     fieldViewBuilder:
                         (context, controller, focusNode, onEditingComplete) {
+                      // Use the custom controller
                       return FormBuilderTextField(
-                        controller: controller,
+                        controller: _jobTypeController,
                         focusNode: focusNode,
                         style: TextStyle(fontSize: 12),
-                        validator: ((value) {
-                          if (value == null || value.isEmpty) {
-                            return "Tip posla je obavezno polje";
-                          } else {
-                            return null;
-                          }
-                        }),
-                        name: 'jobTypeId',
+                        name:
+                            'jobTypeId_autocomplete', // Use a different name to avoid conflicts
                         decoration: InputDecoration(
                           labelText: 'Tip posla',
                           labelStyle: TextStyle(fontSize: 14),
@@ -166,10 +193,8 @@ class JobStep2State extends State<JobStep2> {
                               (schedule) => Padding(
                                 padding: EdgeInsets.all(2),
                                 child: FilterChip(
-                                  label: Text(
-                                    schedule.answer ?? '',
-                                    style: TextStyle(fontSize: 10),
-                                  ),
+                                  label: Text(schedule.answer ?? '',
+                                      style: TextStyle(fontSize: 10)),
                                   selected: selectedJobSchedules!
                                       .contains(schedule.id),
                                   onSelected: (bool selected) {
@@ -190,43 +215,41 @@ class JobStep2State extends State<JobStep2> {
                   ),
                 ),
               ),
-              SizedBox(
-                height: 10,
-              ),
+              SizedBox(height: 10),
               if (!showAllSchedules)
-                if (!showAllSchedules)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          setState(() {
-                            showAllSchedules = true;
-                          });
-                        },
-                        icon: Text("više", style: TextStyle(fontSize: 12)),
-                        label: Icon(Icons.keyboard_arrow_down, size: 20),
-                      ),
-                    ],
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          showAllSchedules = true;
+                        });
+                      },
+                      icon: Text("više", style: TextStyle(fontSize: 12)),
+                      label: Icon(Icons.keyboard_arrow_down, size: 20),
+                    ),
+                  ],
+                ),
               if (showAllSchedules)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     ElevatedButton.icon(
-                        onPressed: () {
-                          setState(() {
-                            showAllSchedules = false;
-                          });
-                        },
-                        icon: Text("manje", style: TextStyle(fontSize: 12)),
-                        label: Icon(Icons.keyboard_arrow_up, size: 20))
+                      onPressed: () {
+                        setState(() {
+                          showAllSchedules = false;
+                        });
+                      },
+                      icon: Text("manje", style: TextStyle(fontSize: 12)),
+                      label: Icon(Icons.keyboard_arrow_up, size: 20),
+                    ),
                   ],
                 ),
               if (isClickedBtnNext &&
                   (selectedJobSchedules == null ||
                       selectedJobSchedules!.isEmpty))
-                rowMethod(Text("Rspored posla je obavezno polje",
+                rowMethod(Text("Raspored posla je obavezno polje",
                     style: TextStyle(color: Colors.red[800], fontSize: 12))),
               SizedBox(height: 20),
               rowMethod(Text("Koliko brzo želite da pronađete?")),
@@ -240,10 +263,8 @@ class JobStep2State extends State<JobStep2> {
                           (option) => Padding(
                             padding: EdgeInsets.all(2),
                             child: FilterChip(
-                              label: Text(
-                                option['label'],
-                                style: TextStyle(fontSize: 10),
-                              ),
+                              label: Text(option['label'],
+                                  style: TextStyle(fontSize: 10)),
                               selected: applicationsEndTo == option,
                               onSelected: (bool selected) {
                                 setState(() {
@@ -263,12 +284,8 @@ class JobStep2State extends State<JobStep2> {
               ),
               if (isClickedBtnNext &&
                   (applicationsEndTo == null || applicationsEndTo!.isEmpty))
-                rowMethod(
-                  Text(
-                    "Ovo je obavezno polje",
-                    style: TextStyle(color: Colors.red[800], fontSize: 12),
-                  ),
-                ),
+                rowMethod(Text("Ovo je obavezno polje",
+                    style: TextStyle(color: Colors.red[800], fontSize: 12))),
               SizedBox(height: 20),
               rowMethod(
                 Expanded(
@@ -278,9 +295,8 @@ class JobStep2State extends State<JobStep2> {
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     decoration: InputDecoration(
                       label: Text(
-                        "Koliko Vam je potrebno radnika za ovaj posao?",
-                        style: TextStyle(fontSize: 12),
-                      ),
+                          "Koliko Vam je potrebno radnika za ovaj posao?",
+                          style: TextStyle(fontSize: 12)),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -305,23 +321,18 @@ class JobStep2State extends State<JobStep2> {
     return Expanded(
       child: Row(
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-            ),
-          ),
-          SizedBox(width: 8), // Add spacing between label and text field
+          Text(label, style: TextStyle(fontSize: 14)),
+          SizedBox(width: 8),
           Flexible(
             child: FormBuilderTextField(
               name: name,
-              validator: ((value) {
+              validator: (value) {
                 if (value == null || value.isEmpty) {
                   return "$label je obavezno polje";
                 } else {
                   return null;
                 }
-              }),
+              },
               style: TextStyle(fontSize: 12),
               decoration: InputDecoration(
                 labelText: label,
@@ -334,36 +345,38 @@ class JobStep2State extends State<JobStep2> {
     );
   }
 
-  bool validateAndSave() {
+   validateAndSave() {
+    
     _formKey.currentState?.save();
     if (_formKey.currentState!.validate()) {
       final Map<String, dynamic>? formValues = _formKey.currentState!.value;
-      var selectedJobTypeName = formValues!['jobTypeId'];
+      var selectedJobTypeName = formValues!['jobTypeId']??formValues!['jobTypeId_autocomplete'];
       var selectedJobType = _jobTypes!
           .firstWhere((jobType) => jobType.name == selectedJobTypeName);
 
       var jobScheduleInfo =
           JobScheduleInfo(_jobSchedules![0].questionId, selectedJobSchedules);
       var saveRequest = JobSaveRequest(
-          _job!.id!,
-          _job!.name,
-          _job!.description,
-          _job!.streetAddressAndNumber,
-          _job!.cityId,
-          0,
-          selectedJobType.id,
-          int.tryParse(formValues!['requiredEmployees']),
-          jobScheduleInfo,
-          null,
-          null,
-          DateTime.now().add(Duration(days: applicationsEndTo!['days']!)));
+        _job!.id!,
+        _job!.name,
+        _job!.description,
+        _job!.streetAddressAndNumber,
+        _job!.cityId,
+        0,
+        selectedJobType.id,
+        int.tryParse(formValues['requiredEmployees']),
+        jobScheduleInfo,
+        null,
+        null,
+        DateTime.now().add(Duration(days: applicationsEndTo!['days']!)),
+      );
 
       setState(() {
         _jobSaveRequest = saveRequest;
       });
-      return true;
+     widget.onNextButton(true,_jobSaveRequest!);
     }
-    return false;
+      widget.onNextButton(false,_jobSaveRequest!);
   }
 
   JobSaveRequest getUpdatedJob() {

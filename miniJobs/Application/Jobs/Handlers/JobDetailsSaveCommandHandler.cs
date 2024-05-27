@@ -17,17 +17,18 @@ public class JobDetailsSaveCommandHandler : IRequestHandler<JobDetailsSaveComman
     private readonly IMapper _mapper;
     private readonly IJobQuestionRepository _jobQuestionRepository;
     private readonly IJobQuestionAnswerRepository _jobQuestionAnswerRepository;
-    private readonly IProposedAnswerRepository _proposedAnswerRepository;   
+    private readonly IJobTypeRepository _jobTypeRepository;   
 
 
 
-    public JobDetailsSaveCommandHandler(IJobRepository jobRepository, IMapper mapper, IJobQuestionRepository jobQuestionRepository, IJobQuestionAnswerRepository jobQuestionAnswerRepository, IProposedAnswerRepository proposedAnswerRepository)
+    public JobDetailsSaveCommandHandler(IJobRepository jobRepository, IMapper mapper, IJobQuestionRepository jobQuestionRepository,
+        IJobQuestionAnswerRepository jobQuestionAnswerRepository, IJobTypeRepository jobTypeRepository)
     {
         _jobRepository = jobRepository;
         _mapper = mapper;
         _jobQuestionRepository = jobQuestionRepository;
         _jobQuestionAnswerRepository = jobQuestionAnswerRepository;
-        _proposedAnswerRepository = proposedAnswerRepository;
+        _jobTypeRepository = jobTypeRepository;
     }
 
     public async Task<Job> Handle(JobDetailsSaveCommand command, CancellationToken cancellationToken)
@@ -35,6 +36,8 @@ public class JobDetailsSaveCommandHandler : IRequestHandler<JobDetailsSaveComman
         using var ts = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         Job job = await _jobRepository.TryFindAsync(command.Request.Id);
         ExceptionExtension.Validate("JOB_NOT_EXISTS", () => job == null);
+        JobType jobType= await _jobTypeRepository.TryFindAsync(command.Request.JobTypeId);
+        ExceptionExtension.Validate("JOB_TYPE_NOT_EXISTS", () => jobType == null);
 
         _mapper.Map(command.Request, job);
         if (command.Request.JobSchedule != null)
@@ -61,6 +64,7 @@ public class JobDetailsSaveCommandHandler : IRequestHandler<JobDetailsSaveComman
         job.Schedules = jobDetails.Schedules;
         job.AdditionalPaymentOptions = jobDetails.AdditionalPaymentOptions;
         job.PaymentQuestion = jobDetails.PaymentQuestion;
+        job.JobType = jobType;
         ts.Complete();
 
         return job;

@@ -37,12 +37,12 @@ class JobStep1State extends State<JobStep1> {
 
     setState(() {
       _job = _jobProvider.getCurrentJob();
-      if(_job!=null)
        _setInitialFormValues();
     });
   }
 
   void _setInitialFormValues() {
+    if(_job!=null)
     _formKey.currentState?.patchValue({
       'name': _job!.name,
       'description': _job!.description,
