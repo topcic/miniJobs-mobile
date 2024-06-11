@@ -1,8 +1,5 @@
 ﻿using Domain.Common;
-using Domain.Enums;
 using Domain.Interfaces;
-using System.ComponentModel;
-using System.Text.Json.Serialization;
 
 namespace Domain.Entities;
 
@@ -22,8 +19,8 @@ public class Job : BaseAuditableEntity, IEntity<int>
     [Column("street_address_and_number")]
     public string StreetAddressAndNumber { get; set; }
 
-    [Column("applications_end_to")]
-    public DateTime? ApplicationsEndTo { get; set; }
+    [Column("applications_duration")]
+    public int? ApplicationsDuration { get; set; }
 
     [Column("status")]
     public int Status { get; set; }
@@ -56,5 +53,8 @@ public class Job : BaseAuditableEntity, IEntity<int>
 
     [NotMapped]
     public JobType JobType { get; set; }
+
+    [NotMapped]
+    public City City { get; set; }
 
 }

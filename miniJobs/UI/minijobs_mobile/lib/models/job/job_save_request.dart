@@ -16,7 +16,7 @@ class JobSaveRequest {
   JobScheduleInfo? jobSchedule;
   Map<int, List<int>>? answersToPaymentQuestions;
   int? wage;
-  DateTime? applicationsEndTo;
+  int? applicationsDuration;
 
   JobSaveRequest(
       this.id,
@@ -30,7 +30,7 @@ class JobSaveRequest {
       this.jobSchedule,
       this.answersToPaymentQuestions,
       this.wage,
-      this.applicationsEndTo);
+      this.applicationsDuration);
 
   factory JobSaveRequest.fromJson(Map<String, dynamic> json) =>
       _$JobSaveRequestFromJson(json);

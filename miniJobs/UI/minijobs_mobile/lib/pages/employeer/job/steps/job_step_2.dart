@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -16,13 +15,14 @@ import 'package:minijobs_mobile/utils/util_widgets.dart';
 import 'package:provider/provider.dart';
 
 class JobStep2 extends StatefulWidget {
-  final Function(bool,JobSaveRequest) onNextButton;
-    final Function(Function()) setValidateAndSaveCallback;
+  final Function(bool, JobSaveRequest) onNextButton;
+  final Function(Function()) setValidateAndSaveCallback;
   const JobStep2({
     Key? key,
     required this.onNextButton,
     required this.setValidateAndSaveCallback,
   }) : super(key: key);
+
   @override
   State<JobStep2> createState() => JobStep2State();
 }
@@ -61,7 +61,7 @@ class JobStep2State extends State<JobStep2> {
     if (_job != null) {
       _setInitialFormValues();
     }
-       widget.setValidateAndSaveCallback(validateAndSave);
+    widget.setValidateAndSaveCallback(validateAndSave);
   }
 
   @override
@@ -84,26 +84,26 @@ class JobStep2State extends State<JobStep2> {
 
   void _setInitialFormValues() {
     _formKey.currentState?.patchValue({
-      'requiredEmployees': _job!.requiredEmployees.toString(),
-      'jobTypeId': _job!.jobTypeId.toString(),
-    });
-    selectedJobSchedules =
-        _job!.schedules?.map((schedule) => schedule.id!).toList();
-    if (_job!.applicationsEndTo != null) {
-      Duration difference = _job!.applicationsEndTo!.difference(_job!.created!);
-      int days = difference.inDays;
-      if (difference.inHours % 24 > 0) {
-        days += 1;
-      }
+  'requiredEmployees': _job?.requiredEmployees?.toString() ?? '',
+  'jobType': _job?.jobType?.name ?? '',
+});
 
-      applicationsEndTo = durationOptions
-          .firstWhere((option) => option['days'] == days, orElse: () => {});
-    }
-    JobType? selectedJobType =
-        _jobTypes?.firstWhere((jobType) => jobType.id == _job!.jobTypeId);
-    if (selectedJobType != null) {
-      _jobTypeController.text = selectedJobType.name!;
-    }
+selectedJobSchedules = _job?.schedules?.map((schedule) => schedule.id!).toList() ?? [];
+
+if (_job?.applicationsDuration != null) {
+  applicationsEndTo = durationOptions.firstWhere(
+    (option) => option['days'] == _job!.applicationsDuration,
+    orElse: () => {},
+  );
+}
+
+JobType? selectedJobType;
+if (_jobTypes != null && _job?.jobTypeId != null) {
+  selectedJobType = _jobTypes!.firstWhere((jobType) => jobType.id == _job!.jobTypeId);
+}
+if (selectedJobType != null) {
+  _jobTypeController.text = selectedJobType.name!;
+}
   }
 
   @override
@@ -137,11 +137,10 @@ class JobStep2State extends State<JobStep2> {
                           .id!;
                       _formKey.currentState?.fields['jobTypeId']
                           ?.didChange(selectedId.toString());
-                      _jobTypeController.text =
-                          selection; // Update the controller text to display the selected value
+                      _jobTypeController.text = selection;
                     },
-                    optionsViewBuilder: (context, Function(String) onSelected,
-                        Iterable<String> options) {
+                    optionsViewBuilder: (context,
+                        Function(String) onSelected, Iterable<String> options) {
                       return Align(
                         alignment: Alignment.topLeft,
                         child: Material(
@@ -162,15 +161,20 @@ class JobStep2State extends State<JobStep2> {
                         ),
                       );
                     },
-                    fieldViewBuilder:
-                        (context, controller, focusNode, onEditingComplete) {
-                      // Use the custom controller
+                    fieldViewBuilder: (context, controller, focusNode,
+                        onEditingComplete) {
                       return FormBuilderTextField(
-                        controller: _jobTypeController,
+                        controller: controller,
                         focusNode: focusNode,
                         style: TextStyle(fontSize: 12),
-                        name:
-                            'jobTypeId_autocomplete', // Use a different name to avoid conflicts
+                        validator: ((value) {
+                          if (value == null || value.isEmpty) {
+                            return "Tip posla je obavezno polje";
+                          } else {
+                            return null;
+                          }
+                        }),
+                        name: 'jobType',
                         decoration: InputDecoration(
                           labelText: 'Tip posla',
                           labelStyle: TextStyle(fontSize: 14),
@@ -268,11 +272,7 @@ class JobStep2State extends State<JobStep2> {
                               selected: applicationsEndTo == option,
                               onSelected: (bool selected) {
                                 setState(() {
-                                  if (selected) {
-                                    applicationsEndTo = option;
-                                  } else {
-                                    applicationsEndTo = null;
-                                  }
+                                  applicationsEndTo = selected ? option : null;
                                 });
                               },
                             ),
@@ -345,17 +345,22 @@ class JobStep2State extends State<JobStep2> {
     );
   }
 
-   validateAndSave() {
-    
+  validateAndSave() {
     _formKey.currentState?.save();
-    if (_formKey.currentState!.validate()) {
+    setState(() {
+      isClickedBtnNext = true;
+    });
+    if (_formKey.currentState!.validate() &&
+        selectedJobSchedules != null &&
+        selectedJobSchedules!.isNotEmpty &&
+        applicationsEndTo != null) {
       final Map<String, dynamic>? formValues = _formKey.currentState!.value;
-      var selectedJobTypeName = formValues!['jobTypeId']??formValues!['jobTypeId_autocomplete'];
+      var selectedJobTypeName = formValues!['jobType'];
       var selectedJobType = _jobTypes!
           .firstWhere((jobType) => jobType.name == selectedJobTypeName);
-
       var jobScheduleInfo =
           JobScheduleInfo(_jobSchedules![0].questionId, selectedJobSchedules);
+
       var saveRequest = JobSaveRequest(
         _job!.id!,
         _job!.name,
@@ -368,15 +373,16 @@ class JobStep2State extends State<JobStep2> {
         jobScheduleInfo,
         null,
         null,
-        DateTime.now().add(Duration(days: applicationsEndTo!['days']!)),
+        applicationsEndTo!['days']!,
       );
 
       setState(() {
         _jobSaveRequest = saveRequest;
       });
-     widget.onNextButton(true,_jobSaveRequest!);
+      widget.onNextButton(true, _jobSaveRequest!);
+    } else {
+      widget.onNextButton(false, _jobSaveRequest!);
     }
-      widget.onNextButton(false,_jobSaveRequest!);
   }
 
   JobSaveRequest getUpdatedJob() {

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:json_annotation/json_annotation.dart';
 import 'package:minijobs_mobile/models/user.dart';
 part 'employer.g.dart';
@@ -19,6 +21,7 @@ class Employer extends User {
       super.role,
       super.deleted,
       super.accountConfirmed,
+      super.photo,
       this.name,
       this.streetAddressAndNumber,
       this.idNumber,

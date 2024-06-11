@@ -14,10 +14,8 @@ Job _$JobFromJson(Map<String, dynamic> json) => Job()
   ..city = json['city'] == null
       ? null
       : City.fromJson(json['city'] as Map<String, dynamic>)
-  ..applicationsEndTo = json['applicationsEndTo'] == null
-      ? null
-      : DateTime.parse(json['applicationsEndTo'] as String)
-  ..status = jobStatusFromInt(json['status'] as int?)
+  ..applicationsDuration = (json['applicationsDuration'] as num?)?.toInt()
+  ..status =jobStatusFromInt(json['status'] as int?)
   ..requiredEmployees = (json['requiredEmployees'] as num?)?.toInt()
   ..wage = (json['wage'] as num?)?.toInt()
   ..employer = json['employer'] == null
@@ -34,7 +32,14 @@ Job _$JobFromJson(Map<String, dynamic> json) => Job()
       : JobType.fromJson(json['jobType'] as Map<String, dynamic>)
   ..schedules = (json['schedules'] as List<dynamic>?)
       ?.map((e) => ProposedAnswer.fromJson(e as Map<String, dynamic>))
-      .toList();
+      .toList()
+  ..paymentQuestion = json['paymentQuestion'] == null
+      ? null
+      : ProposedAnswer.fromJson(json['paymentQuestion'] as Map<String, dynamic>)
+  ..additionalPaymentOptions =
+      (json['additionalPaymentOptions'] as List<dynamic>?)
+          ?.map((e) => ProposedAnswer.fromJson(e as Map<String, dynamic>))
+          .toList();
 
 Map<String, dynamic> _$JobToJson(Job instance) => <String, dynamic>{
       'id': instance.id,
@@ -42,7 +47,7 @@ Map<String, dynamic> _$JobToJson(Job instance) => <String, dynamic>{
       'description': instance.description,
       'streetAddressAndNumber': instance.streetAddressAndNumber,
       'city': instance.city,
-      'applicationsEndTo': instance.applicationsEndTo?.toIso8601String(),
+      'applicationsEndTo': instance.applicationsDuration,
       'status': instance.status?.index,
       'requiredEmployees': instance.requiredEmployees,
       'wage': instance.wage,
@@ -54,8 +59,9 @@ Map<String, dynamic> _$JobToJson(Job instance) => <String, dynamic>{
       'jobTypeId': instance.jobTypeId,
       'jobType': instance.jobType,
       'schedules': instance.schedules,
+      'paymentQuestion': instance.paymentQuestion,
+      'additionalPaymentOptions': instance.additionalPaymentOptions,
     };
-
 
 JobStatus? jobStatusFromInt(int? status) {
   if (status == null) return null;

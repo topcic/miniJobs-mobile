@@ -46,68 +46,80 @@ class _JobListState extends State<JobList> {
               DataColumn(label: Center(child: Text('Broj aplikacija'))),
               DataColumn(label: Center(child: Text('Status'))),
             ],
-            rows: jobs.map((job) => DataRow(cells: [
-              DataCell(
-                PopupMenuButton<String>(
-                  icon: Icon(Icons.more_vert, size: 18),
-                  itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                    PopupMenuItem<String>(
-                      value: 'details',
-                      child: Row(children: [
-                        Icon(Icons.reorder, size: 18),
-                        SizedBox(width: 8),
-                        Text('Detalji')
-                      ]),
-                    ),
-                    PopupMenuItem<String>(
-                      value: 'delete',
-                      child: Row(children: [
-                        Icon(
-                          Icons.close,
-                          color: Colors.redAccent[700],
-                          size: 18,
+            rows: jobs
+                .map((job) => DataRow(cells: [
+                      DataCell(
+                        PopupMenuButton<String>(
+                          icon: Icon(Icons.more_vert, size: 18),
+                          itemBuilder: (BuildContext context) =>
+                              <PopupMenuEntry<String>>[
+                            PopupMenuItem<String>(
+                              value: 'details',
+                              child: Row(children: [
+                                Icon(Icons.reorder, size: 18),
+                                SizedBox(width: 8),
+                                Text('Detalji')
+                              ]),
+                            ),
+                            PopupMenuItem<String>(
+                              value: 'delete',
+                              child: Row(children: [
+                                Icon(
+                                  Icons.close,
+                                  color: Colors.redAccent[700],
+                                  size: 18,
+                                ),
+                                SizedBox(width: 8),
+                                Text('Obriši')
+                              ]),
+                            ),
+                            PopupMenuItem<String>(
+                              value: 'complete',
+                              child: Row(children: [
+                                Icon(Icons.check,
+                                    color: Colors.greenAccent[700], size: 18),
+                                SizedBox(width: 8),
+                                Text('Završi')
+                              ]),
+                            ),
+                          ],
+                          onSelected: (String value) {
+                            // Handle option selection here
+                            // Handle option selection here
+                            if (value == 'details') {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        JobDetails(jobId: job.id!)),
+                              );
+                            } else if (value == 'delete') {
+                              // Handle delete option
+                            } else if (value == 'complete') {
+                              // Handle complete option
+                            }
+                          },
                         ),
-                        SizedBox(width: 8),
-                        Text('Obriši')
-                      ]),
-                    ),
-                    PopupMenuItem<String>(
-                      value: 'complete',
-                      child: Row(children: [
-                        Icon(Icons.check, color: Colors.greenAccent[700], size: 18),
-                        SizedBox(width: 8),
-                        Text('Završi')
-                      ]),
-                    ),
-                  ],
-                  onSelected: (String value) {
-                    // Handle option selection here
-                      // Handle option selection here
-    if (value == 'details') {
-      Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => JobDetails(jobId:job.id!)),
-  );
-    } else if (value == 'delete') {
-      // Handle delete option
-    } else if (value == 'complete') {
-      // Handle complete option
-    }
-                  },
-                ),
-              ),
-              DataCell(Center(child: Text(job.name ?? ''))),
-              DataCell(Center(
-                  child: Text(job.created != null
-                      ? DateFormat('dd.MM.yyyy.').format(job.created!)
-                      : ''))),
-              DataCell(Center(
-                  child: Text(job.applicationsEndTo != null
-                      ? DateFormat('dd.MM.yyyy.').format(job.applicationsEndTo!)
-                      : ''))),
-              DataCell(Center(child: Text(job.numberOfApplications!.toString()))),
-              DataCell(Center(child: JobBadge(status: job.status!))), // Using JobBadge with status
-            ])).toList(),
+                      ),
+                      DataCell(Center(child: Text(job.name ?? ''))),
+                      DataCell(Center(
+                          child: Text(job.created != null
+                              ? DateFormat('dd.MM.yyyy.').format(job.created!)
+                              : ''))),
+                      DataCell(Center(
+                          child: Text(job.applicationsDuration != null
+                              ? DateFormat('dd.MM.yyyy.').format(DateTime.now()
+                                  .add(Duration(
+                                      days: job.applicationsDuration!)))
+                              : ''))),
+                      DataCell(Center(
+                          child: Text(job.numberOfApplications!.toString()))),
+                      DataCell(Center(
+                          child: JobBadge(
+                              status:
+                                  job.status!))), // Using JobBadge with status
+                    ]))
+                .toList(),
           ),
         ),
       ),

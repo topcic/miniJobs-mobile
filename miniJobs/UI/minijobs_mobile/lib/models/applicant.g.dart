@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'user.dart';
+part of 'applicant.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-User _$UserFromJson(Map<String, dynamic> json) => User(
+Applicant _$ApplicantFromJson(Map<String, dynamic> json) => Applicant(
       (json['id'] as num?)?.toInt(),
       json['firstName'] as String?,
       json['lastName'] as String?,
@@ -17,9 +17,13 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
       json['deleted'] as bool?,
       json['accountConfirmed'] as bool?,
       json['photo'] == null ? null : base64Decode(json['photo'] as String),
+      json['cv'] == null ? null : base64Decode(json['cv'] as String),
+      json['description'] as String?,
+      json['experience'] as String?,
+      json['wageProposal'] == null ? null : Decimal.parse(json['wageProposal'] as String),
     );
 
-Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
+Map<String, dynamic> _$ApplicantToJson(Applicant instance) => <String, dynamic>{
       'id': instance.id,
       'firstName': instance.firstName,
       'lastName': instance.lastName,
@@ -30,4 +34,8 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'deleted': instance.deleted,
       'accountConfirmed': instance.accountConfirmed,
       'photo': instance.photo == null ? null : base64Encode(instance.photo!),
+      'cv': instance.cv == null ? null : base64Encode(instance.cv!),
+      'description': instance.description,
+      'experience': instance.experience,
+      'wageProposal': instance.wageProposal,
     };

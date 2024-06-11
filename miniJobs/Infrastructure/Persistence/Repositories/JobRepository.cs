@@ -18,48 +18,64 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<Job> GetWithDetailsAsync(int id)
         {
             var sqlQuery = @"
-                WITH SchedulesCTE AS (
-                    SELECT jq.job_id, pa.*
-                    FROM job_questions AS jq
-                    LEFT JOIN job_question_answers AS qa ON jq.id = qa.job_question_id
-                    LEFT JOIN proposed_answers AS pa ON qa.proposed_answer_id = pa.id
-                    WHERE jq.question_id = 1
-                ),
-                PaymentQuestionCTE AS (
-                    SELECT jq.job_id, pa.*
-                    FROM job_questions AS jq
-                    LEFT JOIN job_question_answers AS qa ON jq.id = qa.job_question_id
-                    LEFT JOIN proposed_answers AS pa ON qa.proposed_answer_id = pa.id
-                    WHERE jq.question_id = 2
-                ),
-                AdditionalPaymentOptionsCTE AS (
-                    SELECT jq.job_id, pa.*
-                    FROM job_questions AS jq
-                    LEFT JOIN job_question_answers AS qa ON jq.id = qa.job_question_id
-                    LEFT JOIN proposed_answers AS pa ON qa.proposed_answer_id = pa.id
-                    WHERE jq.question_id = 3
-                )
-                SELECT j.*,
-                    (
-                        SELECT pa.id, pa.answer, pa.question_id
-                        FROM SchedulesCTE AS pa
-                        WHERE pa.job_id = j.id
-                        FOR JSON PATH
-                    ) AS Schedules,
-                    (
-                        SELECT pa.id, pa.answer, pa.question_id
-                        FROM PaymentQuestionCTE AS pa
-                        WHERE pa.job_id = j.id
-                        FOR JSON PATH
-                    ) AS PaymentQuestion,
-                        (
-                        SELECT pa.id, pa.answer, pa.question_id
-                        FROM AdditionalPaymentOptionsCTE AS pa
-                        WHERE pa.job_id = j.id
-                        FOR JSON PATH
-                    ) AS AdditionalPaymentOptions
-                FROM jobs AS j
-                WHERE j.id = @JobId;
+              WITH SchedulesCTE AS (
+    SELECT jq.job_id, pa.*
+    FROM job_questions AS jq
+    LEFT JOIN job_question_answers AS qa ON jq.id = qa.job_question_id
+    LEFT JOIN proposed_answers AS pa ON qa.proposed_answer_id = pa.id
+    WHERE jq.question_id = 1
+),
+PaymentQuestionCTE AS (
+    SELECT jq.job_id, pa.*
+    FROM job_questions AS jq
+    LEFT JOIN job_question_answers AS qa ON jq.id = qa.job_question_id
+    LEFT JOIN proposed_answers AS pa ON qa.proposed_answer_id = pa.id
+    WHERE jq.question_id = 2
+),
+AdditionalPaymentOptionsCTE AS (
+    SELECT jq.job_id, pa.*
+    FROM job_questions AS jq
+    LEFT JOIN job_question_answers AS qa ON jq.id = qa.job_question_id
+    LEFT JOIN proposed_answers AS pa ON qa.proposed_answer_id = pa.id
+    WHERE jq.question_id = 3
+),
+JobTypeCTE AS (
+    SELECT j.id,
+           (
+               SELECT jt.*
+               FROM job_types AS jt
+               WHERE jt.id = j.job_type_id
+               FOR JSON PATH
+           ) AS JobType
+    FROM jobs AS j
+    WHERE j.id = @JobId
+),
+CityCTE AS (
+    SELECT j.id,
+           (
+               SELECT c.*
+               FROM cities  AS c
+               WHERE c.id = j.city_id
+               FOR JSON PATH
+           ) AS City
+    FROM jobs AS j
+    WHERE j.id = @JobId
+)
+SELECT j.*,
+    (
+        SELECT JSON_QUERY(CAST((SELECT pa.id, pa.answer, pa.question_id FROM SchedulesCTE AS pa WHERE pa.job_id = j.id FOR JSON PATH) AS NVARCHAR(MAX)))
+    ) AS Schedules,
+    (
+        SELECT JSON_QUERY(CAST((SELECT pa.id, pa.answer, pa.question_id FROM PaymentQuestionCTE AS pa WHERE pa.job_id = j.id FOR JSON PATH) AS NVARCHAR(MAX)))
+    ) AS PaymentQuestion,
+    (
+        SELECT JSON_QUERY(CAST((SELECT pa.id, pa.answer, pa.question_id FROM AdditionalPaymentOptionsCTE AS pa WHERE pa.job_id = j.id FOR JSON PATH) AS NVARCHAR(MAX)))
+    ) AS AdditionalPaymentOptions,
+    jt.JobType AS JobType,c.City as City
+FROM jobs AS j
+INNER JOIN CityCTE as c ON c.id=j.id
+LEFT JOIN JobTypeCTE AS jt ON j.id = jt.id;
+
             ";
 
             await using var connection = _context.Database.GetDbConnection();
@@ -89,6 +105,16 @@ namespace Infrastructure.Persistence.Repositories
                 if (!reader.IsDBNull(reader.GetOrdinal("AdditionalPaymentOptions")))
                 {
                     job.AdditionalPaymentOptions = JsonConvert.DeserializeObject<List<ProposedAnswer>>(reader.GetString(reader.GetOrdinal("AdditionalPaymentOptions")));
+                }
+                if (!reader.IsDBNull(reader.GetOrdinal("JobType")))
+                {
+                  var types= JsonConvert.DeserializeObject<List<JobType>>(reader.GetString(reader.GetOrdinal("JobType")));
+                    job.JobType = types[0];
+                }
+                if (!reader.IsDBNull(reader.GetOrdinal("City")))
+                {
+                    var cities = JsonConvert.DeserializeObject<List<City>>(reader.GetString(reader.GetOrdinal("City")));
+                    job.City = cities[0];
                 }
 
                 return job;

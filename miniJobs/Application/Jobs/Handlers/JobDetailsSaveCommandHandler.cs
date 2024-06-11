@@ -32,6 +32,7 @@ public class JobDetailsSaveCommandHandler : IRequestHandler<JobDetailsSaveComman
     }
 
     public async Task<Job> Handle(JobDetailsSaveCommand command, CancellationToken cancellationToken)
+     
     {
         using var ts = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         Job job = await _jobRepository.TryFindAsync(command.Request.Id);
@@ -65,6 +66,8 @@ public class JobDetailsSaveCommandHandler : IRequestHandler<JobDetailsSaveComman
         job.AdditionalPaymentOptions = jobDetails.AdditionalPaymentOptions;
         job.PaymentQuestion = jobDetails.PaymentQuestion;
         job.JobType = jobType;
+        job.City = jobDetails.City;
+
         ts.Complete();
 
         return job;

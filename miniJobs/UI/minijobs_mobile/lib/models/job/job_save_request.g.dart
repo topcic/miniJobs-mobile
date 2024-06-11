@@ -25,9 +25,7 @@ JobSaveRequest _$JobSaveRequestFromJson(Map<String, dynamic> json) =>
             (e as List<dynamic>).map((e) => (e as num).toInt()).toList()),
       ),
       (json['wage'] as num?)?.toInt(),
-      json['applicationsEndTo'] == null
-          ? null
-          : DateTime.parse(json['applicationsEndTo'] as String),
+      (json['applicationsDuration'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$JobSaveRequestToJson(JobSaveRequest instance) =>
@@ -44,5 +42,5 @@ Map<String, dynamic> _$JobSaveRequestToJson(JobSaveRequest instance) =>
       'answersToPaymentQuestions': instance.answersToPaymentQuestions
           ?.map((k, e) => MapEntry(k.toString(), e)),
       'wage': instance.wage,
-      'applicationsEndTo': instance.applicationsEndTo?.toIso8601String(),
+      'applicationsDuration': instance.applicationsDuration,
     };

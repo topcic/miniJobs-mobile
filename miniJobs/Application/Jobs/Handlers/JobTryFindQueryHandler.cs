@@ -24,7 +24,8 @@ public class JobTryFindQueryHandler: IRequestHandler<JobTryFindQuery, Job>
         job.Schedules = jobDetails.Schedules;
         job.AdditionalPaymentOptions = jobDetails.AdditionalPaymentOptions;
         job.PaymentQuestion = jobDetails.PaymentQuestion;
-
+        job.JobType = jobDetails.JobType;
+        job.City = jobDetails.City;
         return job;
     }
 }

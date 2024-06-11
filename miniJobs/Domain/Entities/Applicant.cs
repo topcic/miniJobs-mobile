@@ -18,7 +18,7 @@ public class Applicant : IEntity<int>
     public string? Description { get; set; }
 
     [Column("wage_proposal")]
-    public string? WageProposal { get; set; }
+    public decimal? WageProposal { get; set; }
 
     [Column("confirmation_code")]
     public int? ConfirmationCode { get; set; }
@@ -29,4 +29,6 @@ public class Applicant : IEntity<int>
     [Column("created")]
     public DateTime Created { get; set; }
 
+    public virtual User User { get; set; }
+    public virtual ICollection<ApplicantJobType> ApplicantJobTypes { get; set; }
 }

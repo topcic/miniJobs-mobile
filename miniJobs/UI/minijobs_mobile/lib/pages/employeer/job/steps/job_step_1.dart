@@ -22,8 +22,8 @@ class JobStep1State extends State<JobStep1> {
   late CityProvider _cityProvider;
   late JobProvider _jobProvider;
   late Job? _job;
-  
-   @override
+
+  @override
   void initState() {
     super.initState();
   }
@@ -33,27 +33,27 @@ class JobStep1State extends State<JobStep1> {
     super.didChangeDependencies();
     _cityProvider = context.read<CityProvider>();
     getCities();
-     _jobProvider = Provider.of<JobProvider>(context);
+    _jobProvider = Provider.of<JobProvider>(context);
 
     setState(() {
       _job = _jobProvider.getCurrentJob();
-       _setInitialFormValues();
+      _setInitialFormValues();
     });
   }
 
   void _setInitialFormValues() {
-    if(_job!=null)
-    _formKey.currentState?.patchValue({
-      'name': _job!.name,
-      'description': _job!.description,
-      'cityId': _job!.cityId.toString(),
-      'streetAddressAndNumber': _job!.streetAddressAndNumber,
-    });
+    if (_job != null)
+      _formKey.currentState?.patchValue({
+        'name': _job!.name,
+        'description': _job!.description,
+        'cityId': _job!.cityId.toString(),
+        'streetAddressAndNumber': _job!.streetAddressAndNumber,
+      });
   }
 
   Future<void> getCities() async {
     cities = await _cityProvider.getAll();
-       _setInitialFormValues();
+    _setInitialFormValues();
     setState(() {});
   }
 
@@ -156,22 +156,26 @@ class JobStep1State extends State<JobStep1> {
   bool validateAndSave() {
     _formKey.currentState?.save();
     if (_formKey.currentState!.validate()) {
-     final formData = Map<String, dynamic>.from(_formKey.currentState!.value);
-     formData['cityId'] = int.tryParse(formData['cityId']);
+      final formData = Map<String, dynamic>.from(_formKey.currentState!.value);
+      formData['cityId'] = int.tryParse(formData['cityId']);
 
-    setState(() {
-       var job= Job.fromJson(formData);
-       _job!.name=job.name;
-       _job!.description=job.description;
-       _job!.cityId=job.cityId;
-       _job!.streetAddressAndNumber=job.streetAddressAndNumber;
-    });
+      setState(() {
+        var job = Job.fromJson(formData);
+        if (_job == null)
+          _job = job;
+        else {
+          _job!.name = job.name;
+          _job!.description = job.description;
+          _job!.cityId = job.cityId;
+          _job!.streetAddressAndNumber = job.streetAddressAndNumber;
+        }
+      });
       return true;
     }
     return false;
   }
 
-   Job getUpdatedJob() {
+  Job getUpdatedJob() {
     return _job!;
   }
 }

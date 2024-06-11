@@ -54,6 +54,13 @@ public class JobsController(IMediator mediator, BaseState state) : ControllerBas
         var initialState = JobState.JobDetails;
         var initialStateInstance = state.CreateState(initialState);
         return Ok(await initialStateInstance.SaveDetails (request));
+    } 
+    [HttpPut("activate/{jobId}")]
+    [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> ActivateJob([FromRoute] int jobId, [FromBody] int request)
+    {
+        return Ok(await mediator.Send(new JobActivateCommand(jobId, request)));
     }
-
 }

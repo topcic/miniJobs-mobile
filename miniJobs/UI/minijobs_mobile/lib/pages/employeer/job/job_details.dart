@@ -1,7 +1,9 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:minijobs_mobile/enumerations/job_statuses.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/models/job/job_save_request.dart';
+import 'package:minijobs_mobile/pages/employeer/job/steps/job_preview.dart';
 import 'package:minijobs_mobile/pages/employeer/job/steps/job_step_1.dart';
 import 'package:minijobs_mobile/pages/employeer/job/steps/job_step_2.dart';
 import 'package:minijobs_mobile/pages/employeer/job/steps/job_step_3.dart';
@@ -23,8 +25,10 @@ class _JobDetailsState extends State<JobDetails> {
   late Job _job = new Job();
   late JobProvider _jobProvider = JobProvider();
   final GlobalKey<JobStep1State> _jobStep1Key = GlobalKey<JobStep1State>();
- JobSaveRequest? _jobSaveRequest;
-late Function() _validateAndSaveCallback;
+  JobSaveRequest? _jobSaveRequest;
+  late Function() _validateAndSaveStep2Callback;
+  late Function() _validateAndSaveStep3Callback;
+
   void _nextPressed(Job job) {
     setState(() {
       if (_currentStep < getSteps().length - 1) {
@@ -56,17 +60,18 @@ late Function() _validateAndSaveCallback;
     super.didChangeDependencies();
     _jobProvider = Provider.of<JobProvider>(context);
   }
+
   void _onNextButton(bool isValid, JobSaveRequest? jobSaveRequest) async {
     if (isValid) {
-        var saveRequest = jobSaveRequest;
-        var job = await _jobProvider.update(saveRequest!.id!, saveRequest);
-        if (job != null) {
-          _jobProvider.setCurrentJob(job);
-          setState(() {
-            _currentStep += 1;
-          });
-        }
-    } 
+      var saveRequest = jobSaveRequest;
+      var job = await _jobProvider.update(saveRequest!.id!, saveRequest);
+      if (job != null) {
+        _jobProvider.setCurrentJob(job);
+        setState(() {
+          _currentStep += 1;
+        });
+      }
+    }
   }
 
   @override
@@ -134,11 +139,11 @@ late Function() _validateAndSaveCallback;
         ),
         Step(
           title: Text(''),
-         content: JobStep2(onNextButton:_onNextButton
-            ,
-            setValidateAndSaveCallback: (Function() validateAndSave) {
-              _validateAndSaveCallback = validateAndSave;
-            }),
+          content: JobStep2(
+              onNextButton: _onNextButton,
+              setValidateAndSaveCallback: (Function() validateAndSave) {
+                _validateAndSaveStep2Callback = validateAndSave;
+              }),
           isActive: _currentStep >= 1,
           state: _currentStep == 0
               ? StepState.editing
@@ -148,7 +153,11 @@ late Function() _validateAndSaveCallback;
         ),
         Step(
           title: Text(''),
-          content:  JobStep3(),
+          content: JobStep3(
+              onNextButton: _onNextButton,
+              setValidateAndSaveCallback: (Function() validateAndSave) {
+                _validateAndSaveStep3Callback = validateAndSave;
+              }),
           isActive: _currentStep >= 2,
           state: _currentStep == 0
               ? StepState.editing
@@ -158,7 +167,7 @@ late Function() _validateAndSaveCallback;
         ),
         Step(
           title: Text(''),
-          content: Container(),
+          content: JobPreview(),
           isActive: _currentStep >= 3,
           state: _currentStep == 3
               ? StepState.editing
@@ -178,10 +187,12 @@ late Function() _validateAndSaveCallback;
 
       if (jobStep1State != null && jobStep1State.validateAndSave()) {
         _job = jobStep1State.getUpdatedJob();
-        if (_job.id == 0) {
+        if (_job.id == null || _job.id == 0) {
           var job = await _jobProvider.insert(_job);
           if (job != null) {
             setState(() {
+              _job = job;
+              _jobProvider.setCurrentJob(job);
               _currentStep += 1;
             });
           }
@@ -190,17 +201,24 @@ late Function() _validateAndSaveCallback;
           if (job != null) {
             _jobProvider.setCurrentJob(job);
             setState(() {
+              _job = job;
               _currentStep += 1;
             });
           }
         }
       }
     } else if (_currentStep == 1) {
-          _validateAndSaveCallback();
-    } else {
-      setState(() {
-        isCompleted = true;
-      });
+      _validateAndSaveStep2Callback();
+    } else if (_currentStep == 2) {
+      _validateAndSaveStep3Callback();
+    } else if (_currentStep == 3) {
+      var job = await _jobProvider.activate(_job.id!, JobStatus.Aktivan);
+      if (job != null) {
+        _jobProvider.setCurrentJob(job);
+        setState(() {
+          isCompleted = true;
+        });
+      }
     }
   }
 }

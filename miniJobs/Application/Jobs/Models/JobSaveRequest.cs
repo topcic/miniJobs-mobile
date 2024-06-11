@@ -15,5 +15,5 @@ public class JobSaveRequest
     public int? RequiredEmployees { get; set; }
     public string? Description { get; set; }
     public int? Wage { get; set; }
-    public DateTime? ApplicationsEndTo { get; set; }
+    public int? ApplicationsDuration { get; set; }
 }
