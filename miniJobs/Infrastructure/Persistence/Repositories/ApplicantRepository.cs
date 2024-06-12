@@ -44,33 +44,23 @@ public class ApplicantRepository(ApplicationDbContext context) : GenericReposito
         var offsetParam = new SqlParameter("@offset", offset);
         var limitParam = new SqlParameter("@limit", limit);
 
-        var query =await _context.Applicants
-            .FromSqlRaw(@"
-     SELECT 
-    a.id AS Id, 
-    a.cv AS Cv, 
-    a.experience AS Experience, 
-    a.description AS Description, 
-    a.created AS Created, 
-    u.id AS UserId, 
-    u.Deleted AS UserDeleted, 
-    u.last_name AS UserLastName
-FROM 
-    applicants a
-INNER JOIN 
-    users u ON a.id = u.id
-WHERE 
-    u.Deleted = 0
-ORDER BY 
-    u.last_name
-OFFSET 
-    @offset ROWS
-FETCH NEXT 
-    @limit ROWS ONLY",
-                searchTextParam,  offsetParam, limitParam)
-            .Include(a => a.User)
-            .ToListAsync();
-        return query;
+        var query = _context.Applicants
+    .Include(a => a.User)
+    .Include(a => a.ApplicantJobTypes)
+        .ThenInclude(ajt => ajt.JobType)
+    .Where(a => !a.User.Deleted &&
+        (searchText == null || (a.User.FirstName.Contains(searchText) || a.User.LastName.Contains(searchText))) &&
+        (!cityId.HasValue || a.User.CityId == cityId) &&
+        (!jobTypeId.HasValue || a.ApplicantJobTypes.Any(ajt => ajt.JobTypeId == jobTypeId)))
+    .OrderBy(a => a.User.LastName)
+    .Skip(offset)
+    .Take(limit);
+
+        var resultList = await query.ToListAsync();
+
+        return resultList;
+
+
     }
 
     public async Task<int> SearchCountAsync(string searchText, int? cityId, int? jobTypeId)

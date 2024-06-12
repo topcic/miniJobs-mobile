@@ -8,5 +8,6 @@ public class ApplicantJobType
 
     [Column("job_type_id")]
     public int JobTypeId { get; set; }
+    [NotMapped]
     public JobType JobType { get; set; }
 }
