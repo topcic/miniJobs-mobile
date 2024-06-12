@@ -25,7 +25,8 @@ public class Job : BaseAuditableEntity, IEntity<int>
     [Column("status")]
     public int Status { get; set; }
     [Column("required_employees")]
-    public int? RequiredEmployees { get; set; }
+    public int? RequiredEmployees { get; set; }//http://localhost:5020/api/applicants/search?SearchText=mah&CityId&JobTypeId&Limit=10&Offset=0
+
 
     [Column("wage")]
     public int? Wage { get; set; }
