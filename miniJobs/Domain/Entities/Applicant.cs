@@ -28,8 +28,7 @@ public class Applicant : IEntity<int>
 
     [Column("created")]
     public DateTime Created { get; set; }
-    [NotMapped]
-    public  User User { get; set; }
-    [NotMapped]
+    public User User { get; set; }
+
     public ICollection<ApplicantJobType> ApplicantJobTypes { get; set; }
 }

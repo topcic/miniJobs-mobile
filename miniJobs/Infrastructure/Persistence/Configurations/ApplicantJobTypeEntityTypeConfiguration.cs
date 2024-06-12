@@ -6,8 +6,12 @@ public class ApplicantJobTypeEntityTypeConfiguration : IEntityTypeConfiguration<
 {
     public void Configure(EntityTypeBuilder<ApplicantJobType> builder)
     {
-        builder.HasKey(x => new { x.ApplicantId, x.JobTypeId });
-        builder.HasOne<Applicant>().WithMany().HasForeignKey(x => x.ApplicantId);
-        builder.HasOne<JobType>().WithMany().HasForeignKey(x => x.JobTypeId);
+        builder.HasKey(ajt => new { ajt.ApplicantId, ajt.JobTypeId });
+        builder.HasOne(ajt => ajt.Applicant)
+               .WithMany(a => a.ApplicantJobTypes)
+               .HasForeignKey(ajt => ajt.ApplicantId);
+        builder.HasOne(ajt => ajt.JobType)
+               .WithMany()
+               .HasForeignKey(ajt => ajt.JobTypeId);
     }
 }

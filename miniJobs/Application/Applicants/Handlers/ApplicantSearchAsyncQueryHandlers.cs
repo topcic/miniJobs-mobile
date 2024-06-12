@@ -18,7 +18,7 @@ public class ApplicantSearchAsyncQueryHandlers : IRequestHandler<ApplicantSearch
 
     public async Task<SearchResponseBase<Applicant>> Handle(ApplicantSearchAsyncQuery request, CancellationToken cancellationToken)
     {
-        
+
         SearchResponseBase<Applicant> result = new SearchResponseBase<Applicant>();
         result.Result = await applicantRepository.SearchAsync(request.SearchRequest.SearchText, request.SearchRequest.Limit,
             request.SearchRequest.Offset, request.SearchRequest.CityId, request.SearchRequest.JobTypeId);

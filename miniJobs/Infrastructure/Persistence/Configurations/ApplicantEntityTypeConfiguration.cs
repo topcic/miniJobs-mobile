@@ -6,6 +6,9 @@ public class ApplicantEntityTypeConfiguration : IEntityTypeConfiguration<Applica
 {
     public void Configure(EntityTypeBuilder<Applicant> builder)
     {
-        builder.HasOne<User>().WithOne().HasForeignKey<Applicant>(x => x.Id).OnDelete(DeleteBehavior.NoAction);
+        builder.HasOne(a => a.User)
+               .WithOne()
+               .HasForeignKey<Applicant>(a => a.Id)
+               .OnDelete(DeleteBehavior.NoAction);
     }
 }
