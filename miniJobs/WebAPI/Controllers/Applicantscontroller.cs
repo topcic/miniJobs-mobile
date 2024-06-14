@@ -17,7 +17,7 @@ public class Applicantscontroller(IMediator mediator) : ControllerBase
     [ProducesResponseType(typeof(UserRegistrationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> InsertAsync(ApplicantSearchRequest request)
+    public async Task<IActionResult> SearchAsync(ApplicantSearchRequest request)
     {
         return Ok(await mediator.Send(new ApplicantSearchAsyncQuery(request)));
     }

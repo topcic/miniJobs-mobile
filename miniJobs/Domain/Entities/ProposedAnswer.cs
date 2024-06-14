@@ -13,4 +13,5 @@ public class ProposedAnswer : IEntity<int>
 
     [Column("question_id")]
     public int QuestionId { get; set; }
+
 }

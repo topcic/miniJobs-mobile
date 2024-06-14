@@ -156,5 +156,41 @@ LEFT JOIN JobTypeCTE AS jt ON j.id = jt.id;
 
             return jobs;
         }
+
+        public async Task<IEnumerable<Job>> SearchAsync(string searchText, int limit, int offset, int? cityId, int? jobTypeId)
+        {
+
+            var query = _context.Set<Job>().AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                query = query.Where(job => job.Name.Contains(searchText) || job.Description.Contains(searchText));
+            }
+
+            if (cityId.HasValue)
+            {
+                query = query.Where(job => job.CityId == cityId.Value);
+            }
+
+            if (jobTypeId.HasValue)
+            {
+                query = query.Where(job => job.JobTypeId == jobTypeId.Value);
+            }
+
+            query = query.Skip(offset).Take(limit);
+
+            query = query.Include(job => job.City)
+                         .Include(job => job.JobType)
+                         .Include(job => job.Schedules)
+                         .Include(job => job.AdditionalPaymentOptions)
+                         .Include(job => job.PaymentQuestion);
+
+            return await query.ToListAsync();
+        }
+
+        public Task<int> SearchCountAsync(string searchText, int? cityId, int? jobTypeId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

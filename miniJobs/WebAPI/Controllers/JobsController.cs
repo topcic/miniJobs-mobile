@@ -1,6 +1,9 @@
-﻿using Application.Jobs.Commands;
+﻿using Application.Applicants.Models;
+using Application.Applicants.Queries;
+using Application.Jobs.Commands;
 using Application.Jobs.Models;
 using Application.Jobs.Queries;
+using Application.Users.Models;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.JobStateMachine;
@@ -62,5 +65,14 @@ public class JobsController(IMediator mediator, BaseState state) : ControllerBas
     public async Task<IActionResult> ActivateJob([FromRoute] int jobId, [FromBody] int request)
     {
         return Ok(await mediator.Send(new JobActivateCommand(jobId, request)));
+    }
+
+    [HttpGet("search")]
+    [ProducesResponseType(typeof(UserRegistrationResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> SearchAsync(JobSearchRequest request)
+    {
+        return Ok(await mediator.Send(new JobSearchQuery(request)));
     }
 }

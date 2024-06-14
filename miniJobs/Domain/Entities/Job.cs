@@ -40,22 +40,10 @@ public class Job : BaseAuditableEntity, IEntity<int>
     [Column("job_type_id")]
     public int? JobTypeId { get; set; }
 
-    [NotMapped]
-    public List<ProposedAnswer> Schedules { get; set; }
-
-    [NotMapped]
-    public ProposedAnswer PaymentQuestion { get; set; }
-
-    [NotMapped]
-    public List<ProposedAnswer> AdditionalPaymentOptions { get; set; }
-
-    [NotMapped]
-    public int NumberOfApplications { get; set; }
-
-    [NotMapped]
-    public JobType JobType { get; set; }
-
-    [NotMapped]
-    public City City { get; set; }
+    public virtual JobType JobType { get; set; }
+    public virtual City City { get; set; }
+    public virtual ICollection<ProposedAnswer> Schedules { get; set; }
+    public virtual ProposedAnswer PaymentQuestion { get; set; }
+    public virtual ICollection<ProposedAnswer> AdditionalPaymentOptions { get; set; }
 
 }
