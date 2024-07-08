@@ -1,8 +1,10 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Data;
 using System.Data.Common;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace Infrastructure.Persistence.Repositories
 {
@@ -78,7 +80,7 @@ LEFT JOIN JobTypeCTE AS jt ON j.id = jt.id;
 
             ";
 
-            await using var connection = _context.Database.GetDbConnection();
+            await using var connection = new SqlConnection(_context.Database.GetConnectionString());
             await connection.OpenAsync();
 
             await using var command = connection.CreateCommand();
@@ -155,42 +157,125 @@ LEFT JOIN JobTypeCTE AS jt ON j.id = jt.id;
              .SqlQuery<Job>(sqlQuery).ToListAsync();
 
             return jobs;
-        }
+        }//return await _context.Database.SqlQuery<Job>().ToListAsync();
 
         public async Task<IEnumerable<Job>> SearchAsync(string searchText, int limit, int offset, int? cityId, int? jobTypeId)
         {
+            var sqlQuery = @"
+        WITH FilteredJobs AS (
+            SELECT j.*,
+                (
+                    SELECT JSON_QUERY(CAST((SELECT pa.id, pa.answer, pa.question_id 
+                                            FROM job_questions AS jq
+                                            LEFT JOIN job_question_answers AS qa ON jq.id = qa.job_question_id
+                                            LEFT JOIN proposed_answers AS pa ON qa.proposed_answer_id = pa.id
+                                            WHERE jq.job_id = j.id AND jq.question_id = 1 FOR JSON PATH) AS NVARCHAR(MAX)))
+                ) AS Schedules,
+                (
+                    SELECT JSON_QUERY(CAST((SELECT pa.id, pa.answer, pa.question_id 
+                                            FROM job_questions AS jq
+                                            LEFT JOIN job_question_answers AS qa ON jq.id = qa.job_question_id
+                                            LEFT JOIN proposed_answers AS pa ON qa.proposed_answer_id = pa.id
+                                            WHERE jq.job_id = j.id AND jq.question_id = 2 FOR JSON PATH) AS NVARCHAR(MAX)))
+                ) AS PaymentQuestion,
+                (
+                    SELECT JSON_QUERY(CAST((SELECT pa.id, pa.answer, pa.question_id 
+                                            FROM job_questions AS jq
+                                            LEFT JOIN job_question_answers AS qa ON jq.id = qa.job_question_id
+                                            LEFT JOIN proposed_answers AS pa ON qa.proposed_answer_id = pa.id
+                                            WHERE jq.job_id = j.id AND jq.question_id = 3 FOR JSON PATH) AS NVARCHAR(MAX)))
+                ) AS AdditionalPaymentOptions,
+                (
+                    SELECT JSON_QUERY(CAST((SELECT jt.*
+                                            FROM job_types AS jt
+                                            WHERE jt.id = j.job_type_id FOR JSON PATH) AS NVARCHAR(MAX)))
+                ) AS JobType,
+                (
+                    SELECT JSON_QUERY(CAST((SELECT c.*
+                                            FROM cities AS c
+                                            WHERE c.id = j.city_id FOR JSON PATH) AS NVARCHAR(MAX)))
+                ) AS City
+            FROM jobs AS j
+            WHERE (@searchText IS NULL OR j.name LIKE '%' + @searchText + '%')
+              AND (@cityId IS NULL OR j.city_id = @cityId)
+              AND (@jobTypeId IS NULL OR j.job_type_id = @jobTypeId)
+        )
+        SELECT *
+        FROM FilteredJobs
+        ORDER BY id
+        OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY;
+    ";
+            await using var connection = new SqlConnection(_context.Database.GetConnectionString());
+            await connection.OpenAsync();
 
-            var query = _context.Set<Job>().AsQueryable();
+            await using var command = connection.CreateCommand();
+            command.CommandText = sqlQuery;
+            command.Parameters.Add(new SqlParameter("@searchText", (object)searchText ?? DBNull.Value));
+            command.Parameters.Add(new SqlParameter("@cityId", (object)cityId ?? DBNull.Value));
+            command.Parameters.Add(new SqlParameter("@jobTypeId", (object)jobTypeId ?? DBNull.Value));
+            command.Parameters.Add(new SqlParameter("@limit", limit));
+            command.Parameters.Add(new SqlParameter("@offset", offset));
 
-            if (!string.IsNullOrEmpty(searchText))
+            var jobs = new List<Job>();
+
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
             {
-                query = query.Where(job => job.Name.Contains(searchText) || job.Description.Contains(searchText));
+                var job = MapJob(reader);
+
+                if (!reader.IsDBNull(reader.GetOrdinal("Schedules")))
+                {
+                    job.Schedules = JsonConvert.DeserializeObject<List<ProposedAnswer>>(reader.GetString(reader.GetOrdinal("Schedules")));
+                }
+                if (!reader.IsDBNull(reader.GetOrdinal("PaymentQuestion")))
+                {
+                    var proposedAnswers = JsonConvert.DeserializeObject<List<ProposedAnswer>>(reader.GetString(reader.GetOrdinal("PaymentQuestion")));
+                    if (proposedAnswers.Any())
+                    {
+                        job.PaymentQuestion = proposedAnswers.FirstOrDefault();
+                    }
+                }
+                if (!reader.IsDBNull(reader.GetOrdinal("AdditionalPaymentOptions")))
+                {
+                    job.AdditionalPaymentOptions = JsonConvert.DeserializeObject<List<ProposedAnswer>>(reader.GetString(reader.GetOrdinal("AdditionalPaymentOptions")));
+                }
+                if (!reader.IsDBNull(reader.GetOrdinal("JobType")))
+                {
+                    var types = JsonConvert.DeserializeObject<List<JobType>>(reader.GetString(reader.GetOrdinal("JobType")));
+                    job.JobType = types.FirstOrDefault();
+                }
+                if (!reader.IsDBNull(reader.GetOrdinal("City")))
+                {
+                    var cities = JsonConvert.DeserializeObject<List<City>>(reader.GetString(reader.GetOrdinal("City")));
+                    job.City = cities.FirstOrDefault();
+                }
+
+                jobs.Add(job);
             }
 
-            if (cityId.HasValue)
-            {
-                query = query.Where(job => job.CityId == cityId.Value);
-            }
-
-            if (jobTypeId.HasValue)
-            {
-                query = query.Where(job => job.JobTypeId == jobTypeId.Value);
-            }
-
-            query = query.Skip(offset).Take(limit);
-
-            query = query.Include(job => job.City)
-                         .Include(job => job.JobType)
-                         .Include(job => job.Schedules)
-                         .Include(job => job.AdditionalPaymentOptions)
-                         .Include(job => job.PaymentQuestion);
-
-            return await query.ToListAsync();
+            return jobs;
         }
 
-        public Task<int> SearchCountAsync(string searchText, int? cityId, int? jobTypeId)
+        public async Task<int> SearchCountAsync(string searchText, int? cityId, int? jobTypeId)
         {
-            throw new NotImplementedException();
+            var sqlQuery = @"
+        SELECT COUNT(*)
+        FROM jobs AS j
+        WHERE (@searchText IS NULL OR j.name LIKE '%' + @searchText + '%')
+          AND (@cityId IS NULL OR j.city_id = @cityId)
+          AND (@jobTypeId IS NULL OR j.job_type_id = @jobTypeId);
+    ";
+            await using var connection = new SqlConnection(_context.Database.GetConnectionString());
+            await connection.OpenAsync();
+
+            await using var command = connection.CreateCommand();
+            command.CommandText = sqlQuery;
+            command.Parameters.Add(new SqlParameter("@searchText", (object)searchText ?? DBNull.Value));
+            command.Parameters.Add(new SqlParameter("@cityId", (object)cityId ?? DBNull.Value));
+            command.Parameters.Add(new SqlParameter("@jobTypeId", (object)jobTypeId ?? DBNull.Value));
+
+            var count = (int)await command.ExecuteScalarAsync();
+            return count;
         }
     }
 }
