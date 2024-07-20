@@ -21,6 +21,14 @@ Applicant _$ApplicantFromJson(Map<String, dynamic> json) => Applicant(
       json['description'] as String?,
       json['experience'] as String?,
       json['wageProposal'] == null ? null : Decimal.parse(json['wageProposal'] as String),
+      json['jobType'] == null
+          ? null
+          : JobType.fromJson(
+              json['jobType'] as Map<String, dynamic>),
+            json['city'] == null
+          ? null
+          : City.fromJson(
+              json['city'] as Map<String, dynamic>),        
     );
 
 Map<String, dynamic> _$ApplicantToJson(Applicant instance) => <String, dynamic>{
@@ -38,4 +46,6 @@ Map<String, dynamic> _$ApplicantToJson(Applicant instance) => <String, dynamic>{
       'description': instance.description,
       'experience': instance.experience,
       'wageProposal': instance.wageProposal,
+      'jobType': instance.jobType,
+      'city': instance.city,
     };

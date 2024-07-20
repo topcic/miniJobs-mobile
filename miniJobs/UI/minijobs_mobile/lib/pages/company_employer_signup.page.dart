@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 import '../utils/util_widgets.dart';
 
 class CompanyEmployerSignupPage extends StatefulWidget {
-  const CompanyEmployerSignupPage({Key? key}) : super(key: key);
+  const CompanyEmployerSignupPage({super.key});
 
   @override
   State<CompanyEmployerSignupPage> createState() =>
@@ -66,7 +66,7 @@ class _CompanyEmployerSignupPageState extends State<CompanyEmployerSignupPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Registruj se kao poslodavac"),
+        title: const Text("Registruj se kao poslodavac"),
         centerTitle: true,
       ),
       body: isLoading
@@ -84,7 +84,7 @@ class _CompanyEmployerSignupPageState extends State<CompanyEmployerSignupPage> {
                   children: [
                     Image.asset("assets/images/logo.png",
                         height: 150, width: 150),
-                    Row(
+                    const Row(
                       children: [
                         Expanded(
                             child: Divider()), // First divider widget
@@ -110,13 +110,13 @@ class _CompanyEmployerSignupPageState extends State<CompanyEmployerSignupPage> {
                       _textField('name', "Naziv firme"),
                       CrossAxisAlignment.center,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     rowMethod(
                       _textField('streetAddressAndNumber',
                           "Adresa i broj ulice"),
                       CrossAxisAlignment.center,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     rowMethod(
                       Expanded(
                         child: FormBuilderDropdown<String>(
@@ -128,7 +128,7 @@ class _CompanyEmployerSignupPageState extends State<CompanyEmployerSignupPage> {
                               return null;
                             }
                           },
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: "Sjedište firme",
                           ),
                           items: cities != null
@@ -142,13 +142,13 @@ class _CompanyEmployerSignupPageState extends State<CompanyEmployerSignupPage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     rowMethod(
                       Expanded(
                         child: FormBuilderTextField(
                             inputFormatters: [idNumberMask],
                             name: 'idNumber',
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               label: Text("ID broj"),
                             ),
                             validator: ((value) {
@@ -160,8 +160,8 @@ class _CompanyEmployerSignupPageState extends State<CompanyEmployerSignupPage> {
                       ),
                       CrossAxisAlignment.center,
                     ),
-                    SizedBox(height: 40),
-                    Row(
+                    const SizedBox(height: 40),
+                    const Row(
                       children: [
                         Expanded(
                             child: Divider()), // First divider widget
@@ -187,18 +187,18 @@ class _CompanyEmployerSignupPageState extends State<CompanyEmployerSignupPage> {
                       _textField('firstName', "Ime"),
                       CrossAxisAlignment.center,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     rowMethod(
                       _textField('lastName', "Prezime"),
                       CrossAxisAlignment.center,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     rowMethod(
                       Expanded(
                         child: FormBuilderTextField(
                             inputFormatters: [phoneNumberMask],
                             name: 'companyPhoneNumber',
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               label: Text("Službeni telefon"),
                             ),
                             validator: ((value) {
@@ -210,20 +210,20 @@ class _CompanyEmployerSignupPageState extends State<CompanyEmployerSignupPage> {
                       ),
                       CrossAxisAlignment.center,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     rowMethod(
                       Expanded(
                         child: FormBuilderTextField(
                           inputFormatters: [phoneNumberMask],
                           name: 'phoneNumber',
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             label: Text("Broj telefona"),
                           ),
                         ),
                       ),
                       CrossAxisAlignment.center,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     rowMethod(
                       Expanded(
                         child: FormBuilderTextField(
@@ -245,7 +245,7 @@ class _CompanyEmployerSignupPageState extends State<CompanyEmployerSignupPage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     rowMethod(
                       Expanded(
                         child: FormBuilderTextField(
@@ -263,14 +263,14 @@ class _CompanyEmployerSignupPageState extends State<CompanyEmployerSignupPage> {
                               return null;
                             }
                           }),
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             label: Text("Lozinka"),
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(height: 20),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     rowMethod(
                       Expanded(
                         child: FormBuilderTextField(
@@ -287,13 +287,13 @@ class _CompanyEmployerSignupPageState extends State<CompanyEmployerSignupPage> {
                               return null;
                             }
                           }),
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             label: Text("Ponovljena lozinka"),
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -308,31 +308,29 @@ class _CompanyEmployerSignupPageState extends State<CompanyEmployerSignupPage> {
                                       _formKey.currentState!.value);
                                   var result = await _userCompanyProvider
                                       .insert(request);
-                                  if (result != null) {
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(SnackBar(
-                                        content: Text(
-                                            "Uspješno ste se registrovali. Molimo Vas provjerite Vaš email")));
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(const SnackBar(
+                                      content: Text(
+                                          "Uspješno ste se registrovali. Molimo Vas provjerite Vaš email")));
 
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                VerificationPage()));
-                                  }
-                                } else {}
+                                  Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const VerificationPage()));
+                                                                } else {}
                               } catch (e) {
                                 ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
+                                    .showSnackBar(const SnackBar(
                                     content: Text(
                                         " Email adresa se već koristi. Molimo izaberite drugu email adresu.")));
                               }
                             },
-                            child: Text("Registruj se"),
+                            child: const Text("Registruj se"),
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 40),
+                    const SizedBox(height: 40),
                   ],
                 ),
               ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:minijobs_mobile/pages/impressions.dart';
 
 class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -10,8 +12,8 @@ class ProfilePage extends StatelessWidget {
         length: 3,
         child: Scaffold(
           appBar: AppBar(
-            title: Text('Profile'),
-            bottom: TabBar(
+            title: const Text('Profile'),
+            bottom: const TabBar(
               tabs: [
                 Tab(text: 'Info'),
                 Tab(text: 'Završeni poslovi'),
@@ -23,9 +25,9 @@ class ProfilePage extends StatelessWidget {
             children: [
               // Info tab
               Container(
-                padding: EdgeInsets.all(20.0),
+                padding: const EdgeInsets.all(20.0),
                 alignment: Alignment.center,
-                child: Column(
+                child: const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Profile photo
@@ -60,11 +62,11 @@ class ProfilePage extends StatelessWidget {
                 ),
               ),
               // Završeni poslovi tab
-              Center(
+              const Center(
                 child: Text('Završeni poslovi'),
               ),
               // Utisci tab
-              Center(
+              const Center(
                 child: ImpressionsPage(),
               ),
             ],

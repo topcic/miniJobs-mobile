@@ -61,34 +61,34 @@ abstract class BaseProvider<T> with ChangeNotifier {
     return null;
   }
 
-  Future<SearchResult<T>> search({dynamic filter}) async {
-    //var url = "https://localhost:44343/api/users/search?SearchText=&Limit=10&Offset=0&SortBy=&SortOrder=0";
-    try {
-      _endpoint =
-          "users/search?SearchText=&Limit=10&Offset=0&SortBy=&SortOrder=0";
-      var url = _endpoint;
-      if (filter != null) {
-        var queryString = getQueryString(filter);
-        url = "$url?$queryString";
-      }
+  // Future<SearchResult<T>> search({dynamic filter}) async {
+  //   //var url = "https://localhost:44343/api/users/search?SearchText=&Limit=10&Offset=0&SortBy=&SortOrder=0";
+  //   try {
+  //     _endpoint =
+  //         "users/search?SearchText=&Limit=10&Offset=0&SortBy=&SortOrder=0";
+  //     var url = _endpoint;
+  //     if (filter != null) {
+  //       var queryString = getQueryString(filter);
+  //       url = "$url?$queryString";
+  //     }
 
-      var response = await _dio.get(url);
+  //     var response = await _dio.get(url);
 
-      var data = jsonDecode(response.data);
+  //     var data = jsonDecode(response.data);
 
-      var result = SearchResult<T>();
+  //     var result = SearchResult<T>();
 
-      result.count = data['count'];
+  //     result.count = data['count'];
 
-      for (var item in data['result']) {
-        result.result?.add(fromJson(item));
-      }
+  //     for (var item in data['result']) {
+  //       result.result?.add(fromJson(item));
+  //     }
 
-      return result;
-    } on DioException catch (err) {
-      throw new Exception(err.message);
-    }
-  }
+  //     return result;
+  //   } on DioException catch (err) {
+  //     throw new Exception(err.message);
+  //   }
+  // }
 
   Future<List<T>> getAll() async {
     try {

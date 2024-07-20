@@ -29,6 +29,5 @@ public class Applicant : IEntity<int>
     [Column("created")]
     public DateTime Created { get; set; }
     public User User { get; set; }
-
     public ICollection<ApplicantJobType> ApplicantJobTypes { get; set; }
 }

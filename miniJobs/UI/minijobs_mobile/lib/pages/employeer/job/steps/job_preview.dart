@@ -1,15 +1,14 @@
-import 'dart:convert';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
-import 'package:minijobs_mobile/models/proposed_answer.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
 import 'package:provider/provider.dart';
 
 class JobPreview extends StatelessWidget {
+  const JobPreview({super.key});
+
   @override
   Widget build(BuildContext context) {
     final jobProvider = Provider.of<JobProvider>(context);
@@ -184,7 +183,7 @@ return  SingleChildScrollView(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            boxShadow: [
+            boxShadow: const [
               BoxShadow(
                 color: Colors.black12,
                 blurRadius: 8,
@@ -192,7 +191,7 @@ return  SingleChildScrollView(
               ),
             ],
           ),
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -204,7 +203,7 @@ return  SingleChildScrollView(
                   color: Colors.deepPurple[800],
                 ),
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Text(
                 '$userName - ${job.city!.name}',
                 style: TextStyle(fontSize: 16, color: Colors.deepPurple[300]),
@@ -214,47 +213,47 @@ return  SingleChildScrollView(
                 'Opis posla:',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.deepPurple[700]),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
                 job.description!,
                 style: TextStyle(fontSize: 15, color: Colors.grey[700]),
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Row(
                 children: [
                   Text(
                     'Tip posla:',
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.deepPurple[700]),
                   ),
-                  SizedBox(width: 4),
+                  const SizedBox(width: 4),
                   Text(
                     job.jobType!.name!,
                     style: TextStyle(fontSize: 15, color: Colors.grey[700]),
                   ),
                 ],
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Row(
                 children: [
                   Text(
                     'Potrebno radnika:',
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.deepPurple[700]),
                   ),
-                  SizedBox(width: 4),
+                  const SizedBox(width: 4),
                   Text(
                     job.requiredEmployees!.toString(),
                     style: TextStyle(fontSize: 15, color: Colors.grey[700]),
                   ),
                 ],
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Row(
                 children: [
                   Text(
                     'Plaćanje:',
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.deepPurple[700]),
                   ),
-                  SizedBox(width: 4),
+                  const SizedBox(width: 4),
                   Text(
                     job.paymentQuestion!.answer!,
                     style: TextStyle(fontSize: 15, color: Colors.grey[700]),
@@ -266,7 +265,7 @@ return  SingleChildScrollView(
                     ),
                 ],
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Text(
                 'Raspored posla:',
                 style: TextStyle(
@@ -275,7 +274,7 @@ return  SingleChildScrollView(
                   color: Colors.deepPurple[700],
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Wrap(
                 spacing: 8.0,
                 runSpacing: 4.0,
@@ -287,7 +286,7 @@ return  SingleChildScrollView(
                 }).toList(),
               ),
               if (job.additionalPaymentOptions != null && job.additionalPaymentOptions!.isNotEmpty) ...[
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 Text(
                   'Dodatno plaća:',
                   style: TextStyle(
@@ -296,7 +295,7 @@ return  SingleChildScrollView(
                     color: Colors.deepPurple[700],
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Wrap(
                   spacing: 8.0,
                   runSpacing: 4.0,
@@ -308,9 +307,9 @@ return  SingleChildScrollView(
                   }).toList(),
                 ),
               ],
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Container(
-                padding: EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.blue[50],
                   borderRadius: BorderRadius.circular(8),
@@ -327,7 +326,7 @@ return  SingleChildScrollView(
                         color: Colors.blue[800],
                       ),
                     ),
-                    SizedBox(width: 4),
+                    const SizedBox(width: 4),
                     Text(
                       formattedDate,
                       style: TextStyle(

@@ -55,4 +55,7 @@ public class User : IEntity<int>
 
     [NotMapped]
     public string Role { get; set; }
+
+    public City City { get; set; }
+
 }

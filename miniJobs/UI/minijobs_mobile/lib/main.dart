@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:minijobs_mobile/pages/login_sign_up_page.dart';
+import 'package:minijobs_mobile/providers/applicant_provider.dart';
 import 'package:minijobs_mobile/providers/authentication_provider.dart';
 import 'package:minijobs_mobile/providers/city_provider.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
@@ -22,6 +23,7 @@ void main() async {
       ChangeNotifierProvider(create: (s) => JobTypeProvider()),
       ChangeNotifierProvider(create: (s) => ProposedAnswerProvider()),
       ChangeNotifierProvider(create: (s) => JobProvider()),
+      ChangeNotifierProvider(create: (s) => ApplicantProvider())
     ],
     child: const MyApp(),
   ));
@@ -39,7 +41,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
         useMaterial3: true,
       ),
-      home: MyMaterialApp(),
+      home: const MyMaterialApp(),
     );
   }
 }
@@ -56,7 +58,7 @@ class MyAppBar extends StatelessWidget {
 }
 
 class MyMaterialApp extends StatelessWidget {
-  const MyMaterialApp({Key? key}) : super(key: key);
+  const MyMaterialApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -67,14 +69,14 @@ class MyMaterialApp extends StatelessWidget {
           seedColor: Colors.blue,
           //  brightness: Brightness.light,
         ),
-        textTheme: TextTheme(
-          displayLarge: const TextStyle(
+        textTheme: const TextTheme(
+          displayLarge: TextStyle(
             fontSize: 72,
             fontWeight: FontWeight.bold,
           ),
         ),
       ),
-      home: LoginSignupPage(),
+      home: const LoginSignupPage(),
     );
   }
 }

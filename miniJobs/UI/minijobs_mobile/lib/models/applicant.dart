@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:decimal/decimal.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:minijobs_mobile/models/city.dart';
+import 'package:minijobs_mobile/models/job_type.dart';
 import 'package:minijobs_mobile/models/user.dart';
 
 part 'applicant.g.dart';
@@ -11,6 +13,8 @@ class Applicant extends User {
     String? description;
     String? experience;
     Decimal? wageProposal;
+    JobType? jobType;
+    City? city;
   
     Applicant(
         super.id,
@@ -26,9 +30,12 @@ class Applicant extends User {
         this.cv,
         this.description,
         this.experience,
-        this.wageProposal);
+        this.wageProposal,
+        this.jobType,
+        this.city);
   
          factory Applicant.fromJson(Map<String, dynamic> json) => _$ApplicantFromJson(json);
   
-    Map<String, dynamic> toJson() => _$ApplicantToJson(this);
+    @override
+  Map<String, dynamic> toJson() => _$ApplicantToJson(this);
   }

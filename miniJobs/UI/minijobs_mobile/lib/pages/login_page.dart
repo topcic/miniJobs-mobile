@@ -17,7 +17,8 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormBuilderState>();
   late AuthenticationProvider _authenticationProvider =
   AuthenticationProvider();
-    void initState() {
+    @override
+  void initState() {
     super.initState();
     // Access authentication provider
     _authenticationProvider = context.read<AuthenticationProvider>();
@@ -42,11 +43,11 @@ class _LoginPageState extends State<LoginPage> {
     if (result) {
       // Navigate to Navbar if authentication is successful
       Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => Navbar(),
+        builder: (context) => const Navbar(),
       ));
     } else {
       // Show SnackBar with error message if authentication fails
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Nevalidna lozinka ili email'),
       ));
     }
@@ -62,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Prijavi se"),
+          title: const Text("Prijavi se"),
           centerTitle: true,
         ),
         body: Center(
@@ -117,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                                 return null;
                               }
                             }),
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               label: Text("Lozinka"),
                             ),
                           ),
@@ -130,21 +131,21 @@ class _LoginPageState extends State<LoginPage> {
                           onPressed: () async {
                             _formKey.currentState?.save();
                             if (_formKey.currentState!.validate()) {
-                              final Map<String, dynamic>? formValues =
+                              final Map<String, dynamic> formValues =
                                   _formKey.currentState!.value;
-                              final String email = formValues?['email'] ?? '';
+                              final String email = formValues['email'] ?? '';
                               final String password =
-                                  formValues?['password'] ?? '';
+                                  formValues['password'] ?? '';
                               var autCodeRequest= AuthCodeRequest("27topcic.mahir@gmail.com", "Arni1234",
                                   "password", "","" );
                               var result = await _authenticationProvider.tokens(autCodeRequest);
 
                               if (result) {
                                 Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => Navbar()));
+                                    builder: (context) => const Navbar()));
                               } else {
                                 ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
+                                    .showSnackBar(const SnackBar(
                                   content: Text('Nevalidna lozinka ili email'),
                                 ));
                                 _formKey.currentState?.reset();

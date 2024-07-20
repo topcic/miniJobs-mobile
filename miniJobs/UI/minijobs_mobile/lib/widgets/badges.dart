@@ -11,13 +11,13 @@ class Badge extends StatelessWidget {
     required this.text,
     required this.backgroundColor,
     required this.textColor,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(4.0),
         color: backgroundColor,
@@ -41,8 +41,8 @@ class UserBadge extends StatelessWidget {
 
   const UserBadge({
     required this.status,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -71,8 +71,8 @@ class JobBadge extends StatelessWidget {
 
   const JobBadge({
     required this.status,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

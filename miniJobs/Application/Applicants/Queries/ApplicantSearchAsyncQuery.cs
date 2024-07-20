@@ -5,7 +5,7 @@ using Domain.Entities;
 
 namespace Application.Applicants.Queries;
 
-public class ApplicantSearchAsyncQuery : QueryBase<SearchResponseBase<Applicant>>
+public class ApplicantSearchAsyncQuery : QueryBase<SearchResponseBase<ApplicantResponse>>
 {
    
     public ApplicantSearchRequest SearchRequest { get; set; }

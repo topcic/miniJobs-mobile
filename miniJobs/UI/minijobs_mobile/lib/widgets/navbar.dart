@@ -1,3 +1,5 @@
+// File path: lib/navbar.dart
+
 import 'package:flutter/material.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:get_storage/get_storage.dart';
@@ -8,20 +10,20 @@ import 'package:minijobs_mobile/pages/employeer/job_list.dart';
 import 'package:minijobs_mobile/pages/profile.dart';
 
 class Navbar extends StatefulWidget {
+  const Navbar({super.key});
+
   @override
   _NavbarState createState() => _NavbarState();
 }
 
 class _NavbarState extends State<Navbar> {
   int _bottomNavIndex = 0;
-  int _jobStep = 0;
-  IconData _fabIcon = Icons.home; // Default FAB icon
-  List<Widget> _pages = [];
+  final PageController _pageController = PageController();
+
   @override
   void initState() {
     super.initState();
     _initRole();
-    _initPages();
   }
 
   _initRole() async {
@@ -31,32 +33,27 @@ class _NavbarState extends State<Navbar> {
     });
   }
 
-  _initPages() {
-    String role = GetStorage().read('role') ?? '';
-    _pages = [
-      JobList(),
-      // JobStep1Page(
-      //   onNextPressed: () {
-      //     setState(() {
-      //       _bottomNavIndex = 2;
-      //     });
-      //   }
-      // ),
-      JobList(),
-      ProfilePage(),
-    ];
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _bottomNavIndex,
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() {
+            _bottomNavIndex = index;
+          });
+        },
         children: _buildPages(),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
-        child: Icon(_fabIcon),
+        child: Icon(_getFabIcon(_bottomNavIndex)),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: AnimatedBottomNavigationBar(
@@ -72,14 +69,13 @@ class _NavbarState extends State<Navbar> {
         onTap: (index) {
           setState(() {
             _bottomNavIndex = index;
-            _fabIcon = _getFabIcon(index);
           });
+          _pageController.jumpToPage(index);
         },
       ),
     );
   }
 
-  // Method to get the FAB icon based on the selected index
   IconData _getFabIcon(int index) {
     switch (index) {
       case 0:
@@ -95,9 +91,8 @@ class _NavbarState extends State<Navbar> {
     }
   }
 
-  // Method to get the icons based on the role
   List<IconData> _getIconsForRole() {
-    String role = '';
+    String role = GetStorage().read('role') ?? '';
     if (role == 'Applicant') {
       return [
         Icons.home,
@@ -115,22 +110,23 @@ class _NavbarState extends State<Navbar> {
     }
   }
 
-  // Method to dynamically build pages based on the role
   List<Widget> _buildPages() {
     String role = GetStorage().read('role') ?? '';
-    List<Widget> pages = [];
     if (role == 'Applicant') {
-      pages.add(HomePage());
-      pages.add(_buildPage("Saved Jobs"));
-      pages.add(_buildPage("View List Page"));
-      pages.add(_buildPage("User Page"));
+      return [
+        const HomePage(),
+        _buildPage("Saved Jobs"),
+        _buildPage("View List Page"),
+        _buildPage("User Page"),
+      ];
     } else {
-      pages.add(EmployerHomePage());
-      pages.add(JobDetails(jobId:0));
-      pages.add(JobList());
-      pages.add(ProfilePage());
+      return [
+        const EmployerHomePage(),
+        const JobDetails(jobId: 0),
+        const JobList(),
+        const ProfilePage(),
+      ];
     }
-    return pages;
   }
 
   Widget _buildPage(String title) {

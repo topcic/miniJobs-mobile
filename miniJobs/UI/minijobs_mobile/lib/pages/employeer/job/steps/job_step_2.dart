@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -18,10 +17,10 @@ class JobStep2 extends StatefulWidget {
   final Function(bool, JobSaveRequest) onNextButton;
   final Function(Function()) setValidateAndSaveCallback;
   const JobStep2({
-    Key? key,
+    super.key,
     required this.onNextButton,
     required this.setValidateAndSaveCallback,
-  }) : super(key: key);
+  });
 
   @override
   State<JobStep2> createState() => JobStep2State();
@@ -48,7 +47,7 @@ class JobStep2State extends State<JobStep2> {
   late ProposedAnswerProvider _proposedAnswerProvider =
       ProposedAnswerProvider();
   late JobProvider _jobProvider = JobProvider();
-  TextEditingController _jobTypeController = TextEditingController();
+  final TextEditingController _jobTypeController = TextEditingController();
 
   @override
   void didChangeDependencies() {
@@ -152,7 +151,7 @@ if (selectedJobType != null) {
                               children: options
                                   .map((option) => ListTile(
                                         title: Text(option,
-                                            style: TextStyle(fontSize: 12)),
+                                            style: const TextStyle(fontSize: 12)),
                                         onTap: () => onSelected(option),
                                       ))
                                   .toList(),
@@ -166,7 +165,7 @@ if (selectedJobType != null) {
                       return FormBuilderTextField(
                         controller: controller,
                         focusNode: focusNode,
-                        style: TextStyle(fontSize: 12),
+                        style: const TextStyle(fontSize: 12),
                         validator: ((value) {
                           if (value == null || value.isEmpty) {
                             return "Tip posla je obavezno polje";
@@ -175,7 +174,7 @@ if (selectedJobType != null) {
                           }
                         }),
                         name: 'jobType',
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Tip posla',
                           labelStyle: TextStyle(fontSize: 14),
                         ),
@@ -185,9 +184,9 @@ if (selectedJobType != null) {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
-              rowMethod(Text("Raspored posla")),
-              SizedBox(height: 10),
+              const SizedBox(height: 20),
+              rowMethod(const Text("Raspored posla")),
+              const SizedBox(height: 10),
               rowMethod(
                 Expanded(
                   child: Wrap(
@@ -195,10 +194,10 @@ if (selectedJobType != null) {
                     children: displayedSchedules
                             ?.map(
                               (schedule) => Padding(
-                                padding: EdgeInsets.all(2),
+                                padding: const EdgeInsets.all(2),
                                 child: FilterChip(
                                   label: Text(schedule.answer ?? '',
-                                      style: TextStyle(fontSize: 10)),
+                                      style: const TextStyle(fontSize: 10)),
                                   selected: selectedJobSchedules!
                                       .contains(schedule.id),
                                   onSelected: (bool selected) {
@@ -219,7 +218,7 @@ if (selectedJobType != null) {
                   ),
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               if (!showAllSchedules)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -230,8 +229,8 @@ if (selectedJobType != null) {
                           showAllSchedules = true;
                         });
                       },
-                      icon: Text("više", style: TextStyle(fontSize: 12)),
-                      label: Icon(Icons.keyboard_arrow_down, size: 20),
+                      icon: const Text("više", style: TextStyle(fontSize: 12)),
+                      label: const Icon(Icons.keyboard_arrow_down, size: 20),
                     ),
                   ],
                 ),
@@ -245,8 +244,8 @@ if (selectedJobType != null) {
                           showAllSchedules = false;
                         });
                       },
-                      icon: Text("manje", style: TextStyle(fontSize: 12)),
-                      label: Icon(Icons.keyboard_arrow_up, size: 20),
+                      icon: const Text("manje", style: TextStyle(fontSize: 12)),
+                      label: const Icon(Icons.keyboard_arrow_up, size: 20),
                     ),
                   ],
                 ),
@@ -255,9 +254,9 @@ if (selectedJobType != null) {
                       selectedJobSchedules!.isEmpty))
                 rowMethod(Text("Raspored posla je obavezno polje",
                     style: TextStyle(color: Colors.red[800], fontSize: 12))),
-              SizedBox(height: 20),
-              rowMethod(Text("Koliko brzo želite da pronađete?")),
-              SizedBox(height: 10),
+              const SizedBox(height: 20),
+              rowMethod(const Text("Koliko brzo želite da pronađete?")),
+              const SizedBox(height: 10),
               rowMethod(
                 Expanded(
                   child: Wrap(
@@ -265,10 +264,10 @@ if (selectedJobType != null) {
                     children: durationOptions
                         .map(
                           (option) => Padding(
-                            padding: EdgeInsets.all(2),
+                            padding: const EdgeInsets.all(2),
                             child: FilterChip(
                               label: Text(option['label'],
-                                  style: TextStyle(fontSize: 10)),
+                                  style: const TextStyle(fontSize: 10)),
                               selected: applicationsEndTo == option,
                               onSelected: (bool selected) {
                                 setState(() {
@@ -286,14 +285,14 @@ if (selectedJobType != null) {
                   (applicationsEndTo == null || applicationsEndTo!.isEmpty))
                 rowMethod(Text("Ovo je obavezno polje",
                     style: TextStyle(color: Colors.red[800], fontSize: 12))),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               rowMethod(
                 Expanded(
                   child: FormBuilderTextField(
                     keyboardType: TextInputType.number,
                     name: 'requiredEmployees',
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       label: Text(
                           "Koliko Vam je potrebno radnika za ovaj posao?",
                           style: TextStyle(fontSize: 12)),
@@ -321,8 +320,8 @@ if (selectedJobType != null) {
     return Expanded(
       child: Row(
         children: [
-          Text(label, style: TextStyle(fontSize: 14)),
-          SizedBox(width: 8),
+          Text(label, style: const TextStyle(fontSize: 14)),
+          const SizedBox(width: 8),
           Flexible(
             child: FormBuilderTextField(
               name: name,
@@ -333,10 +332,10 @@ if (selectedJobType != null) {
                   return null;
                 }
               },
-              style: TextStyle(fontSize: 12),
+              style: const TextStyle(fontSize: 12),
               decoration: InputDecoration(
                 labelText: label,
-                labelStyle: TextStyle(fontSize: 14),
+                labelStyle: const TextStyle(fontSize: 14),
               ),
             ),
           ),
@@ -354,8 +353,8 @@ if (selectedJobType != null) {
         selectedJobSchedules != null &&
         selectedJobSchedules!.isNotEmpty &&
         applicationsEndTo != null) {
-      final Map<String, dynamic>? formValues = _formKey.currentState!.value;
-      var selectedJobTypeName = formValues!['jobType'];
+      final Map<String, dynamic> formValues = _formKey.currentState!.value;
+      var selectedJobTypeName = formValues['jobType'];
       var selectedJobType = _jobTypes!
           .firstWhere((jobType) => jobType.name == selectedJobTypeName);
       var jobScheduleInfo =

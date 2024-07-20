@@ -6,7 +6,7 @@ import '../models/search_result.dart';
 import '../utils/util_widgets.dart';
 
 class UserDetailsPage extends StatefulWidget {
-  const UserDetailsPage({Key? key}) : super(key: key);
+  const UserDetailsPage({super.key});
 
   @override
   State<UserDetailsPage> createState() => _UserDetailsPageState();
@@ -59,17 +59,17 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                             _textField('firstName', "Ime"),
                             CrossAxisAlignment.center,
                           ),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
                           rowMethod(
                             _textField('lastName', "Prezime"),
                             CrossAxisAlignment.center,
                           ),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
                           rowMethod(
                             _textField('phoneNumber', "Broj telefona"),
                             CrossAxisAlignment.center,
                           ),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
                           rowMethod(
                             Expanded(
                               child: FormBuilderTextField(

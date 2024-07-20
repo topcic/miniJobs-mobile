@@ -16,7 +16,7 @@ class CustomModal extends StatelessWidget {
   final String deadline;
   final String status;
 
-  CustomModal({
+  const CustomModal({super.key, 
     required this.naziv,
     required this.poslodavac,
     required this.opstina,
@@ -47,111 +47,111 @@ class CustomModal extends StatelessWidget {
                 children: [
                   IconButton(
                     onPressed: () {},
-                    icon: Icon(Icons.bookmark_outline),
+                    icon: const Icon(Icons.bookmark_outline),
                   ),
                   IconButton(
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    icon: Icon(Icons.close),
+                    icon: const Icon(Icons.close),
                   ),
                 ],
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text(
-                "$naziv",
-                style: TextStyle(
+                naziv,
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
               ),
               Row(
                 children: [
-                  Icon(Icons.location_on),
-                  SizedBox(
+                  const Icon(Icons.location_on),
+                  const SizedBox(
                     width: 10.0,
                   ),
                   Text("$poslodavac - $opstina, $adresa"),
                 ],
               ),
-              SizedBox(height: 10),
-              Text(
+              const SizedBox(height: 10),
+              const Text(
                 'Opis posla:',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text(
-                "$opis",
+                opis,
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text(
                 'Tip posla: $posaoTip',
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Row(
                 children: [
-                  Icon(Icons.money),
-                  SizedBox(
+                  const Icon(Icons.money),
+                  const SizedBox(
                     width: 10.0,
                   ),
                   Text("$cijena $nacinPlacanja"),
                 ],
               ),
-              SizedBox(height: 10),
-              Text(
+              const SizedBox(height: 10),
+              const Text(
                 'Raspored posla:',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text(
-                "$rasporedOdgovori",
+                rasporedOdgovori,
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               if (true) // Modify this condition as needed
-                Text(
+                const Text(
                   'Dodatno plaća:',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               if (true) // Modify this condition as needed
                 Text(
-                  "$dodatnoPlacanjecopy",
+                  dodatnoPlacanjecopy,
                 ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Row(
                 children: [
-                  Icon(Icons.supervisor_account),
-                  SizedBox(
+                  const Icon(Icons.supervisor_account),
+                  const SizedBox(
                     width: 10.0,
                   ),
                   Text("$brojRadnika radnik/a"),
                 ],
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               if (true) // Modify this condition as needed
                 Row(
                   children: [
-                    Icon(Icons.date_range),
-                    SizedBox(
+                    const Icon(Icons.date_range),
+                    const SizedBox(
                       width: 10.0,
                     ),
-                    Text("$deadline"),
+                    Text(deadline),
                   ],
                 ),
               if (true) // Modify this condition as needed
-                Text(
+                const Text(
                   'Posao je završen',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               if (true) // Modify this condition as needed
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -160,8 +160,8 @@ class CustomModal extends StatelessWidget {
                       onPressed: () {
                         // Logic for when the button is pressed
                       },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(
                             horizontal:
                                 20), // Add horizontal padding to the button
                         child: Text('Apliciraj'),

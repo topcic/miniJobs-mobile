@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -16,7 +15,7 @@ class AuthenticationProvider extends BaseProvider<AuthTokenResponse> {
 
   Future<bool> tokens(AuthCodeRequest request) async {
     try {
-      var url = baseUrl + "tokens";
+      var url = "${baseUrl}tokens";
       var dio = Dio();
 
       var jsonRequest = jsonEncode({

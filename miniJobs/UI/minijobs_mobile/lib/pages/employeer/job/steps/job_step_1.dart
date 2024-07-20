@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -10,7 +9,7 @@ import 'package:minijobs_mobile/utils/util_widgets.dart';
 import 'package:provider/provider.dart';
 
 class JobStep1 extends StatefulWidget {
-  JobStep1({Key? key}) : super(key: key);
+  const JobStep1({super.key});
 
   @override
   JobStep1State createState() => JobStep1State();
@@ -42,13 +41,14 @@ class JobStep1State extends State<JobStep1> {
   }
 
   void _setInitialFormValues() {
-    if (_job != null)
+    if (_job != null) {
       _formKey.currentState?.patchValue({
         'name': _job!.name,
         'description': _job!.description,
         'cityId': _job!.cityId.toString(),
         'streetAddressAndNumber': _job!.streetAddressAndNumber,
       });
+    }
   }
 
   Future<void> getCities() async {
@@ -71,14 +71,14 @@ class JobStep1State extends State<JobStep1> {
                 _textField('name', "Naziv posla"),
                 CrossAxisAlignment.center,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               rowMethod(
                 Expanded(
                   child: FormBuilderTextField(
                     maxLines: 8,
                     keyboardType: TextInputType.multiline,
                     name: 'description',
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: "Opis",
                       hintText: "Unesite opis ovdje",
                       border: OutlineInputBorder(),
@@ -89,12 +89,12 @@ class JobStep1State extends State<JobStep1> {
                       }
                       return null;
                     },
-                    style: TextStyle(fontSize: 12),
+                    style: const TextStyle(fontSize: 12),
                   ),
                 ),
                 CrossAxisAlignment.center,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               rowMethod(
                 Expanded(
                   child: FormBuilderDropdown<String>(
@@ -105,7 +105,7 @@ class JobStep1State extends State<JobStep1> {
                       }
                       return null;
                     },
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: "Grad",
                       labelStyle: TextStyle(fontSize: 14),
                     ),
@@ -114,7 +114,7 @@ class JobStep1State extends State<JobStep1> {
                             value: g.id.toString(),
                             child: Text(
                               g.name ?? '',
-                              style: TextStyle(fontSize: 12),
+                              style: const TextStyle(fontSize: 12),
                             ),
                           );
                         }).toList() ??
@@ -122,7 +122,7 @@ class JobStep1State extends State<JobStep1> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               rowMethod(
                 _textField('streetAddressAndNumber', "Adresa"),
                 CrossAxisAlignment.center,
@@ -144,10 +144,10 @@ class JobStep1State extends State<JobStep1> {
           }
           return null;
         },
-        style: TextStyle(fontSize: 12),
+        style: const TextStyle(fontSize: 12),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(fontSize: 14),
+          labelStyle: const TextStyle(fontSize: 14),
         ),
       ),
     );
@@ -161,9 +161,9 @@ class JobStep1State extends State<JobStep1> {
 
       setState(() {
         var job = Job.fromJson(formData);
-        if (_job == null)
+        if (_job == null) {
           _job = job;
-        else {
+        } else {
           _job!.name = job.name;
           _job!.description = job.description;
           _job!.cityId = job.cityId;

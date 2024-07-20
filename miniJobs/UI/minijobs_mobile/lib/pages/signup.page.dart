@@ -13,7 +13,7 @@ import '../utils/util_widgets.dart';
 
 class SignupPage extends StatefulWidget {
   final Role role;
-  const SignupPage({Key? key, required this.role}) : super(key: key);
+  const SignupPage({super.key, required this.role});
 
   @override
   State<SignupPage> createState() => _SignupPageState();
@@ -91,25 +91,25 @@ class _SignupPageState extends State<SignupPage> {
                       _textField('firstName', "Ime"),
                       CrossAxisAlignment.center,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     rowMethod(
                       _textField('lastName', "Prezime"),
                       CrossAxisAlignment.center,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     rowMethod(
                       Expanded(
                         child: FormBuilderTextField(
                           inputFormatters: [maskFormatter],
                           name: 'phoneNumber',
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             label: Text("Broj telefona"),
                           ),
                         ),
                       ),
                       CrossAxisAlignment.center,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     rowMethod(
                       Expanded(
                         child: FormBuilderDropdown<String>(
@@ -121,7 +121,7 @@ class _SignupPageState extends State<SignupPage> {
                               return null;
                             }
                           },
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: "Spol",
                           ),
                           items: Gender.values.map((gender) {
@@ -135,7 +135,7 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     rowMethod(
                       Expanded(
                         child: FormBuilderDropdown<String>(
@@ -147,7 +147,7 @@ class _SignupPageState extends State<SignupPage> {
                               return null;
                             }
                           },
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: "Grad",
                           ),
                           items: cities != null
@@ -161,7 +161,7 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     rowMethod(
                       Expanded(
                         child: FormBuilderTextField(
@@ -183,7 +183,7 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     rowMethod(
                       Expanded(
                         child: FormBuilderTextField(
@@ -201,14 +201,14 @@ class _SignupPageState extends State<SignupPage> {
                               return null;
                             }
                           }),
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             label: Text("Lozinka"),
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(height: 20),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     rowMethod(
                       Expanded(
                         child: FormBuilderTextField(
@@ -225,13 +225,13 @@ class _SignupPageState extends State<SignupPage> {
                               return null;
                             }
                           }),
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             label: Text("Ponovljena lozinka"),
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -255,28 +255,28 @@ class _SignupPageState extends State<SignupPage> {
                                       .insert(request);
                                   if (result.isRegistered == true) {
                                     ScaffoldMessenger.of(context)
-                                        .showSnackBar(SnackBar(
+                                        .showSnackBar(const SnackBar(
                                         content: Text(
                                             "Uspješno ste se registrovali. Molimo Vas provjerite Vaš email")));
                                     Navigator.of(context).push(
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                VerificationPage()));
+                                                const VerificationPage()));
                                   }
                                 } else {}
                               } catch (e) {
                                 ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
+                                    .showSnackBar(const SnackBar(
                                     content: Text(
                                         " Email adresa se već koristi. Molimo izaberite drugu email adresu.")));
                               }
                             },
-                            child: Text("Registruj se"),
+                            child: const Text("Registruj se"),
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 40),
+                    const SizedBox(height: 40),
                   ],
                 ),
               ),

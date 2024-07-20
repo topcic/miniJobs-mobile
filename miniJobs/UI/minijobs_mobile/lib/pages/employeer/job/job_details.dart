@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:minijobs_mobile/enumerations/job_statuses.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
@@ -13,7 +12,7 @@ import 'package:provider/provider.dart';
 class JobDetails extends StatefulWidget {
   final int jobId;
 
-  JobDetails({required this.jobId});
+  const JobDetails({super.key, required this.jobId});
 
   @override
   _JobDetailsState createState() => _JobDetailsState();
@@ -22,7 +21,7 @@ class JobDetails extends StatefulWidget {
 class _JobDetailsState extends State<JobDetails> {
   int _currentStep = 0;
   bool isCompleted = false;
-  late Job _job = new Job();
+  late Job _job = Job();
   late JobProvider _jobProvider = JobProvider();
   final GlobalKey<JobStep1State> _jobStep1Key = GlobalKey<JobStep1State>();
   JobSaveRequest? _jobSaveRequest;
@@ -65,20 +64,18 @@ class _JobDetailsState extends State<JobDetails> {
     if (isValid) {
       var saveRequest = jobSaveRequest;
       var job = await _jobProvider.update(saveRequest!.id!, saveRequest);
-      if (job != null) {
-        _jobProvider.setCurrentJob(job);
-        setState(() {
-          _currentStep += 1;
-        });
-      }
-    }
+      _jobProvider.setCurrentJob(job);
+      setState(() {
+        _currentStep += 1;
+      });
+        }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Job Details'),
+          title: const Text('Job Details'),
         ),
         body: isCompleted
             ? buildCompleted()
@@ -105,20 +102,20 @@ class _JobDetailsState extends State<JobDetails> {
                   final isLastStep = _currentStep == getSteps().length - 1;
 
                   return Container(
-                      margin: EdgeInsets.only(top: 50),
+                      margin: const EdgeInsets.only(top: 50),
                       child: Row(
                         children: [
                           if (_currentStep != 0)
                             Expanded(
                                 child: ElevatedButton(
-                              child: Text('Nazad'),
                               onPressed: details.onStepCancel,
+                              child: const Text('Nazad'),
                             )),
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                           Expanded(
                               child: ElevatedButton(
-                            child: Text(isLastStep ? 'Objavi posao' : 'Dalje'),
                             onPressed: details.onStepContinue,
+                            child: Text(isLastStep ? 'Objavi posao' : 'Dalje'),
                           ))
                         ],
                       ));
@@ -128,7 +125,7 @@ class _JobDetailsState extends State<JobDetails> {
 
   List<Step> getSteps() => [
         Step(
-          title: Text(''),
+          title: const Text(''),
           content: JobStep1(key: _jobStep1Key),
           isActive: _currentStep >= 0,
           state: _currentStep == 0
@@ -138,7 +135,7 @@ class _JobDetailsState extends State<JobDetails> {
                   : StepState.indexed,
         ),
         Step(
-          title: Text(''),
+          title: const Text(''),
           content: JobStep2(
               onNextButton: _onNextButton,
               setValidateAndSaveCallback: (Function() validateAndSave) {
@@ -152,7 +149,7 @@ class _JobDetailsState extends State<JobDetails> {
                   : StepState.indexed,
         ),
         Step(
-          title: Text(''),
+          title: const Text(''),
           content: JobStep3(
               onNextButton: _onNextButton,
               setValidateAndSaveCallback: (Function() validateAndSave) {
@@ -166,8 +163,8 @@ class _JobDetailsState extends State<JobDetails> {
                   : StepState.indexed,
         ),
         Step(
-          title: Text(''),
-          content: JobPreview(),
+          title: const Text(''),
+          content: const JobPreview(),
           isActive: _currentStep >= 3,
           state: _currentStep == 3
               ? StepState.editing
@@ -189,23 +186,19 @@ class _JobDetailsState extends State<JobDetails> {
         _job = jobStep1State.getUpdatedJob();
         if (_job.id == null || _job.id == 0) {
           var job = await _jobProvider.insert(_job);
-          if (job != null) {
-            setState(() {
-              _job = job;
-              _jobProvider.setCurrentJob(job);
-              _currentStep += 1;
-            });
-          }
-        } else {
-          var job = await _jobProvider.update(_job.id!, _job);
-          if (job != null) {
+          setState(() {
+            _job = job;
             _jobProvider.setCurrentJob(job);
-            setState(() {
-              _job = job;
-              _currentStep += 1;
-            });
-          }
-        }
+            _currentStep += 1;
+          });
+                } else {
+          var job = await _jobProvider.update(_job.id!, _job);
+          _jobProvider.setCurrentJob(job);
+          setState(() {
+            _job = job;
+            _currentStep += 1;
+          });
+                }
       }
     } else if (_currentStep == 1) {
       _validateAndSaveStep2Callback();
@@ -213,12 +206,10 @@ class _JobDetailsState extends State<JobDetails> {
       _validateAndSaveStep3Callback();
     } else if (_currentStep == 3) {
       var job = await _jobProvider.activate(_job.id!, JobStatus.Aktivan);
-      if (job != null) {
-        _jobProvider.setCurrentJob(job);
-        setState(() {
-          isCompleted = true;
-        });
-      }
-    }
+      _jobProvider.setCurrentJob(job);
+      setState(() {
+        isCompleted = true;
+      });
+        }
   }
 }

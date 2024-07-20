@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -16,10 +15,10 @@ class JobStep3 extends StatefulWidget {
   final Function(bool, JobSaveRequest) onNextButton;
   final Function(Function()) setValidateAndSaveCallback;
   const JobStep3({
-    Key? key,
+    super.key,
     required this.onNextButton,
     required this.setValidateAndSaveCallback,
-  }) : super(key: key);
+  });
 
   @override
   State<JobStep3> createState() => _JobStep3State();
@@ -36,7 +35,7 @@ class _JobStep3State extends State<JobStep3> {
   List<int> selectedAdditionalPayments = [];
   Map<int, List<int>>? answersToPaymentQuestions = {};
   late JobProvider _jobProvider = JobProvider();
-  late ProposedAnswerProvider _proposedAnswerProvider =
+  late final ProposedAnswerProvider _proposedAnswerProvider =
       ProposedAnswerProvider();
   int? paymentChoiceQuestionId;
   JobSaveRequest? _jobSaveRequest;
@@ -104,7 +103,7 @@ class _JobStep3State extends State<JobStep3> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(2),
+      padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
@@ -113,7 +112,7 @@ class _JobStep3State extends State<JobStep3> {
             color: Colors.grey.withOpacity(0.5),
             spreadRadius: 1,
             blurRadius: 1,
-            offset: Offset(0, 3),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -124,9 +123,9 @@ class _JobStep3State extends State<JobStep3> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SizedBox(height: 20),
-              rowMethod(Text("Izaberite način plaćanja")),
-              SizedBox(height: 10),
+              const SizedBox(height: 20),
+              rowMethod(const Text("Izaberite način plaćanja")),
+              const SizedBox(height: 10),
               rowMethod(
                 Expanded(
                   child: Wrap(
@@ -136,11 +135,11 @@ class _JobStep3State extends State<JobStep3> {
                         ? paymentOptions!
                             .map(
                               (option) => Padding(
-                                padding: EdgeInsets.all(2),
+                                padding: const EdgeInsets.all(2),
                                 child: FilterChip(
                                   label: Text(
                                     option.answer!, // Accessing option.answer
-                                    style: TextStyle(fontSize: 10),
+                                    style: const TextStyle(fontSize: 10),
                                   ),
                                   selected: paymentChoice == option.id,
                                   onSelected: (bool selected) {
@@ -168,9 +167,9 @@ class _JobStep3State extends State<JobStep3> {
                       "po dogovoru")
                 FormBuilderTextField(
                     name: 'wage',
-                    initialValue: _job != null ? _job!.wage?.toString() : null,
+                    initialValue: _job?.wage?.toString(),
                     keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Cijena',
                     ),
                     // onChanged: (value) {
@@ -191,9 +190,9 @@ class _JobStep3State extends State<JobStep3> {
                           .isEmpty))
                 rowMethod(Text("Način plaćanja je obavezno polje",
                     style: TextStyle(color: Colors.red[800], fontSize: 12))),
-              SizedBox(height: 20),
-              rowMethod(Text("Plaćate li")),
-              SizedBox(height: 10),
+              const SizedBox(height: 20),
+              rowMethod(const Text("Plaćate li")),
+              const SizedBox(height: 10),
               rowMethod(
                 Expanded(
                   child: Wrap(
@@ -202,11 +201,11 @@ class _JobStep3State extends State<JobStep3> {
                         ? additionalPaymentOptions!
                             .map(
                               (option) => Padding(
-                                padding: EdgeInsets.all(2),
+                                padding: const EdgeInsets.all(2),
                                 child: FilterChip(
                                   label: Text(
                                     option.answer ?? '',
-                                    style: TextStyle(fontSize: 10),
+                                    style: const TextStyle(fontSize: 10),
                                   ),
                                   selected: selectedAdditionalPayments
                                       .contains(option.id),
@@ -240,7 +239,7 @@ class _JobStep3State extends State<JobStep3> {
     _formKey.currentState?.save();
     if (_formKey.currentState!.validate()) {
 
-      final Map<String, dynamic>? formValues = _formKey.currentState!.value;
+      final Map<String, dynamic> formValues = _formKey.currentState!.value;
       saveAnswersToPaymentQuestions();
       var jobScheduleInfo = JobScheduleInfo(
           questionValues[Questions.workingHours]!,
@@ -257,7 +256,7 @@ class _JobStep3State extends State<JobStep3> {
         _job?.requiredEmployees!,
         jobScheduleInfo,
         answersToPaymentQuestions,
-       formValues?['wage']!=null? int.tryParse(formValues?['wage']) : 0,
+       formValues['wage']!=null? int.tryParse(formValues['wage']) : 0,
         _job?.applicationsDuration!,
       );
 

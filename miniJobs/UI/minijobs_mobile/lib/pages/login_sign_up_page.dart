@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:minijobs_mobile/pages/signup.page.dart';
 import 'package:minijobs_mobile/pages/company_employer_signup.page.dart';
 import 'package:minijobs_mobile/pages/login_page.dart';
@@ -7,7 +6,7 @@ import 'package:minijobs_mobile/pages/login_page.dart';
 import '../enumerations/role.dart';
 
 class LoginSignupPage extends StatefulWidget {
-  const LoginSignupPage({Key? key}) : super(key: key);
+  const LoginSignupPage({super.key});
 
   @override
   _LoginSignupPageState createState() => _LoginSignupPageState();
@@ -31,6 +30,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
       });
     }
   }
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -38,9 +38,9 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
         length: 2,
         child: Scaffold(
           appBar: AppBar(
-            title: Text('Prijava i registracija'),
+            title: const Text('Prijava i registracija'),
             bottom: TabBar(
-              tabs: [
+              tabs: const [
                 Tab(text: 'Prijava'),
                 Tab(text: 'Registracija'),
               ],
@@ -53,10 +53,10 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
           ),
           body: TabBarView(
             children: [
-              LoginPage(),
+              const LoginPage(),
               _selectedIndex==-1? SignupMenu(onOptionSelected: switchTabView)
-                  :_selectedIndex==0?SignupPage(role:Role.Applicant)
-                  :_selectedIndex==1?SignupPage(role:Role.Employer):CompanyEmployerSignupPage(),
+                  :_selectedIndex==0?const SignupPage(role:Role.Applicant)
+                  :_selectedIndex==1?const SignupPage(role:Role.Employer):const CompanyEmployerSignupPage(),
             ],
           ),
         ),
@@ -67,7 +67,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
 class SignupMenu extends StatefulWidget {
   final Function(String) onOptionSelected; // Define callback function
 
-  const SignupMenu({Key? key, required this.onOptionSelected}) : super(key: key);
+  const SignupMenu({super.key, required this.onOptionSelected});
 
   @override
   _SignupMenuState createState() => _SignupMenuState();
@@ -91,7 +91,7 @@ class _SignupMenuState extends State<SignupMenu> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Column(
               children: [
                 ElevatedButton(
@@ -102,7 +102,7 @@ class _SignupMenuState extends State<SignupMenu> {
                     widget.onOptionSelected('Applicant'); // Trigger callback
                   },
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 40),
+                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
                   ),
                   child: const Text(
                     'Aplikant',
@@ -117,7 +117,7 @@ class _SignupMenuState extends State<SignupMenu> {
                     });
                   },
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 40),
+                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
                   ),
                   child: const Text(
                     'Poslodavac',
@@ -137,7 +137,7 @@ class _SignupMenuState extends State<SignupMenu> {
                       },
                       style: ElevatedButton.styleFrom(
                         padding:
-                        EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                        const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                       ),
                       child: const Text(
                         'Kao fizičko lice',
@@ -153,7 +153,7 @@ class _SignupMenuState extends State<SignupMenu> {
                       },
                       style: ElevatedButton.styleFrom(
                         padding:
-                        EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                        const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                       ),
                       child: const Text(
                         'Kao kompanija',

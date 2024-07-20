@@ -94,7 +94,7 @@ class _UsersPageState extends State<UsersPage> {
                   child: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
                     child: DataTable(
-                      columns: [
+                      columns: const [
                         DataColumn(label: Text('Ime')),
                         DataColumn(label: Text('Prezime')),
                         DataColumn(label: Text('Email')),

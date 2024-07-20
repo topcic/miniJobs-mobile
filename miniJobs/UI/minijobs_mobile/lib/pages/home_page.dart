@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:minijobs_mobile/pages/job_modal.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  TextEditingController _locationController = TextEditingController();
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
     @override
   Widget build(BuildContext context) {
@@ -23,8 +25,8 @@ class _HomePageState extends State<HomePage> {
             child: Container(
               height: 130,
               color: Colors.blue, // Plava pozadina
-              padding: EdgeInsets.all(20.0),
-              child: Column(
+              padding: const EdgeInsets.all(20.0),
+              child: const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
@@ -58,32 +60,32 @@ class _HomePageState extends State<HomePage> {
                 color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(10.0), // Radijus zaobljenja obruba
               ),
-              margin: EdgeInsets.symmetric(horizontal: 20.0),
+              margin: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Row(
                 children: [
-                  SizedBox(width: 10.0),
-                  Icon(Icons.location_on), // Ikona za lokaciju
-                  SizedBox(width: 10.0),
+                  const SizedBox(width: 10.0),
+                  const Icon(Icons.location_on), // Ikona za lokaciju
+                  const SizedBox(width: 10.0),
                   Expanded(
                     child: TextFormField(
                       controller: _locationController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: 'Gdje?',
                       ),
                     ),
                   ),
-                  SizedBox(width: 20.0),
-                  Icon(Icons.search), // Ikona za lokaciju
-                  SizedBox(width: 10.0),
+                  const SizedBox(width: 20.0),
+                  const Icon(Icons.search), // Ikona za lokaciju
+                  const SizedBox(width: 10.0),
                   Expanded(
                     child: TextFormField(
                       controller: _searchController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: 'Šta?',
                       ),
                     ),
                   ),
-                  SizedBox(width: 20.0),
+                  const SizedBox(width: 20.0),
                   ElevatedButton(
                     onPressed: () {
                       String location = _locationController.text;
@@ -91,13 +93,13 @@ class _HomePageState extends State<HomePage> {
                       // Implementirajte logiku pretraživanja ovdje
                       print('Location: $location, Search term: $searchTerm');
                     },
-                    child: Text(
+                    style: ElevatedButton.styleFrom(),
+                    child: const Text(
                       'Pretraži',
                       style: TextStyle(color: Colors.blue),
                     ),
-                    style: ElevatedButton.styleFrom(),
                   ),
-                  SizedBox(width: 10.0),
+                  const SizedBox(width: 10.0),
                 ],
               ),
             ),
@@ -132,7 +134,7 @@ Widget _buildJobs() {
 
 Widget _buildJobsGrid() {
   return GridView.builder(
-    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
       crossAxisCount: 2, // Broj kartica u redu
       crossAxisSpacing: 10.0, // Razmak između kartica u redu
       mainAxisSpacing: 10.0, // Razmak između redova kartica
@@ -140,11 +142,11 @@ Widget _buildJobsGrid() {
     itemCount: 8, // Zamijenite ovu vrijednost s vašim brojem poslova
     itemBuilder: (BuildContext context, int index) {
      return Card(
-  margin: EdgeInsets.all(10.0),
+  margin: const EdgeInsets.all(10.0),
   color: Colors.blue[50],
   child: Container(
     alignment: Alignment.center,
-    padding: EdgeInsets.all(10.0),
+    padding: const EdgeInsets.all(10.0),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -152,8 +154,8 @@ Widget _buildJobsGrid() {
           'Job Title $index',
           textAlign: TextAlign.center, // Poravnanje teksta na sredinu
         ),
-        SizedBox(height: 10), // Prostor između tekstova i ikona
-        Row(
+        const SizedBox(height: 10), // Prostor između tekstova i ikona
+        const Row(
           mainAxisAlignment: MainAxisAlignment.center, // Poravnanje u sredini
           children: [
             Icon(Icons.location_on), // Ikona za lokaciju
@@ -161,23 +163,23 @@ Widget _buildJobsGrid() {
             Text("Mostar"),
           ],
         ),
-        SizedBox(height: 10), // Prostor između ikona i cijene
+        const SizedBox(height: 10), // Prostor između ikona i cijene
         Row(
           mainAxisAlignment: MainAxisAlignment.center, // Poravnanje u sredini
           children: [
-            Icon(Icons.money_sharp),
-            SizedBox(width: 10),
+            const Icon(Icons.money_sharp),
+            const SizedBox(width: 10),
             Text('${10 * index}'),
           ],
         ),
-        SizedBox(height: 10), // Prostor između cijene i gumba
+        const SizedBox(height: 10), // Prostor između cijene i gumba
          ElevatedButton(
           onPressed: () {
             // Show dialog with job details
            showDialog(
       context: context,
       builder: (BuildContext context) {
-        return CustomModal(
+        return const CustomModal(
           // Pass job details to the modal constructor
           naziv: 'Potreban radnik za dostavu hrane',
           poslodavac: 'Napolitano',
@@ -197,7 +199,7 @@ Widget _buildJobsGrid() {
       },
     );
           },
-          child: Text('Pogledaj'),
+          child: const Text('Pogledaj'),
         ),
       ],
     ),

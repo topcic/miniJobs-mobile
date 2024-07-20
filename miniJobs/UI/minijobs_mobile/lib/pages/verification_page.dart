@@ -4,10 +4,11 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:minijobs_mobile/models/auth_code_request.dart';
 import 'package:minijobs_mobile/pages/login_page.dart';
 import 'package:minijobs_mobile/providers/authentication_provider.dart';
-import 'package:minijobs_mobile/utils/util_widgets.dart';
 import 'package:provider/provider.dart';
 
 class VerificationPage extends StatefulWidget {
+  const VerificationPage({super.key});
+
   @override
   _VerificationPageState createState() => _VerificationPageState();
 }
@@ -30,7 +31,7 @@ class _VerificationPageState extends State<VerificationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Verifikacija emaila'),
+        title: const Text('Verifikacija emaila'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -43,16 +44,16 @@ class _VerificationPageState extends State<VerificationPage> {
                 "assets/images/verify-mail2.png",
                 fit: BoxFit.contain,
               ),
-              SizedBox(height: 20),
-              Text(
+              const SizedBox(height: 20),
+              const Text(
                 'Unesite kod koji ste dobili na Vaš email',
                 style: TextStyle(fontSize: 18),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               FormBuilderTextField(
                 inputFormatters: [numberMask],
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Verifikacijski kod',
                   border: OutlineInputBorder(),
                 ),
@@ -64,7 +65,7 @@ class _VerificationPageState extends State<VerificationPage> {
                   return null;
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
                   _formKey.currentState?.save();
@@ -76,20 +77,20 @@ class _VerificationPageState extends State<VerificationPage> {
                     var result = await _authenticationProvider.tokens(authCodeRequest);
 
                     if (result) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                         content: Text("Uspješno ste potvrdili Vaš email. Molimo Vas prijavite se."),
                       ));
                       Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => LoginPage(),
+                        builder: (context) => const LoginPage(),
                       ));
                     } else {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                         content: Text("Verifikacijski kod nije validan."),
                       ));
                     }
                   }
                 },
-                child: Text('Pošalji'),
+                child: const Text('Pošalji'),
               ),
             ],
           ),

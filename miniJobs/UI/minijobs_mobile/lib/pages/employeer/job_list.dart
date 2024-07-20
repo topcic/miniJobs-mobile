@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 import 'package:minijobs_mobile/widgets/badges.dart';
 
 class JobList extends StatefulWidget {
+  const JobList({super.key});
+
   @override
   _JobListState createState() => _JobListState();
 }
@@ -31,14 +33,14 @@ class _JobListState extends State<JobList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Job List'),
+        title: const Text('Job List'),
       ),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: DataTable(
-            columns: [
+            columns: const [
               DataColumn(label: Center(child: Text('Opcije'))),
               DataColumn(label: Center(child: Text('Naziv'))),
               DataColumn(label: Center(child: Text('Kreiran'))),
@@ -50,10 +52,10 @@ class _JobListState extends State<JobList> {
                 .map((job) => DataRow(cells: [
                       DataCell(
                         PopupMenuButton<String>(
-                          icon: Icon(Icons.more_vert, size: 18),
+                          icon: const Icon(Icons.more_vert, size: 18),
                           itemBuilder: (BuildContext context) =>
                               <PopupMenuEntry<String>>[
-                            PopupMenuItem<String>(
+                            const PopupMenuItem<String>(
                               value: 'details',
                               child: Row(children: [
                                 Icon(Icons.reorder, size: 18),
@@ -69,8 +71,8 @@ class _JobListState extends State<JobList> {
                                   color: Colors.redAccent[700],
                                   size: 18,
                                 ),
-                                SizedBox(width: 8),
-                                Text('Obriši')
+                                const SizedBox(width: 8),
+                                const Text('Obriši')
                               ]),
                             ),
                             PopupMenuItem<String>(
@@ -78,8 +80,8 @@ class _JobListState extends State<JobList> {
                               child: Row(children: [
                                 Icon(Icons.check,
                                     color: Colors.greenAccent[700], size: 18),
-                                SizedBox(width: 8),
-                                Text('Završi')
+                                const SizedBox(width: 8),
+                                const Text('Završi')
                               ]),
                             ),
                           ],
