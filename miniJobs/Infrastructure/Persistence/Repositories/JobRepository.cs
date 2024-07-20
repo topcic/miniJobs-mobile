@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Domain.Entities;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Data;
@@ -138,26 +139,40 @@ LEFT JOIN JobTypeCTE AS jt ON j.id = jt.id;
                 Status = reader.GetInt32(reader.GetOrdinal("status")),
                 Created = reader.GetDateTime(reader.GetOrdinal("created")),
                 CreatedBy = reader.GetInt32(reader.GetOrdinal("created_by")),
+                NumberOfApplications = reader.GetInt32(reader.GetOrdinal("NumberOfApplications")),
             };
         }
 
         public async Task<IEnumerable<Job>> GetEmployeerJobsAsync(int employeerId)
         {
-            var sqlQuery = FormattableStringFactory.Create(@"
-    SELECT j.*,
-        (
-            SELECT COUNT(*)
-            FROM job_applications AS ja
-            WHERE ja.job_id = j.id AND ja.status != 0
-        ) AS NumberOfApplications
-    FROM jobs AS j
-    WHERE j.created_by = {0};
-", employeerId);
-            var jobs = await _context.Database
-             .SqlQuery<Job>(sqlQuery).ToListAsync();
+            var sqlQuery = @"
+                SELECT j.*,
+                    (
+                        SELECT COUNT(*)
+                        FROM job_applications AS ja
+                        WHERE ja.job_id = j.id AND ja.status != 0
+                    ) AS NumberOfApplications
+                FROM jobs AS j
+                WHERE j.created_by = @employeerId;
+            ";
 
+            await using var connection = new SqlConnection(_context.Database.GetConnectionString());
+            await connection.OpenAsync();
+
+            await using var command = connection.CreateCommand();
+            command.CommandText = sqlQuery;
+            command.Parameters.Add(new SqlParameter("@employeerId", employeerId));
+            var jobs = new List<Job>();
+
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                var job = MapJob(reader);
+
+                jobs.Add(job);
+            }
             return jobs;
-        }//return await _context.Database.SqlQuery<Job>().ToListAsync();
+        }
 
         public async Task<IEnumerable<Job>> SearchAsync(string searchText, int limit, int offset, int? cityId, int? jobTypeId)
         {
