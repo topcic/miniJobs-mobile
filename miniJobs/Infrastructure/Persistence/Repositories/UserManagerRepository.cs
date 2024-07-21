@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories;
 
@@ -35,5 +36,13 @@ public class UserManagerRepository(ApplicationDbContext context) : GenericReposi
         await context.Set<UserRole>().AddAsync(userRole);
         await context.SaveChangesAsync();
         return userRole;
+    }
+
+    public async Task<IEnumerable<Rating>> GetRatings(int userId)
+    {
+        var ratings = await context.Ratings
+                                   .Where(r => r.RatedUserId == userId)
+                                   .ToListAsync();
+        return ratings;
     }
 }

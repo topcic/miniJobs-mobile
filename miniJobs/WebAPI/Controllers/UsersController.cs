@@ -1,4 +1,5 @@
 ﻿using Application.Jobs.Queries;
+using Application.Users;
 using Application.Users.Commands;
 using Application.Users.Models;
 using Domain.Entities;
@@ -32,5 +33,15 @@ public class UsersController(IMediator mediator, BaseState state) : ControllerBa
     public async Task<IActionResult> PostAsync([FromBody] UserSaveRequest request)
     {
         return Ok(await mediator.Send(new UserInsertCommand(request)));
+    }
+
+    [HttpGet("reatings/{userId}")]
+    [ProducesResponseType(typeof(IEnumerable<User>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetReatings([FromRoute] int userId)
+    {
+
+        return Ok(await mediator.Send(new UserGetRatingsQuery(userId)));
     }
 }
