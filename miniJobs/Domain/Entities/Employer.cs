@@ -19,4 +19,7 @@ public class Employer : IEntity<int>
 
     [NotMapped]
     public User User { get; set; }
+
+    [NotMapped]
+    public decimal AverageRating { get; set; }
 }

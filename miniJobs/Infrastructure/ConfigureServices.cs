@@ -44,8 +44,8 @@ public static class ConfigureServices
         services.AddScoped<IJobRepository, JobRepository>();
         services.AddScoped<ICantonRepository, CantonRepository>();
         services.AddScoped<IUserManagerRepository, UserManagerRepository>();
-        services.AddScoped<IApplicantRepository, ApplicantRepository>();
         services.AddScoped<IEmployerRepository, EmployerRepository>();
+        services.AddScoped<IApplicantRepository, ApplicantRepository>();
         services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
         services.AddScoped<IJobTypeRepository, JobTypeRepository>();
         services.AddScoped<ISavedJobRepository, SavedJobRepository>();

@@ -1,6 +1,8 @@
 ﻿using Application.Employers.Commands;
 using Application.Employers.Models;
+using Application.Employers.Queries;
 using Application.Users.Models;
+using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,5 +22,14 @@ public class EmployersController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> InsertAsync([FromBody] EmployerInsertRequest request)
     {
         return Ok(await mediator.Send(new EmployerInsertCommand(request)));
+    }
+
+    [HttpGet("{employerId}")]
+    [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> FindUser([FromRoute] int employerId)
+    {
+        return Ok(await mediator.Send(new EmployerTryFindQuery(employerId)));
     }
 }

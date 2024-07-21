@@ -1,8 +1,7 @@
-﻿using Application.Jobs.Models;
+﻿using Application.Jobs.Queries;
 using Application.Users.Commands;
 using Application.Users.Models;
 using Domain.Entities;
-using Domain.Enums;
 using Infrastructure.JobStateMachine;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -22,8 +21,7 @@ public class UsersController(IMediator mediator, BaseState state) : ControllerBa
     public async Task<IActionResult> GetAll()
     {
 
-        var users = CreateDummyUsers(); // Call method to create dummy users
-        return Ok(users);
+        return Ok();
     }
 
     [HttpPost("")]
@@ -35,35 +33,4 @@ public class UsersController(IMediator mediator, BaseState state) : ControllerBa
     {
         return Ok(await mediator.Send(new UserInsertCommand(request)));
     }
-    private SearchResult CreateDummyUsers()
-    {
-        var users = new List<User>();
-        var r = new SearchResult();
-        // Create 5 dummy users
-        for (int i = 1; i <= 5; i++)
-        {
-            users.Add(new User
-            {
-                Id = i,
-                FirstName = $"User{i}",
-                LastName = $"LastName{i}",
-                Role = $"username{i}",
-                Email = $"user{i}@example.com",
-                PhoneNumber = $"123456{i}",
-                Gender = Gender.Male, // or Gender.Female or Gender.Other
-                DateOfBirth = DateTime.Now.AddYears(-i),
-                Deleted = i % 2 == 0,
-                AccountConfirmed = i % 2 != 0
-            }) ;
-        }
-
-        r.Count = 5;
-        r.Result= users;
-        return r;
-    }
-}
-public class SearchResult
-{
-    public int Count { get; set; }
-    public List<User> Result { get; set; }
 }
