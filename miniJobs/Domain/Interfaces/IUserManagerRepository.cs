@@ -9,4 +9,5 @@ public interface IUserManagerRepository : IGenericRepository<User, int>
     Task<Role> TryFindRoleAsync(string roleId);
     Task<UserRole> AssignUserRoleAsync(User user, Role role);
     Task<IEnumerable<Rating>> GetRatings(int userId);
+    Task<IEnumerable<Job>> GetFinishedJobs(int userId, bool isApplicant);
 }

@@ -1,5 +1,7 @@
 ﻿using Domain.Entities;
+using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Any;
 
 namespace Infrastructure.Persistence.Repositories;
 
@@ -44,5 +46,21 @@ public class UserManagerRepository(ApplicationDbContext context) : GenericReposi
                                    .Where(r => r.RatedUserId == userId)
                                    .ToListAsync();
         return ratings;
+    }
+
+    public async Task<IEnumerable<Job>> GetFinishedJobs(int userId, bool isApplicant)
+    {
+        IQueryable<Job> query;
+       if(isApplicant)
+         query = from j in context.Jobs
+                    join a in context.JobApplications on j.Id equals a.JobId
+                    where a.Status == JobApplicationStatus.Accepted && a.CreatedBy == userId && j.Status == (int)JobStatus.Completed
+                    select j;
+       else
+            query = from j in context.Jobs
+                    where  j.Status == (int)JobStatus.Completed
+                    select j;
+
+        return await query.ToListAsync();
     }
 }

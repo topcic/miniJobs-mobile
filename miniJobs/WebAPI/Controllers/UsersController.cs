@@ -2,6 +2,7 @@
 using Application.Users;
 using Application.Users.Commands;
 using Application.Users.Models;
+using Application.Users.Queries;
 using Domain.Entities;
 using Infrastructure.JobStateMachine;
 using MediatR;
@@ -43,5 +44,15 @@ public class UsersController(IMediator mediator, BaseState state) : ControllerBa
     {
 
         return Ok(await mediator.Send(new UserGetRatingsQuery(userId)));
+    }
+
+    [HttpGet("finishedjobs/{userId}")]
+    [ProducesResponseType(typeof(IEnumerable<User>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetFinishedJobs([FromRoute] int userId)
+    {
+
+        return Ok(await mediator.Send(new UserGetFinishedJobsQuery(userId)));
     }
 }

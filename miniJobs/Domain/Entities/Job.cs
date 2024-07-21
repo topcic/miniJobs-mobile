@@ -45,6 +45,7 @@ public class Job : BaseAuditableEntity, IEntity<int>
     public virtual ICollection<ProposedAnswer> Schedules { get; set; }
     public virtual ProposedAnswer PaymentQuestion { get; set; }
     public virtual ICollection<ProposedAnswer>? AdditionalPaymentOptions { get; set; }
-    public int? NumberOfApplications { get; set; }
+    [NotMapped]
+    public  int? NumberOfApplications { get; set; }
 
 }
