@@ -28,8 +28,6 @@ class _EmployerHomePageState extends State<EmployerHomePage> {
   @override
   void initState() {
     super.initState();
-    applicants = SearchResult<Applicant>(
-        0, []); // Initialize applicants with an empty list
   }
 
   @override
@@ -38,6 +36,7 @@ class _EmployerHomePageState extends State<EmployerHomePage> {
     _applicantProvider = context.read<ApplicantProvider>();
     _cityProvider = context.read<CityProvider>();
     getCities();
+    searchApplicant();
   }
 
   Future<void> getCities() async {
@@ -50,14 +49,17 @@ class _EmployerHomePageState extends State<EmployerHomePage> {
       isLoading = true;
     });
 
-    String location = _locationController.text;
     String searchTerm = _searchController.text;
-   City city = cities.firstWhere(
-    (city) => city.name == selectedCity,// Provide a default value or handle the case where no city is found
-  );
+    City? city;
+    if (selectedCity != null)
+      city = cities.firstWhere(
+        (city) =>
+            city.name ==
+            selectedCity, // Provide a default value or handle the case where no city is found
+      );
     applicants = await _applicantProvider.searchApplicants(
       searchText: searchTerm,
-      cityId: city.id ,
+      cityId: city != null ? city.id : null,
     );
 
     setState(() {
@@ -104,7 +106,7 @@ class _EmployerHomePageState extends State<EmployerHomePage> {
 
   Widget _buildWorkers() {
     if (applicants.result == null || applicants.result!.isEmpty) {
-      return const Center(child: Text('No applicants found.'));
+      return const Center(child: Text('Nema pronađenih radnika'));
     }
     return GridView.builder(
       padding: const EdgeInsets.all(20.0),
@@ -279,7 +281,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                   child: TextFormField(
                     controller: widget.searchController,
                     decoration: const InputDecoration(
-                      hintText: 'Pretraži radnike',
+                      hintText: 'Koju uslugu ili kojeg radnika tražite?',
                       border: InputBorder.none,
                     ),
                   ),
@@ -358,7 +360,6 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                 'Pretraži',
                 style: TextStyle(color: Colors.white),
               ),
-
             ),
           ],
         ),
