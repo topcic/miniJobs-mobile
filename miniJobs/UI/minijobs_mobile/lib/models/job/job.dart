@@ -27,10 +27,11 @@ class Job {
   List<ProposedAnswer>? schedules;
   ProposedAnswer? paymentQuestion;
   List<ProposedAnswer>? additionalPaymentOptions;
+  String? employerFullName;
 
   Job();
   Job.withData(this.id, this.name, this.description, this.streetAddressAndNumber,
-      this.city,this.applicationsDuration,this.status, this.requiredEmployees,this.wage,this.employer,this.state,this.cityId);
+      this.city,this.applicationsDuration,this.status, this.requiredEmployees,this.wage,this.employer,this.state,this.cityId,this.employerFullName);
 
   factory Job.fromJson(Map<String, dynamic> json) => _$JobFromJson(json);
 

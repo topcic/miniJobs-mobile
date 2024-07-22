@@ -1,11 +1,7 @@
-﻿using Domain.Entities;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 using System.Data;
 using System.Data.Common;
-using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace Infrastructure.Persistence.Repositories
 {
@@ -63,6 +59,17 @@ CityCTE AS (
            ) AS City
     FROM jobs AS j
     WHERE j.id = @JobId
+),
+EmployerCTE AS (
+    SELECT j.id,
+           (
+               SELECT CONCAT(u.first_name, ' ', u.last_name)  AS FullName
+               FROM users  AS u
+               WHERE u.id = j.created_by
+               FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
+           ) AS Employer
+    FROM jobs AS j
+    WHERE j.id = @JobId
 )
 SELECT j.*,
     (
@@ -74,9 +81,10 @@ SELECT j.*,
     (
         SELECT JSON_QUERY(CAST((SELECT pa.id, pa.answer, pa.question_id FROM AdditionalPaymentOptionsCTE AS pa WHERE pa.job_id = j.id FOR JSON PATH) AS NVARCHAR(MAX)))
     ) AS AdditionalPaymentOptions,
-    jt.JobType AS JobType,c.City as City
+    jt.JobType AS JobType,c.City as City, e.Employer as Employer
 FROM jobs AS j
 INNER JOIN CityCTE as c ON c.id=j.id
+INNER JOIN EmployerCTE as e ON e.id=j.id
 LEFT JOIN JobTypeCTE AS jt ON j.id = jt.id;
 
             ";
@@ -119,7 +127,13 @@ LEFT JOIN JobTypeCTE AS jt ON j.id = jt.id;
                     var cities = JsonConvert.DeserializeObject<List<City>>(reader.GetString(reader.GetOrdinal("City")));
                     job.City = cities[0];
                 }
+                if (!reader.IsDBNull(reader.GetOrdinal("Employer")))
+                {
+                    string employerJson = reader.GetString(reader.GetOrdinal("Employer"));
+                    var employer = JsonConvert.DeserializeObject<User>(employerJson);
+                    job.EmployerFullName = employer.FullName;
 
+                }
                 return job;
             }
 
@@ -128,6 +142,9 @@ LEFT JOIN JobTypeCTE AS jt ON j.id = jt.id;
 
         private static Job MapJob(DbDataReader reader)
         {
+            var schemaTable = reader.GetSchemaTable();
+            bool columnExists = schemaTable.AsEnumerable()
+                                           .Any(row => row.Field<string>("ColumnName") == "NumberOfApplications");
             return new Job
             {
                 Id = reader.GetInt32(reader.GetOrdinal("id")),
@@ -139,7 +156,7 @@ LEFT JOIN JobTypeCTE AS jt ON j.id = jt.id;
                 Status = reader.GetInt32(reader.GetOrdinal("status")),
                 Created = reader.GetDateTime(reader.GetOrdinal("created")),
                 CreatedBy = reader.GetInt32(reader.GetOrdinal("created_by")),
-                NumberOfApplications = reader.GetInt32(reader.GetOrdinal("NumberOfApplications")),
+                NumberOfApplications = columnExists ? reader.GetInt32(reader.GetOrdinal("NumberOfApplications")) :0,
             };
         }
 

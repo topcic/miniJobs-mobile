@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:minijobs_mobile/pages/job_modal.dart';
+import 'package:minijobs_mobile/pages/employeer/job/job_modal.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -175,29 +175,29 @@ Widget _buildJobsGrid() {
         const SizedBox(height: 10), // Prostor između cijene i gumba
          ElevatedButton(
           onPressed: () {
+             DateTime deadline = DateTime.now();
             // Show dialog with job details
-           showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return const CustomModal(
-          // Pass job details to the modal constructor
-          naziv: 'Potreban radnik za dostavu hrane',
-          poslodavac: 'Napolitano',
-          opstina: 'Mostar',
-          adresa: 'Kazazića 8',
-          opis: 'Dostavljač hrane je odgovoran za preuzimanje narudžbi iz restorana ili kuhinja te njihovu dostavu klijentima na njihovu adresu. To uključuje vožnju do različitih lokacija i osiguravanje visoke kvalitete usluge i sigurnosti tijekom dostave. Komunikacija s klijentima i pridržavanje sigurnosnih i higijenskih standarda također su ključni dio ovog posla.',
-          posaoTip: 'Dostavljač',
-          cijena: '50',
-          nacinPlacanja: 'dnevnica',
-          rasporedOdgovori: 'prva smjena, druga smjena, pon-petak',
-          dodatnoPlacanje: 'topli obrok, prekovremeni sati',
-          dodatnoPlacanjecopy: 'topli obrok, prekovremeni sati',
-          brojRadnika: '2',
-          deadline: '12,5,2024',
-          status: 'Aktivan',
-        );
-      },
-    );
+    //        showDialog(
+    //   context: context,
+    //   builder: (BuildContext context) {
+    //     return const JobModal(
+    //       // Pass job details to the modal constructor
+    //       naziv: 'Potreban radnik za dostavu hrane',
+    //       poslodavac: 'Napolitano',
+    //       opstina: 'Mostar',
+    //       adresa: 'Kazazića 8',
+    //       opis: 'Dostavljač hrane je odgovoran za preuzimanje narudžbi iz restorana ili kuhinja te njihovu dostavu klijentima na njihovu adresu. To uključuje vožnju do različitih lokacija i osiguravanje visoke kvalitete usluge i sigurnosti tijekom dostave. Komunikacija s klijentima i pridržavanje sigurnosnih i higijenskih standarda također su ključni dio ovog posla.',
+    //       posaoTip: 'Dostavljač',
+    //       cijena: '50',
+    //       nacinPlacanja: 'dnevnica',
+    //       rasporedOdgovori: 'prva smjena, druga smjena, pon-petak',
+    //       dodatnoPlacanje: 'topli obrok, prekovremeni sati',
+    //       brojRadnika: '2',
+    //       deadline: deadline,
+    //       status: 'Aktivan',
+    //     );
+    //   },
+    // );
           },
           child: const Text('Pogledaj'),
         ),

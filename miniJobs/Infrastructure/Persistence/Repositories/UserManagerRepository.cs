@@ -1,7 +1,9 @@
 ﻿using Domain.Entities;
 using Domain.Enums;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Any;
+using Newtonsoft.Json.Linq;
 
 namespace Infrastructure.Persistence.Repositories;
 
@@ -16,7 +18,7 @@ public class UserManagerRepository(ApplicationDbContext context) : GenericReposi
 
     public async Task<IEnumerable<UserRole>> GetAllRolesAsync(int userId)
     {
-        return dbSet.Where(x => x.Id== userId)
+        return dbSet.Where(x => x.Id == userId)
             .Join(context.Set<UserRole>(),
              u => u.Id,
              ur => ur.UserId,
@@ -42,25 +44,71 @@ public class UserManagerRepository(ApplicationDbContext context) : GenericReposi
 
     public async Task<IEnumerable<Rating>> GetRatings(int userId)
     {
-        var ratings = await context.Ratings
-                                   .Where(r => r.RatedUserId == userId)
-                                   .ToListAsync();
+        var ratings = await (from r in context.Ratings
+                             join u in context.Users on r.CreatedBy equals u.Id
+                             where r.RatedUserId == userId
+                             select new Rating
+                             {
+                                 Id = r.Id,
+                                 Value = r.Value,
+                                 Comment = r.Comment,
+                                 JobApplicationId = r.JobApplicationId,
+                                 RatedUserId = r.RatedUserId,
+                                 Created = r.Created,
+                                 CreatedByFullName = u.FirstName + " " + u.LastName // Concatenate full name
+                             }).ToListAsync();
+
         return ratings;
     }
 
     public async Task<IEnumerable<Job>> GetFinishedJobs(int userId, bool isApplicant)
     {
         IQueryable<Job> query;
-       if(isApplicant)
-         query = from j in context.Jobs
-                    join a in context.JobApplications on j.Id equals a.JobId
-                    where a.Status == JobApplicationStatus.Accepted && a.CreatedBy == userId && j.Status == (int)JobStatus.Completed
-                    select j;
-       else
+        if (isApplicant)
+        {
             query = from j in context.Jobs
-                    where  j.Status == (int)JobStatus.Completed
-                    select j;
-
+                    join a in context.JobApplications on j.Id equals a.JobId
+                    join c in context.Cities on j.CityId equals c.Id
+                    where a.Status == JobApplicationStatus.Accepted
+                          && a.CreatedBy == userId
+                          && j.Status == (int)JobStatus.Completed
+                    select new Job
+                    {
+                        Id = j.Id,
+                        Name = j.Name,
+                        Description = j.Description,
+                        StreetAddressAndNumber = j.StreetAddressAndNumber,
+                        ApplicationsDuration = j.ApplicationsDuration,
+                        Status = j.Status,
+                        RequiredEmployees = j.RequiredEmployees,
+                        Wage = j.Wage,
+                        CityId = j.CityId,
+                        State = j.State,
+                        JobTypeId = j.JobTypeId,
+                        City = c // Include City information
+                    };
+        }
+        else
+        {
+            query = from j in context.Jobs
+                    join c in context.Cities on j.CityId equals c.Id
+                    where j.Status == (int)JobStatus.Completed
+                    select new Job
+                    {
+                        Id = j.Id,
+                        Name = j.Name,
+                        Description = j.Description,
+                        StreetAddressAndNumber = j.StreetAddressAndNumber,
+                        ApplicationsDuration = j.ApplicationsDuration,
+                        Status = j.Status,
+                        RequiredEmployees = j.RequiredEmployees,
+                        Wage = j.Wage,
+                        CityId = j.CityId,
+                        State = j.State,
+                        JobTypeId = j.JobTypeId,
+                        City = c // Include City information
+                    };
+        }
         return await query.ToListAsync();
     }
 }

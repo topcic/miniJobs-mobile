@@ -21,4 +21,7 @@ public class Rating : BaseAuditableEntity, IEntity<int>
 
     [Column("rated_user_id")]
     public int RatedUserId { get; set; }
+
+    [NotMapped]
+    public string CreatedByFullName { get; set; }
 }

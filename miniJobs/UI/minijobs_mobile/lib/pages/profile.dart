@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:minijobs_mobile/pages/impressions.dart';
+import 'package:minijobs_mobile/pages/user-profile/finished_job_view.dart';
+import 'package:minijobs_mobile/pages/user-profile/user_ratings_view.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -63,11 +65,11 @@ class ProfilePage extends StatelessWidget {
               ),
               // Završeni poslovi tab
               const Center(
-                child: Text('Završeni poslovi'),
+                child: FinishedJobsView(userId: 2),
               ),
               // Utisci tab
               const Center(
-                child: ImpressionsPage(),
+                child: UserRatingsView(userId: 2),
               ),
             ],
           ),

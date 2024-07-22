@@ -39,7 +39,8 @@ Job _$JobFromJson(Map<String, dynamic> json) => Job()
   ..additionalPaymentOptions =
       (json['additionalPaymentOptions'] as List<dynamic>?)
           ?.map((e) => ProposedAnswer.fromJson(e as Map<String, dynamic>))
-          .toList();
+          .toList()
+  ..employerFullName = json['employerFullName'] as String?        ;
 
 Map<String, dynamic> _$JobToJson(Job instance) => <String, dynamic>{
       'id': instance.id,
@@ -61,6 +62,7 @@ Map<String, dynamic> _$JobToJson(Job instance) => <String, dynamic>{
       'schedules': instance.schedules,
       'paymentQuestion': instance.paymentQuestion,
       'additionalPaymentOptions': instance.additionalPaymentOptions,
+      'employerFullName': instance.employerFullName,
     };
 
 JobStatus? jobStatusFromInt(int? status) {

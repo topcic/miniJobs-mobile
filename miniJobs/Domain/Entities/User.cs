@@ -58,4 +58,7 @@ public class User : IEntity<int>
 
     public City City { get; set; }
 
+    [NotMapped]
+    public string FullName { get; set; }
+
 }

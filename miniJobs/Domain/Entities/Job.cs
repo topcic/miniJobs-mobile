@@ -48,4 +48,7 @@ public class Job : BaseAuditableEntity, IEntity<int>
     [NotMapped]
     public  int? NumberOfApplications { get; set; }
 
+    [NotMapped]
+    public string EmployerFullName { get; set; }
+
 }

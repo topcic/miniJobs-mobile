@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-class CustomModal extends StatelessWidget {
+class JobModal extends StatelessWidget {
   final String naziv;
   final String poslodavac;
   final String opstina;
@@ -10,13 +11,12 @@ class CustomModal extends StatelessWidget {
   final String cijena;
   final String nacinPlacanja;
   final String rasporedOdgovori;
-  final String dodatnoPlacanje;
-  final String dodatnoPlacanjecopy;
+  final String? dodatnoPlacanje;
   final String brojRadnika;
-  final String deadline;
+  final DateTime deadline;
   final String status;
 
-  const CustomModal({super.key, 
+  const JobModal({super.key, 
     required this.naziv,
     required this.poslodavac,
     required this.opstina,
@@ -27,7 +27,6 @@ class CustomModal extends StatelessWidget {
     required this.nacinPlacanja,
     required this.rasporedOdgovori,
     required this.dodatnoPlacanje,
-    required this.dodatnoPlacanjecopy,
     required this.brojRadnika,
     required this.deadline,
     required this.status,
@@ -119,11 +118,6 @@ class CustomModal extends StatelessWidget {
                   ),
                 ),
               const SizedBox(height: 10),
-              if (true) // Modify this condition as needed
-                Text(
-                  dodatnoPlacanjecopy,
-                ),
-              const SizedBox(height: 10),
               Row(
                 children: [
                   const Icon(Icons.supervisor_account),
@@ -141,7 +135,7 @@ class CustomModal extends StatelessWidget {
                     const SizedBox(
                       width: 10.0,
                     ),
-                    Text(deadline),
+                    Text(DateFormat('dd.MM.yyyy.').format(deadline)),
                   ],
                 ),
               if (true) // Modify this condition as needed
