@@ -34,7 +34,7 @@ public class EmployersController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(new EmployerTryFindQuery(employerId)));
     }
 
-    [HttpGet("/{employerId}/avtivejobs")]
+    [HttpGet("{employerId}/activejobs")]
     [ProducesResponseType(typeof(IEnumerable<Job>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]

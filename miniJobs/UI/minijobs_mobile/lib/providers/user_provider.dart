@@ -13,7 +13,7 @@ class UserProvider extends BaseProvider<User> {
     Future<List<Rating>> getUserRatings(int userId) async {
     try {
        var dio = Dio();
-        var url = "${baseUrl}users/ratings/$userId";
+        var url = "${baseUrl}users/$userId/ratings";
       var response = await dio.get(url);
      List<Rating> responseData = List<Rating>.from(response.data.map((item) => Rating.fromJson(item)));
     return responseData;
@@ -25,7 +25,7 @@ class UserProvider extends BaseProvider<User> {
    Future<List<Job>> getUserFinishedJobs(int userId) async {
     try {
        var dio = Dio();
-        var url = "${baseUrl}users/finishedjobs/$userId";
+        var url = "${baseUrl}users/$userId/finishedjobs";
       var response = await dio.get(url);
      List<Job> responseData = List<Job>.from(response.data.map((item) => Job.fromJson(item)));
     return responseData;

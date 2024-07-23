@@ -36,7 +36,7 @@ public class UsersController(IMediator mediator, BaseState state) : ControllerBa
         return Ok(await mediator.Send(new UserInsertCommand(request)));
     }
 
-    [HttpGet("/{userId}/ratings")]
+    [HttpGet("{userId}/ratings")]
     [ProducesResponseType(typeof(IEnumerable<Rating>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -46,7 +46,7 @@ public class UsersController(IMediator mediator, BaseState state) : ControllerBa
         return Ok(await mediator.Send(new UserGetRatingsQuery(userId)));
     }
 
-    [HttpGet("/{userId}/finishedjobs")]
+    [HttpGet("{userId}/finishedjobs")]
     [ProducesResponseType(typeof(IEnumerable<Job>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]

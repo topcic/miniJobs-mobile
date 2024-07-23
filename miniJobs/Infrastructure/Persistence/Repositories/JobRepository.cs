@@ -14,130 +14,70 @@ namespace Infrastructure.Persistence.Repositories
             _context = context;
         }
 
-        public async Task<Job> GetWithDetailsAsync(int id)
+        public async Task<Job> GetWithDetailsAsync(int id, bool isApplicant, int userId)
         {
-            var sqlQuery = @"
-              WITH SchedulesCTE AS (
-    SELECT jq.job_id, pa.*
-    FROM job_questions AS jq
-    LEFT JOIN job_question_answers AS qa ON jq.id = qa.job_question_id
-    LEFT JOIN proposed_answers AS pa ON qa.proposed_answer_id = pa.id
-    WHERE jq.question_id = 1
-),
-PaymentQuestionCTE AS (
-    SELECT jq.job_id, pa.*
-    FROM job_questions AS jq
-    LEFT JOIN job_question_answers AS qa ON jq.id = qa.job_question_id
-    LEFT JOIN proposed_answers AS pa ON qa.proposed_answer_id = pa.id
-    WHERE jq.question_id = 2
-),
-AdditionalPaymentOptionsCTE AS (
-    SELECT jq.job_id, pa.*
-    FROM job_questions AS jq
-    LEFT JOIN job_question_answers AS qa ON jq.id = qa.job_question_id
-    LEFT JOIN proposed_answers AS pa ON qa.proposed_answer_id = pa.id
-    WHERE jq.question_id = 3
-),
-JobTypeCTE AS (
-    SELECT j.id,
-           (
-               SELECT jt.*
-               FROM job_types AS jt
-               WHERE jt.id = j.job_type_id
-               FOR JSON PATH
-           ) AS JobType
-    FROM jobs AS j
-    WHERE j.id = @JobId
-),
-CityCTE AS (
-    SELECT j.id,
-           (
-               SELECT c.*
-               FROM cities  AS c
-               WHERE c.id = j.city_id
-               FOR JSON PATH
-           ) AS City
-    FROM jobs AS j
-    WHERE j.id = @JobId
-),
-EmployerCTE AS (
-    SELECT j.id,
-           (
-               SELECT CONCAT(u.first_name, ' ', u.last_name)  AS FullName
-               FROM users  AS u
-               WHERE u.id = j.created_by
-               FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
-           ) AS Employer
-    FROM jobs AS j
-    WHERE j.id = @JobId
-)
-SELECT j.*,
-    (
-        SELECT JSON_QUERY(CAST((SELECT pa.id, pa.answer, pa.question_id FROM SchedulesCTE AS pa WHERE pa.job_id = j.id FOR JSON PATH) AS NVARCHAR(MAX)))
-    ) AS Schedules,
-    (
-        SELECT JSON_QUERY(CAST((SELECT pa.id, pa.answer, pa.question_id FROM PaymentQuestionCTE AS pa WHERE pa.job_id = j.id FOR JSON PATH) AS NVARCHAR(MAX)))
-    ) AS PaymentQuestion,
-    (
-        SELECT JSON_QUERY(CAST((SELECT pa.id, pa.answer, pa.question_id FROM AdditionalPaymentOptionsCTE AS pa WHERE pa.job_id = j.id FOR JSON PATH) AS NVARCHAR(MAX)))
-    ) AS AdditionalPaymentOptions,
-    jt.JobType AS JobType,c.City as City, e.Employer as Employer
-FROM jobs AS j
-INNER JOIN CityCTE as c ON c.id=j.id
-INNER JOIN EmployerCTE as e ON e.id=j.id
-LEFT JOIN JobTypeCTE AS jt ON j.id = jt.id;
+            var job = await (from j in _context.Jobs
+                             join jt in _context.JobTypes on j.JobTypeId equals jt.Id into jobTypeJoin
+                             from jt in jobTypeJoin.DefaultIfEmpty()
+                             join c in _context.Cities on j.CityId equals c.Id into cityJoin
+                             from c in cityJoin.DefaultIfEmpty()
+                             join u in _context.Users on j.CreatedBy equals u.Id into userJoin
+                             from u in userJoin.DefaultIfEmpty()
+                             where j.Id == id
+                             select new
+                             {
+                                 Job = j,
+                                 JobType = jt,
+                                 City = c,
+                                 EmployerFullName = u.FirstName + " " + u.LastName
+                             }).FirstOrDefaultAsync();
 
-            ";
-
-            await using var connection = new SqlConnection(_context.Database.GetConnectionString());
-            await connection.OpenAsync();
-
-            await using var command = connection.CreateCommand();
-            command.CommandText = sqlQuery;
-            command.Parameters.Add(new SqlParameter("@JobId", id));
-
-            await using var reader = await command.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
+            if (job == null)
             {
-                var job = MapJob(reader);
-
-                if (!reader.IsDBNull(reader.GetOrdinal("Schedules")))
-                {
-                    job.Schedules = JsonConvert.DeserializeObject<List<ProposedAnswer>>(reader.GetString(reader.GetOrdinal("Schedules")));
-                }
-                if (!reader.IsDBNull(reader.GetOrdinal("PaymentQuestion")))
-                {
-                    var proposedAnswers = JsonConvert.DeserializeObject<List<ProposedAnswer>>(reader.GetString(reader.GetOrdinal("PaymentQuestion")));
-                    if (proposedAnswers.Any())
-                    {
-                        job.PaymentQuestion = proposedAnswers.FirstOrDefault();
-                    }
-                }
-                if (!reader.IsDBNull(reader.GetOrdinal("AdditionalPaymentOptions")))
-                {
-                    job.AdditionalPaymentOptions = JsonConvert.DeserializeObject<List<ProposedAnswer>>(reader.GetString(reader.GetOrdinal("AdditionalPaymentOptions")));
-                }
-                if (!reader.IsDBNull(reader.GetOrdinal("JobType")))
-                {
-                  var types= JsonConvert.DeserializeObject<List<JobType>>(reader.GetString(reader.GetOrdinal("JobType")));
-                    job.JobType = types[0];
-                }
-                if (!reader.IsDBNull(reader.GetOrdinal("City")))
-                {
-                    var cities = JsonConvert.DeserializeObject<List<City>>(reader.GetString(reader.GetOrdinal("City")));
-                    job.City = cities[0];
-                }
-                if (!reader.IsDBNull(reader.GetOrdinal("Employer")))
-                {
-                    string employerJson = reader.GetString(reader.GetOrdinal("Employer"));
-                    var employer = JsonConvert.DeserializeObject<User>(employerJson);
-                    job.EmployerFullName = employer.FullName;
-
-                }
-                return job;
+                return null;
             }
 
-            return null;
+            var schedules = await (from jq in _context.JobQuestions
+                                   join qa in _context.JobQuestionAnswers on jq.Id equals qa.JobQuestionId into qaJoin
+                                   from qa in qaJoin.DefaultIfEmpty()
+                                   join pa in _context.ProposedAnswers on qa.ProposedAnswerId equals pa.Id into paJoin
+                                   from pa in paJoin.DefaultIfEmpty()
+                                   where jq.QuestionId == 1 && jq.JobId == id
+                                   select pa).ToListAsync();
+
+            var paymentQuestion = await (from jq in _context.JobQuestions
+                                         join qa in _context.JobQuestionAnswers on jq.Id equals qa.JobQuestionId into qaJoin
+                                         from qa in qaJoin.DefaultIfEmpty()
+                                         join pa in _context.ProposedAnswers on qa.ProposedAnswerId equals pa.Id into paJoin
+                                         from pa in paJoin.DefaultIfEmpty()
+                                         where jq.QuestionId == 2 && jq.JobId == id
+                                         select pa).FirstOrDefaultAsync();
+
+            var additionalPaymentOptions = await (from jq in _context.JobQuestions
+                                                  join qa in _context.JobQuestionAnswers on jq.Id equals qa.JobQuestionId into qaJoin
+                                                  from qa in qaJoin.DefaultIfEmpty()
+                                                  join pa in _context.ProposedAnswers on qa.ProposedAnswerId equals pa.Id into paJoin
+                                                  from pa in paJoin.DefaultIfEmpty()
+                                                  where jq.QuestionId == 3 && jq.JobId == id
+                                                  select pa).ToListAsync();
+
+            var result = job.Job;
+            result.JobType = job.JobType;
+            result.City = job.City;
+            result.EmployerFullName = job.EmployerFullName;
+            result.Schedules = schedules;
+            result.PaymentQuestion = paymentQuestion;
+            result.AdditionalPaymentOptions = additionalPaymentOptions;
+            if (isApplicant)
+            {
+                var hasApplied = await _context.JobApplications.AnyAsync(ja => ja.JobId == id && ja.CreatedBy == userId);
+                var hasSaved = await _context.SavedJobs.AnyAsync(sj => sj.JobId == id && sj.CreatedBy == userId);
+
+                result.IsApplied = hasApplied;
+                result.IsSaved = hasSaved;
+            }
+
+            return result;
         }
 
         private static Job MapJob(DbDataReader reader)

@@ -1,5 +1,7 @@
-﻿using Application.Jobs.Queries;
+﻿using Application.Common.Extensions;
+using Application.Jobs.Queries;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.Interfaces;
 using MediatR;
 
@@ -18,15 +20,9 @@ public class JobTryFindQueryHandler: IRequestHandler<JobTryFindQuery, Job>
 
     public async Task<Job> Handle(JobTryFindQuery request, CancellationToken cancellationToken)
     {
-
-        var job = await jobRepository.TryFindAsync(request.JobId);
-        var jobDetails = await jobRepository.GetWithDetailsAsync(job.Id);
-        job.Schedules = jobDetails.Schedules;
-        job.AdditionalPaymentOptions = jobDetails.AdditionalPaymentOptions;
-        job.PaymentQuestion = jobDetails.PaymentQuestion;
-        job.JobType = jobDetails.JobType;
-        job.City = jobDetails.City;
-        job.EmployerFullName = jobDetails.EmployerFullName;
+        var isApplicant=request.RoleId==Roles.Applicant.ToString();
+        var job = await jobRepository.GetWithDetailsAsync(request.JobId, isApplicant,request.UserId.Value);
+        ExceptionExtension.Validate("JOB_NOT_EXISTS", () => job == null);
         return job;
     }
 }

@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:minijobs_mobile/enumerations/job_statuses.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/pages/employeer/job/steps/job_preview.dart';
@@ -80,22 +81,22 @@ Job job=new Job();
            showDialog(
       context: context,
       builder: (BuildContext context) {
-                  debugger();
         return  JobModal(
           // Pass job details to the modal constructor
-          naziv: job.name!,
-          poslodavac: job.employerFullName!,
-          opstina: job.city?.name ??'',
-          adresa: job.streetAddressAndNumber!,
-          opis: job.description!,
-          posaoTip: job.jobType?.name??'',
-          cijena: job.wage.toString() ?? 'po dogovoru',
-          nacinPlacanja: job.paymentQuestion?.answer??'',
-          rasporedOdgovori:job.schedules?.map((option) => option.answer).join(', ') ?? '',
-          dodatnoPlacanje: job.additionalPaymentOptions?.map((option) => option.answer).join(', ') ?? null,
-          brojRadnika: job.numberOfApplications.toString()??'',
-          deadline: job.created!.add(Duration(days: job.applicationsDuration!)),
-          status: job.status.toString(),
+          job: job!,
+          role: GetStorage().read('role')
+          // poslodavac: job.employerFullName!,
+          // opstina: job.city?.name ??'',
+          // adresa: job.streetAddressAndNumber!,
+          // opis: job.description!,
+          // posaoTip: job.jobType?.name??'',
+          // cijena: job.wage.toString() ?? 'po dogovoru',
+          // nacinPlacanja: job.paymentQuestion?.answer??'',
+          // rasporedOdgovori:job.schedules?.map((option) => option.answer).join(', ') ?? '',
+          // dodatnoPlacanje: job.additionalPaymentOptions?.map((option) => option.answer).join(', ') ?? null,
+          // brojRadnika: job.numberOfApplications.toString()??'',
+          // deadline: job.created!.add(Duration(days: job.applicationsDuration!)),
+          // status: job.status!,
         );
       },
     );

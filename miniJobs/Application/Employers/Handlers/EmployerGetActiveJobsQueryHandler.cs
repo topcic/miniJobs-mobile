@@ -19,7 +19,7 @@ public class EmployerGetActiveJobsQueryHandler : IRequestHandler<EmployerGetActi
 
     public async Task<IEnumerable<Job>> Handle(EmployerGetActiveJobsQuery request, CancellationToken cancellationToken)
     {
-        var employer = await employerRepository.GetWithDetailsAsync(request.EmployerId);
+        var employer = await employerRepository.TryFindAsync(request.EmployerId);
         ExceptionExtension.Validate("EMPOLOYER_NOT_EXISTS", () => employer == null);
         return await employerRepository.GetActiveJobs(employer.Id, request.UserId.Value);
     }

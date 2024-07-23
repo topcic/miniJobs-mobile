@@ -4,7 +4,7 @@ namespace Domain.Interfaces;
 
 public interface IJobRepository : IGenericRepository<Job, int>
 {
-    Task<Job> GetWithDetailsAsync(int id);
+    Task<Job> GetWithDetailsAsync(int id,bool isApplicant, int userId=0);
 
     Task<IEnumerable<Job>> GetEmployeerJobsAsync(int employeerId);
 

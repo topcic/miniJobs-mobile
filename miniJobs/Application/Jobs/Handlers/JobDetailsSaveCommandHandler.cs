@@ -61,12 +61,8 @@ public class JobDetailsSaveCommandHandler : IRequestHandler<JobDetailsSaveComman
 
         await _jobRepository.UpdateAsync(job);
 
-       var jobDetails = await _jobRepository.GetWithDetailsAsync(job.Id);
-        job.Schedules = jobDetails.Schedules;
-        job.AdditionalPaymentOptions = jobDetails.AdditionalPaymentOptions;
-        job.PaymentQuestion = jobDetails.PaymentQuestion;
-        job.JobType = jobType;
-        job.City = jobDetails.City;
+        var isApplicant = command.RoleId == Roles.Applicant.ToString();
+        job = await _jobRepository.GetWithDetailsAsync(job.Id, isApplicant, command.UserId.Value);
 
         ts.Complete();
 

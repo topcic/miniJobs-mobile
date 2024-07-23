@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:minijobs_mobile/pages/employeer/employeer_home_page.dart';
+import 'package:minijobs_mobile/pages/employeer/employer_profile_page.dart';
 import 'package:minijobs_mobile/pages/employeer/job/job_details.dart';
 import 'package:minijobs_mobile/pages/home_page.dart';
 import 'package:minijobs_mobile/pages/employeer/job_list.dart';
@@ -124,7 +125,7 @@ class _NavbarState extends State<Navbar> {
         const EmployerHomePage(),
         const JobDetails(jobId: 0),
         const JobList(),
-        const ProfilePage(),
+        const EmployerProfilePage(),
       ];
     }
   }

@@ -22,14 +22,14 @@ abstract class BaseProvider<T> with ChangeNotifier {
 
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
-        options.headers["Accept"] = "application/json";
-        String? token = _getStorage.read('accessToken');
-     // String? token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJFbXBsb3llciIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWVpZGVudGlmaWVyIjoiMiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6IjI3dG9wY2ljLm1haGlyQGdtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2dpdmVubmFtZSI6Ik1haGlyIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvc3VybmFtZSI6IlRvcGNpYyIsIm5iZiI6MTcxNjY0OTE4NCwiZXhwIjoxNzE2NjUwMzg0LCJpc3MiOiJtaW5pSm9icyIsImF1ZCI6Im1pbmlKb2JzIn0.bsw7BzIv_Hn02-LYnWNI1rw6yb1x84w2k3ZL49HEbEs";
-        if (token != null) {
-          options.headers["Authorization"] = "Bearer " + token;
-        }
-        return handler.next(options);
-      },
+  options.headers["Accept"] = "application/json";
+  String? token = _getStorage.read('accessToken');
+  print('Token: $token'); // Debugging line
+  if (token != null) {
+    options.headers["Authorization"] = "Bearer $token";
+  }
+  return handler.next(options);
+},
       onError: (error, handler) async {
         if (error.response?.statusCode == 401) {
           final newAccessToken = await refreshToken();
@@ -42,7 +42,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
       },
     ));
   }
-
+Dio get dio => _dio;
   Future<String?> refreshToken() async {
     try {
       String? refreshToken = _getStorage.read('refreshToken');
