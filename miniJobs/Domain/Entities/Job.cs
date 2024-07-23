@@ -51,4 +51,10 @@ public class Job : BaseAuditableEntity, IEntity<int>
     [NotMapped]
     public string EmployerFullName { get; set; }
 
+    [NotMapped]
+    public bool IsApplied { get; set; }
+
+    [NotMapped]
+    public bool IsSaved { get; set; }
+
 }

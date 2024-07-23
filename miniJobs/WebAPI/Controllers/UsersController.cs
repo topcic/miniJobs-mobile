@@ -36,8 +36,8 @@ public class UsersController(IMediator mediator, BaseState state) : ControllerBa
         return Ok(await mediator.Send(new UserInsertCommand(request)));
     }
 
-    [HttpGet("ratings/{userId}")]
-    [ProducesResponseType(typeof(IEnumerable<User>), StatusCodes.Status200OK)]
+    [HttpGet("/{userId}/ratings")]
+    [ProducesResponseType(typeof(IEnumerable<Rating>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetReatings([FromRoute] int userId)
@@ -46,8 +46,8 @@ public class UsersController(IMediator mediator, BaseState state) : ControllerBa
         return Ok(await mediator.Send(new UserGetRatingsQuery(userId)));
     }
 
-    [HttpGet("finishedjobs/{userId}")]
-    [ProducesResponseType(typeof(IEnumerable<User>), StatusCodes.Status200OK)]
+    [HttpGet("/{userId}/finishedjobs")]
+    [ProducesResponseType(typeof(IEnumerable<Job>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetFinishedJobs([FromRoute] int userId)

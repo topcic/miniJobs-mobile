@@ -5,7 +5,7 @@ using Domain.Interfaces;
 using MediatR;
 
 namespace Application.Employers.Handlers;
-internal class EmployerTryFindQueryHandler : IRequestHandler<EmployerTryFindQuery, Employer>
+public class EmployerTryFindQueryHandler : IRequestHandler<EmployerTryFindQuery, Employer>
 {
     private readonly IEmployerRepository employerRepository;
 
