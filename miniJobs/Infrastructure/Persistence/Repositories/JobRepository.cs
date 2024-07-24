@@ -99,7 +99,7 @@ namespace Infrastructure.Persistence.Repositories
                 Status = reader.GetInt32(reader.GetOrdinal("status")),
                 Created = reader.GetDateTime(reader.GetOrdinal("created")),
                 CreatedBy = reader.GetInt32(reader.GetOrdinal("created_by")),
-                NumberOfApplications = columnExists ? reader.GetInt32(reader.GetOrdinal("NumberOfApplications")) :0,
+                NumberOfApplications = columnExists ? reader.GetInt32(reader.GetOrdinal("NumberOfApplications")) : 0,
             };
         }
 
@@ -303,6 +303,58 @@ namespace Infrastructure.Persistence.Repositories
 
 
             return await query.ToListAsync();
+        }
+
+        public async Task<IEnumerable<Applicant>> GetApplicants(int jobId)
+        {
+
+            var applicants = from j in _context.Jobs
+                             join ja in _context.JobApplications on j.Id equals ja.JobId
+                             join a in _context.Applicants on ja.CreatedBy equals a.Id
+                             join u in _context.Users on a.Id equals u.Id
+                             where j.Id == jobId
+                             select new Applicant
+                             {
+                                 Id = a.Id,
+                                 Cv = a.Cv,
+                                 Experience = a.Experience,
+                                 Description = a.Description,
+                                 WageProposal = a.WageProposal,
+                                 ConfirmationCode = a.ConfirmationCode,
+                                 AccessFailedCount = a.AccessFailedCount,
+                                 Created = a.Created,
+                                 User = u,
+                                 ApplicantJobTypes = a.ApplicantJobTypes
+                             };
+
+            var applicantDetails = from app in applicants
+                                   let ratings = _context.Ratings
+                                                        .Where(r => r.RatedUserId == app.Id)
+                                                        .Select(r => (double)r.Value)
+                                                        .ToList() // Convert to List<double>
+                                   let finishedJobsCount = (from ja in _context.JobApplications
+                                                            join j in _context.Jobs on ja.JobId equals j.Id
+                                                            where ja.CreatedBy == app.Id && j.Status == (int)JobStatus.Completed
+                                                            select ja).Count()
+                                   select new Applicant
+                                   {
+                                       Id = app.Id,
+                                       Cv = app.Cv,
+                                       Experience = app.Experience,
+                                       Description = app.Description,
+                                       WageProposal = app.WageProposal,
+                                       ConfirmationCode = app.ConfirmationCode,
+                                       AccessFailedCount = app.AccessFailedCount,
+                                       Created = app.Created,
+                                       User = app.User,
+                                       ApplicantJobTypes = app.ApplicantJobTypes,
+                                       AverageRating = ratings.Any() ? (decimal)ratings.Average() : 0,
+                                       NumberOfFinishedJobs = finishedJobsCount
+                                   };
+
+            var result = await applicantDetails.ToListAsync();
+            return result;
+
         }
     }
 }

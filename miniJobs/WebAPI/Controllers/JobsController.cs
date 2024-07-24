@@ -75,4 +75,14 @@ public class JobsController(IMediator mediator, BaseState state) : ControllerBas
     {
         return Ok(await mediator.Send(new JobSearchQuery(request)));
     }
+
+    //JobGetApplicantsQuery
+    [HttpGet("{jobId}/applicants")]
+    [ProducesResponseType(typeof(IEnumerable<Applicant>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> FindJobApplicants([FromRoute] int jobId)
+    {
+        return Ok(await mediator.Send(new JobGetApplicantsQuery(jobId)));
+    }
 }

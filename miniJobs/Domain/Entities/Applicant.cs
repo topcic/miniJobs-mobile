@@ -30,4 +30,8 @@ public class Applicant : IEntity<int>
     public DateTime Created { get; set; }
     public User User { get; set; }
     public ICollection<ApplicantJobType> ApplicantJobTypes { get; set; }
+    [NotMapped]
+    public decimal AverageRating { get; set; }
+    [NotMapped]
+    public int NumberOfFinishedJobs { get; set; }
 }
