@@ -1,5 +1,6 @@
 ﻿using Domain.Entities;
 using Domain.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Application.Applicants.Models;
 
@@ -24,5 +25,7 @@ public class ApplicantResponse
     public string Role { get; set; }
     public ICollection<ApplicantJobType> ApplicantJobTypes { get; set; }
     public City City { get; set; }
+    public decimal AverageRating { get; set; }
+    public int NumberOfFinishedJobs { get; set; }
 
 }

@@ -1,5 +1,6 @@
 ﻿
 
+using Domain.Enums;
 using Microsoft.Data.SqlClient;
 
 namespace Infrastructure.Persistence.Repositories;
@@ -10,7 +11,7 @@ public class ApplicantRepository(ApplicationDbContext context) : GenericReposito
 
     public async Task<IEnumerable<Applicant>> SearchAsync(string searchText, int limit, int offset, int? cityId, int? jobTypeId)
     {
-        var query = context.Applicants.AsQueryable();
+        var query = _context.Applicants.AsQueryable();
 
         if (!string.IsNullOrEmpty(searchText))
         {
@@ -33,12 +34,40 @@ public class ApplicantRepository(ApplicationDbContext context) : GenericReposito
         query = query.Skip(offset).Take(limit);
 
         query = query.Include(a => a.User)
-            .Include(a=>a.User.City)
-                     .Include(a => a.ApplicantJobTypes).ThenInclude(ajt => ajt.JobType);
+                     .Include(a => a.User.City)
+                     .Include(a => a.ApplicantJobTypes)
+                     .ThenInclude(ajt => ajt.JobType);
 
-        var result = await query.ToListAsync();
+        var result = await query.Select(a => new
+        {
+            Applicant = a,
+            AverageRating = _context.Ratings
+                                    .Where(r => r.RatedUserId == a.Id)
+                                    .Select(r => (double?)r.Value)
+                                    .Average() ?? 0,
+            NumberOfFinishedJobs = (from ja in _context.JobApplications
+                                    join j in _context.Jobs on ja.JobId equals j.Id
+                                    where ja.CreatedBy == a.Id && j.Status == (int)JobStatus.Completed
+                                    select ja)
+                                          .Count()
+        })
+        .ToListAsync();
 
-        return result;
+        return result.Select(x => new Applicant
+        {
+            Id = x.Applicant.Id,
+            Cv = x.Applicant.Cv,
+            Experience = x.Applicant.Experience,
+            Description = x.Applicant.Description,
+            WageProposal = x.Applicant.WageProposal,
+            ConfirmationCode = x.Applicant.ConfirmationCode,
+            AccessFailedCount = x.Applicant.AccessFailedCount,
+            Created = x.Applicant.Created,
+            User = x.Applicant.User,
+            ApplicantJobTypes = x.Applicant.ApplicantJobTypes,
+            AverageRating = (decimal)x.AverageRating,
+            NumberOfFinishedJobs = x.NumberOfFinishedJobs
+        });
     }
 
     public async Task<int> SearchCountAsync(string searchText, int? cityId, int? jobTypeId)
