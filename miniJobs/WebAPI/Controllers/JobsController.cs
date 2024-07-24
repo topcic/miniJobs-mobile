@@ -37,7 +37,7 @@ public class JobsController(IMediator mediator, BaseState state) : ControllerBas
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAllForUser()
     { 
-        return Ok(await mediator.Send(new JobFindAllForEmployeerQuery()));
+        return Ok(await mediator.Send(new JobFindAllForEmployerQuery()));
     }
     [HttpGet("{jobId}")]
     [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
@@ -74,23 +74,5 @@ public class JobsController(IMediator mediator, BaseState state) : ControllerBas
     public async Task<IActionResult> SearchAsync(JobSearchRequest request)
     {
         return Ok(await mediator.Send(new JobSearchQuery(request)));
-    }
-
-    [HttpPost("{jobId}/save")]
-    [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> SaveJob([FromRoute] int jobId, [FromBody] bool save)
-    {
-        return Ok(await mediator.Send(new JobSaveCommand(jobId, save)));
-    }
-
-    [HttpPost("{jobId}/apply")]
-    [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> ApplyToJob([FromRoute] int jobId, [FromBody] bool apply)
-    {
-        return Ok(await mediator.Send(new JobApplyCommand(jobId, apply)));
     }
 }

@@ -3,6 +3,6 @@ using Domain.Entities;
 
 namespace Application.Jobs.Queries;
 
-public class JobFindAllForEmployeerQuery  : QueryBase<IEnumerable<Job>>
+public class JobFindAllForEmployerQuery  : QueryBase<IEnumerable<Job>>
 {
 }

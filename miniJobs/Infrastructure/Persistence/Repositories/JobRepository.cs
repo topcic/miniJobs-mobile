@@ -1,7 +1,10 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Domain.Entities;
+using Domain.Enums;
+using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 using System.Data;
 using System.Data.Common;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Infrastructure.Persistence.Repositories
 {
@@ -100,7 +103,7 @@ namespace Infrastructure.Persistence.Repositories
             };
         }
 
-        public async Task<IEnumerable<Job>> GetEmployeerJobsAsync(int employeerId)
+        public async Task<IEnumerable<Job>> GetEmployerJobsAsync(int employerId)
         {
             var sqlQuery = @"
                 SELECT j.*,
@@ -110,7 +113,7 @@ namespace Infrastructure.Persistence.Repositories
                         WHERE ja.job_id = j.id AND ja.status != 0
                     ) AS NumberOfApplications
                 FROM jobs AS j
-                WHERE j.created_by = @employeerId;
+                WHERE j.created_by = @employerId;
             ";
 
             await using var connection = new SqlConnection(_context.Database.GetConnectionString());
@@ -118,7 +121,7 @@ namespace Infrastructure.Persistence.Repositories
 
             await using var command = connection.CreateCommand();
             command.CommandText = sqlQuery;
-            command.Parameters.Add(new SqlParameter("@employeerId", employeerId));
+            command.Parameters.Add(new SqlParameter("@employerId", employerId));
             var jobs = new List<Job>();
 
             await using var reader = await command.ExecuteReaderAsync();
@@ -248,6 +251,58 @@ namespace Infrastructure.Persistence.Repositories
 
             var count = (int)await command.ExecuteScalarAsync();
             return count;
+        }
+
+        public async Task<IEnumerable<Job>> GetApplicantSavedJobsAsync(int applicantId)
+        {
+            var query = from j in _context.Jobs
+                        join sj in _context.SavedJobs on j.Id equals sj.JobId
+                        join c in _context.Cities on j.CityId equals c.Id
+                        where sj.CreatedBy == applicantId
+                        select new Job
+                        {
+                            Id = j.Id,
+                            Name = j.Name,
+                            Description = j.Description,
+                            StreetAddressAndNumber = j.StreetAddressAndNumber,
+                            ApplicationsDuration = j.ApplicationsDuration,
+                            Status = j.Status,
+                            RequiredEmployees = j.RequiredEmployees,
+                            Wage = j.Wage,
+                            CityId = j.CityId,
+                            State = j.State,
+                            JobTypeId = j.JobTypeId,
+                            City = c // Include City information
+                        };
+
+
+            return await query.ToListAsync();
+        }
+
+        public async Task<IEnumerable<Job>> GetApplicantAppliedJobsAsync(int applicantId)
+        {
+            var query = from j in _context.Jobs
+                        join a in _context.JobApplications on j.Id equals a.JobId
+                        join c in _context.Cities on j.CityId equals c.Id
+                        where a.CreatedBy == applicantId
+                        select new Job
+                        {
+                            Id = j.Id,
+                            Name = j.Name,
+                            Description = j.Description,
+                            StreetAddressAndNumber = j.StreetAddressAndNumber,
+                            ApplicationsDuration = j.ApplicationsDuration,
+                            Status = j.Status,
+                            RequiredEmployees = j.RequiredEmployees,
+                            Wage = j.Wage,
+                            CityId = j.CityId,
+                            State = j.State,
+                            JobTypeId = j.JobTypeId,
+                            City = c // Include City information
+                        };
+
+
+            return await query.ToListAsync();
         }
     }
 }
