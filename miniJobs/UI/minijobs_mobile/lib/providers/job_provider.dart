@@ -50,8 +50,7 @@ class JobProvider extends BaseProvider<Job> {
 
   Future<Job> activate(int id, JobStatus status) async {
     try {
-      var dio = Dio();
-      var url = "${baseUrl}jobs/activate/$id";
+      var url = "${baseUrl}jobs/$id/activate";
       dio.options.headers['Content-Type'] = 'application/json';
 
       // Send the request with the status serialized as JSON

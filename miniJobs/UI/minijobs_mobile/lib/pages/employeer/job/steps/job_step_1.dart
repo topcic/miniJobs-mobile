@@ -1,4 +1,6 @@
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:minijobs_mobile/models/city.dart';
@@ -20,24 +22,30 @@ class JobStep1State extends State<JobStep1> {
   List<City>? cities;
   late CityProvider _cityProvider;
   late JobProvider _jobProvider;
-  late Job? _job;
+  Job? _job;
 
   @override
   void initState() {
     super.initState();
+    // Initialize providers and fetch cities here if needed
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
+    // Fetch providers and cities only if they haven't been fetched already
     _cityProvider = context.read<CityProvider>();
-    getCities();
     _jobProvider = Provider.of<JobProvider>(context);
 
-    setState(() {
+    if (cities == null) {
+      // Fetch cities only if they haven't been fetched yet
+      getCities();
+    } else {
+      // If cities are already fetched, just set the initial form values
       _job = _jobProvider.getCurrentJob();
       _setInitialFormValues();
-    });
+    }
   }
 
   void _setInitialFormValues() {
@@ -52,11 +60,18 @@ class JobStep1State extends State<JobStep1> {
   }
 
   Future<void> getCities() async {
-    cities = await _cityProvider.getAll();
-    _setInitialFormValues();
-    setState(() {});
+    try {
+      cities = await _cityProvider.getAll();
+      if (mounted) {
+        setState(() {
+          _setInitialFormValues();
+        });
+      }
+    } catch (e) {
+      // Handle errors properly
+      log('Error fetching cities: $e');
+    }
   }
-
   @override
   Widget build(BuildContext context) {
     return Container(

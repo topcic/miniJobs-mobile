@@ -37,8 +37,12 @@ public class JobDetailsSaveCommandHandler : IRequestHandler<JobDetailsSaveComman
         using var ts = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         Job job = await _jobRepository.TryFindAsync(command.Request.Id);
         ExceptionExtension.Validate("JOB_NOT_EXISTS", () => job == null);
-        JobType jobType= await _jobTypeRepository.TryFindAsync(command.Request.JobTypeId);
-        ExceptionExtension.Validate("JOB_TYPE_NOT_EXISTS", () => jobType == null);
+        JobType jobType;
+        if (command.Request.JobTypeId.HasValue)
+        {
+            jobType = await _jobTypeRepository.TryFindAsync(command.Request.JobTypeId.Value);
+            ExceptionExtension.Validate("JOB_TYPE_NOT_EXISTS", () => jobType == null);
+        }
 
         _mapper.Map(command.Request, job);
         if (command.Request.JobSchedule != null)

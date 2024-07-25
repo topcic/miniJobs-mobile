@@ -1,7 +1,10 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:minijobs_mobile/enumerations/job_statuses.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/models/job/job_save_request.dart';
+import 'package:minijobs_mobile/models/job/job_schedule_info.dart';
 import 'package:minijobs_mobile/pages/employeer/job/steps/job_preview.dart';
 import 'package:minijobs_mobile/pages/employeer/job/steps/job_step_1.dart';
 import 'package:minijobs_mobile/pages/employeer/job/steps/job_step_2.dart';
@@ -37,6 +40,9 @@ class _JobDetailsState extends State<JobDetails> {
       }
     });
   }
+  bool isJobCompleted() {
+  return _job!=null && _job.status == JobStatus.Zavrsen;
+}
 
   @override
   void initState() {
@@ -53,7 +59,43 @@ class _JobDetailsState extends State<JobDetails> {
       _job = job; // Update _job with fetched data
     });
   }
+JobSaveRequest createJobSaveRequest(Job job) {
 
+  var schedules = job.schedules != null && job.schedules
+  !.length>0
+      ? JobScheduleInfo(
+          job.schedules![0].questionId,
+          job.schedules!.map((e) => e.id!).toList(),
+        )
+      : null;
+
+  var answersToPaymentQuestions = job.additionalPaymentOptions != null
+     && job.additionalPaymentOptions!.length>0 ? job.additionalPaymentOptions!.fold<Map<int, List<int>>>(
+          {},
+          (map, answer) {
+            if (answer.questionId != null && answer.id != null) {
+              map.putIfAbsent(answer.questionId!, () => []).add(answer.id!);
+            }
+            return map;
+          },
+        )
+      : null;
+ 
+    return JobSaveRequest(
+    job.id!,
+    job.name,
+    job.description,
+    job.streetAddressAndNumber,
+    job.cityId,
+    job.status!.index,
+    job.jobTypeId!=null?job.jobTypeId:null,
+    job.requiredEmployees!=null?job.requiredEmployees:null,
+    schedules,
+    answersToPaymentQuestions,
+    job.wage!=null?job.wage:null,
+    job.applicationsDuration!=null?job.applicationsDuration:null
+  );
+}
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -78,7 +120,9 @@ class _JobDetailsState extends State<JobDetails> {
           title: const Text('Job Details'),
         ),
         body: isCompleted
-            ? buildCompleted()
+        ? buildCompleted()
+        : isJobCompleted()
+            ? JobPreview()  // Show only job preview if the job is completed
             : Stepper(
                 type: StepperType.horizontal,
                 steps: getSteps(),
@@ -192,7 +236,8 @@ class _JobDetailsState extends State<JobDetails> {
             _currentStep += 1;
           });
                 } else {
-          var job = await _jobProvider.update(_job.id!, _job);
+       var saveRequest= createJobSaveRequest(_job);
+          var job = await _jobProvider.update(_job.id!, saveRequest);
           _jobProvider.setCurrentJob(job);
           setState(() {
             _job = job;

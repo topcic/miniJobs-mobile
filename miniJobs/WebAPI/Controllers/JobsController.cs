@@ -53,12 +53,12 @@ public class JobsController(IMediator mediator, BaseState state) : ControllerBas
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Update([FromRoute] int jobId, [FromBody] JobSaveRequest request)
     {
-        request.Id = jobId;
+         request.Id = jobId;
         var initialState = JobState.JobDetails;
         var initialStateInstance = state.CreateState(initialState);
         return Ok(await initialStateInstance.SaveDetails (request));
     } 
-    [HttpPut("activate/{jobId}")]
+    [HttpPut("{jobId}/activate")]
     [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]

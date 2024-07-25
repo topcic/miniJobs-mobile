@@ -15,21 +15,13 @@ class EmployerProfilePage extends StatelessWidget {
         child: Scaffold(
           appBar: AppBar(
             title: const Text('Profile'),
-            bottom: const TabBar(
-              tabs: [
-                Tab(text: 'Info'),
-                Tab(text: 'Aktivni poslovi'),
-                Tab(text: 'Završeni poslovi'),
-                Tab(text: 'Utisci'),
-              ],
-            ),
           ),
-          body: TabBarView(
+          body: Column(
             children: [
-              // Info tab
+              // Info section
               Container(
                 padding: const EdgeInsets.all(20.0),
-                alignment: Alignment.center,
+                color: Colors.grey[200], // Optional background color for the info section
                 child: const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -64,16 +56,26 @@ class EmployerProfilePage extends StatelessWidget {
                   ],
                 ),
               ),
-              const Center(
-                child: ActiveJobsView(userId: 2),
+              // Tabs section
+              const TabBar(
+                tabs: [
+                  Tab(text: 'Aktivni'),
+                  Tab(text: 'Završeni'),
+                  Tab(text: 'Utisci'),
+                ],
               ),
-              // Završeni poslovi tab
-              const Center(
-                child: FinishedJobsView(userId: 2),
-              ),
-              // Utisci tab
-              const Center(
-                child: UserRatingsView(userId: 2),
+              // Expanded tab bar view
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    // Aktivni poslovi tab
+                    ActiveJobsView(userId: 2),
+                    // Završeni poslovi tab
+                    FinishedJobsView(userId: 2),
+                    // Utisci tab
+                    UserRatingsView(userId: 2),
+                  ],
+                ),
               ),
             ],
           ),
