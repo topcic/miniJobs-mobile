@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:minijobs_mobile/models/employer.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
@@ -20,4 +22,5 @@ class EmployerProvider extends BaseProvider<Employer> {
       throw Exception(err.toString());
     }
   }
+
 }

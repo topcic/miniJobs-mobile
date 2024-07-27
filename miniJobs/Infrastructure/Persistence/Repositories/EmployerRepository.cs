@@ -1,4 +1,5 @@
-﻿using Domain.Enums;
+﻿using Domain.Dtos;
+using Domain.Enums;
 
 namespace Infrastructure.Persistence.Repositories;
 
@@ -60,19 +61,20 @@ public class EmployerRepository(ApplicationDbContext _context) : GenericReposito
         return await query.ToListAsync();
     }
 
-    public async Task<Employer> GetWithDetailsAsync(int employerId)
+    public async Task<EmployerDTO> GetWithDetailsAsync(int employerId)
     {
         var employerWithUser = await (from e in _context.Employers
                                       join u in _context.Users on e.Id equals u.Id
                                       where e.Id == employerId
                                       select new { Employer = e, User = u })
-                                      .FirstOrDefaultAsync();
+                                          .FirstOrDefaultAsync();
 
         if (employerWithUser == null)
         {
             return null;
         }
 
+        // Fetch ratings and calculate average rating
         var ratings = await _context.Ratings
                                     .Where(r => r.RatedUserId == employerWithUser.Employer.Id)
                                     .Select(r => (double)r.Value)
@@ -80,9 +82,29 @@ public class EmployerRepository(ApplicationDbContext _context) : GenericReposito
 
         double averageRating = ratings.Any() ? ratings.Average() : 0;
 
-        employerWithUser.Employer.AverageRating = (decimal)Math.Round(averageRating, 2);
-        employerWithUser.Employer.User = employerWithUser.User;
+        // Populate EmployerDTO
+        var employerDto = new EmployerDTO
+        {
+            Id = employerWithUser.Employer.Id,
+            Name = employerWithUser.Employer.Name,
+            IdNumber = employerWithUser.Employer.IdNumber,
+            CompanyPhoneNumber = employerWithUser.Employer.CompanyPhoneNumber,
+            Created = employerWithUser.User.Created,
+            FirstName = employerWithUser.User.FirstName,
+            LastName = employerWithUser.User.LastName,
+            Email = employerWithUser.User.Email,
+            PhoneNumber = employerWithUser.User.PhoneNumber,
+            Gender = employerWithUser.User.Gender,
+            DateOfBirth = employerWithUser.User.DateOfBirth,
+            CityId = employerWithUser.User.CityId,
+            Deleted = employerWithUser.User.Deleted,
+            CreatedBy = employerWithUser.User.CreatedBy,
+            Photo = employerWithUser.User.Photo,
+            Role = employerWithUser.User.Role,
+            City = await _context.Cities.FindAsync(employerWithUser.User.CityId) ??null,
+            AverageRating = (decimal)Math.Round(averageRating, 2)
+        };
 
-        return employerWithUser.Employer;
+        return employerDto;
     }
 }

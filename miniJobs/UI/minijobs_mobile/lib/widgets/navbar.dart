@@ -3,11 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:minijobs_mobile/pages/employeer/employeer_home_page.dart';
-import 'package:minijobs_mobile/pages/employeer/employer_profile_page.dart';
-import 'package:minijobs_mobile/pages/employeer/job/job_details.dart';
+import 'package:minijobs_mobile/pages/employer/employeer_home_page.dart';
+import 'package:minijobs_mobile/pages/employer/employer_profile_page.dart';
+import 'package:minijobs_mobile/pages/employer/job/job_details.dart';
 import 'package:minijobs_mobile/pages/home_page.dart';
-import 'package:minijobs_mobile/pages/employeer/job_list.dart';
+import 'package:minijobs_mobile/pages/employer/job_list.dart';
 import 'package:minijobs_mobile/pages/profile.dart';
 
 class Navbar extends StatefulWidget {

@@ -17,6 +17,11 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
       json['deleted'] as bool?,
       json['accountConfirmed'] as bool?,
       json['photo'] == null ? null : base64Decode(json['photo'] as String),
+       (json['cityId'] as num?)?.toInt(),
+       json['city'] == null
+          ? null
+          : City.fromJson(
+              json['city'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{

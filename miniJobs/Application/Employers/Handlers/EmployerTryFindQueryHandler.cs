@@ -1,11 +1,12 @@
 ﻿using Application.Common.Extensions;
 using Application.Employers.Queries;
+using Domain.Dtos;
 using Domain.Entities;
 using Domain.Interfaces;
 using MediatR;
 
 namespace Application.Employers.Handlers;
-public class EmployerTryFindQueryHandler : IRequestHandler<EmployerTryFindQuery, Employer>
+public class EmployerTryFindQueryHandler : IRequestHandler<EmployerTryFindQuery, EmployerDTO>
 {
     private readonly IEmployerRepository employerRepository;
 
@@ -16,7 +17,7 @@ public class EmployerTryFindQueryHandler : IRequestHandler<EmployerTryFindQuery,
     }
 
 
-    public async Task<Employer> Handle(EmployerTryFindQuery request, CancellationToken cancellationToken)
+    public async Task<EmployerDTO> Handle(EmployerTryFindQuery request, CancellationToken cancellationToken)
     {
 
         var employer = await employerRepository.GetWithDetailsAsync(request.Id);

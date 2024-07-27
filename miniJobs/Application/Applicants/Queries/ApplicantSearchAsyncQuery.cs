@@ -1,11 +1,11 @@
 ﻿using Application.Applicants.Models;
 using Application.Common.Models;
 using Application.Common.Queries;
-using Domain.Entities;
+using Domain.Dtos;
 
 namespace Application.Applicants.Queries;
 
-public class ApplicantSearchAsyncQuery : QueryBase<SearchResponseBase<ApplicantResponse>>
+public class ApplicantSearchAsyncQuery : QueryBase<SearchResponseBase<ApplicantDTO>>
 {
    
     public ApplicantSearchRequest SearchRequest { get; set; }

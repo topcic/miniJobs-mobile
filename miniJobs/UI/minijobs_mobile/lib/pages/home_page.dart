@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:minijobs_mobile/pages/employeer/job/job_modal.dart';
+import 'package:minijobs_mobile/pages/employer/job/job_modal.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:minijobs_mobile/pages/employer/employer_info.dart';
 import 'package:minijobs_mobile/pages/user-profile/active_jobs_view.dart';
 import 'package:minijobs_mobile/pages/user-profile/finished_job_view.dart';
 import 'package:minijobs_mobile/pages/user-profile/user_ratings_view.dart';
@@ -8,6 +10,8 @@ class EmployerProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userId = int.parse( GetStorage().read('userId')) ;
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: DefaultTabController(
@@ -21,14 +25,26 @@ class EmployerProfilePage extends StatelessWidget {
               // Info section
               Container(
                 padding: const EdgeInsets.all(20.0),
-                color: Colors.grey[200], // Optional background color for the info section
-                child: const Column(
+                color: Colors.grey[
+                    200], // Optional background color for the info section
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Profile photo
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundImage: AssetImage('assets/profile_photo.jpg'),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                EmployerInfo(employerId: userId),
+                          ),
+                        );
+                      },
+                      child: const CircleAvatar(
+                        radius: 50,
+                        backgroundImage: AssetImage('assets/profile_photo.jpg'),
+                      ),
                     ),
                     SizedBox(height: 10),
                     // Name
@@ -69,11 +85,11 @@ class EmployerProfilePage extends StatelessWidget {
                 child: TabBarView(
                   children: [
                     // Aktivni poslovi tab
-                    ActiveJobsView(userId: 2),
+                    ActiveJobsView(userId: userId),
                     // Završeni poslovi tab
-                    FinishedJobsView(userId: 2),
+                    FinishedJobsView(userId: userId),
                     // Utisci tab
-                    UserRatingsView(userId: 2),
+                    UserRatingsView(userId: userId),
                   ],
                 ),
               ),

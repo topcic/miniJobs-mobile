@@ -1,4 +1,6 @@
-﻿using Domain.Entities;
+﻿using Application.Applicants.Models;
+using Domain.Dtos;
+using Domain.Entities;
 using Domain.Enums;
 using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
@@ -100,6 +102,9 @@ namespace Infrastructure.Persistence.Repositories
                 Created = reader.GetDateTime(reader.GetOrdinal("created")),
                 CreatedBy = reader.GetInt32(reader.GetOrdinal("created_by")),
                 NumberOfApplications = columnExists ? reader.GetInt32(reader.GetOrdinal("NumberOfApplications")) : 0,
+                ApplicationsDuration = reader.IsDBNull(reader.GetOrdinal("applications_duration"))
+    ? (int?)null
+    : reader.GetInt32(reader.GetOrdinal("applications_duration"))
             };
         }
 
@@ -305,49 +310,52 @@ namespace Infrastructure.Persistence.Repositories
             return await query.ToListAsync();
         }
 
-        public async Task<IEnumerable<Applicant>> GetApplicants(int jobId)
+        public async Task<IEnumerable<ApplicantDTO>> GetApplicants(int jobId)
         {
-
             var applicants = from j in _context.Jobs
                              join ja in _context.JobApplications on j.Id equals ja.JobId
                              join a in _context.Applicants on ja.CreatedBy equals a.Id
                              join u in _context.Users on a.Id equals u.Id
+                             join c in _context.Cities on u.CityId equals c.Id
                              where j.Id == jobId
-                             select new Applicant
+                             select new
                              {
-                                 Id = a.Id,
-                                 Cv = a.Cv,
-                                 Experience = a.Experience,
-                                 Description = a.Description,
-                                 WageProposal = a.WageProposal,
-                                 ConfirmationCode = a.ConfirmationCode,
-                                 AccessFailedCount = a.AccessFailedCount,
-                                 Created = a.Created,
+                                 Applicant = a,
                                  User = u,
+                                 City = c,
                                  ApplicantJobTypes = a.ApplicantJobTypes
                              };
 
             var applicantDetails = from app in applicants
                                    let ratings = _context.Ratings
-                                                        .Where(r => r.RatedUserId == app.Id)
+                                                        .Where(r => r.RatedUserId == app.Applicant.Id)
                                                         .Select(r => (double)r.Value)
-                                                        .ToList() // Convert to List<double>
+                                                        .ToList()
                                    let finishedJobsCount = (from ja in _context.JobApplications
                                                             join j in _context.Jobs on ja.JobId equals j.Id
-                                                            where ja.CreatedBy == app.Id && j.Status == (int)JobStatus.Completed
+                                                            where ja.CreatedBy == app.Applicant.Id && j.Status == (int)JobStatus.Completed
                                                             select ja).Count()
-                                   select new Applicant
+                                   select new ApplicantDTO
                                    {
-                                       Id = app.Id,
-                                       Cv = app.Cv,
-                                       Experience = app.Experience,
-                                       Description = app.Description,
-                                       WageProposal = app.WageProposal,
-                                       ConfirmationCode = app.ConfirmationCode,
-                                       AccessFailedCount = app.AccessFailedCount,
-                                       Created = app.Created,
-                                       User = app.User,
+                                       Id = app.Applicant.Id,
+                                       Cv = app.Applicant.Cv,
+                                       Experience = app.Applicant.Experience,
+                                       Description = app.Applicant.Description,
+                                       WageProposal = app.Applicant.WageProposal,
+                                       Created = app.Applicant.Created,
+                                       FirstName = app.User.FirstName,
+                                       LastName = app.User.LastName,
+                                       Email = app.User.Email,
+                                       PhoneNumber = app.User.PhoneNumber,
+                                       Gender = app.User.Gender,
+                                       DateOfBirth = app.User.DateOfBirth,
+                                       CityId = app.User.CityId,
+                                       Deleted = app.User.Deleted,
+                                       CreatedBy = app.User.CreatedBy,
+                                       Photo = app.User.Photo,
+                                       Role = app.User.Role,
                                        ApplicantJobTypes = app.ApplicantJobTypes,
+                                       City = app.City,
                                        AverageRating = ratings.Any() ? (decimal)ratings.Average() : 0,
                                        NumberOfFinishedJobs = finishedJobsCount
                                    };

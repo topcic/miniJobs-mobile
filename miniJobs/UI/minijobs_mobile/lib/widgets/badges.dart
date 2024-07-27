@@ -84,27 +84,44 @@ class JobBadge extends StatelessWidget {
     switch (status) {
       case JobStatus.Kreiran:
         statusText = 'Kreiran';
-        backgroundColor = Colors.blue[200]!;
+        backgroundColor = Colors.blue[400]!;
         break;
       case JobStatus.Aktivan:
         statusText = 'Aktivan';
-        backgroundColor = Colors.green[200]!;
+        backgroundColor = Colors.green[400]!;
         break;
       case JobStatus.Zavrsen:
         statusText = 'Završen';
-        backgroundColor = Colors.grey[200]!;
-        textColor = Colors.black;
+        backgroundColor = Colors.purple[400]!;
         break;
       case JobStatus.Izbrisan:
         statusText = 'Izbrisan';
-        backgroundColor = Colors.red[200]!;
+        backgroundColor = Colors.red[400]!;
+        break;
+      default:
+        statusText = 'Unknown';
+        backgroundColor = Colors.grey[300]!;
         break;
     }
 
-    return Badge(
-      text: statusText,
-      backgroundColor: backgroundColor,
-      textColor: textColor,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.black.withOpacity(0.1), // Subtle border to add depth
+          width: 1,
+        ),
+      ),
+      child: Text(
+        statusText,
+        style: TextStyle(
+          color: textColor,
+          fontWeight: FontWeight.bold,
+          fontSize: 14, // Adjust font size as needed
+        ),
+      ),
     );
   }
 }

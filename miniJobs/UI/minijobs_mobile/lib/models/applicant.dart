@@ -14,7 +14,6 @@ class Applicant extends User {
     String? experience;
     Decimal? wageProposal;
     JobType? jobType;
-    City? city;
   
     Applicant(
         super.id,
@@ -27,12 +26,13 @@ class Applicant extends User {
         super.deleted,
         super.accountConfirmed,
         super.photo,
+        super.cityId,
+        super.city,
         this.cv,
         this.description,
         this.experience,
         this.wageProposal,
-        this.jobType,
-        this.city);
+        this.jobType);
   
          factory Applicant.fromJson(Map<String, dynamic> json) => _$ApplicantFromJson(json);
   

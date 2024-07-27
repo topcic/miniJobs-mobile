@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
-import 'package:minijobs_mobile/pages/employeer/job/job_card.dart';
+import 'package:minijobs_mobile/pages/employer/job/job_card.dart';
 import 'package:minijobs_mobile/providers/employer_provider.dart';
 import 'package:provider/provider.dart';
 

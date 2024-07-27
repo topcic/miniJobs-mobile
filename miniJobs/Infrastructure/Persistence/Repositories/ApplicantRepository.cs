@@ -1,5 +1,6 @@
 ﻿
 
+using Domain.Dtos;
 using Domain.Enums;
 using Microsoft.Data.SqlClient;
 
@@ -7,9 +8,9 @@ namespace Infrastructure.Persistence.Repositories;
 
 public class ApplicantRepository(ApplicationDbContext context) : GenericRepository<Applicant, int, ApplicationDbContext>(context), IApplicantRepository
 {
-    private readonly ApplicationDbContext _context= context;
+    private readonly ApplicationDbContext _context = context;
 
-    public async Task<IEnumerable<Applicant>> SearchAsync(string searchText, int limit, int offset, int? cityId, int? jobTypeId)
+    public async Task<IEnumerable<ApplicantDTO>> SearchAsync(string searchText, int limit, int offset, int? cityId, int? jobTypeId)
     {
         var query = _context.Applicants.AsQueryable();
 
@@ -49,22 +50,31 @@ public class ApplicantRepository(ApplicationDbContext context) : GenericReposito
                                     join j in _context.Jobs on ja.JobId equals j.Id
                                     where ja.CreatedBy == a.Id && j.Status == (int)JobStatus.Completed
                                     select ja)
-                                          .Count()
+                                      .Count()
         })
         .ToListAsync();
 
-        return result.Select(x => new Applicant
+        return result.Select(x => new ApplicantDTO
         {
             Id = x.Applicant.Id,
             Cv = x.Applicant.Cv,
             Experience = x.Applicant.Experience,
             Description = x.Applicant.Description,
             WageProposal = x.Applicant.WageProposal,
-            ConfirmationCode = x.Applicant.ConfirmationCode,
-            AccessFailedCount = x.Applicant.AccessFailedCount,
             Created = x.Applicant.Created,
-            User = x.Applicant.User,
+            FirstName = x.Applicant.User.FirstName,
+            LastName = x.Applicant.User.LastName,
+            Email = x.Applicant.User.Email,
+            PhoneNumber = x.Applicant.User.PhoneNumber,
+            Gender = x.Applicant.User.Gender,
+            DateOfBirth = x.Applicant.User.DateOfBirth,
+            CityId = x.Applicant.User.CityId,
+            Deleted = x.Applicant.User.Deleted,
+            CreatedBy = x.Applicant.User.CreatedBy,
+            Photo = x.Applicant.User.Photo,
+            Role = x.Applicant.User.Role,
             ApplicantJobTypes = x.Applicant.ApplicantJobTypes,
+            City = x.Applicant.User.City,
             AverageRating = (decimal)x.AverageRating,
             NumberOfFinishedJobs = x.NumberOfFinishedJobs
         });

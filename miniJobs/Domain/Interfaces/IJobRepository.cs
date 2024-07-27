@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Domain.Dtos;
+using Domain.Entities;
 
 namespace Domain.Interfaces;
 
@@ -10,5 +11,5 @@ public interface IJobRepository : IGenericRepository<Job, int>
     Task<int> SearchCountAsync(string searchText, int? cityId, int? jobTypeId);
     Task<IEnumerable<Job>> GetApplicantSavedJobsAsync(int applicantId);
     Task<IEnumerable<Job>> GetApplicantAppliedJobsAsync(int applicantId);
-    Task<IEnumerable<Applicant>> GetApplicants(int jobId);
+    Task<IEnumerable<ApplicantDTO>> GetApplicants(int jobId);
 }

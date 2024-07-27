@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:json_annotation/json_annotation.dart';
+import 'package:minijobs_mobile/models/city.dart';
 part 'user.g.dart';
 
 @JsonSerializable()
@@ -16,9 +17,11 @@ class User {
   bool? deleted;
   bool? accountConfirmed;
   Uint8List? photo;
+  int? cityId;
+  City? city;
 
   User(this.id, this.firstName, this.lastName, this.userName, this.email,
-      this.phoneNumber, this.role, this.deleted, this.accountConfirmed, this.photo);
+      this.phoneNumber, this.role, this.deleted, this.accountConfirmed, this.photo,this.cityId,this.city);
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 

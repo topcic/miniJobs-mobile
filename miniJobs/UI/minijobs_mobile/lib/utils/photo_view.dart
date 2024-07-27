@@ -1,0 +1,97 @@
+import 'dart:typed_data';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
+class PhotoView extends StatefulWidget {
+  final Uint8List? photo;
+  final bool editable;
+  final Function(Uint8List?) onPhotoChanged;
+
+  const PhotoView({
+    Key? key,
+    this.photo,
+    this.editable = false,
+    required this.onPhotoChanged,
+  }) : super(key: key);
+
+  @override
+  _PhotoViewState createState() => _PhotoViewState();
+}
+
+class _PhotoViewState extends State<PhotoView> {
+  final ImagePicker _picker = ImagePicker();
+  Uint8List? _currentPhoto;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentPhoto = widget.photo;
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedFile = await _picker.pickImage(source: source);
+
+    if (pickedFile != null) {
+      final imageBytes = await pickedFile.readAsBytes();
+      setState(() {
+        _currentPhoto = imageBytes;
+      });
+      widget.onPhotoChanged(_currentPhoto);
+    }
+  }
+
+  void _showImageSourceDialog() {
+    if (!widget.editable) return;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Select Image Source'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera),
+              title: const Text('Take a Photo'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _pickImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.image),
+              title: const Text('Choose from Gallery'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Stack(
+        alignment: Alignment.bottomRight,
+        children: [
+          CircleAvatar(
+            radius: 50,
+            backgroundImage: _currentPhoto != null
+                ? MemoryImage(_currentPhoto!)
+                : AssetImage('assets/images/user-icon.png') as ImageProvider,
+            backgroundColor: Colors.grey.shade200,
+          ),
+          if (widget.editable)
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: _showImageSourceDialog,
+            ),
+        ],
+      ),
+    );
+  }
+}

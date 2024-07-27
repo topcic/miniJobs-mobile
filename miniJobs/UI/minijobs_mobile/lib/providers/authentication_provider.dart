@@ -49,7 +49,7 @@ class AuthenticationProvider extends BaseProvider<AuthTokenResponse> {
         if (key.endsWith('claims/role')) {
           GetStorage().write('role', value);
         } else if (key.endsWith('claims/nameidentifier')) {
-          GetStorage().write('nameidentifier', value);
+          GetStorage().write('userId', value);
         } else if (key.endsWith('claims/givenname')) {
           GetStorage().write('givenname', value);
         } else if (key.endsWith('claims/surname')) {

@@ -1,7 +1,10 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:dio/dio.dart';
 import 'package:minijobs_mobile/enumerations/job_statuses.dart';
+import 'package:minijobs_mobile/models/applicant.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/providers/base_provider.dart';
 
@@ -89,6 +92,17 @@ class JobProvider extends BaseProvider<Job> {
           textColor: Colors.white,
           fontSize: 16.0,
         );
+      return responseData;
+    } catch (err) {
+      throw Exception(err.toString());
+    }
+  }
+   Future<List<Applicant>> getApplicantsForJob(int jobId) async {
+    try {
+      var url = "${baseUrl}jobs/$jobId/applicants";
+      var response = await dio.get(url);
+
+      List<Applicant> responseData = List<Applicant>.from(response.data.map((item) => Applicant.fromJson(item)));
       return responseData;
     } catch (err) {
       throw Exception(err.toString());

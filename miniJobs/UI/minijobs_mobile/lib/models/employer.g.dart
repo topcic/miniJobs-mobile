@@ -17,6 +17,10 @@ Employer _$EmployerFromJson(Map<String, dynamic> json) => Employer(
       json['deleted'] as bool?,
       json['accountConfirmed'] as bool?,
       json['photo'] == null ? null : base64Decode(json['photo'] as String),
+      (json['cityId'] as num?)?.toInt(),
+      json['city'] == null
+          ? null
+          : City.fromJson(json['city'] as Map<String, dynamic>),
       json['name'] as String?,
       json['streetAddressAndNumber'] as String?,
       json['idNumber'] as String?,
@@ -34,6 +38,8 @@ Map<String, dynamic> _$EmployerToJson(Employer instance) => <String, dynamic>{
       'deleted': instance.deleted,
       'accountConfirmed': instance.accountConfirmed,
       'photo': instance.photo == null ? null : base64Encode(instance.photo!),
+      'city': instance.city,
+      'cityId': instance.cityId,
       'name': instance.name,
       'streetAddressAndNumber': instance.streetAddressAndNumber,
       'idNumber': instance.idNumber,

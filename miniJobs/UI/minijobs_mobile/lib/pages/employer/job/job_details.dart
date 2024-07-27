@@ -5,10 +5,10 @@ import 'package:minijobs_mobile/enumerations/job_statuses.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/models/job/job_save_request.dart';
 import 'package:minijobs_mobile/models/job/job_schedule_info.dart';
-import 'package:minijobs_mobile/pages/employeer/job/steps/job_preview.dart';
-import 'package:minijobs_mobile/pages/employeer/job/steps/job_step_1.dart';
-import 'package:minijobs_mobile/pages/employeer/job/steps/job_step_2.dart';
-import 'package:minijobs_mobile/pages/employeer/job/steps/job_step_3.dart';
+import 'package:minijobs_mobile/pages/employer/job/steps/job_preview.dart';
+import 'package:minijobs_mobile/pages/employer/job/steps/job_step_1.dart';
+import 'package:minijobs_mobile/pages/employer/job/steps/job_step_2.dart';
+import 'package:minijobs_mobile/pages/employer/job/steps/job_step_3.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
 import 'package:provider/provider.dart';
 
