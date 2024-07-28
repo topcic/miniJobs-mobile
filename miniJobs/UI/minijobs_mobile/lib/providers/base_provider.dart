@@ -1,8 +1,8 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:minijobs_mobile/models/search_result.dart';
 
 abstract class BaseProvider<T> with ChangeNotifier {
   static String? _baseUrl;
@@ -13,7 +13,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
   BaseProvider(String endpoint) {
     _endpoint = endpoint;
     _baseUrl = const String.fromEnvironment("baseUrl",
-        defaultValue: "http://localhost:5020/api/");
+        defaultValue: "http://localhost:5020/api/");// "http://10.0.2.2:5020/api/
     _dio = Dio(BaseOptions(
       baseUrl: _baseUrl!,
       responseType: ResponseType.json,
@@ -24,7 +24,6 @@ abstract class BaseProvider<T> with ChangeNotifier {
       onRequest: (options, handler) async {
   options.headers["Accept"] = "application/json";
   String? token = _getStorage.read('accessToken');
-  print('Token: $token'); // Debugging line
   if (token != null) {
     options.headers["Authorization"] = "Bearer $token";
   }
@@ -34,7 +33,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
         if (error.response?.statusCode == 401) {
           final newAccessToken = await refreshToken();
           if (newAccessToken != null) {
-            _dio.options.headers["Authorization"] = "Bearer " + newAccessToken;
+            _dio.options.headers["Authorization"] = "Bearer $newAccessToken";
             return handler.resolve(await _dio.fetch(error.requestOptions));
           }
         }
@@ -159,7 +158,7 @@ Future<T> get(int id) async {
         }
         query += '$prefix$key=$encoded';
       } else if (value is DateTime) {
-        query += '$prefix$key=${(value as DateTime).toIso8601String()}';
+        query += '$prefix$key=${(value).toIso8601String()}';
       } else if (value is List || value is Map) {
         if (value is List) value = value.asMap();
         value.forEach((k, v) {

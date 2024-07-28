@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -35,7 +34,7 @@ class JobProvider extends BaseProvider<Job> {
       // Send the request with the status serialized as JSON
       var response = await dio.post(url, data: apply);
       Job responseData = Job.fromJson(response.data);
-      if (apply)
+      if (apply) {
         Fluttertoast.showToast(
           msg: "Uspješno ste aplicirali na posao",
           toastLength: Toast.LENGTH_SHORT,
@@ -45,6 +44,7 @@ class JobProvider extends BaseProvider<Job> {
           textColor: Colors.white,
           fontSize: 16.0,
         );
+      }
       return responseData;
     } catch (err) {
       throw Exception(err.toString());
@@ -82,7 +82,7 @@ class JobProvider extends BaseProvider<Job> {
       // Send the request with the status serialized as JSON
       var response = await dio.post(url, data: save);
       Job responseData = Job.fromJson(response.data);
-      if (save)
+      if (save) {
         Fluttertoast.showToast(
           msg: "Uspješno ste spremili posao",
           toastLength: Toast.LENGTH_SHORT,
@@ -92,6 +92,7 @@ class JobProvider extends BaseProvider<Job> {
           textColor: Colors.white,
           fontSize: 16.0,
         );
+      }
       return responseData;
     } catch (err) {
       throw Exception(err.toString());

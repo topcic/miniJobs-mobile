@@ -42,7 +42,7 @@ class _JobListState extends State<JobList> {
         title: const Text('Job List'),
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
               itemCount: jobs.length,
               itemBuilder: (context, index) {
@@ -117,7 +117,7 @@ class _JobListState extends State<JobList> {
     if (job.numberOfApplications != null && job.numberOfApplications! > 0) {
       menuItems.insert(
         0,
-        PopupMenuItem<String>(
+        const PopupMenuItem<String>(
           value: 'applicants',
           child: ListTile(
             leading: Icon(Icons.people, color: Colors.blue),
@@ -186,7 +186,7 @@ class _JobListState extends State<JobList> {
               } catch (e) {
                 // Handle errors here, e.g., show a snackbar or alert
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Došlo je do greške pri brisanju')),
+                  const SnackBar(content: Text('Došlo je do greške pri brisanju')),
                 );
               }
             },

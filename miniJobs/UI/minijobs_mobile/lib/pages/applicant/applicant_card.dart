@@ -32,12 +32,12 @@ class ApplicantCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            CircleAvatar(
+            const CircleAvatar(
               radius: 12,
               backgroundColor: Colors.blue,
               child: Text(
                 '10', // Replace with actual completed jobs count
-                style: const TextStyle(color: Colors.white, fontSize: 12),
+                style: TextStyle(color: Colors.white, fontSize: 12),
               ),
             ),
           ],

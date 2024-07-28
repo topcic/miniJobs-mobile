@@ -87,6 +87,7 @@ public class EmployerRepository(ApplicationDbContext _context) : GenericReposito
         {
             Id = employerWithUser.Employer.Id,
             Name = employerWithUser.Employer.Name,
+            StreetAddressAndNumber = employerWithUser.Employer.StreetAddressAndNumber,
             IdNumber = employerWithUser.Employer.IdNumber,
             CompanyPhoneNumber = employerWithUser.Employer.CompanyPhoneNumber,
             Created = employerWithUser.User.Created,

@@ -18,7 +18,7 @@ class JobModal extends StatefulWidget {
 
 class _JobModalState extends State<JobModal> {
   late JobProvider jobProvider;
-  Job job=new Job();
+  Job job=Job();
   String role='';
   @override
   void initState() {
@@ -31,8 +31,8 @@ class _JobModalState extends State<JobModal> {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     jobProvider= context.read<JobProvider>();
-    job=widget.job!;
-    role=widget.role!;
+    job=widget.job;
+    role=widget.role;
     setState(() {
       
     });

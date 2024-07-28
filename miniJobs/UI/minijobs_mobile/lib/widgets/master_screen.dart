@@ -31,7 +31,7 @@ class _MasterScreenWidgetState extends State<MasterScreenWidget> {
             ),
           ),
           ListTile(
-            leading: const FaIcon(FontAwesomeIcons.home),
+            leading: const FaIcon(FontAwesomeIcons.house),
             title: const Text("Kontrolna ploča"),
             onTap: () {
               Navigator.of(context).push(
@@ -47,7 +47,7 @@ class _MasterScreenWidgetState extends State<MasterScreenWidget> {
             },
           ),
           ListTile(
-            leading: const FaIcon(FontAwesomeIcons.usersCog),
+            leading: const FaIcon(FontAwesomeIcons.usersGear),
             title: const Text("Aplikanti"),
             onTap: () {
               Navigator.of(context).push(

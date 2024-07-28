@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:minijobs_mobile/enumerations/job_statuses.dart';
@@ -41,7 +40,7 @@ class _JobDetailsState extends State<JobDetails> {
     });
   }
   bool isJobCompleted() {
-  return _job!=null && _job.status == JobStatus.Zavrsen;
+  return _job.status == JobStatus.Zavrsen;
 }
 
   @override
@@ -62,7 +61,7 @@ class _JobDetailsState extends State<JobDetails> {
 JobSaveRequest createJobSaveRequest(Job job) {
 
   var schedules = job.schedules != null && job.schedules
-  !.length>0
+  !.isNotEmpty
       ? JobScheduleInfo(
           job.schedules![0].questionId,
           job.schedules!.map((e) => e.id!).toList(),
@@ -70,7 +69,7 @@ JobSaveRequest createJobSaveRequest(Job job) {
       : null;
 
   var answersToPaymentQuestions = job.additionalPaymentOptions != null
-     && job.additionalPaymentOptions!.length>0 ? job.additionalPaymentOptions!.fold<Map<int, List<int>>>(
+     && job.additionalPaymentOptions!.isNotEmpty ? job.additionalPaymentOptions!.fold<Map<int, List<int>>>(
           {},
           (map, answer) {
             if (answer.questionId != null && answer.id != null) {
@@ -88,12 +87,12 @@ JobSaveRequest createJobSaveRequest(Job job) {
     job.streetAddressAndNumber,
     job.cityId,
     job.status!.index,
-    job.jobTypeId!=null?job.jobTypeId:null,
-    job.requiredEmployees!=null?job.requiredEmployees:null,
+    job.jobTypeId,
+    job.requiredEmployees,
     schedules,
     answersToPaymentQuestions,
-    job.wage!=null?job.wage:null,
-    job.applicationsDuration!=null?job.applicationsDuration:null
+    job.wage,
+    job.applicationsDuration
   );
 }
   @override
@@ -122,7 +121,7 @@ JobSaveRequest createJobSaveRequest(Job job) {
         body: isCompleted
         ? buildCompleted()
         : isJobCompleted()
-            ? JobPreview()  // Show only job preview if the job is completed
+            ? const JobPreview()  // Show only job preview if the job is completed
             : Stepper(
                 type: StepperType.horizontal,
                 steps: getSteps(),

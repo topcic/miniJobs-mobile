@@ -8,11 +8,11 @@ class PhotoView extends StatefulWidget {
   final Function(Uint8List?) onPhotoChanged;
 
   const PhotoView({
-    Key? key,
+    super.key,
     this.photo,
     this.editable = false,
     required this.onPhotoChanged,
-  }) : super(key: key);
+  });
 
   @override
   _PhotoViewState createState() => _PhotoViewState();
@@ -82,7 +82,7 @@ class _PhotoViewState extends State<PhotoView> {
             radius: 50,
             backgroundImage: _currentPhoto != null
                 ? MemoryImage(_currentPhoto!)
-                : AssetImage('assets/images/user-icon.png') as ImageProvider,
+                : const AssetImage('assets/images/user-icon.png') as ImageProvider,
             backgroundColor: Colors.grey.shade200,
           ),
           if (widget.editable)

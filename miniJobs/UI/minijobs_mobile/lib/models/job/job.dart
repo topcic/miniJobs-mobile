@@ -1,7 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:minijobs_mobile/enumerations/job_statuses.dart';
 import 'package:minijobs_mobile/models/city.dart';
-import 'package:minijobs_mobile/models/employer.dart';
+import 'package:minijobs_mobile/models/employer/employer.dart';
 import 'package:minijobs_mobile/models/job_type.dart';
 import 'package:minijobs_mobile/models/proposed_answer.dart';
 

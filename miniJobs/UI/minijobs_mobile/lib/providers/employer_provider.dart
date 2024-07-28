@@ -1,9 +1,11 @@
-import 'dart:developer';
 
-import 'package:dio/dio.dart';
-import 'package:minijobs_mobile/models/employer.dart';
+import 'dart:convert';
+
+import 'package:minijobs_mobile/models/employer/employer.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/providers/base_provider.dart';
+
+import '../models/employer/employer_save_request.dart';
 
 class EmployerProvider extends BaseProvider<Employer> {
   EmployerProvider(): super("employers");
@@ -22,5 +24,16 @@ class EmployerProvider extends BaseProvider<Employer> {
       throw Exception(err.toString());
     }
   }
+  @override
+  Future<Employer> update(int id, [dynamic request]) async {
+    if (request is! EmployerSaveRequest) {
+      throw ArgumentError('Request must be of type EmployerSaveRequest');
+    }
 
+    var url = "${baseUrl}employers/$id";
+    var jsonRequest = request.toJson();
+    var response = await dio.put(url, data: jsonEncode(jsonRequest)); // Make sure to encode JSON
+
+    return fromJson(response.data);
+  }
 }

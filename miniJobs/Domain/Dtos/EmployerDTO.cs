@@ -23,5 +23,5 @@ public class EmployerDTO
     public string Role { get; set; }
     public City City { get; set; }
     public decimal AverageRating { get; set; }
-
+    public string StreetAddressAndNumber { get; set; }
 }

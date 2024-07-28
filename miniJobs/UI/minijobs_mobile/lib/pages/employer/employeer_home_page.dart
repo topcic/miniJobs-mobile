@@ -51,15 +51,16 @@ class _EmployerHomePageState extends State<EmployerHomePage> {
 
     String searchTerm = _searchController.text;
     City? city;
-    if (selectedCity != null)
+    if (selectedCity != null) {
       city = cities.firstWhere(
         (city) =>
             city.name ==
             selectedCity, // Provide a default value or handle the case where no city is found
       );
+    }
     applicants = await _applicantProvider.searchApplicants(
       searchText: searchTerm,
-      cityId: city != null ? city.id : null,
+      cityId: city?.id,
     );
 
     setState(() {
@@ -75,7 +76,7 @@ class _EmployerHomePageState extends State<EmployerHomePage> {
       ),
       body: Stack(
         children: [
-          HeaderWidget(),
+          const HeaderWidget(),
           // Search bar container
           SearchBarWidget(
             searchController: _searchController,
@@ -199,6 +200,8 @@ class _EmployerHomePageState extends State<EmployerHomePage> {
 }
 
 class HeaderWidget extends StatelessWidget {
+  const HeaderWidget({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Positioned(
@@ -244,7 +247,7 @@ class SearchBarWidget extends StatefulWidget {
   final ValueChanged<String?> onCityChanged;
   final VoidCallback onSearch;
 
-  SearchBarWidget({
+  const SearchBarWidget({super.key, 
     required this.searchController,
     required this.cities,
     required this.selectedCity,
@@ -372,7 +375,7 @@ class WorkerProfilesWidget extends StatelessWidget {
   final bool isLoading;
   final Widget workers;
 
-  WorkerProfilesWidget({
+  const WorkerProfilesWidget({super.key, 
     required this.isLoading,
     required this.workers,
   });

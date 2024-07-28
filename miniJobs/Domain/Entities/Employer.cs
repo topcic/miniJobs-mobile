@@ -17,9 +17,10 @@ public class Employer : IEntity<int>
     [Column("company_phone_number")]
     public string? CompanyPhoneNumber { get; set; }
 
-    [NotMapped]
-    public User User { get; set; }
+
+    [Column("street_address_and_number")]
+    public string StreetAddressAndNumber { get; set; }
 
     [NotMapped]
-    public decimal AverageRating { get; set; }
+    public User User { get; set; }
 }

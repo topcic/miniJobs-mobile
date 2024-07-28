@@ -1,10 +1,7 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:minijobs_mobile/enumerations/job_statuses.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
-import 'package:minijobs_mobile/pages/employer/job/steps/job_preview.dart';
 import 'package:minijobs_mobile/pages/employer/job/job_modal.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
 import 'package:provider/provider.dart';
@@ -19,7 +16,7 @@ class JobCard extends StatefulWidget {
 
 class _JobCardState extends State<JobCard> {
 late JobProvider jobProvider;
-Job job=new Job();
+Job job=Job();
 
 @override
   void initState() {
@@ -59,8 +56,8 @@ Job job=new Job();
          Row(
           mainAxisAlignment: MainAxisAlignment.center, // Poravnanje u sredini
           children: [
-            Icon(Icons.location_on), // Ikona za lokaciju
-            SizedBox(width: 10),
+            const Icon(Icons.location_on), // Ikona za lokaciju
+            const SizedBox(width: 10),
             Text(job.city?.name ??''),
           ],
         ),
@@ -83,7 +80,7 @@ Job job=new Job();
       builder: (BuildContext context) {
         return  JobModal(
           // Pass job details to the modal constructor
-          job: job!,
+          job: job,
           role: GetStorage().read('role')
           // poslodavac: job.employerFullName!,
           // opstina: job.city?.name ??'',

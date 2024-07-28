@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:minijobs_mobile/models/applicant.dart';
 import 'package:minijobs_mobile/pages/applicant/applicant_card.dart';
-import 'package:minijobs_mobile/pages/employer/job/steps/job_preview.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -40,7 +39,7 @@ class _JobApplicantsViewState extends State<JobApplicantsView> {
         title: const Text('Aplikanti'),
       ),
       body: applicants.isEmpty
-          ? Center(child: Text('No applicants found.'))
+          ? const Center(child: Text('No applicants found.'))
           : ListView.builder(
               itemCount: applicants.length,
               itemBuilder: (context, index) {

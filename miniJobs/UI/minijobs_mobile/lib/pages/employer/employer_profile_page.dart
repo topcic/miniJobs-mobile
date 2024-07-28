@@ -46,18 +46,18 @@ class EmployerProfilePage extends StatelessWidget {
                         backgroundImage: AssetImage('assets/profile_photo.jpg'),
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     // Name
-                    Text(
+                    const Text(
                       'John Doe',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 5),
+                    const SizedBox(height: 5),
                     // Average rating
-                    Row(
+                    const Row(
                       children: [
                         Icon(Icons.star, color: Colors.yellow),
                         SizedBox(width: 5),

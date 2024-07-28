@@ -1,15 +1,16 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:minijobs_mobile/utils/photo_view.dart';
 import 'package:provider/provider.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:minijobs_mobile/models/city.dart';
-import 'package:minijobs_mobile/models/employer.dart';
+import 'package:minijobs_mobile/models/employer/employer.dart';
+import 'package:minijobs_mobile/models/employer/employer_save_request.dart';
 import 'package:minijobs_mobile/providers/city_provider.dart';
-import 'package:minijobs_mobile/providers/employer_provider.dart';// Import the PhotoView widget
+import 'package:minijobs_mobile/providers/employer_provider.dart';
+
+import '../../utils/photo_view.dart';
 
 class EmployerInfo extends StatefulWidget {
   final int employerId;
@@ -60,101 +61,133 @@ class _EmployerInfoState extends State<EmployerInfo> {
     });
   }
 
+  Future<void> _saveChanges() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      final formData = _formKey.currentState!.value;
+
+      final request = EmployerSaveRequest(
+        formData['name'],
+        formData['streetAddressAndNumber'],
+        formData['idNumber'],
+        formData['companyPhoneNumber'],
+        formData['firstName'],
+        formData['lastName'],
+        formData['phoneNumber'],
+        int.tryParse(formData['cityId'])
+      );
+
+      try {
+        await employerProvider.update(widget.employerId, request);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Changes saved successfully')),
+        );
+      } catch (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save changes: $error')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Employer Info'),
+        title: const Text('Korisničke informacije'),
         centerTitle: true,
       ),
       body: isLoading
           ? const SpinKitRing(color: Colors.brown)
           : SingleChildScrollView(
-              child: FormBuilder(
-                key: _formKey,
-                initialValue: employer != null
-                    ? {
-                        'name': employer!.name,
-                        'streetAddressAndNumber': employer!.streetAddressAndNumber,
-                        'cityId': employer!.cityId?.toString(),
-                        'idNumber': employer!.idNumber,
-                        'firstName': employer!.firstName,
-                        'lastName': employer!.lastName,
-                        'phoneNumber': employer!.phoneNumber,
-                        'email': employer!.email,
-                      }
-                    : {},
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      PhotoView(
-                        photo: employer?.photo,
-                        editable: true,
-                        onPhotoChanged: _updatePhoto,
-                      ),
-                      const SizedBox(height: 16),
-                      if (employer?.name != null) ...[
-                        const Text(
-                          'Company Information',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 16),
-                        _buildTextField('name', 'Company Name'),
-                        const SizedBox(height: 16),
-                        _buildTextField('streetAddressAndNumber', 'Street Address and Number'),
-                        const SizedBox(height: 16),
-                        FormBuilderDropdown<String>(
-                          name: 'cityId',
-                          decoration: const InputDecoration(labelText: 'City'),
-                          validator: (value) {
-                            if (value == null) {
-                              return 'City is required';
-                            }
-                            return null;
-                          },
-                          items: cities != null
-                              ? cities!.map((city) {
-                                  return DropdownMenuItem(
-                                    value: city.id.toString(),
-                                    child: Text(city.name ?? ''),
-                                  );
-                                }).toList()
-                              : [],
-                        ),
-                        const SizedBox(height: 16),
-                        _buildTextField('idNumber', 'ID Number', mask: MaskTextInputFormatter(
-                          mask: '4############',
-                          filter: {'#': RegExp(r'[0-9]')}
-                        )),
-                      ],
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Personal Information',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField('firstName', 'First Name'),
-                      const SizedBox(height: 16),
-                      _buildTextField('lastName', 'Last Name'),
-                      const SizedBox(height: 16),
-                      _buildTextField('phoneNumber', 'Phone Number', mask: phoneNumberMask),
-                      const SizedBox(height: 16),
-                      _buildTextField('email', 'Email', readOnly: true),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            // Handle save action
-                          }
-                        },
-                        child: const Text('Save Changes'),
-                      ),
-                    ],
+        child: FormBuilder(
+          key: _formKey,
+          initialValue: employer != null
+              ? {
+            'name': employer!.name,
+            'streetAddressAndNumber': employer!.streetAddressAndNumber,
+            'cityId': employer!.cityId?.toString(),
+            'idNumber': employer!.idNumber,
+            'firstName': employer!.firstName,
+            'lastName': employer!.lastName,
+            'companyPhoneNumber': employer!.companyPhoneNumber,
+            'phoneNumber': employer!.phoneNumber,
+            'email': employer!.email,
+          }
+              : {},
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                if (employer != null)
+                  PhotoView(
+                    photo: employer!.photo,
+                    editable: true,
+                    onPhotoChanged: _updatePhoto,
                   ),
+                const SizedBox(height: 16),
+                if (employer?.name != null) ...[
+                  const Text(
+                    'Company Information',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildTextField('name', 'Naziv firme'),
+                  const SizedBox(height: 16),
+                  _buildTextField('streetAddressAndNumber', 'Adresa i broj ulice'),
+                  const SizedBox(height: 16),
+                  FormBuilderDropdown<String>(
+                    name: 'cityId',
+                    decoration: const InputDecoration(labelText: 'Sjedište firme'),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'City is required';
+                      }
+                      return null;
+                    },
+                    items: cities != null
+                        ? cities!.map((city) {
+                      return DropdownMenuItem(
+                        value: city.id.toString(),
+                        child: Text(city.name ?? ''),
+                      );
+                    }).toList()
+                        : [],
+                  ),
+                  const SizedBox(height: 16),
+                _buildTextField('companyPhoneNumber', 'Službeni broj telefona', mask: phoneNumberMask),
+                  _buildTextField(
+                    'idNumber',
+                    'ID broj',
+                    mask: MaskTextInputFormatter(
+                        mask: '4############',
+                        filter: {'#': RegExp(r'[0-9]')}
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 16),
+                const Text(
+                  'Personal Information',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-              ),
+                const SizedBox(height: 16),
+                _buildTextField('firstName', 'Ime'),
+                const SizedBox(height: 16),
+                _buildTextField('lastName', 'Prezime'),
+                const SizedBox(height: 16),
+                _buildTextField('phoneNumber', 'Broj telefona', mask: phoneNumberMask),
+                const SizedBox(height: 16),
+                _buildTextField('email', 'Email', readOnly: true),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: _saveChanges,
+                  child: const Text('Spasi promjene'),
+                ),
+              ],
             ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -166,7 +199,7 @@ class _EmployerInfoState extends State<EmployerInfo> {
       decoration: InputDecoration(labelText: label),
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return '$label is required';
+          return '$label je obavezno polje.';
         }
         return null;
       },

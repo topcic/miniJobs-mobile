@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:minijobs_mobile/pages/impressions.dart';
 import 'package:minijobs_mobile/pages/user-profile/finished_job_view.dart';
 import 'package:minijobs_mobile/pages/user-profile/user_ratings_view.dart';
 

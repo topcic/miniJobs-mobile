@@ -1,5 +1,4 @@
 ﻿using Application.Employers.Models;
-using Application.Users.Models;
 using AutoMapper;
 using Domain.Entities;
 
@@ -10,5 +9,7 @@ public class EmployerMapping : Profile
     public EmployerMapping()
     {
         CreateMap<EmployerInsertRequest, User>();
+        CreateMap<EmployerUpdateRequest, User>();
+        CreateMap<EmployerUpdateRequest, Employer>();
     }
 }

@@ -25,6 +25,16 @@ public class EmployersController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(new EmployerInsertCommand(request)));
     }
 
+
+    [HttpPut("{employerId}")]
+    [ProducesResponseType(typeof(UserRegistrationResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UpdateAsync([FromRoute] int employerId, [FromBody] EmployerUpdateRequest request)
+    {
+        return Ok(await mediator.Send(new EmployerUpdateCommand(employerId, request)));
+    }
+
     [HttpGet("{employerId}")]
     [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
