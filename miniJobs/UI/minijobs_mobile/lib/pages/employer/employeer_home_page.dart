@@ -7,6 +7,8 @@ import 'package:minijobs_mobile/providers/applicant_provider.dart';
 import 'package:minijobs_mobile/providers/city_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../applicant/applicant_card.dart';
+
 class EmployerHomePage extends StatefulWidget {
   const EmployerHomePage({super.key});
 
@@ -109,94 +111,15 @@ class _EmployerHomePageState extends State<EmployerHomePage> {
     if (applicants.result == null || applicants.result!.isEmpty) {
       return const Center(child: Text('Nema pronađenih radnika'));
     }
-    return GridView.builder(
-      padding: const EdgeInsets.all(20.0),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 1, // Show one card per row
-        crossAxisSpacing: 10.0,
-        mainAxisSpacing: 10.0,
-        childAspectRatio: 3 / 2, // Adjust the aspect ratio as needed
-      ),
+    return ListView.builder(
       itemCount: applicants.result!.length,
-      itemBuilder: (BuildContext context, int index) {
+      itemBuilder: (context, index) {
         final applicant = applicants.result![index];
-        return Card(
-          margin: const EdgeInsets.all(10.0),
-          color: Colors.blue[50],
-          child: Container(
-            alignment: Alignment.center,
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                ClipOval(
-                  child: Image.asset(
-                    'assets/images/user-icon.png',
-                    fit: BoxFit.cover,
-                    width: 100.0,
-                    height: 100.0,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  '${applicant.firstName ?? ''} ${applicant.lastName ?? ''}',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.location_on),
-                    const SizedBox(width: 10),
-                    Text(applicant.city?.name ?? 'Unknown'),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                if (applicant.jobType != null) // Conditionally show job type
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.work),
-                      const SizedBox(width: 10),
-                      Text(applicant.jobType!.name ?? 'Unknown'),
-                    ],
-                  ),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    // Show worker details
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('Worker Details'),
-                          content: Text(
-                              'Details for ${applicant.firstName ?? ''} ${applicant.lastName ?? ''}'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('Close'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                  child: const Text('Pogledaj'),
-                ),
-              ],
-            ),
-          ),
-        );
+        return ApplicantCard(applicant: applicant, showOptions: false);
       },
     );
   }
+
 }
 
 class HeaderWidget extends StatelessWidget {
@@ -267,7 +190,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
       left: 0,
       right: 0,
       child: Container(
-        height: 230,
+        height: 240,
         decoration: BoxDecoration(
           color: Colors.grey[100],
           borderRadius: BorderRadius.circular(10.0),
@@ -323,21 +246,21 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                           icon: const Icon(Icons.arrow_drop_down),
                           items: widget.cities.isEmpty
                               ? [
-                                  const DropdownMenuItem<String>(
-                                    value: null,
-                                    child: Text('Učitavanje gradova...'),
-                                  ),
-                                ]
+                            const DropdownMenuItem<String>(
+                              value: null,
+                              child: Text('Učitavanje gradova...'),
+                            ),
+                          ]
                               : widget.cities
-                                  .map((city) => DropdownMenuItem<String>(
-                                        value: city.name,
-                                        child: Row(
-                                          children: [
-                                            Text(city.name!),
-                                          ],
-                                        ),
-                                      ))
-                                  .toList(),
+                              .map((city) => DropdownMenuItem<String>(
+                            value: city.name,
+                            child: Row(
+                              children: [
+                                Text(city.name!),
+                              ],
+                            ),
+                          ))
+                              .toList(),
                           onChanged: widget.onCityChanged,
                           isDense: true,
                           isExpanded: true,
@@ -349,25 +272,29 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
               ],
             ),
             const SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: widget.onSearch,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                padding: const EdgeInsets.symmetric(
-                    vertical: 15.0, horizontal: 30.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: ElevatedButton(
+                onPressed: widget.onSearch,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 15.0, horizontal: 30.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
                 ),
-              ),
-              child: const Text(
-                'Pretraži',
-                style: TextStyle(color: Colors.white),
+                child: const Text(
+                  'Pretraži',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
           ],
         ),
       ),
     );
+
   }
 }
 
@@ -383,7 +310,7 @@ class WorkerProfilesWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: 310,
+      top: 340,
       left: 0,
       right: 0,
       bottom: 0,

@@ -93,6 +93,7 @@ class _NavbarState extends State<Navbar> {
 
   List<IconData> _getIconsForRole() {
     String role = GetStorage().read('role') ?? '';
+   int userId = int.parse( GetStorage().read('userId'));
     if (role == 'Applicant') {
       return [
         Icons.home,
@@ -112,6 +113,8 @@ class _NavbarState extends State<Navbar> {
 
   List<Widget> _buildPages() {
     String role = GetStorage().read('role') ?? '';
+    int userId = int.parse( GetStorage().read('userId'));
+
     if (role == 'Applicant') {
       return [
         const HomePage(),
@@ -124,7 +127,7 @@ class _NavbarState extends State<Navbar> {
         const EmployerHomePage(),
         const JobDetails(jobId: 0),
         const JobList(),
-        const EmployerProfilePage(),
+         EmployerProfilePage(userId: userId ),
       ];
     }
   }

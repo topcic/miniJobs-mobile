@@ -55,7 +55,10 @@ public class UserManagerRepository(ApplicationDbContext context) : GenericReposi
                                  JobApplicationId = r.JobApplicationId,
                                  RatedUserId = r.RatedUserId,
                                  Created = r.Created,
-                                 CreatedByFullName = u.FirstName + " " + u.LastName // Concatenate full name
+                                 CreatedByFullName = u.FirstName + " " + u.LastName,
+                                 Photo=u.Photo,
+                                 CreatedBy=r.CreatedBy
+                                 
                              }).ToListAsync();
 
         return ratings;

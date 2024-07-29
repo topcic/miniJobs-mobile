@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:typed_data';
-
 import 'package:json_annotation/json_annotation.dart';
 import 'package:minijobs_mobile/models/city.dart';
 part 'user.g.dart';

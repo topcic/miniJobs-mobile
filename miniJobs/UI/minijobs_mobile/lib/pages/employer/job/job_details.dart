@@ -116,7 +116,7 @@ JobSaveRequest createJobSaveRequest(Job job) {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Job Details'),
+          title: const Text('Detalji posla'),
         ),
         body: isCompleted
         ? buildCompleted()

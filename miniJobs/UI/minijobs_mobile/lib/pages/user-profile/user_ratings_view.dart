@@ -1,55 +1,47 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:minijobs_mobile/models/rating.dart';
 import 'package:minijobs_mobile/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../../utils/photo_view.dart';
+
 class UserRatingsView extends StatefulWidget {
   final int userId;
-  const UserRatingsView({super.key,required this.userId});
+  const UserRatingsView({super.key, required this.userId});
 
   @override
   _UserRatingsViewState createState() => _UserRatingsViewState();
 }
+
 class _UserRatingsViewState extends State<UserRatingsView> {
   late UserProvider userProvider;
-  List<Rating> ratings=[];
-  @override
-  void initState() {
-    super.initState();
-  }
+  List<Rating> ratings = [];
 
-@override
+  @override
   void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    userProvider= context.read<UserProvider>();
+    userProvider = context.read<UserProvider>();
     getRatings();
   }
-      getRatings() async{
-        ratings= await  userProvider.getUserRatings(widget.userId);
-        setState(() {
-          
-        });
-      }
+
+  getRatings() async {
+    ratings = await userProvider.getUserRatings(widget.userId);
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Impressions'),
-        ),
         body: ListView.builder(
-          itemCount: ratings.length, // Replace this with your actual number of impressions
+          itemCount: ratings.length,
           itemBuilder: (context, index) {
-            final rating= ratings[index];
-            return  ImpressionCard(
-              userPhoto: 'assets/user_photo.jpg', // Replace with actual user photo
-              userName: rating.createdByFullName, // Replace with actual user name
-              comment: rating.comment, // Replace with actual comment
-              mark: rating.value, // Replace with actual mark
-              date: rating.created, // Replace with actual date
+            final rating = ratings[index];
+            return ImpressionCard(
+                rating: rating,
             );
           },
         ),
@@ -59,19 +51,11 @@ class _UserRatingsViewState extends State<UserRatingsView> {
 }
 
 class ImpressionCard extends StatelessWidget {
-  final String userPhoto;
-  final String userName;
-  final String comment;
-  final int mark;
-  final DateTime date;
+  final Rating rating;
 
   const ImpressionCard({
     super.key,
-    required this.userPhoto,
-    required this.userName,
-    required this.comment,
-    required this.mark,
-    required this.date,
+    required this.rating
   });
 
   @override
@@ -81,27 +65,34 @@ class ImpressionCard extends StatelessWidget {
       child: ListTile(
         leading: CircleAvatar(
           radius: 25,
-          backgroundImage: AssetImage(userPhoto),
-        ),
+          child: PhotoView(
+              photo: rating.photo,
+              editable: false,
+              userId: rating.createdBy
+            ),
+          ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              userName,
+              rating.createdByFullName,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
-            Text(comment),
+            Text(rating.comment),
             const SizedBox(height: 5),
             Row(
               children: [
                 const Icon(Icons.star, color: Colors.yellow),
                 const SizedBox(width: 5),
-                Text(mark.toString()),
+                Text(rating.value .toString()),
               ],
             ),
             const SizedBox(height: 5),
-            Text(DateFormat('dd.MM.yyyy.').format(date)),
+            Text(
+              DateFormat('dd.MM.yyyy.').format(rating.created),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
           ],
         ),
       ),

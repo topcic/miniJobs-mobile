@@ -7,7 +7,6 @@ public abstract class BaseAuditableEntity
     [Column("created")]
     public DateTime Created { get; set; }
 
-    [IgnoreDataMember]
     [Column("created_by")]
     public int? CreatedBy { get; set; }
 

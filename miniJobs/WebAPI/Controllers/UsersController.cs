@@ -52,7 +52,15 @@ public class UsersController(IMediator mediator, BaseState state) : ControllerBa
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetFinishedJobs([FromRoute] int userId)
     {
-
         return Ok(await mediator.Send(new UserGetFinishedJobsQuery(userId)));
+    }
+
+    [HttpPatch("{userId}/photo")]
+    [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> AddUserPhoto([FromRoute] int userId, [FromForm] IFormFile photo)
+    {
+        return Ok(await mediator.Send(new UserUpdatePhotoCommand(userId, photo)));
     }
 }

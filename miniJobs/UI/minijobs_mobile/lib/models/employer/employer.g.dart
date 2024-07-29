@@ -25,6 +25,9 @@ Employer _$EmployerFromJson(Map<String, dynamic> json) => Employer(
       json['streetAddressAndNumber'] as String?,
       json['idNumber'] as String?,
       json['companyPhoneNumber'] as String?,
+      json['averageRating'] != null
+          ? Decimal.parse(json['averageRating'].toString())
+          : null,
     );
 
 Map<String, dynamic> _$EmployerToJson(Employer instance) => <String, dynamic>{
@@ -44,4 +47,5 @@ Map<String, dynamic> _$EmployerToJson(Employer instance) => <String, dynamic>{
       'streetAddressAndNumber': instance.streetAddressAndNumber,
       'idNumber': instance.idNumber,
       'companyPhoneNumber': instance.companyPhoneNumber,
+      'averageRating': instance.averageRating
     };

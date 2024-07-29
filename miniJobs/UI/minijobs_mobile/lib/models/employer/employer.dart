@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:decimal/decimal.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:minijobs_mobile/models/city.dart';
 import 'package:minijobs_mobile/models/user.dart';
@@ -11,6 +12,7 @@ class Employer extends User {
   String? streetAddressAndNumber;
   String? idNumber;
   String? companyPhoneNumber;
+  Decimal? averageRating;
 
   Employer(
       super.id,
@@ -28,7 +30,8 @@ class Employer extends User {
       this.name,
       this.streetAddressAndNumber,
       this.idNumber,
-      this.companyPhoneNumber);
+      this.companyPhoneNumber,
+      this.averageRating);
 
   factory Employer.fromJson(Map<String, dynamic> json) =>
       _$EmployerFromJson(json);

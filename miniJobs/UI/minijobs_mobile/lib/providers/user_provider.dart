@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/models/rating.dart';
@@ -12,7 +14,6 @@ class UserProvider extends BaseProvider<User> {
   }
     Future<List<Rating>> getUserRatings(int userId) async {
     try {
-       var dio = Dio();
         var url = "${baseUrl}users/$userId/ratings";
       var response = await dio.get(url);
      List<Rating> responseData = List<Rating>.from(response.data.map((item) => Rating.fromJson(item)));
@@ -24,12 +25,23 @@ class UserProvider extends BaseProvider<User> {
   }
    Future<List<Job>> getUserFinishedJobs(int userId) async {
     try {
-       var dio = Dio();
         var url = "${baseUrl}users/$userId/finishedjobs";
       var response = await dio.get(url);
      List<Job> responseData = List<Job>.from(response.data.map((item) => Job.fromJson(item)));
     return responseData;
 
+    } catch (err) {
+      throw Exception(err.toString());
+    }
+  }
+  Future<User> uploadUserPhoto(int userId, MultipartFile photo) async {
+    try {
+      var url = "${baseUrl}users/$userId/photo";
+      var formData = FormData.fromMap({
+        'photo': photo,
+      });
+      var response = await dio.patch(url, data: formData);
+      return User.fromJson(response.data);
     } catch (err) {
       throw Exception(err.toString());
     }

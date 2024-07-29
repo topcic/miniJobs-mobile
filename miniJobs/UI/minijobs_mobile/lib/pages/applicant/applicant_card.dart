@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:minijobs_mobile/models/applicant.dart';
 
+import '../../utils/photo_view.dart';// Assuming you have a PhotoView widget in your project
+
 class ApplicantCard extends StatelessWidget {
   final Applicant applicant;
+  final bool showOptions;
 
-  const ApplicantCard({super.key, required this.applicant});
+  const ApplicantCard({super.key, required this.applicant, this.showOptions = true});
 
   @override
   Widget build(BuildContext context) {
@@ -14,10 +17,14 @@ class ApplicantCard extends StatelessWidget {
       child: ListTile(
         contentPadding: const EdgeInsets.all(16),
         leading: CircleAvatar(
-          backgroundImage: applicant.photo != null
-              ? MemoryImage(applicant.photo!)
-              : const AssetImage('assets/images/default_user.png') as ImageProvider,
           radius: 30,
+          child: ClipOval(
+            child: PhotoView(
+              photo: applicant.photo,
+              editable: false,
+              userId: applicant.id!
+            ),
+          ),
         ),
         title: Text('${applicant.firstName} ${applicant.lastName}'),
         subtitle: Column(
@@ -27,27 +34,32 @@ class ApplicantCard extends StatelessWidget {
               children: [
                 Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
                 const SizedBox(width: 4),
-                Text(applicant.city?.name ?? 'No City',
-                    style: TextStyle(color: Colors.grey[600])),
+                Text(
+                  applicant.city?.name ?? 'No City',
+                  style: TextStyle(color: Colors.grey[600]),
+                ),
               ],
             ),
             const SizedBox(height: 8),
-            const CircleAvatar(
+            if(applicant.numberOfFinishedJobs!=null && applicant.numberOfFinishedJobs!>0)
+            CircleAvatar(
               radius: 12,
               backgroundColor: Colors.blue,
               child: Text(
-                '10', // Replace with actual completed jobs count
-                style: TextStyle(color: Colors.white, fontSize: 12),
+                '${applicant.numberOfFinishedJobs}', // Replace with actual completed jobs count
+                style: const TextStyle(color: Colors.white, fontSize: 12),
               ),
             ),
           ],
         ),
-        trailing: IconButton(
+        trailing: showOptions
+            ? IconButton(
           icon: const Icon(Icons.more_vert),
           onPressed: () {
             _showApplicantOptions(context, applicant);
           },
-        ),
+        )
+            : null,
       ),
     );
   }

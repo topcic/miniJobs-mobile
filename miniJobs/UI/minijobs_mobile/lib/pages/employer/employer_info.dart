@@ -98,7 +98,7 @@ class _EmployerInfoState extends State<EmployerInfo> {
         centerTitle: true,
       ),
       body: isLoading
-          ? const SpinKitRing(color: Colors.brown)
+          ?  SpinKitRing(color: Colors.brown)
           : SingleChildScrollView(
         child: FormBuilder(
           key: _formKey,
@@ -116,19 +116,19 @@ class _EmployerInfoState extends State<EmployerInfo> {
           }
               : {},
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding:  EdgeInsets.all(16.0),
             child: Column(
               children: [
                 if (employer != null)
                   PhotoView(
                     photo: employer!.photo,
                     editable: true,
-                    onPhotoChanged: _updatePhoto,
+                    userId: employer!.id!
                   ),
                 const SizedBox(height: 16),
                 if (employer?.name != null) ...[
-                  const Text(
-                    'Company Information',
+                   Text(
+                    'Podaci o firmi',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
@@ -138,7 +138,7 @@ class _EmployerInfoState extends State<EmployerInfo> {
                   const SizedBox(height: 16),
                   FormBuilderDropdown<String>(
                     name: 'cityId',
-                    decoration: const InputDecoration(labelText: 'Sjedište firme'),
+                    decoration:  InputDecoration(labelText: 'Sjedište firme'),
                     validator: (value) {
                       if (value == null) {
                         return 'City is required';
@@ -154,7 +154,7 @@ class _EmployerInfoState extends State<EmployerInfo> {
                     }).toList()
                         : [],
                   ),
-                  const SizedBox(height: 16),
+                   SizedBox(height: 16),
                 _buildTextField('companyPhoneNumber', 'Službeni broj telefona', mask: phoneNumberMask),
                   _buildTextField(
                     'idNumber',
@@ -165,15 +165,37 @@ class _EmployerInfoState extends State<EmployerInfo> {
                     ),
                   ),
                 ],
-                const SizedBox(height: 16),
-                const Text(
-                  'Personal Information',
+                 SizedBox(height: 16),
+                if(employer?.name != null)
+                 Text(
+                  'Odgovorno lice',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
                 _buildTextField('firstName', 'Ime'),
                 const SizedBox(height: 16),
                 _buildTextField('lastName', 'Prezime'),
+                if(employer?.name == null)...[
+                  const SizedBox(height: 16),
+                  FormBuilderDropdown<String>(
+                    name: 'cityId',
+                    decoration:  InputDecoration(labelText: 'Sjedište firme'),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'City is required';
+                      }
+                      return null;
+                    },
+                    items: cities != null
+                        ? cities!.map((city) {
+                      return DropdownMenuItem(
+                        value: city.id.toString(),
+                        child: Text(city.name ?? ''),
+                      );
+                    }).toList()
+                        : [],
+                  ),
+    ],
                 const SizedBox(height: 16),
                 _buildTextField('phoneNumber', 'Broj telefona', mask: phoneNumberMask),
                 const SizedBox(height: 16),
@@ -185,7 +207,10 @@ class _EmployerInfoState extends State<EmployerInfo> {
                 ),
               ],
             ),
-          ),
+          )
+
+
+
         ),
       ),
     );

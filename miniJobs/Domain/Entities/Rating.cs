@@ -24,4 +24,8 @@ public class Rating : BaseAuditableEntity, IEntity<int>
 
     [NotMapped]
     public string CreatedByFullName { get; set; }
+
+    [NotMapped]
+    public byte[]? Photo { get; set; }
+
 }

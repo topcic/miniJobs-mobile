@@ -1,17 +1,21 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:dio/dio.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/user_provider.dart';
 
 class PhotoView extends StatefulWidget {
   final Uint8List? photo;
   final bool editable;
-  final Function(Uint8List?) onPhotoChanged;
+  final int userId;
 
   const PhotoView({
     super.key,
     this.photo,
     this.editable = false,
-    required this.onPhotoChanged,
+    required this.userId,
   });
 
   @override
@@ -36,7 +40,22 @@ class _PhotoViewState extends State<PhotoView> {
       setState(() {
         _currentPhoto = imageBytes;
       });
-      widget.onPhotoChanged(_currentPhoto);
+      await _updatePhoto(imageBytes);
+    }
+  }
+
+  Future<void> _updatePhoto(Uint8List newPhoto) async {
+    try {
+      final userProvider = context.read<UserProvider>();
+      final photo = MultipartFile.fromBytes(newPhoto, filename: 'photo.jpg');
+      await userProvider.uploadUserPhoto(widget.userId, photo);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Photo updated successfully')),
+      );
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update photo: $error')),
+      );
     }
   }
 

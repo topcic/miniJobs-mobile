@@ -1,17 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:minijobs_mobile/models/employer/employer.dart';
+import 'package:provider/provider.dart';
 import 'package:minijobs_mobile/pages/employer/employer_info.dart';
 import 'package:minijobs_mobile/pages/user-profile/active_jobs_view.dart';
 import 'package:minijobs_mobile/pages/user-profile/finished_job_view.dart';
 import 'package:minijobs_mobile/pages/user-profile/user_ratings_view.dart';
 
-class EmployerProfilePage extends StatelessWidget {
-  const EmployerProfilePage({super.key});
+import '../../providers/employer_provider.dart';
+import '../../utils/photo_view.dart';
+import '../../providers/user_provider.dart'; // Import your UserProvider
+import '../../models/user.dart'; // Import your User model
+
+class EmployerProfilePage extends StatefulWidget {
+  final int userId;
+  const EmployerProfilePage({super.key, required this.userId});
+
+  @override
+  _EmployerProfilePageState createState() => _EmployerProfilePageState();
+}
+
+class _EmployerProfilePageState extends State<EmployerProfilePage> {
+  late int userId;
+  Employer? employer;
+  bool isLoading = true;
+  bool isAbleTodoEdit=false;
+
+  @override
+  void initState() {
+    super.initState();
+   //userId = int.parse(GetStorage().read('userId'));
+    userId=widget.userId;
+    isAbleTodoEdit=userId==int.parse(GetStorage().read('userId'));
+    fetchUserData();
+  }
+
+  Future<void> fetchUserData() async {
+    try {
+      final employerProvider = context.read<EmployerProvider>();
+      final fetchedUser = await employerProvider.get(userId);
+      setState(() {
+        employer = fetchedUser;
+        isLoading = false;
+      });
+    } catch (error) {
+      // Handle error
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final userId = int.parse( GetStorage().read('userId')) ;
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: DefaultTabController(
@@ -20,50 +61,53 @@ class EmployerProfilePage extends StatelessWidget {
           appBar: AppBar(
             title: const Text('Profile'),
           ),
-          body: Column(
+          body: isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Column(
             children: [
               // Info section
               Container(
                 padding: const EdgeInsets.all(20.0),
-                color: Colors.grey[
-                    200], // Optional background color for the info section
+                color: Colors.grey[200], // Optional background color for the info section
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     // Profile photo
                     GestureDetector(
                       onTap: () {
+                        if(isAbleTodoEdit)
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                EmployerInfo(employerId: userId),
+                            builder: (context) => EmployerInfo(employerId: userId),
                           ),
                         );
                       },
-                      child: const CircleAvatar(
-                        radius: 50,
-                        backgroundImage: AssetImage('assets/profile_photo.jpg'),
+                      child: PhotoView(
+                        photo: employer?.photo,
+                        editable: false,
+                        userId: userId,
                       ),
                     ),
                     const SizedBox(height: 10),
                     // Name
-                    const Text(
-                      'John Doe',
-                      style: TextStyle(
+                    Text(
+                      employer?.name ?? '${employer?.firstName ?? ''} ${employer?.lastName ?? ''}',
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 5),
                     // Average rating
-                    const Row(
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.star, color: Colors.yellow),
-                        SizedBox(width: 5),
+                        const Icon(Icons.star, color: Colors.yellow),
+                        const SizedBox(width: 5),
                         Text(
-                          '4.5',
-                          style: TextStyle(
+                          employer?.averageRating?.toStringAsFixed(1) ?? 'N/A',
+                          style: const TextStyle(
                             fontSize: 16,
                           ),
                         ),

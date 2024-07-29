@@ -39,7 +39,7 @@ class _JobListState extends State<JobList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Job List'),
+        title: const Text('Vaši poslovi'),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
