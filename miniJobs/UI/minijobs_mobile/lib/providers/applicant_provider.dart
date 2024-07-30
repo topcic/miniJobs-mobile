@@ -72,18 +72,31 @@ class ApplicantProvider extends BaseProvider<Applicant> {
   @override
   Future<Applicant> update(int id, [dynamic request]) async {
     var url = "${baseUrl}applicants/$id";
-    var formData = FormData.fromMap({
-      'firstName': request.firstName,
-      'lastName': request.lastName,
-      'phoneNumber': request.phoneNumber,
-      'cityId': request.cityId,
-      'description': request.description,
-      'experience': request.experience,
-      'wageProposal': request.wageProposal,
-      if (request.cvFile != null)
-        'cvFile': MultipartFile.fromBytes(request.cvFile!,
-            filename: request.cvFileName),
-    });
+   List<int> jobTypesList = request.jobTypes ?? [];
+Map<String, dynamic> formDataMap = {
+  'firstName': request.firstName,
+  'lastName': request.lastName,
+  'phoneNumber': request.phoneNumber,
+  'cityId': request.cityId,
+  'description': request.description,
+  'experience': request.experience,
+  'wageProposal': request.wageProposal,
+};
+
+// Add each job type as a separate form data item
+for (int i = 0; i < jobTypesList.length; i++) {
+  formDataMap['jobTypes[$i]'] = jobTypesList[i].toString();
+}
+
+var formData = FormData.fromMap(formDataMap);
+
+if (request.cvFile != null) {
+  formData.files.add(MapEntry(
+    'cvFile', 
+    MultipartFile.fromBytes(request.cvFile!,
+      filename: request.cvFileName),
+  ));
+}
 
     var response = await dio.put(url, data: formData);
 

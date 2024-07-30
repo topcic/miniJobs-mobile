@@ -19,6 +19,9 @@ ApplicantSaveRequest _$ApplicantSaveRequestFromJson(Map<String, dynamic> json) =
           : Decimal.parse(json['wageProposal'] as String),
       json['cvFile'] == null ? null : base64Decode(json['cvFile'] as String),
       json['cvFileName'] as String?,
+      json['jobTypes'] == null
+          ? null
+          : List<int>.from(json['jobTypes']),
     );
 
 Map<String, dynamic> _$ApplicantSaveRequestToJson(ApplicantSaveRequest instance) => <String, dynamic>{
@@ -31,4 +34,5 @@ Map<String, dynamic> _$ApplicantSaveRequestToJson(ApplicantSaveRequest instance)
   'wageProposal': instance.wageProposal,
   'cvFile': instance.cvFile,
   'cvFileName': instance.cvFileName,
+  'jobTypes': instance.jobTypes,
 };

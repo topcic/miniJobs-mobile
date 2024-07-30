@@ -26,4 +26,6 @@ public class ApplicantDTO
     public City City { get; set; }
     public decimal AverageRating { get; set; }
     public int NumberOfFinishedJobs { get; set; }
+
+    public IEnumerable<JobType> JobTypes { get; set; }
 }

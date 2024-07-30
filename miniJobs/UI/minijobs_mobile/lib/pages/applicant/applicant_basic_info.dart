@@ -58,6 +58,10 @@ class _ApplicantBasicInfoState extends State<ApplicantBasicInfo> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       final formData = _formKey.currentState!.value;
+      final List<int>? jobTypeIds = applicant?.jobTypes
+          ?.map((jt) => jt.id) // Get List<int?>?
+          .whereType<int>() // Filter out null values
+          .toList();
       final request = ApplicantSaveRequest(
           formData['firstName'],
           formData['lastName'],
@@ -67,7 +71,8 @@ class _ApplicantBasicInfoState extends State<ApplicantBasicInfo> {
           applicant?.experience,
           applicant?.wageProposal,
           applicant?.cv,
-          null);
+          null,
+          jobTypeIds );
 
       try {
         await applicantProvider.update(widget.applicantId, request);

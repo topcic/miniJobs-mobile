@@ -12,5 +12,6 @@ public class ApplicantUpdateRequest
     public string Experience { get; set; }
     public decimal WageProposal { get; set; }
     public IFormFile CvFile { get; set; }
+    public List<int> JobTypes { get; set; }
 }
 

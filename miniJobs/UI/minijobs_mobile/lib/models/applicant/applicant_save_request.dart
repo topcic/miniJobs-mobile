@@ -17,6 +17,7 @@ class ApplicantSaveRequest  {
   Decimal? wageProposal;
   Uint8List? cvFile;
   String? cvFileName;
+  List<int>? jobTypes;
 
 
   ApplicantSaveRequest(
@@ -28,7 +29,8 @@ class ApplicantSaveRequest  {
       this.experience,
       this.wageProposal,
       this.cvFile,
-      this.cvFileName
+      this.cvFileName,
+      this.jobTypes
       );
 
   factory ApplicantSaveRequest.fromJson(Map<String, dynamic> json) =>

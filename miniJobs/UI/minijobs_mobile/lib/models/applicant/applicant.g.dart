@@ -34,6 +34,9 @@ Applicant _$ApplicantFromJson(Map<String, dynamic> json) => Applicant(
       json['averageRating'] != null
           ? Decimal.parse(json['averageRating'].toString())
           : null,
+    (json['jobTypes'] as List<dynamic>?)
+        ?.map((e) => JobType.fromJson(e as Map<String, dynamic>))
+        .toList()
 );
 
 Map<String, dynamic> _$ApplicantToJson(Applicant instance) => <String, dynamic>{
@@ -56,4 +59,5 @@ Map<String, dynamic> _$ApplicantToJson(Applicant instance) => <String, dynamic>{
       'jobType': instance.jobType,
       'numberOfFinishedJobs': instance.numberOfFinishedJobs,
       'averageRating': instance.averageRating,
+      'jobTypes': instance.jobTypes,
 };

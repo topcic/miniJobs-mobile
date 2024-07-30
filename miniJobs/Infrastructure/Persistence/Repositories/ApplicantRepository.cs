@@ -53,12 +53,13 @@ public class ApplicantRepository(ApplicationDbContext context) : GenericReposito
             CreatedBy = applicant.User.CreatedBy,
             Photo = applicant.User.Photo,
             Role = applicant.User.Role,
-            ApplicantJobTypes = applicant.ApplicantJobTypes,
+            JobTypes = applicant.ApplicantJobTypes.Select(ajt => ajt.JobType).ToList(), // Correctly map JobTypes
             City = applicant.User.City,
             AverageRating = (decimal)averageRating,
             NumberOfFinishedJobs = numberOfFinishedJobs
         };
     }
+
 
 
     public async Task<IEnumerable<ApplicantDTO>> SearchAsync(string searchText, int limit, int offset, int? cityId, int? jobTypeId)
@@ -124,12 +125,14 @@ public class ApplicantRepository(ApplicationDbContext context) : GenericReposito
             CreatedBy = x.Applicant.User.CreatedBy,
             Photo = x.Applicant.User.Photo,
             Role = x.Applicant.User.Role,
-            ApplicantJobTypes = x.Applicant.ApplicantJobTypes,
+            JobTypes = x.Applicant.ApplicantJobTypes.Select(ajt => ajt.JobType).ToList(), 
             City = x.Applicant.User.City,
             AverageRating = (decimal)x.AverageRating,
             NumberOfFinishedJobs = x.NumberOfFinishedJobs
         });
     }
+
+
 
     public async Task<int> SearchCountAsync(string searchText, int? cityId, int? jobTypeId)
     {

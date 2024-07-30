@@ -11,9 +11,10 @@ import 'package:minijobs_mobile/providers/applicant_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:open_file/open_file.dart';
-import 'package:permission_handler/permission_handler.dart';
-
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 import '../../models/applicant/applicant_save_request.dart';
+import '../../models/job_type.dart';
+import '../../providers/job_type_provider.dart';
 
 class ApplicantAdditionalInfo extends StatefulWidget {
   final int applicantId;
@@ -26,11 +27,14 @@ class ApplicantAdditionalInfo extends StatefulWidget {
 class _ApplicantAdditionalInfoState extends State<ApplicantAdditionalInfo> {
   final _formKey = GlobalKey<FormBuilderState>();
   late ApplicantProvider applicantProvider;
+  late JobTypeProvider jobTypeProvider = JobTypeProvider();
 
   Applicant? applicant;
   bool isLoading = true;
   Uint8List? cvBytes;
   String? cvFileName;
+  List<JobType>? jobTypes;
+  List<int>? selectedJobTypeIds;
 
   final experienceOptions = [
     'Bez iskustva',
@@ -44,6 +48,7 @@ class _ApplicantAdditionalInfoState extends State<ApplicantAdditionalInfo> {
     super.didChangeDependencies();
     applicantProvider = context.read<ApplicantProvider>();
     getApplicant();
+    getJobTypes();
   }
 
   Future<void> getApplicant() async {
@@ -54,7 +59,16 @@ class _ApplicantAdditionalInfoState extends State<ApplicantAdditionalInfo> {
         cvBytes = applicant!.cv;
         cvFileName = "CV.${_getFileExtension(applicant!.cv!)}";
       }
+      selectedJobTypeIds = applicant?.jobTypes
+          ?.map((jt) => jt.id)
+          .whereType<int>()
+          .toList();
     });
+  }
+
+  Future<void> getJobTypes() async {
+    jobTypes = await jobTypeProvider.getAll();
+    setState(() {});
   }
 
   String _getFileExtension(Uint8List bytes) {
@@ -110,6 +124,7 @@ class _ApplicantAdditionalInfoState extends State<ApplicantAdditionalInfo> {
         wageProposal,
         cvBytes,
         cvFileName,
+        selectedJobTypeIds ?? [],
       );
 
       try {
@@ -144,18 +159,10 @@ class _ApplicantAdditionalInfoState extends State<ApplicantAdditionalInfo> {
     }
   }
 
-
   Future<void> _downloadCVFile() async {
     if (cvBytes != null && cvFileName != null) {
-        String? path = await FileSaver.instance.saveFile(name: cvFileName!, bytes: cvBytes!, ext: "");
-        if (path != null) {
-          OpenFile.open(path);
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to save the file.')),
-          );
-        }
-
+      String? path = await FileSaver.instance.saveFile(name: cvFileName!, bytes: cvBytes!, ext: "");
+        OpenFile.open(path);
     }
   }
 
@@ -165,7 +172,6 @@ class _ApplicantAdditionalInfoState extends State<ApplicantAdditionalInfo> {
       cvFileName = null;
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -179,6 +185,7 @@ class _ApplicantAdditionalInfoState extends State<ApplicantAdditionalInfo> {
           'description': applicant!.description,
           'experience': applicant!.experience,
           'wageProposal': applicant!.wageProposal?.toString(),
+          'jobTypes': selectedJobTypeIds,
         }
             : {},
         child: Padding(
@@ -200,13 +207,32 @@ class _ApplicantAdditionalInfoState extends State<ApplicantAdditionalInfo> {
               const SizedBox(height: 16),
               _buildTextField('wageProposal', 'Plata (KM)'),
               const SizedBox(height: 16),
+              MultiSelectDialogField<int>(
+                items: jobTypes?.map((jobType) => MultiSelectItem<int>(jobType.id!, jobType.name!)).toList() ?? [],
+                title: Text("Job Types"),
+                initialValue: selectedJobTypeIds ?? [], // Use initialValue instead of selectedItems
+                onConfirm: (values) {
+                  setState(() {
+                    selectedJobTypeIds = values.cast<int>();
+                  });
+                },
+                validator: (values) {
+                  if (values == null || values.isEmpty) {
+                    return 'Please select at least one job type';
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
                     child: ElevatedButton.icon(
-                        onPressed: _pickCVFile,
-                        icon: const Icon(Icons.upload_file),
-                        label: const Text('Odaberi CV')),
+                      onPressed: _pickCVFile,
+                      icon: const Icon(Icons.upload_file),
+                      label: const Text('Odaberi CV'),
+                    ),
                   ),
                 ],
               ),
