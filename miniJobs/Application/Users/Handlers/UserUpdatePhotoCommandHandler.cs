@@ -16,7 +16,9 @@ public class UserUpdatePhotoCommandHandler : IRequestHandler<UserUpdatePhotoComm
     public async Task<User> Handle(UserUpdatePhotoCommand command, CancellationToken cancellationToken)
     {
         var user = await userManager.TryFindAsync(command.UserId);
-        ExceptionExtension.Validate("user_NOT_EXISTS", () => user == null);
+        ExceptionExtension.Validate("USER_NOT_EXISTS", () => user == null);
+        ExceptionExtension.Validate("PHOTO_IS_REQUIRED", () => command.Photo == null);
+
         var ms = new MemoryStream();
         await command.Photo.OpenReadStream().CopyToAsync(ms, cancellationToken);
         user.Photo = ms.ToArray();

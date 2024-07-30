@@ -1,35 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:minijobs_mobile/models/employer/employer.dart';
+import 'package:minijobs_mobile/models/applicant/applicant.dart';
+import 'package:minijobs_mobile/providers/applicant_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:minijobs_mobile/pages/employer/employer_info.dart';
-import 'package:minijobs_mobile/pages/user-profile/active_jobs_view.dart';
 import 'package:minijobs_mobile/pages/user-profile/finished_job_view.dart';
 import 'package:minijobs_mobile/pages/user-profile/user_ratings_view.dart';
 
-import '../../providers/employer_provider.dart';
 import '../../utils/photo_view.dart';
-// Import your UserProvider
-// Import your User model
+import 'applicant_info.dart'; // Import your User model
 
-class EmployerProfilePage extends StatefulWidget {
+class ApplicantProfilePage extends StatefulWidget {
   final int userId;
-  const EmployerProfilePage({super.key, required this.userId});
+  const ApplicantProfilePage({super.key, required this.userId});
 
   @override
-  _EmployerProfilePageState createState() => _EmployerProfilePageState();
+  _ApplicantProfilePageState createState() => _ApplicantProfilePageState();
 }
 
-class _EmployerProfilePageState extends State<EmployerProfilePage> {
+class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
   late int userId;
-  Employer? employer;
+  Applicant? applicant;
   bool isLoading = true;
   bool isAbleTodoEdit=false;
 
   @override
   void initState() {
     super.initState();
-   //userId = int.parse(GetStorage().read('userId'));
+    //userId = int.parse(GetStorage().read('userId'));
     userId=widget.userId;
     isAbleTodoEdit=userId==int.parse(GetStorage().read('userId'));
     fetchUserData();
@@ -37,10 +34,10 @@ class _EmployerProfilePageState extends State<EmployerProfilePage> {
 
   Future<void> fetchUserData() async {
     try {
-      final employerProvider = context.read<EmployerProvider>();
-      final fetchedUser = await employerProvider.get(userId);
+      final applicantProvider = context.read<ApplicantProvider>();
+      final fetchedUser = await applicantProvider.get(userId);
       setState(() {
-        employer = fetchedUser;
+        applicant = fetchedUser;
         isLoading = false;
       });
     } catch (error) {
@@ -77,15 +74,15 @@ class _EmployerProfilePageState extends State<EmployerProfilePage> {
                       onTap: () {
                         if(isAbleTodoEdit) {
                           Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EmployerInfo(employerId: userId),
-                          ),
-                        );
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ApplicantInfo(applicantId: userId),
+                            ),
+                          );
                         }
                       },
                       child: PhotoView(
-                        photo: employer?.photo,
+                        photo: applicant?.photo,
                         editable: false,
                         userId: userId,
                       ),
@@ -93,7 +90,7 @@ class _EmployerProfilePageState extends State<EmployerProfilePage> {
                     const SizedBox(height: 10),
                     // Name
                     Text(
-                      employer?.name ?? '${employer?.firstName ?? ''} ${employer?.lastName ?? ''}',
+                       '${applicant?.firstName ?? ''} ${applicant?.lastName ?? ''}',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -107,7 +104,7 @@ class _EmployerProfilePageState extends State<EmployerProfilePage> {
                         const Icon(Icons.star, color: Colors.yellow),
                         const SizedBox(width: 5),
                         Text(
-                          employer?.averageRating?.toStringAsFixed(1) ?? 'N/A',
+                          applicant?.averageRating?.toStringAsFixed(1) ?? 'N/A',
                           style: const TextStyle(
                             fontSize: 16,
                           ),
@@ -120,7 +117,7 @@ class _EmployerProfilePageState extends State<EmployerProfilePage> {
               // Tabs section
               const TabBar(
                 tabs: [
-                  Tab(text: 'Aktivni'),
+                  Tab(text: 'Info'),
                   Tab(text: 'Završeni'),
                   Tab(text: 'Utisci'),
                 ],
@@ -130,7 +127,7 @@ class _EmployerProfilePageState extends State<EmployerProfilePage> {
                 child: TabBarView(
                   children: [
                     // Aktivni poslovi tab
-                    ActiveJobsView(userId: userId),
+                  //  ActiveJobsView(userId: userId),
                     // Završeni poslovi tab
                     FinishedJobsView(userId: userId),
                     // Utisci tab

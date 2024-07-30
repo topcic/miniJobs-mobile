@@ -1,7 +1,8 @@
-﻿using Application.Applicants.Models;
+﻿using Application.Applicants.Commands;
+using Application.Applicants.Models;
 using Application.Applicants.Queries;
 using Application.Common.Models;
-using Application.Users.Models;
+using Domain.Dtos;
 using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -40,5 +41,23 @@ public class Applicantscontroller(IMediator mediator) : ControllerBase
     public async Task<IActionResult> GetSavedJobs()
     {
         return Ok(await mediator.Send(new ApplicantGetSavedJobsQuery()));
+    }
+
+    [HttpGet("{applicantId}")]
+    [ProducesResponseType(typeof(ApplicantDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> FindUser([FromRoute] int applicantId)
+    {
+        return Ok(await mediator.Send(new ApplicantTryFindQuery(applicantId)));
+    }
+
+    [HttpPut("{applicantId}")]
+    [ProducesResponseType(typeof(Applicant), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UpdateAsync([FromRoute] int applicantId, [FromForm] ApplicantUpdateRequest request)
+    {
+        return Ok(await mediator.Send(new ApplicantUpdateCommand(applicantId, request)));
     }
 }

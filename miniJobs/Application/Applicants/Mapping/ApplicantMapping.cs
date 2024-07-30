@@ -25,7 +25,10 @@ public class ApplicantMapping : Profile
             .ForMember(dest => dest.WageProposal, opt => opt.MapFrom(src => src.WageProposal))
             .ForMember(dest => dest.ApplicantJobTypes, opt => opt.MapFrom(src => src.ApplicantJobTypes))
             .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.User.City))
-            .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.User.Role)); 
+            .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.User.Role));
+
+        CreateMap<ApplicantUpdateRequest, User>();
+        CreateMap<ApplicantUpdateRequest, Applicant>();
 
     }
 

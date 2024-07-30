@@ -1,6 +1,6 @@
 // lib/screens/employer_home_page.dart
 import 'package:flutter/material.dart';
-import 'package:minijobs_mobile/models/applicant.dart';
+import 'package:minijobs_mobile/models/applicant/applicant.dart';
 import 'package:minijobs_mobile/models/city.dart';
 import 'package:minijobs_mobile/models/search_result.dart';
 import 'package:minijobs_mobile/providers/applicant_provider.dart';
@@ -30,7 +30,9 @@ class _EmployerHomePageState extends State<EmployerHomePage> {
   @override
   void initState() {
     super.initState();
+    applicants = SearchResult( 0, []);
   }
+
 
   @override
   void didChangeDependencies() {
@@ -119,7 +121,6 @@ class _EmployerHomePageState extends State<EmployerHomePage> {
       },
     );
   }
-
 }
 
 class HeaderWidget extends StatelessWidget {
@@ -170,7 +171,8 @@ class SearchBarWidget extends StatefulWidget {
   final ValueChanged<String?> onCityChanged;
   final VoidCallback onSearch;
 
-  const SearchBarWidget({super.key, 
+  const SearchBarWidget({
+    super.key,
     required this.searchController,
     required this.cities,
     required this.selectedCity,
@@ -246,21 +248,21 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                           icon: const Icon(Icons.arrow_drop_down),
                           items: widget.cities.isEmpty
                               ? [
-                            const DropdownMenuItem<String>(
-                              value: null,
-                              child: Text('Učitavanje gradova...'),
-                            ),
-                          ]
+                                  const DropdownMenuItem<String>(
+                                    value: null,
+                                    child: Text('Učitavanje gradova...'),
+                                  ),
+                                ]
                               : widget.cities
-                              .map((city) => DropdownMenuItem<String>(
-                            value: city.name,
-                            child: Row(
-                              children: [
-                                Text(city.name!),
-                              ],
-                            ),
-                          ))
-                              .toList(),
+                                  .map((city) => DropdownMenuItem<String>(
+                                        value: city.name,
+                                        child: Row(
+                                          children: [
+                                            Text(city.name!),
+                                          ],
+                                        ),
+                                      ))
+                                  .toList(),
                           onChanged: widget.onCityChanged,
                           isDense: true,
                           isExpanded: true,
@@ -294,7 +296,6 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
         ),
       ),
     );
-
   }
 }
 
@@ -302,7 +303,8 @@ class WorkerProfilesWidget extends StatelessWidget {
   final bool isLoading;
   final Widget workers;
 
-  const WorkerProfilesWidget({super.key, 
+  const WorkerProfilesWidget({
+    super.key,
     required this.isLoading,
     required this.workers,
   });

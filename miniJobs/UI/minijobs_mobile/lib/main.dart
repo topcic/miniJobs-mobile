@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:minijobs_mobile/pages/login_sign_up_page.dart';
+import 'package:minijobs_mobile/pages/auth/login_sign_up_page.dart';
 import 'package:minijobs_mobile/providers/applicant_provider.dart';
 import 'package:minijobs_mobile/providers/authentication_provider.dart';
 import 'package:minijobs_mobile/providers/city_provider.dart';

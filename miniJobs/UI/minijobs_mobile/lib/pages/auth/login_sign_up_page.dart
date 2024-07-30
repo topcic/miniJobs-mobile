@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:minijobs_mobile/pages/signup.page.dart';
-import 'package:minijobs_mobile/pages/company_employer_signup.page.dart';
-import 'package:minijobs_mobile/pages/login_page.dart';
-
-import '../enumerations/role.dart';
+import 'package:minijobs_mobile/pages/auth/signup.page.dart';
+import '../../enumerations/role.dart';
+import 'company_employer_signup.page.dart';
+import 'login_page.dart';
 
 class LoginSignupPage extends StatefulWidget {
   const LoginSignupPage({super.key});

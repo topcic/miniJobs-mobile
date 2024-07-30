@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:dio/dio.dart';
 import 'package:minijobs_mobile/enumerations/job_statuses.dart';
-import 'package:minijobs_mobile/models/applicant.dart';
+import 'package:minijobs_mobile/models/applicant/applicant.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/providers/base_provider.dart';
 

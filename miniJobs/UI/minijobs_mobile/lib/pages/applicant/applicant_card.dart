@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:minijobs_mobile/models/applicant.dart';
+import 'package:minijobs_mobile/models/applicant/applicant.dart';
 
 import '../../utils/photo_view.dart';// Assuming you have a PhotoView widget in your project
 

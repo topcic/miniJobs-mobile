@@ -9,6 +9,8 @@ import 'package:minijobs_mobile/pages/employer/job/job_details.dart';
 import 'package:minijobs_mobile/pages/home_page.dart';
 import 'package:minijobs_mobile/pages/employer/job_list.dart';
 
+import '../pages/applicant/applicant_profile_page.dart';
+
 class Navbar extends StatefulWidget {
   const Navbar({super.key});
 
@@ -120,7 +122,7 @@ class _NavbarState extends State<Navbar> {
         const HomePage(),
         _buildPage("Saved Jobs"),
         _buildPage("View List Page"),
-        _buildPage("User Page"),
+        ApplicantProfilePage(userId: userId ),
       ];
     } else {
       return [

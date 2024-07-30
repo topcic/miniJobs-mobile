@@ -98,7 +98,7 @@ class _EmployerInfoState extends State<EmployerInfo> {
         centerTitle: true,
       ),
       body: isLoading
-          ?  SpinKitRing(color: Colors.brown)
+          ?  const SpinKitRing(color: Colors.brown)
           : SingleChildScrollView(
         child: FormBuilder(
           key: _formKey,
@@ -116,7 +116,7 @@ class _EmployerInfoState extends State<EmployerInfo> {
           }
               : {},
           child: Padding(
-            padding:  EdgeInsets.all(16.0),
+            padding:  const EdgeInsets.all(16.0),
             child: Column(
               children: [
                 if (employer != null)
@@ -127,7 +127,7 @@ class _EmployerInfoState extends State<EmployerInfo> {
                   ),
                 const SizedBox(height: 16),
                 if (employer?.name != null) ...[
-                   Text(
+                   const Text(
                     'Podaci o firmi',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
@@ -138,7 +138,7 @@ class _EmployerInfoState extends State<EmployerInfo> {
                   const SizedBox(height: 16),
                   FormBuilderDropdown<String>(
                     name: 'cityId',
-                    decoration:  InputDecoration(labelText: 'Sjedište firme'),
+                    decoration:  const InputDecoration(labelText: 'Sjedište firme'),
                     validator: (value) {
                       if (value == null) {
                         return 'City is required';
@@ -154,7 +154,7 @@ class _EmployerInfoState extends State<EmployerInfo> {
                     }).toList()
                         : [],
                   ),
-                   SizedBox(height: 16),
+                   const SizedBox(height: 16),
                 _buildTextField('companyPhoneNumber', 'Službeni broj telefona', mask: phoneNumberMask),
                   _buildTextField(
                     'idNumber',
@@ -165,9 +165,9 @@ class _EmployerInfoState extends State<EmployerInfo> {
                     ),
                   ),
                 ],
-                 SizedBox(height: 16),
+                 const SizedBox(height: 16),
                 if(employer?.name != null)
-                 Text(
+                 const Text(
                   'Odgovorno lice',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
@@ -179,7 +179,7 @@ class _EmployerInfoState extends State<EmployerInfo> {
                   const SizedBox(height: 16),
                   FormBuilderDropdown<String>(
                     name: 'cityId',
-                    decoration:  InputDecoration(labelText: 'Sjedište firme'),
+                    decoration:  const InputDecoration(labelText: 'Sjedište firme'),
                     validator: (value) {
                       if (value == null) {
                         return 'City is required';

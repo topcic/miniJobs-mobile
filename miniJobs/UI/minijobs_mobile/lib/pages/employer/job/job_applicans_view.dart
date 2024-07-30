@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:minijobs_mobile/models/applicant.dart';
+import 'package:minijobs_mobile/models/applicant/applicant.dart';
 import 'package:minijobs_mobile/pages/applicant/applicant_card.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
 import 'package:provider/provider.dart';

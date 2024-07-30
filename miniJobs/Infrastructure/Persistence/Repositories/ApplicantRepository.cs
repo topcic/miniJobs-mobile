@@ -10,6 +10,57 @@ public class ApplicantRepository(ApplicationDbContext context) : GenericReposito
 {
     private readonly ApplicationDbContext _context = context;
 
+    public async Task<ApplicantDTO> GetWithDetailsAsync(int id)
+    {
+        var applicant = await _context.Applicants
+            .Include(a => a.User)
+            .Include(a => a.User.City)
+            .Include(a => a.ApplicantJobTypes)
+                .ThenInclude(ajt => ajt.JobType)
+            .FirstOrDefaultAsync(a => a.Id == id);
+
+        if (applicant == null)
+        {
+            return null;
+        }
+
+        var averageRating = await _context.Ratings
+            .Where(r => r.RatedUserId == applicant.Id)
+            .Select(r => (double?)r.Value)
+            .AverageAsync() ?? 0;
+
+        var numberOfFinishedJobs = await (from ja in _context.JobApplications
+                                          join j in _context.Jobs on ja.JobId equals j.Id
+                                          where ja.CreatedBy == applicant.Id && j.Status == (int)JobStatus.Completed
+                                          select ja).CountAsync();
+
+        return new ApplicantDTO
+        {
+            Id = applicant.Id,
+            Cv = applicant.Cv,
+            Experience = applicant.Experience,
+            Description = applicant.Description,
+            WageProposal = applicant.WageProposal,
+            Created = applicant.User.Created,
+            FirstName = applicant.User.FirstName,
+            LastName = applicant.User.LastName,
+            Email = applicant.User.Email,
+            PhoneNumber = applicant.User.PhoneNumber,
+            Gender = applicant.User.Gender,
+            DateOfBirth = applicant.User.DateOfBirth,
+            CityId = applicant.User.CityId,
+            Deleted = applicant.User.Deleted,
+            CreatedBy = applicant.User.CreatedBy,
+            Photo = applicant.User.Photo,
+            Role = applicant.User.Role,
+            ApplicantJobTypes = applicant.ApplicantJobTypes,
+            City = applicant.User.City,
+            AverageRating = (decimal)averageRating,
+            NumberOfFinishedJobs = numberOfFinishedJobs
+        };
+    }
+
+
     public async Task<IEnumerable<ApplicantDTO>> SearchAsync(string searchText, int limit, int offset, int? cityId, int? jobTypeId)
     {
         var query = _context.Applicants.AsQueryable();
@@ -61,7 +112,7 @@ public class ApplicantRepository(ApplicationDbContext context) : GenericReposito
             Experience = x.Applicant.Experience,
             Description = x.Applicant.Description,
             WageProposal = x.Applicant.WageProposal,
-            Created = x.Applicant.Created,
+            Created = x.Applicant.User.Created,
             FirstName = x.Applicant.User.FirstName,
             LastName = x.Applicant.User.LastName,
             Email = x.Applicant.User.Email,

@@ -24,13 +24,16 @@ Applicant _$ApplicantFromJson(Map<String, dynamic> json) => Applicant(
       json['cv'] == null ? null : base64Decode(json['cv'] as String),
       json['description'] as String?,
       json['experience'] as String?,
-      json['wageProposal'] == null
-          ? null
-          : Decimal.parse(json['wageProposal'] as String),
+      json['wageProposal'] != null
+          ? Decimal.parse(json['wageProposal'].toString())
+          : null,
       json['jobType'] == null
           ? null
           : JobType.fromJson(json['jobType'] as Map<String, dynamic>),
       (json['numberOfFinishedJobs'] as num?)?.toInt(),
+      json['averageRating'] != null
+          ? Decimal.parse(json['averageRating'].toString())
+          : null,
 );
 
 Map<String, dynamic> _$ApplicantToJson(Applicant instance) => <String, dynamic>{
@@ -52,4 +55,5 @@ Map<String, dynamic> _$ApplicantToJson(Applicant instance) => <String, dynamic>{
       'wageProposal': instance.wageProposal,
       'jobType': instance.jobType,
       'numberOfFinishedJobs': instance.numberOfFinishedJobs,
-    };
+      'averageRating': instance.averageRating,
+};

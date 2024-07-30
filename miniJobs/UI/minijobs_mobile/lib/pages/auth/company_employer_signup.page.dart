@@ -2,44 +2,42 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:minijobs_mobile/enumerations/gender.dart';
-import 'package:minijobs_mobile/enumerations/role.dart';
 import 'package:minijobs_mobile/models/city.dart';
 import 'package:minijobs_mobile/pages/verification_page.dart';
 import 'package:minijobs_mobile/providers/city_provider.dart';
-import 'package:minijobs_mobile/providers/user_registration_provider.dart';
+import 'package:minijobs_mobile/providers/employer_provider.dart';
 import 'package:provider/provider.dart';
-import '../utils/util_widgets.dart';
 
-class SignupPage extends StatefulWidget {
-  final Role role;
-  const SignupPage({super.key, required this.role});
+import '../../utils/util_widgets.dart';
+
+class CompanyEmployerSignupPage extends StatefulWidget {
+  const CompanyEmployerSignupPage({super.key});
 
   @override
-  State<SignupPage> createState() => _SignupPageState();
+  State<CompanyEmployerSignupPage> createState() =>
+      _CompanyEmployerSignupPageState();
 }
 
-class _SignupPageState extends State<SignupPage> {
+class _CompanyEmployerSignupPageState extends State<CompanyEmployerSignupPage> {
   final _formKey = GlobalKey<FormBuilderState>();
   List<City>? cities;
   bool isLoading = true;
-  late final String title = widget.role == Role.Applicant
-      ? "Registruj se kao aplikant"
-      : "Registruj se kao poslodavac";
-  late CityProvider _cityProvider = CityProvider();
-  late UserRegistrationProvider _userRegistrationProvider =
-  UserRegistrationProvider();
-
-  final maskFormatter = MaskTextInputFormatter(
+  final phoneNumberMask = MaskTextInputFormatter(
     mask: '+387 ## #######',
     filter: {'#': RegExp(r'[0-9]')},
   );
+  final idNumberMask = MaskTextInputFormatter(
+    mask: '4############',
+    filter: {'#': RegExp(r'[0-9]')},
+  );
 
+  late CityProvider _cityProvider = CityProvider();
+  late EmployerProvider _userCompanyProvider = EmployerProvider();
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _cityProvider = context.read<CityProvider>();
-    _userRegistrationProvider = context.read<UserRegistrationProvider>();
+    _userCompanyProvider = context.read<EmployerProvider>();
   }
 
   @override
@@ -69,7 +67,7 @@ class _SignupPageState extends State<SignupPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: const Text("Registruj se kao poslodavac"),
         centerTitle: true,
       ),
       body: isLoading
@@ -85,8 +83,107 @@ class _SignupPageState extends State<SignupPage> {
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
                   children: [
-                   // Image.asset("assets/images/logo.png",
-//height: 150, width: 150),
+                    Image.asset("assets/images/logo.png",
+                        height: 150, width: 150),
+                    const Row(
+                      children: [
+                        Expanded(
+                            child: Divider()), // First divider widget
+                        SizedBox(
+                            width:
+                            10), // Spacer between first divider and text
+                        Text(
+                          'Podaci o firmi', // Your text
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        SizedBox(
+                            width:
+                            10), // Spacer between text and second divider
+                        Expanded(
+                            child: Divider()), // Second divider widget
+                      ],
+                    ),
+                    rowMethod(
+                      _textField('name', "Naziv firme"),
+                      CrossAxisAlignment.center,
+                    ),
+                    const SizedBox(height: 20),
+                    rowMethod(
+                      _textField('streetAddressAndNumber',
+                          "Adresa i broj ulice"),
+                      CrossAxisAlignment.center,
+                    ),
+                    const SizedBox(height: 20),
+                    rowMethod(
+                      Expanded(
+                        child: FormBuilderDropdown<String>(
+                          name: 'cityId',
+                          validator: (value) {
+                            if (value == null) {
+                              return "Sjedište firme je obavezno polje";
+                            } else {
+                              return null;
+                            }
+                          },
+                          decoration: const InputDecoration(
+                            labelText: "Sjedište firme",
+                          ),
+                          items: cities != null
+                              ? cities!.map((g) {
+                            return DropdownMenuItem(
+                              value: g.id.toString(),
+                              child: Text(g.name ?? ''),
+                            );
+                          }).toList()
+                              : [],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    rowMethod(
+                      Expanded(
+                        child: FormBuilderTextField(
+                            inputFormatters: [idNumberMask],
+                            name: 'idNumber',
+                            decoration: const InputDecoration(
+                              label: Text("ID broj"),
+                            ),
+                            validator: ((value) {
+                              if (value == null || value.isEmpty) {
+                                return "ID broj je obavezno polje";
+                              }
+                              return null;
+                            })),
+                      ),
+                      CrossAxisAlignment.center,
+                    ),
+                    const SizedBox(height: 40),
+                    const Row(
+                      children: [
+                        Expanded(
+                            child: Divider()), // First divider widget
+                        SizedBox(
+                            width:
+                            10), // Spacer between first divider and text
+                        Text(
+                          'Odgovorno lice', // Your text
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        SizedBox(
+                            width:
+                            10), // Spacer between text and second divider
+                        Expanded(
+                            child: Divider()), // Second divider widget
+                      ],
+                    ),
                     rowMethod(
                       _textField('firstName', "Ime"),
                       CrossAxisAlignment.center,
@@ -100,7 +197,25 @@ class _SignupPageState extends State<SignupPage> {
                     rowMethod(
                       Expanded(
                         child: FormBuilderTextField(
-                          inputFormatters: [maskFormatter],
+                            inputFormatters: [phoneNumberMask],
+                            name: 'companyPhoneNumber',
+                            decoration: const InputDecoration(
+                              label: Text("Službeni telefon"),
+                            ),
+                            validator: ((value) {
+                              if (value == null || value.isEmpty) {
+                                return "Službeni telefon je obavezno polje";
+                              }
+                              return null;
+                            })),
+                      ),
+                      CrossAxisAlignment.center,
+                    ),
+                    const SizedBox(height: 20),
+                    rowMethod(
+                      Expanded(
+                        child: FormBuilderTextField(
+                          inputFormatters: [phoneNumberMask],
                           name: 'phoneNumber',
                           decoration: const InputDecoration(
                             label: Text("Broj telefona"),
@@ -108,58 +223,6 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                       ),
                       CrossAxisAlignment.center,
-                    ),
-                    const SizedBox(height: 20),
-                    rowMethod(
-                      Expanded(
-                        child: FormBuilderDropdown<String>(
-                          name: 'gender',
-                          validator: (value) {
-                            if (value == null) {
-                              return "Spol je obavezno polje";
-                            } else {
-                              return null;
-                            }
-                          },
-                          decoration: const InputDecoration(
-                            labelText: "Spol",
-                          ),
-                          items: Gender.values.map((gender) {
-                            return DropdownMenuItem<String>(
-                              value: gender.name,
-                              child: Text(gender.name == 'Male'
-                                  ? 'Muški'
-                                  : 'Ženski'),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    rowMethod(
-                      Expanded(
-                        child: FormBuilderDropdown<String>(
-                          name: 'cityId',
-                          validator: (value) {
-                            if (value == null) {
-                              return "Grad je obavezno polje";
-                            } else {
-                              return null;
-                            }
-                          },
-                          decoration: const InputDecoration(
-                            labelText: "Grad",
-                          ),
-                          items: cities != null
-                              ? cities!.map((g) {
-                            return DropdownMenuItem(
-                              value: g.id.toString(),
-                              child: Text(g.name ?? ''),
-                            );
-                          }).toList()
-                              : [],
-                        ),
-                      ),
                     ),
                     const SizedBox(height: 20),
                     rowMethod(
@@ -244,26 +307,18 @@ class _SignupPageState extends State<SignupPage> {
                                 if (_formKey.currentState!.validate()) {
                                   Map<String, dynamic> request = Map.of(
                                       _formKey.currentState!.value);
-
-                                  request['gender'] = Gender.Male.name ==
-                                      request['gender']
-                                      ? 0
-                                      : 1;
-                                  request['roleId'] = widget.role.name;
-                                  var result =
-                                  await _userRegistrationProvider
+                                  var result = await _userCompanyProvider
                                       .insert(request);
-                                  if (result.isRegistered == true) {
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(const SnackBar(
-                                        content: Text(
-                                            "Uspješno ste se registrovali. Molimo Vas provjerite Vaš email")));
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const VerificationPage()));
-                                  }
-                                } else {}
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(const SnackBar(
+                                      content: Text(
+                                          "Uspješno ste se registrovali. Molimo Vas provjerite Vaš email")));
+
+                                  Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const VerificationPage()));
+                                                                } else {}
                               } catch (e) {
                                 ScaffoldMessenger.of(context)
                                     .showSnackBar(const SnackBar(

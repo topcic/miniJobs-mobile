@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:minijobs_mobile/models/applicant.dart';
+import 'package:minijobs_mobile/models/applicant/applicant.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/models/search_result.dart';
 import 'package:minijobs_mobile/providers/base_provider.dart';
@@ -10,7 +10,8 @@ class ApplicantProvider extends BaseProvider<Applicant> {
   Applicant fromJson(data) {
     return Applicant.fromJson(data);
   }
- Future<SearchResult<Applicant>> searchApplicants({
+
+  Future<SearchResult<Applicant>> searchApplicants({
     String? searchText,
     int? cityId,
     int? jobTypeId,
@@ -19,7 +20,7 @@ class ApplicantProvider extends BaseProvider<Applicant> {
   }) async {
     try {
       var url = "${baseUrl}applicants/search?SearchText=$searchText&Limit=$limit&Offset=$offset";
-      
+
       if (cityId != null) {
         url += "&CityId=$cityId";
       }
@@ -30,12 +31,12 @@ class ApplicantProvider extends BaseProvider<Applicant> {
 
       var dio = Dio();
       var response = await dio.get(url);
-  var data = response.data;
+      var data = response.data;
 
       // Use the custom SearchResult.fromJson method
       var result = SearchResult<Applicant>.fromJson(
         data,
-        (json) => Applicant.fromJson(json as Map<String, dynamic>),
+            (json) => Applicant.fromJson(json as Map<String, dynamic>),
       );
 
       return result;
@@ -48,7 +49,8 @@ class ApplicantProvider extends BaseProvider<Applicant> {
     try {
       var url = "${baseUrl}applicants/savedjobs";
       var response = await dio.get(url); // Use the dio getter here
-      List<Job> responseData = List<Job>.from(response.data.map((item) => Job.fromJson(item)));
+      List<Job> responseData =
+          List<Job>.from(response.data.map((item) => Job.fromJson(item)));
       return responseData;
     } catch (err) {
       throw Exception(err.toString());
@@ -59,11 +61,32 @@ class ApplicantProvider extends BaseProvider<Applicant> {
     try {
       var url = "${baseUrl}applicants/appliedjobs";
       var response = await dio.get(url); // Use the dio getter here
-      List<Job> responseData = List<Job>.from(response.data.map((item) => Job.fromJson(item)));
+      List<Job> responseData =
+          List<Job>.from(response.data.map((item) => Job.fromJson(item)));
       return responseData;
     } catch (err) {
       throw Exception(err.toString());
     }
   }
-}
 
+  @override
+  Future<Applicant> update(int id, [dynamic request]) async {
+    var url = "${baseUrl}applicants/$id";
+    var formData = FormData.fromMap({
+      'firstName': request.firstName,
+      'lastName': request.lastName,
+      'phoneNumber': request.phoneNumber,
+      'cityId': request.cityId,
+      'description': request.description,
+      'experience': request.experience,
+      'wageProposal': request.wageProposal,
+      if (request.cvFile != null)
+        'cvFile': MultipartFile.fromBytes(request.cvFile!,
+            filename: request.cvFileName),
+    });
+
+    var response = await dio.put(url, data: formData);
+
+    return fromJson(response.data);
+  }
+}
