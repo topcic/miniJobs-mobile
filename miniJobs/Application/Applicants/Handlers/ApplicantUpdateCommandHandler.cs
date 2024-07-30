@@ -24,12 +24,14 @@ public class ApplicantUpdateCommandHandler(IMapper mapper, IApplicantRepository 
         mapper.Map(command.Request, user);
         mapper.Map(command.Request, applicant);
 
-        if(command.Request.CvFile!= null)
+        if (command.Request.CvFile != null)
         {
             var ms = new MemoryStream();
             await command.Request.CvFile.OpenReadStream().CopyToAsync(ms, cancellationToken);
             applicant.Cv = ms.ToArray();
         }
+        else
+            applicant.Cv = null;
         await applicantRepository.UpdateAsync(applicant);
         await userManager.UpdateAsync(user);
 

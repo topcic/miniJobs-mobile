@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:decimal/decimal.dart';
 import 'package:file_saver/file_saver.dart';
@@ -10,6 +11,8 @@ import 'package:minijobs_mobile/providers/applicant_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:open_file/open_file.dart';
+import 'package:permission_handler/permission_handler.dart';
+
 import '../../models/applicant/applicant_save_request.dart';
 
 class ApplicantAdditionalInfo extends StatefulWidget {
@@ -17,8 +20,7 @@ class ApplicantAdditionalInfo extends StatefulWidget {
   const ApplicantAdditionalInfo({super.key, required this.applicantId});
 
   @override
-  State<ApplicantAdditionalInfo> createState() =>
-      _ApplicantAdditionalInfoState();
+  State<ApplicantAdditionalInfo> createState() => _ApplicantAdditionalInfoState();
 }
 
 class _ApplicantAdditionalInfoState extends State<ApplicantAdditionalInfo> {
@@ -50,8 +52,7 @@ class _ApplicantAdditionalInfoState extends State<ApplicantAdditionalInfo> {
       isLoading = false;
       if (applicant?.cv != null) {
         cvBytes = applicant!.cv;
-        cvFileName =
-            "CV.${_getFileExtension(applicant!.cv!)}"; // Assume a generic file name for existing CV
+        cvFileName = "CV.${_getFileExtension(applicant!.cv!)}";
       }
     });
   }
@@ -61,14 +62,13 @@ class _ApplicantAdditionalInfoState extends State<ApplicantAdditionalInfo> {
 
     if (mimeType != null) {
       final extension = mimeType.split('/').last;
-      return '$extension'; // Add the dot for consistency
+      return extension;
     }
 
-    // Fallback for known file signatures
     final signatures = {
-      '25504446': 'pdf', // PDF
-      '504B0304': 'docx', // DOCX
-      'D0CF11E0': 'doc', // DOC
+      '25504446': 'pdf',
+      '504B0304': 'docx',
+      'D0CF11E0': 'doc',
     };
 
     final headerBytes = bytes
@@ -79,10 +79,10 @@ class _ApplicantAdditionalInfoState extends State<ApplicantAdditionalInfo> {
     final extension = signatures[headerBytes];
 
     if (extension != null) {
-      return extension; // Add the dot for consistency
+      return extension;
     }
 
-    return ''; // Handle unknown file type appropriately
+    return '';
   }
 
   Future<void> _saveChanges() async {
@@ -90,14 +90,12 @@ class _ApplicantAdditionalInfoState extends State<ApplicantAdditionalInfo> {
       _formKey.currentState!.save();
       final formData = _formKey.currentState!.value;
 
-      // Convert wageProposal from String to Decimal
       final String? wageProposalStr = formData['wageProposal'];
       Decimal? wageProposal;
       if (wageProposalStr != null && wageProposalStr.isNotEmpty) {
         try {
           wageProposal = Decimal.parse(wageProposalStr);
         } catch (e) {
-          // Handle parsing error if needed
           wageProposal = null;
         }
       }
@@ -134,17 +132,30 @@ class _ApplicantAdditionalInfoState extends State<ApplicantAdditionalInfo> {
     );
 
     if (result != null) {
-      setState(() {
-        cvBytes = result.files.single.bytes;
-        cvFileName = result.files.single.name;
-      });
+      PlatformFile file = result.files.first;
+      if (file.path != null) {
+        final File selectedFile = File(file.path!);
+        final bytes = await selectedFile.readAsBytes();
+        setState(() {
+          cvBytes = bytes;
+          cvFileName = file.name;
+        });
+      }
     }
   }
 
+
   Future<void> _downloadCVFile() async {
     if (cvBytes != null && cvFileName != null) {
-      await FileSaver.instance.saveFile(name: cvFileName!, bytes: cvBytes!);
-      OpenFile.open(cvFileName!);
+        String? path = await FileSaver.instance.saveFile(name: cvFileName!, bytes: cvBytes!, ext: "");
+        if (path != null) {
+          OpenFile.open(path);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to save the file.')),
+          );
+        }
+
     }
   }
 
@@ -155,133 +166,134 @@ class _ApplicantAdditionalInfoState extends State<ApplicantAdditionalInfo> {
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     return isLoading
         ? const SpinKitRing(color: Colors.brown)
         : SingleChildScrollView(
-            child: FormBuilder(
-              key: _formKey,
-              initialValue: applicant != null
-                  ? {
-                      'description': applicant!.description,
-                      'experience': applicant!.experience,
-                      'wageProposal': applicant!.wageProposal?.toString(),
-                    }
-                  : {},
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    _buildTextField('description', 'Opis', maxLines: 5),
-                    const SizedBox(height: 16),
-                    FormBuilderDropdown<String>(
-                      name: 'experience',
-                      decoration: const InputDecoration(labelText: 'Iskustvo'),
-                      items: experienceOptions
-                          .map((experience) => DropdownMenuItem(
-                                value: experience,
-                                child: Text(experience),
-                              ))
-                          .toList(),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildTextField('wageProposal', 'Plata (KM)'),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton.icon(
-                              onPressed: _pickCVFile,
-                              icon: const Icon(Icons.upload_file),
-                              label: const Text('Odaberi CV')),
-                        ),
-                      ],
-                    ),
-                    if (cvFileName != null) ...[
-                      const SizedBox(height: 10),
-                      Card(
-                        color: Colors.grey[200],
-                        elevation: 2,
-                        margin: EdgeInsets.zero,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.description,
-                                    color: Colors.green[700],
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      cvFileName!,
-                                      style: const TextStyle(
-                                        color: Colors.green,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  TextButton.icon(
-                                    onPressed: _downloadCVFile,
-                                    icon: const Icon(Icons.download,
-                                        color: Colors.blue),
-                                    label: const Text(
-                                      'Preuzmi',
-                                      style: TextStyle(color: Colors.blue),
-                                    ),
-                                    style: TextButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 8),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  TextButton.icon(
-                                    onPressed: _removeCVFile,
-                                    icon: const Icon(Icons.delete,
-                                        color: Colors.red),
-                                    label: const Text(
-                                      'Ukloni',
-                                      style: TextStyle(color: Colors.red),
-                                    ),
-                                    style: TextButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 8),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: _saveChanges,
-                            child: const Text('Spasi promjene'),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+      child: FormBuilder(
+        key: _formKey,
+        initialValue: applicant != null
+            ? {
+          'description': applicant!.description,
+          'experience': applicant!.experience,
+          'wageProposal': applicant!.wageProposal?.toString(),
+        }
+            : {},
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              _buildTextField('description', 'Opis', maxLines: 5),
+              const SizedBox(height: 16),
+              FormBuilderDropdown<String>(
+                name: 'experience',
+                decoration: const InputDecoration(labelText: 'Iskustvo'),
+                items: experienceOptions
+                    .map((experience) => DropdownMenuItem(
+                  value: experience,
+                  child: Text(experience),
+                ))
+                    .toList(),
               ),
-            ),
-          );
+              const SizedBox(height: 16),
+              _buildTextField('wageProposal', 'Plata (KM)'),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                        onPressed: _pickCVFile,
+                        icon: const Icon(Icons.upload_file),
+                        label: const Text('Odaberi CV')),
+                  ),
+                ],
+              ),
+              if (cvFileName != null) ...[
+                const SizedBox(height: 10),
+                Card(
+                  color: Colors.grey[200],
+                  elevation: 2,
+                  margin: EdgeInsets.zero,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.description,
+                              color: Colors.green[700],
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                cvFileName!,
+                                style: const TextStyle(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            TextButton.icon(
+                              onPressed: _downloadCVFile,
+                              icon: const Icon(Icons.download,
+                                  color: Colors.blue),
+                              label: const Text(
+                                'Preuzmi',
+                                style: TextStyle(color: Colors.blue),
+                              ),
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            TextButton.icon(
+                              onPressed: _removeCVFile,
+                              icon: const Icon(Icons.delete,
+                                  color: Colors.red),
+                              label: const Text(
+                                'Ukloni',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _saveChanges,
+                      child: const Text('Spasi promjene'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildTextField(String name, String label, {int maxLines = 1}) {
@@ -290,7 +302,7 @@ class _ApplicantAdditionalInfoState extends State<ApplicantAdditionalInfo> {
       maxLines: maxLines,
       decoration: InputDecoration(labelText: label),
       validator: (value) {
-        return null; // Optional field, no validation required
+        return null;
       },
     );
   }
