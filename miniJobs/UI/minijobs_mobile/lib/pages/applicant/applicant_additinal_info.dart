@@ -209,19 +209,19 @@ class _ApplicantAdditionalInfoState extends State<ApplicantAdditionalInfo> {
               const SizedBox(height: 16),
               MultiSelectDialogField<int>(
                 items: jobTypes?.map((jobType) => MultiSelectItem<int>(jobType.id!, jobType.name!)).toList() ?? [],
-                title: Text("Job Types"),
+                title: Text("Tipovi posla"),
                 initialValue: selectedJobTypeIds ?? [], // Use initialValue instead of selectedItems
+                  buttonText: Text(
+                    "Izaberite tip posla jim se bavite", // Your placeholder text here
+                    style: TextStyle(
+                      color: Colors.grey, // Placeholder text color
+                    ),
+                  ),
                 onConfirm: (values) {
                   setState(() {
                     selectedJobTypeIds = values.cast<int>();
                   });
-                },
-                validator: (values) {
-                  if (values == null || values.isEmpty) {
-                    return 'Please select at least one job type';
-                  }
-                  return null;
-                },
+                }
               ),
 
               const SizedBox(height: 16),

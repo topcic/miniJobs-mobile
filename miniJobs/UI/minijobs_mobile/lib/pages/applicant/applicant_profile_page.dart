@@ -7,7 +7,8 @@ import 'package:minijobs_mobile/pages/user-profile/finished_job_view.dart';
 import 'package:minijobs_mobile/pages/user-profile/user_ratings_view.dart';
 
 import '../../utils/photo_view.dart';
-import 'applicant_info.dart'; // Import your User model
+import 'applicant_info.dart';
+import 'applicant_info_view.dart'; // Import your User model
 
 class ApplicantProfilePage extends StatefulWidget {
   final int userId;
@@ -126,9 +127,7 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
               Expanded(
                 child: TabBarView(
                   children: [
-                    // Aktivni poslovi tab
-                  //  ActiveJobsView(userId: userId),
-                    // Završeni poslovi tab
+                    ApplicantInfoView(applicantId:userId),
                     FinishedJobsView(userId: userId),
                     // Utisci tab
                     UserRatingsView(userId: userId),

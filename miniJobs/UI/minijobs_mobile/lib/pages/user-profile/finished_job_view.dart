@@ -36,6 +36,14 @@ List<Job> jobs=[];
 
   @override
   Widget build(BuildContext context) {
+    if (jobs.isEmpty) {
+      return const Center(
+        child: Text(
+          'Korisnik nema završenih poslova',
+          style: TextStyle(fontSize: 16),
+        ),
+      );
+    }
     return   GridView.builder(
     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
       crossAxisCount: 2, // Broj kartica u redu

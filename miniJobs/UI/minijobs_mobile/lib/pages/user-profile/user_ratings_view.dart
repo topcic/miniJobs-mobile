@@ -32,6 +32,14 @@ class _UserRatingsViewState extends State<UserRatingsView> {
 
   @override
   Widget build(BuildContext context) {
+    if (ratings.isEmpty) {
+      return const Center(
+        child: Text(
+          'Korisnik nije bio ocjenjen',
+          style: TextStyle(fontSize: 16),
+        ),
+      );
+    }
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -59,6 +67,7 @@ class ImpressionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: ListTile(
