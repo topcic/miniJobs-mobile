@@ -67,7 +67,8 @@ class MyMaterialApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Check if the user is logged in
-    bool isLoggedIn = GetStorage().read('accessToken') != null;
+
+    bool isLoggedIn = GetStorage().read('accessToken') != "";
 
     return MaterialApp(
       title: "My app",

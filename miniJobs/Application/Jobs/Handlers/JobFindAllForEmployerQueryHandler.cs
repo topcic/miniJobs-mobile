@@ -19,6 +19,6 @@ sealed class JobFindAllForEmployerQueryHandler : IRequestHandler<JobFindAllForEm
     public async Task<IEnumerable<Job>> Handle(JobFindAllForEmployerQuery request, CancellationToken cancellationToken)
     {
 
-        return await  jobRepository.GetEmployerJobsAsync(request.UserId.Value);
+        return await  jobRepository.GetEmployerJobsAsync(request.EmployerId);
     }
 }

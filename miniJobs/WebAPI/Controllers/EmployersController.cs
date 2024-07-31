@@ -1,6 +1,7 @@
 ﻿using Application.Employers.Commands;
 using Application.Employers.Models;
 using Application.Employers.Queries;
+using Application.Jobs.Queries;
 using Application.Users.Models;
 using Application.Users.Queries;
 using Domain.Entities;
@@ -52,5 +53,15 @@ public class EmployersController(IMediator mediator) : ControllerBase
     {
 
         return Ok(await mediator.Send(new EmployerGetActiveJobsQuery(employerId)));
+    } 
+
+    [HttpGet("{employerId}/jobs")]
+    [ProducesResponseType(typeof(IEnumerable<Job>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetJobs([FromRoute] int employerId)
+    {
+
+        return Ok(await mediator.Send(new JobFindAllForEmployerQuery(employerId)));
     }
 }

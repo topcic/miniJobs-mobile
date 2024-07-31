@@ -31,14 +31,14 @@ public class JobsController(IMediator mediator, BaseState state) : ControllerBas
     }
 
 
-    [HttpGet()]
-    [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllForUser()
-    { 
-        return Ok(await mediator.Send(new JobFindAllForEmployerQuery()));
-    }
+    //[HttpGet()]
+    //[ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
+    //[ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    //[ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    //public async Task<IActionResult> GetAllForUser()
+    //{ 
+    //    return Ok(await mediator.Send(new JobFindAllForEmployerQuery()));
+    //}
     [HttpGet("{jobId}")]
     [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]

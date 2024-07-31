@@ -23,7 +23,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
 
   void _checkLoginStatus() {
     // Check if user is logged in
-    bool isLoggedIn = GetStorage().read('accessToken') != null;
+    bool isLoggedIn = GetStorage().read('accessToken') != "";
 
     if (isLoggedIn) {
       WidgetsBinding.instance.addPostFrameCallback((_) {

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/pages/employer/job/job_applicans_view.dart';
 import 'package:minijobs_mobile/pages/employer/job/job_details.dart';
-import 'package:minijobs_mobile/providers/job_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:minijobs_mobile/widgets/badges.dart';
+
+import '../../providers/employer_provider.dart';
 
 class JobList extends StatefulWidget {
   const JobList({super.key});
@@ -14,14 +16,14 @@ class JobList extends StatefulWidget {
 }
 
 class _JobListState extends State<JobList> {
-  late JobProvider _jobProvider;
+  late EmployerProvider employerProvider;
   List<Job> jobs = [];
   bool isLoading = true;
-
+  int userId=int.parse( GetStorage().read('userId'));
   @override
   void initState() {
     super.initState();
-    _jobProvider = JobProvider();
+    employerProvider = EmployerProvider();
     getJobs();
   }
 
@@ -29,7 +31,7 @@ class _JobListState extends State<JobList> {
     setState(() {
       isLoading = true;
     });
-    jobs = await _jobProvider.getAll();
+    jobs = await employerProvider.getJobs(userId);
     setState(() {
       isLoading = false;
     });

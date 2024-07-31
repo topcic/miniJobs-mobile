@@ -24,6 +24,16 @@ class EmployerProvider extends BaseProvider<Employer> {
       throw Exception(err.toString());
     }
   }
+  Future<List<Job>> getJobs(int userId) async {
+    try {
+      var url = "${baseUrl}employers/$userId/jobs";
+      var response = await dio.get(url); // Use the dio getter here
+      List<Job> responseData = List<Job>.from(response.data.map((item) => Job.fromJson(item)));
+      return responseData;
+    } catch (err) {
+      throw Exception(err.toString());
+    }
+  }
   @override
   Future<Employer> update(int id, [dynamic request]) async {
     if (request is! EmployerSaveRequest) {
