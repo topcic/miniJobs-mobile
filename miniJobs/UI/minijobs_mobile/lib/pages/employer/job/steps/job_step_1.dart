@@ -59,9 +59,7 @@ class JobStep1State extends State<JobStep1> {
   }
 
   void _setInitialFormValues() {
-    log('Setting initial form values: $_job');
     if (_job != null) {
-      log('Form values being set: ${_job!.toJson()}');
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _formKey.currentState?.patchValue({
           'name': _job!.name,

@@ -14,6 +14,7 @@ import 'package:minijobs_mobile/widgets/navbar.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
   runApp(MultiProvider(
     providers: [
@@ -21,13 +22,11 @@ void main() async {
       ChangeNotifierProvider(create: (s) => UserProvider()),
       ChangeNotifierProvider(create: (s) => CityProvider()),
       ChangeNotifierProvider(create: (s) => UserRegistrationProvider()),
-     // ChangeNotifierProvider(create: (s) => EmployerProvider()),
       ChangeNotifierProvider(create: (s) => JobTypeProvider()),
       ChangeNotifierProvider(create: (s) => ProposedAnswerProvider()),
       ChangeNotifierProvider(create: (s) => JobProvider()),
       ChangeNotifierProvider(create: (s) => ApplicantProvider()),
       ChangeNotifierProvider(create: (s) => EmployerProvider())
-
     ],
     child: const MyApp(),
   ));
@@ -35,7 +34,6 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
 
   @override
   Widget build(BuildContext context) {
@@ -50,10 +48,9 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// ignore: must_be_immutable
 class MyAppBar extends StatelessWidget {
-  String title;
-  MyAppBar({super.key, required this.title});
+  final String title;
+  const MyAppBar({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -67,8 +64,7 @@ class MyMaterialApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Check if the user is logged in
-
-    bool isLoggedIn = GetStorage().read('accessToken') != "";
+    bool isLoggedIn = false;
 
     return MaterialApp(
       title: "My app",
@@ -87,4 +83,3 @@ class MyMaterialApp extends StatelessWidget {
     );
   }
 }
-
