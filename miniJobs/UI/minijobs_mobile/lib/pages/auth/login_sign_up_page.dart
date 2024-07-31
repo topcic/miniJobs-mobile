@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:minijobs_mobile/pages/auth/signup.page.dart';
 import '../../enumerations/role.dart';
+import '../../widgets/navbar.dart';
 import 'company_employer_signup.page.dart';
 import 'login_page.dart';
-
 class LoginSignupPage extends StatefulWidget {
   const LoginSignupPage({super.key});
 
@@ -13,6 +14,26 @@ class LoginSignupPage extends StatefulWidget {
 
 class _LoginSignupPageState extends State<LoginSignupPage> {
   int _selectedIndex = -1;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  void _checkLoginStatus() {
+    // Check if user is logged in
+    bool isLoggedIn = GetStorage().read('accessToken') != null;
+
+    if (isLoggedIn) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const Navbar()),
+        );
+      });
+    }
+  }
+
   void switchTabView(String option) {
     if (option == 'Applicant') {
       setState(() {
@@ -22,49 +43,51 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
       setState(() {
         _selectedIndex = 1; // Switch to the second tab
       });
-    }
-    else{
+    } else {
       setState(() {
         _selectedIndex = 2;
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text('Prijava i registracija'),
-            bottom: TabBar(
-              tabs: const [
-                Tab(text: 'Prijava'),
-                Tab(text: 'Registracija'),
-              ],
-              onTap: (index) {
-                setState(() {
-                  _selectedIndex = -1; // Reset the selected index when Registracija tab is clicked
-                });
-              },
-            ),
-          ),
-          body: TabBarView(
-            children: [
-              const LoginPage(),
-              _selectedIndex==-1? SignupMenu(onOptionSelected: switchTabView)
-                  :_selectedIndex==0?const SignupPage(role:Role.Applicant)
-                  :_selectedIndex==1?const SignupPage(role:Role.Employer):const CompanyEmployerSignupPage(),
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Prijava i registracija'),
+          bottom: TabBar(
+            tabs: const [
+              Tab(text: 'Prijava'),
+              Tab(text: 'Registracija'),
             ],
+            onTap: (index) {
+              setState(() {
+                _selectedIndex = -1; // Reset the selected index when Registracija tab is clicked
+              });
+            },
           ),
+        ),
+        body: TabBarView(
+          children: [
+            const LoginPage(),
+            _selectedIndex == -1
+                ? SignupMenu(onOptionSelected: switchTabView)
+                : _selectedIndex == 0
+                ? const SignupPage(role: Role.Applicant)
+                : _selectedIndex == 1
+                ? const SignupPage(role: Role.Employer)
+                : const CompanyEmployerSignupPage(),
+          ],
         ),
       ),
     );
   }
 }
+
 class SignupMenu extends StatefulWidget {
-  final Function(String) onOptionSelected; // Define callback function
+  final Function(String) onOptionSelected;
 
   const SignupMenu({super.key, required this.onOptionSelected});
 
@@ -73,7 +96,7 @@ class SignupMenu extends StatefulWidget {
 }
 
 class _SignupMenuState extends State<SignupMenu> {
-  String _selectedType = ''; // Default selected type
+  String _selectedType = '';
 
   @override
   Widget build(BuildContext context) {
@@ -135,8 +158,7 @@ class _SignupMenuState extends State<SignupMenu> {
                         widget.onOptionSelected('Individual');
                       },
                       style: ElevatedButton.styleFrom(
-                        padding:
-                        const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                       ),
                       child: const Text(
                         'Kao fizičko lice',
@@ -151,8 +173,7 @@ class _SignupMenuState extends State<SignupMenu> {
                         widget.onOptionSelected('Company');
                       },
                       style: ElevatedButton.styleFrom(
-                        padding:
-                        const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                       ),
                       child: const Text(
                         'Kao kompanija',
@@ -168,5 +189,4 @@ class _SignupMenuState extends State<SignupMenu> {
       ),
     );
   }
-
 }

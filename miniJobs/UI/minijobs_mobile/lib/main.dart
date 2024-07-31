@@ -10,6 +10,7 @@ import 'package:minijobs_mobile/providers/job_type_provider.dart';
 import 'package:minijobs_mobile/providers/proposed_answer_provider.dart';
 import 'package:minijobs_mobile/providers/user_registration_provider.dart';
 import 'package:minijobs_mobile/providers/user_provider.dart';
+import 'package:minijobs_mobile/widgets/navbar.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -65,12 +66,14 @@ class MyMaterialApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Check if the user is logged in
+    bool isLoggedIn = GetStorage().read('accessToken') != null;
+
     return MaterialApp(
       title: "My app",
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.blue,
-          //  brightness: Brightness.light,
         ),
         textTheme: const TextTheme(
           displayLarge: TextStyle(
@@ -79,7 +82,7 @@ class MyMaterialApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const LoginSignupPage(),
+      home: isLoggedIn ? const Navbar() : const LoginSignupPage(),
     );
   }
 }

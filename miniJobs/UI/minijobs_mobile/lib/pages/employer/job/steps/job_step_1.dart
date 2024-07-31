@@ -1,4 +1,3 @@
-
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -23,39 +22,20 @@ class JobStep1State extends State<JobStep1> {
   late CityProvider _cityProvider;
   late JobProvider _jobProvider;
   Job? _job;
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize providers and fetch cities here if needed
-  }
+  bool isLoading = true;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    // Fetch providers and cities only if they haven't been fetched already
     _cityProvider = context.read<CityProvider>();
-    _jobProvider = Provider.of<JobProvider>(context);
+    _jobProvider = context.read<JobProvider>();
 
     if (cities == null) {
-      // Fetch cities only if they haven't been fetched yet
       getCities();
     } else {
-      // If cities are already fetched, just set the initial form values
       _job = _jobProvider.getCurrentJob();
       _setInitialFormValues();
-    }
-  }
-
-  void _setInitialFormValues() {
-    if (_job != null) {
-      _formKey.currentState?.patchValue({
-        'name': _job!.name,
-        'description': _job!.description,
-        'cityId': _job!.cityId.toString(),
-        'streetAddressAndNumber': _job!.streetAddressAndNumber,
-      });
     }
   }
 
@@ -64,17 +44,40 @@ class JobStep1State extends State<JobStep1> {
       cities = await _cityProvider.getAll();
       if (mounted) {
         setState(() {
+          isLoading = false;
+          _job = _jobProvider.getCurrentJob();
           _setInitialFormValues();
         });
       }
     } catch (e) {
       // Handle errors properly
       log('Error fetching cities: $e');
+      setState(() {
+        isLoading = false;
+      });
     }
   }
+
+  void _setInitialFormValues() {
+    log('Setting initial form values: $_job');
+    if (_job != null) {
+      log('Form values being set: ${_job!.toJson()}');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _formKey.currentState?.patchValue({
+          'name': _job!.name,
+          'description': _job!.description,
+          'cityId': _job!.cityId?.toString(),
+          'streetAddressAndNumber': _job!.streetAddressAndNumber,
+        });
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : Container(
       child: FormBuilder(
         key: _formKey,
         child: Padding(
@@ -125,14 +128,14 @@ class JobStep1State extends State<JobStep1> {
                       labelStyle: TextStyle(fontSize: 14),
                     ),
                     items: cities?.map((g) {
-                          return DropdownMenuItem(
-                            value: g.id.toString(),
-                            child: Text(
-                              g.name ?? '',
-                              style: const TextStyle(fontSize: 12),
-                            ),
-                          );
-                        }).toList() ??
+                      return DropdownMenuItem(
+                        value: g.id.toString(),
+                        child: Text(
+                          g.name ?? '',
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      );
+                    }).toList() ??
                         [],
                   ),
                 ),
