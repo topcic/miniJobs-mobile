@@ -383,7 +383,17 @@ if (selectedJobType != null) {
       widget.onNextButton(false, _jobSaveRequest!);
     }
   }
-
+bool isValidForm(){
+  _formKey.currentState?.save();
+  if (_formKey.currentState!.validate() &&
+      selectedJobSchedules != null &&
+      selectedJobSchedules!.isNotEmpty &&
+      applicationsEndTo != null) {
+   return true;
+  } else {
+    return false;
+  }
+}
   JobSaveRequest getUpdatedJob() {
     return _jobSaveRequest!;
   }

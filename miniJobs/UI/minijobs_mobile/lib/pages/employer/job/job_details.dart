@@ -22,41 +22,49 @@ class JobDetails extends StatefulWidget {
 class _JobDetailsState extends State<JobDetails> {
   int _currentStep = 0;
   bool isCompleted = false;
-  late Job _job = Job();
-  late JobProvider _jobProvider = JobProvider();
+  Job _job = Job();
+  late JobProvider _jobProvider;
   final GlobalKey<JobStep1State> _jobStep1Key = GlobalKey<JobStep1State>();
   JobSaveRequest? _jobSaveRequest;
   late Function() _validateAndSaveStep2Callback;
   late Function() _validateAndSaveStep3Callback;
-
-  void _nextPressed(Job job) {
-    setState(() {
-      if (_currentStep < getSteps().length - 1) {
-        _currentStep += 1;
-      } else {
-        isCompleted = true;
-      }
-    });
-  }
-
-  bool isJobCompleted() {
-    return _job.status == JobStatus.Zavrsen;
-  }
+  bool isCalledCanAccessStep=false;
+  int requestedStep=0;
 
   @override
   void initState() {
     super.initState();
-    if (widget.jobId != 0) {
-      getjob();
+    _jobProvider = Provider.of<JobProvider>(context, listen: false);
+    _initializeJob(widget.jobId);
+  }
+
+  @override
+  void didUpdateWidget(JobDetails oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.jobId != oldWidget.jobId) {
+      _initializeJob(widget.jobId);
     }
   }
 
-  Future<void> getjob() async {
-    final job = await _jobProvider.get(widget.jobId);
-    _jobProvider.setCurrentJob(job);
+  void _initializeJob(int jobId) async {
     setState(() {
-      _job = job; // Update _job with fetched data
+      _currentStep = 0;
+      isCompleted = false;
+      _job = Job(); // Reset the job
     });
+    if (jobId != 0) {
+      final job = await _jobProvider.get(jobId);
+      _jobProvider.setCurrentJob(job);
+      setState(() {
+        _job = job; // Update _job with fetched data
+      });
+    } else {
+      _jobProvider.setCurrentJob(null);
+    }
+  }
+
+  bool isJobCompleted() {
+    return _job.status == JobStatus.Zavrsen;
   }
 
   JobSaveRequest createJobSaveRequest(Job job) {
@@ -96,6 +104,30 @@ class _JobDetailsState extends State<JobDetails> {
     );
   }
 
+  Future<bool> canAccessStep(int step) async {
+    if (step == 0) {
+      return true;
+    } else if (step == 1) {
+      var jobStep1State = _jobStep1Key.currentState;
+      return jobStep1State != null && jobStep1State.validateAndSave();
+    } else if (step == 2) {
+      var jobStep1State = _jobStep1Key.currentState;
+      if (jobStep1State != null && jobStep1State.validateAndSave()) {
+        _job = jobStep1State.getUpdatedJob();
+        return true;
+      }
+      return false;
+    } else if (step == 3) {
+      var jobStep1State = _jobStep1Key.currentState;
+      if (jobStep1State != null && jobStep1State.validateAndSave()) {
+        _job = jobStep1State.getUpdatedJob();
+        return _validateAndSaveStep2Callback() && _validateAndSaveStep3Callback();
+      }
+      return false;
+    }
+    return false;
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -103,14 +135,23 @@ class _JobDetailsState extends State<JobDetails> {
   }
 
   void _onNextButton(bool isValid, JobSaveRequest? jobSaveRequest) async {
-    if (isValid) {
-      var saveRequest = jobSaveRequest;
-      var job = await _jobProvider.update(saveRequest!.id!, saveRequest);
-      _jobProvider.setCurrentJob(job);
-      setState(() {
-        _currentStep += 1;
-      });
+    if (isValid ) {
+      if(!isCalledCanAccessStep) {
+        var saveRequest = jobSaveRequest;
+        var job = await _jobProvider.update(saveRequest!.id!, saveRequest);
+        _jobProvider.setCurrentJob(job);
+        setState(() {
+          _currentStep += 1;
+        });
+      }
+      else{
+        setState(() {
+          isCalledCanAccessStep=false;
+          _currentStep = requestedStep;
+        });
+      }
     }
+
   }
 
   @override
@@ -130,16 +171,23 @@ class _JobDetailsState extends State<JobDetails> {
         onStepContinue: () async {
           await nextStep();
         },
+        onStepTapped: (step) async {
+          setState(() {
+            requestedStep=step;
+            isCalledCanAccessStep=true;
+          });
+        if(  await canAccessStep(step)){
+          setState(() {
+            isCalledCanAccessStep=false;
+            _currentStep = requestedStep;
+          });
+        }
+        },
         onStepCancel: _currentStep == 0
             ? null
             : () {
           setState(() {
             _currentStep -= 1;
-          });
-        },
-        onStepTapped: (step) {
-          setState(() {
-            _currentStep = step;
           });
         },
         controlsBuilder: (context, details) {
@@ -161,9 +209,7 @@ class _JobDetailsState extends State<JobDetails> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: details.onStepContinue,
-                      child: Text(isLastStep
-                          ? 'Objavi posao'
-                          : 'Dalje'),
+                      child: Text(isLastStep ? 'Objavi posao' : 'Dalje'),
                     ),
                   ),
               ],
@@ -193,7 +239,7 @@ class _JobDetailsState extends State<JobDetails> {
             _validateAndSaveStep2Callback = validateAndSave;
           }),
       isActive: _currentStep >= 1,
-      state: _currentStep == 0
+      state: _currentStep == 1
           ? StepState.editing
           : _currentStep > 1
           ? StepState.complete
@@ -207,7 +253,7 @@ class _JobDetailsState extends State<JobDetails> {
             _validateAndSaveStep3Callback = validateAndSave;
           }),
       isActive: _currentStep >= 2,
-      state: _currentStep == 0
+      state: _currentStep == 2
           ? StepState.editing
           : _currentStep > 2
           ? StepState.complete
@@ -230,10 +276,10 @@ class _JobDetailsState extends State<JobDetails> {
   }
 
   nextStep() async {
-    if (_currentStep == 0) {
+    if (_currentStep == 0  && !isCalledCanAccessStep) {
       var jobStep1State = _jobStep1Key.currentState;
 
-      if (jobStep1State != null && jobStep1State.validateAndSave()) {
+      if (jobStep1State != null && jobStep1State.validateAndSave() && !isCalledCanAccessStep) {
         _job = jobStep1State.getUpdatedJob();
         if (_job.id == null || _job.id == 0) {
           var job = await _jobProvider.insert(_job);
@@ -252,11 +298,11 @@ class _JobDetailsState extends State<JobDetails> {
           });
         }
       }
-    } else if (_currentStep == 1) {
+    } else if (_currentStep == 1 && !isCalledCanAccessStep) {
       _validateAndSaveStep2Callback();
-    } else if (_currentStep == 2) {
+    } else if (_currentStep == 2 && !isCalledCanAccessStep) {
       _validateAndSaveStep3Callback();
-    } else if (_currentStep == 3) {
+    } else if (_currentStep == 3 && !isCalledCanAccessStep) {
       var job = await _jobProvider.activate(_job.id!, JobStatus.Aktivan);
       _jobProvider.setCurrentJob(job);
       setState(() {

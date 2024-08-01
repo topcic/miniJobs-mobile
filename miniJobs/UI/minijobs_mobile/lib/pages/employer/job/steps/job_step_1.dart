@@ -70,7 +70,11 @@ class JobStep1State extends State<JobStep1> {
       });
     }
   }
-
+  @override
+  void dispose() {
+    _formKey.currentState?.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return isLoading
@@ -186,6 +190,13 @@ class JobStep1State extends State<JobStep1> {
           _job!.streetAddressAndNumber = job.streetAddressAndNumber;
         }
       });
+      return true;
+    }
+    return false;
+  }
+  bool isValidForm(){
+    _formKey.currentState?.save();
+    if (_formKey.currentState!.validate()) {
       return true;
     }
     return false;
