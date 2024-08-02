@@ -14,4 +14,7 @@ public class JobQuestionAnswer : IEntity<int>
     public int JobQuestionId { get; set; }
     [Column("proposed_answer_id")]
     public int ProposedAnswerId { get; set; }
+
+    public virtual ProposedAnswer ProposedAnswer { get; set; }
+
 }

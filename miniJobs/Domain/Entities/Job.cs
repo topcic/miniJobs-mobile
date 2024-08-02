@@ -1,4 +1,5 @@
 ﻿using Domain.Common;
+using Domain.Enums;
 using Domain.Interfaces;
 
 namespace Domain.Entities;
@@ -23,7 +24,7 @@ public class Job : BaseAuditableEntity, IEntity<int>
     public int? ApplicationsDuration { get; set; }
 
     [Column("status")]
-    public int Status { get; set; }
+    public JobStatus Status { get; set; }
     [Column("required_employees")]
     public int? RequiredEmployees { get; set; }
 
@@ -56,5 +57,58 @@ public class Job : BaseAuditableEntity, IEntity<int>
 
     [NotMapped]
     public bool IsSaved { get; set; }
+
+
+    #region
+    private Dictionary<StatusTransition, JobStatus> transitions = new Dictionary<StatusTransition, JobStatus>
+        {
+            { new StatusTransition(JobStatus.Draft, JobCommand.Delete), JobStatus.Inactive },
+            { new StatusTransition(JobStatus.Draft, JobCommand.Activate), JobStatus.Active },
+            { new StatusTransition(JobStatus.Active, JobCommand.Delete), JobStatus.Inactive },
+            { new StatusTransition(JobStatus.Active, JobCommand.Complete), JobStatus.Completed }
+        };
+
+    private JobStatus GetNext(JobCommand command)
+    {
+        StatusTransition transition = new StatusTransition(Status, command);
+        JobStatus nextStatus;
+        if (!transitions.TryGetValue(transition, out nextStatus))
+        {
+            throw new Exception($"Invalid incoming order status transition: {Status} -> {command}");
+        }
+        return nextStatus;
+    }
+
+    public JobStatus MoveNext(JobCommand command)
+    {
+        Status = GetNext(command);
+        return Status;
+    }
+
+    private class StatusTransition
+    {
+        readonly JobStatus CurrentStatus;
+        readonly JobCommand Command;
+
+        public StatusTransition(JobStatus currentStatus, JobCommand command)
+        {
+            CurrentStatus = currentStatus;
+            Command = command;
+        }
+
+        public override int GetHashCode()
+        {
+            return CurrentStatus.GetHashCode() + Command.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            StatusTransition other = obj as StatusTransition;
+            return other != null && CurrentStatus == other.CurrentStatus && Command == other.Command;
+        }
+    }
+
+    #endregion
+
 
 }

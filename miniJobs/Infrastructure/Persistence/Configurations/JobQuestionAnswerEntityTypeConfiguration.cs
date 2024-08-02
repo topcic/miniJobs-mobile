@@ -9,5 +9,6 @@ public class JobQuestionAnswerEntityTypeConfiguration : IEntityTypeConfiguration
     {
         builder.HasOne<ProposedAnswer>().WithMany().HasForeignKey(x => x.ProposedAnswerId).OnDelete(DeleteBehavior.NoAction);
         builder.HasOne<JobQuestion>().WithMany().HasForeignKey(x => x.JobQuestionId).OnDelete(DeleteBehavior.NoAction);
+        builder.Ignore(x => x.ProposedAnswer);
     }
 }

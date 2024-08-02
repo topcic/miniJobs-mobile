@@ -117,7 +117,7 @@ class _EmployerHomePageState extends State<EmployerHomePage> {
       itemCount: applicants.result!.length,
       itemBuilder: (context, index) {
         final applicant = applicants.result![index];
-        return ApplicantCard(applicant: applicant, showOptions: false);
+        return ApplicantCard(applicant: applicant);
       },
     );
   }

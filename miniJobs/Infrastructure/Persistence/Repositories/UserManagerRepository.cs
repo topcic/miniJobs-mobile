@@ -56,9 +56,9 @@ public class UserManagerRepository(ApplicationDbContext context) : GenericReposi
                                  RatedUserId = r.RatedUserId,
                                  Created = r.Created,
                                  CreatedByFullName = u.FirstName + " " + u.LastName,
-                                 Photo=u.Photo,
-                                 CreatedBy=r.CreatedBy
-                                 
+                                 Photo = u.Photo,
+                                 CreatedBy = r.CreatedBy
+
                              }).ToListAsync();
 
         return ratings;
@@ -74,7 +74,7 @@ public class UserManagerRepository(ApplicationDbContext context) : GenericReposi
                     join c in context.Cities on j.CityId equals c.Id
                     where a.Status == JobApplicationStatus.Accepted
                           && a.CreatedBy == userId
-                          && j.Status == (int)JobStatus.Completed
+                          && j.Status == JobStatus.Completed
                     select new Job
                     {
                         Id = j.Id,
@@ -88,14 +88,14 @@ public class UserManagerRepository(ApplicationDbContext context) : GenericReposi
                         CityId = j.CityId,
                         State = j.State,
                         JobTypeId = j.JobTypeId,
-                        City = c // Include City information
+                        City = c
                     };
         }
         else
         {
             query = from j in context.Jobs
                     join c in context.Cities on j.CityId equals c.Id
-                    where j.Status == (int)JobStatus.Completed
+                    where j.Status == JobStatus.Completed
                     select new Job
                     {
                         Id = j.Id,
@@ -114,4 +114,70 @@ public class UserManagerRepository(ApplicationDbContext context) : GenericReposi
         }
         return await query.ToListAsync();
     }
+    public override async Task<User> TryFindAsync(int id)
+    {
+        var user = await (from u in DbSet
+                          join ur in Context.Set<UserRole>() on u.Id equals ur.UserId into userRoles
+                          from ur in userRoles.DefaultIfEmpty()
+                          join e in Context.Set<Employer>() on u.Id equals e.Id into employers
+                          from e in employers.DefaultIfEmpty()
+                          where u.Id == id
+                          select new User
+                          {
+                              Id = u.Id,
+                              FirstName = u.FirstName,
+                              LastName = u.LastName,
+                              Email = u.Email,
+                              PhoneNumber = u.PhoneNumber,
+                              Gender = u.Gender,
+                              DateOfBirth = u.DateOfBirth,
+                              CityId = u.CityId,
+                              Deleted = u.Deleted,
+                              AccountConfirmed = u.AccountConfirmed,
+                              PasswordHash = u.PasswordHash,
+                              AccessFailedCount = u.AccessFailedCount,
+                              Created = u.Created,
+                              CreatedBy = u.CreatedBy,
+                              Photo = u.Photo,
+                              Role = ur.RoleId, 
+                              Employer = e 
+                          })
+                     .SingleOrDefaultAsync();
+
+        if (user == null)
+        {
+            return null; 
+        }
+
+      
+        if (user.Role != null)
+        {
+            if (user.Role == "Applicant")
+            {
+                user.FullName = $"{user.FirstName} {user.LastName}";
+            }
+            else if (user.Role == "Employer")
+            {
+                if (!string.IsNullOrEmpty(user.Employer?.Name))
+                {
+                    user.FullName = user.Employer.Name;
+                }
+                else
+                {
+                    user.FullName = $"{user.FirstName} {user.LastName}";
+                }
+            }
+            else
+            {
+                user.FullName = $"{user.FirstName} {user.LastName}";
+            }
+        }
+        else
+        {
+            user.FullName = $"{user.FirstName} {user.LastName}";
+        }
+
+        return user;
+    }
+
 }

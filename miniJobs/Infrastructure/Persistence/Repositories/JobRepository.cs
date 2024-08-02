@@ -85,156 +85,93 @@ namespace Infrastructure.Persistence.Repositories
             return result;
         }
 
-        private static Job MapJob(DbDataReader reader)
-        {
-            var schemaTable = reader.GetSchemaTable();
-            bool columnExists = schemaTable.AsEnumerable()
-                                           .Any(row => row.Field<string>("ColumnName") == "NumberOfApplications");
-            return new Job
-            {
-                Id = reader.GetInt32(reader.GetOrdinal("id")),
-                Name = reader.GetString(reader.GetOrdinal("name")),
-                Description = reader.GetString(reader.GetOrdinal("description")),
-                StreetAddressAndNumber = reader.GetString(reader.GetOrdinal("street_address_and_number")),
-                State = reader.GetInt32(reader.GetOrdinal("state")),
-                CityId = reader.GetInt32(reader.GetOrdinal("city_id")),
-                Status = reader.GetInt32(reader.GetOrdinal("status")),
-                Created = reader.GetDateTime(reader.GetOrdinal("created")),
-                CreatedBy = reader.GetInt32(reader.GetOrdinal("created_by")),
-                NumberOfApplications = columnExists ? reader.GetInt32(reader.GetOrdinal("NumberOfApplications")) : 0,
-                ApplicationsDuration = reader.IsDBNull(reader.GetOrdinal("applications_duration"))
-    ? (int?)null
-    : reader.GetInt32(reader.GetOrdinal("applications_duration"))
-            };
-        }
 
         public async Task<IEnumerable<Job>> GetEmployerJobsAsync(int employerId)
         {
-            var sqlQuery = @"
-                SELECT j.*,
-                    (
-                        SELECT COUNT(*)
-                        FROM job_applications AS ja
-                        WHERE ja.job_id = j.id AND ja.status != 0
-                    ) AS NumberOfApplications
-                FROM jobs AS j
-                WHERE j.created_by = @employerId;
-            ";
+            var jobs = from j in _context.Jobs
+                       where j.CreatedBy == employerId && j.Status != JobStatus.Inactive
+                       select new
+                       {
+                           Job = j,
+                           NumberOfApplications = _context.JobApplications
+                                                .Where(ja => ja.JobId == j.Id && ja.Status != 0)
+                                                .Count()
+                       };
 
-            await using var connection = new SqlConnection(_context.Database.GetConnectionString());
-            await connection.OpenAsync();
+            var jobList = await jobs.ToListAsync();
 
-            await using var command = connection.CreateCommand();
-            command.CommandText = sqlQuery;
-            command.Parameters.Add(new SqlParameter("@employerId", employerId));
-            var jobs = new List<Job>();
-
-            await using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
+            var result = jobList.Select(job => new Job
             {
-                var job = MapJob(reader);
+                Id = job.Job.Id,
+                Name = job.Job.Name,
+                Description = job.Job.Description,
+                CreatedBy = job.Job.CreatedBy,
+                Created = job.Job.Created,
+                Status = job.Job.Status,
+                ApplicationsDuration = job.Job.ApplicationsDuration,
+                RequiredEmployees = job.Job.RequiredEmployees,
+                Wage = job.Job.Wage,
+                CityId = job.Job.CityId,
+                State = job.Job.State,
+                JobTypeId = job.Job.JobTypeId,
+                NumberOfApplications = job.NumberOfApplications
+            }).ToList();
 
-                jobs.Add(job);
-            }
-            return jobs;
+            return result;
         }
 
         public async Task<IEnumerable<Job>> SearchAsync(string searchText, int limit, int offset, int? cityId, int? jobTypeId)
         {
-            var sqlQuery = @"
-        WITH FilteredJobs AS (
-            SELECT j.*,
-                (
-                    SELECT JSON_QUERY(CAST((SELECT pa.id, pa.answer, pa.question_id 
-                                            FROM job_questions AS jq
-                                            LEFT JOIN job_question_answers AS qa ON jq.id = qa.job_question_id
-                                            LEFT JOIN proposed_answers AS pa ON qa.proposed_answer_id = pa.id
-                                            WHERE jq.job_id = j.id AND jq.question_id = 1 FOR JSON PATH) AS NVARCHAR(MAX)))
-                ) AS Schedules,
-                (
-                    SELECT JSON_QUERY(CAST((SELECT pa.id, pa.answer, pa.question_id 
-                                            FROM job_questions AS jq
-                                            LEFT JOIN job_question_answers AS qa ON jq.id = qa.job_question_id
-                                            LEFT JOIN proposed_answers AS pa ON qa.proposed_answer_id = pa.id
-                                            WHERE jq.job_id = j.id AND jq.question_id = 2 FOR JSON PATH) AS NVARCHAR(MAX)))
-                ) AS PaymentQuestion,
-                (
-                    SELECT JSON_QUERY(CAST((SELECT pa.id, pa.answer, pa.question_id 
-                                            FROM job_questions AS jq
-                                            LEFT JOIN job_question_answers AS qa ON jq.id = qa.job_question_id
-                                            LEFT JOIN proposed_answers AS pa ON qa.proposed_answer_id = pa.id
-                                            WHERE jq.job_id = j.id AND jq.question_id = 3 FOR JSON PATH) AS NVARCHAR(MAX)))
-                ) AS AdditionalPaymentOptions,
-                (
-                    SELECT JSON_QUERY(CAST((SELECT jt.*
-                                            FROM job_types AS jt
-                                            WHERE jt.id = j.job_type_id FOR JSON PATH) AS NVARCHAR(MAX)))
-                ) AS JobType,
-                (
-                    SELECT JSON_QUERY(CAST((SELECT c.*
-                                            FROM cities AS c
-                                            WHERE c.id = j.city_id FOR JSON PATH) AS NVARCHAR(MAX)))
-                ) AS City
-            FROM jobs AS j
-            WHERE (@searchText IS NULL OR j.name LIKE '%' + @searchText + '%')
-              AND (@cityId IS NULL OR j.city_id = @cityId)
-              AND (@jobTypeId IS NULL OR j.job_type_id = @jobTypeId)
-        )
-        SELECT *
-        FROM FilteredJobs
-        ORDER BY id
-        OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY;
-    ";
-            await using var connection = new SqlConnection(_context.Database.GetConnectionString());
-            await connection.OpenAsync();
+            var query = from j in _context.Jobs
+                        where (string.IsNullOrEmpty(searchText) || j.Name.Contains(searchText))
+                              && (!cityId.HasValue || j.CityId == cityId)
+                              && (!jobTypeId.HasValue || j.JobTypeId == jobTypeId)
+                        select new
+                        {
+                            Job = j,
+                            Schedules = (from jq in _context.JobQuestions
+                                         join qa in _context.JobQuestionAnswers on jq.Id equals qa.JobQuestionId
+                                         where jq.JobId == j.Id && jq.QuestionId == 1
+                                         select qa.ProposedAnswer).ToList(),
+                            PaymentQuestion = (from jq in _context.JobQuestions
+                                               join qa in _context.JobQuestionAnswers on jq.Id equals qa.JobQuestionId
+                                               where jq.JobId == j.Id && jq.QuestionId == 2
+                                               select qa.ProposedAnswer).FirstOrDefault(),
+                            AdditionalPaymentOptions = (from jq in _context.JobQuestions
+                                                        join qa in _context.JobQuestionAnswers on jq.Id equals qa.JobQuestionId
+                                                        where jq.JobId == j.Id && jq.QuestionId == 3
+                                                        select qa.ProposedAnswer).ToList(),
+                            JobType = _context.JobTypes.FirstOrDefault(jt => jt.Id == j.JobTypeId),
+                            City = _context.Cities.FirstOrDefault(c => c.Id == j.CityId)
+                        };
 
-            await using var command = connection.CreateCommand();
-            command.CommandText = sqlQuery;
-            command.Parameters.Add(new SqlParameter("@searchText", (object)searchText ?? DBNull.Value));
-            command.Parameters.Add(new SqlParameter("@cityId", (object)cityId ?? DBNull.Value));
-            command.Parameters.Add(new SqlParameter("@jobTypeId", (object)jobTypeId ?? DBNull.Value));
-            command.Parameters.Add(new SqlParameter("@limit", limit));
-            command.Parameters.Add(new SqlParameter("@offset", offset));
+            var jobList = await query.Skip(offset).Take(limit).ToListAsync();
 
-            var jobs = new List<Job>();
-
-            await using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
+            var result = jobList.Select(job => new Job
             {
-                var job = MapJob(reader);
+                Id = job.Job.Id,
+                Name = job.Job.Name,
+                Description = job.Job.Description,
+                StreetAddressAndNumber = job.Job.StreetAddressAndNumber,
+                ApplicationsDuration = job.Job.ApplicationsDuration,
+                Status = job.Job.Status,
+                RequiredEmployees = job.Job.RequiredEmployees,
+                Wage = job.Job.Wage,
+                CityId = job.Job.CityId,
+                State = job.Job.State,
+                JobTypeId = job.Job.JobTypeId,
+                Created = job.Job.Created,
+                CreatedBy = job.Job.CreatedBy,
+                Schedules = job.Schedules,
+                PaymentQuestion = job.PaymentQuestion,
+                AdditionalPaymentOptions = job.AdditionalPaymentOptions,
+                JobType = job.JobType,
+                City = job.City
+            }).ToList();
 
-                if (!reader.IsDBNull(reader.GetOrdinal("Schedules")))
-                {
-                    job.Schedules = JsonConvert.DeserializeObject<List<ProposedAnswer>>(reader.GetString(reader.GetOrdinal("Schedules")));
-                }
-                if (!reader.IsDBNull(reader.GetOrdinal("PaymentQuestion")))
-                {
-                    var proposedAnswers = JsonConvert.DeserializeObject<List<ProposedAnswer>>(reader.GetString(reader.GetOrdinal("PaymentQuestion")));
-                    if (proposedAnswers.Any())
-                    {
-                        job.PaymentQuestion = proposedAnswers.FirstOrDefault();
-                    }
-                }
-                if (!reader.IsDBNull(reader.GetOrdinal("AdditionalPaymentOptions")))
-                {
-                    job.AdditionalPaymentOptions = JsonConvert.DeserializeObject<List<ProposedAnswer>>(reader.GetString(reader.GetOrdinal("AdditionalPaymentOptions")));
-                }
-                if (!reader.IsDBNull(reader.GetOrdinal("JobType")))
-                {
-                    var types = JsonConvert.DeserializeObject<List<JobType>>(reader.GetString(reader.GetOrdinal("JobType")));
-                    job.JobType = types.FirstOrDefault();
-                }
-                if (!reader.IsDBNull(reader.GetOrdinal("City")))
-                {
-                    var cities = JsonConvert.DeserializeObject<List<City>>(reader.GetString(reader.GetOrdinal("City")));
-                    job.City = cities.FirstOrDefault();
-                }
-
-                jobs.Add(job);
-            }
-
-            return jobs;
+            return result;
         }
+
 
         public async Task<int> SearchCountAsync(string searchText, int? cityId, int? jobTypeId)
         {
@@ -333,7 +270,7 @@ namespace Infrastructure.Persistence.Repositories
                                                         .ToList()
                                    let finishedJobsCount = (from ja in _context.JobApplications
                                                             join j in _context.Jobs on ja.JobId equals j.Id
-                                                            where ja.CreatedBy == app.Applicant.Id && j.Status == (int)JobStatus.Completed
+                                                            where ja.CreatedBy == app.Applicant.Id && j.Status == JobStatus.Completed
                                                             select ja).Count()
                                    select new ApplicantDTO
                                    {

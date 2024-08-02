@@ -1,8 +1,10 @@
-﻿using Application.Jobs.Queries;
+﻿using Application.Applicants.Queries;
+using Application.Jobs.Queries;
 using Application.Users;
 using Application.Users.Commands;
 using Application.Users.Models;
 using Application.Users.Queries;
+using Domain.Dtos;
 using Domain.Entities;
 using Infrastructure.JobStateMachine;
 using MediatR;
@@ -62,5 +64,14 @@ public class UsersController(IMediator mediator, BaseState state) : ControllerBa
     public async Task<IActionResult> AddUserPhoto([FromRoute] int userId, [FromForm] IFormFile photo)
     {
         return Ok(await mediator.Send(new UserUpdatePhotoCommand(userId, photo)));
+    }
+
+    [HttpGet("{userId}")]
+    [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> FindUser([FromRoute] int userId)
+    {
+        return Ok(await mediator.Send(new UserTryFindQuery(userId)));
     }
 }

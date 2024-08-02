@@ -8,7 +8,6 @@ public class JobSaveRequest
     public string Name { get; set; }
     public string StreetAddressAndNumber { get; set; }
     public int CityId { get; set; }
-    public JobStatus Status { get; set; }
     public int? JobTypeId{ get; set; }
     public JobScheduleInfo? JobSchedule { get; set; }
     public Dictionary<int, List<int>?> AnswersToPaymentQuestions { get; set; }

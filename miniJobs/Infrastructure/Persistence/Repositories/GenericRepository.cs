@@ -20,7 +20,7 @@ public abstract class GenericRepository<TEntity, T, TContext> : IGenericReposito
         _Context = context;
     }
 
-    public async Task<TEntity> TryFindAsync(T id)
+    public virtual async Task<TEntity> TryFindAsync(T id)
     {
         return await DbSet.SingleOrDefaultAsync(x => x.Id.Equals(id));
     }

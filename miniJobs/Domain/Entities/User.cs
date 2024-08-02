@@ -61,4 +61,6 @@ public class User : IEntity<int>
     [NotMapped]
     public string FullName { get; set; }
 
+    [NotMapped]
+    public Employer Employer { get; set; }
 }

@@ -111,6 +111,14 @@ abstract class BaseProvider<T> with ChangeNotifier {
     return fromJson(response.data);
   }
 
+  Future<void> delete(int id) async {
+    try {
+      var url = "$_endpoint/$id";
+      await _dio.delete(url);
+    } catch (err) {
+      throw Exception(err.toString());
+    }
+  }
   T fromJson(data) {
     throw Exception("Method not implemented");
   }

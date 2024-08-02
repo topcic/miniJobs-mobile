@@ -18,7 +18,7 @@ class Employer extends User {
       super.id,
       super.firstName,
       super.lastName,
-      super.userName,
+      super.fullName,
       super.email,
       super.phoneNumber,
       super.role,

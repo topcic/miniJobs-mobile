@@ -30,6 +30,8 @@ public class JobApplyCommandHandler : IRequestHandler<JobApplyCommand, Job>
 
         if (command.Apply)
         {
+            ExceptionExtension.Validate("CAN_NOT_APPLY_TO_JOB_IN_THIS_STATUS", () => job.Status!=JobStatus.Active);
+
             ExceptionExtension.Validate("ALREADY_APPLIED", () => job.IsApplied);
             var jobApplication = new JobApplication
             {

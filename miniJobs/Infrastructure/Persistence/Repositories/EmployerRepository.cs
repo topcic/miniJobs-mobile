@@ -11,7 +11,7 @@ public class EmployerRepository(ApplicationDbContext _context) : GenericReposito
         if(requestedBy == userId) 
             query = from j in _context.Jobs
                     join c in _context.Cities on j.CityId equals c.Id
-                    where j.Status == (int)JobStatus.Active
+                    where j.Status == JobStatus.Active
                     select new Job
                     {
                         Id = j.Id,
@@ -40,7 +40,7 @@ public class EmployerRepository(ApplicationDbContext _context) : GenericReposito
                     from ja in jobApplications.DefaultIfEmpty()
                     join s in _context.SavedJobs on j.Id equals s.JobId into savedJobs
                     from sj in savedJobs.DefaultIfEmpty()
-                    where j.Status == (int)JobStatus.Active
+                    where j.Status == JobStatus.Active
                     select new Job
                     {
                         Id = j.Id,

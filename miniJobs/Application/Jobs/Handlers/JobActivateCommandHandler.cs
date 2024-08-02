@@ -11,14 +11,11 @@ namespace Application.Jobs.Handlers;
 public class JobActivateCommandHandler : IRequestHandler<JobActivateCommand, Job>
 {
     private readonly IJobRepository _jobRepository;
-    private readonly IJobTypeRepository _jobTypeRepository;
 
 
-
-    public JobActivateCommandHandler(IJobRepository jobRepository, IJobTypeRepository jobTypeRepository)
+    public JobActivateCommandHandler(IJobRepository jobRepository)
     {
         _jobRepository = jobRepository;
-        _jobTypeRepository = jobTypeRepository;
     }
 
     public async Task<Job> Handle(JobActivateCommand command, CancellationToken cancellationToken)
@@ -26,11 +23,10 @@ public class JobActivateCommandHandler : IRequestHandler<JobActivateCommand, Job
     {
         using var ts = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         Job job = await _jobRepository.TryFindAsync(command.Id);
-        ExceptionExtension.Validate("JOB_NOT_EXISTS", () => job == null);
-        JobType jobType = await _jobTypeRepository.TryFindAsync(job.JobTypeId.Value);
-        //ExceptionExtension.Validate("JOB_TYPE_NOT_EXISTS", () => jobType == null);
 
-        job.Status = (int)command.Status;
+        ExceptionExtension.Validate("JOB_NOT_EXISTS", () => job == null);
+
+        job.MoveNext(JobCommand.Activate);
 
         await _jobRepository.UpdateAsync(job);
 

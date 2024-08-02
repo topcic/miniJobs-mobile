@@ -9,7 +9,7 @@ class User {
   int? id;
   String? firstName;
   String? lastName;
-  String? userName;
+  String? fullName;
   String? email;
   String? phoneNumber;
   String? role;
@@ -19,7 +19,7 @@ class User {
   int? cityId;
   City? city;
 
-  User(this.id, this.firstName, this.lastName, this.userName, this.email,
+  User(this.id, this.firstName, this.lastName, this.fullName, this.email,
       this.phoneNumber, this.role, this.deleted, this.accountConfirmed, this.photo,this.cityId,this.city);
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);

@@ -16,9 +16,9 @@ namespace WebAPI.Controllers;
 public class JobsController(IMediator mediator, BaseState state) : ControllerBase
 {
     private readonly IMediator mediator = mediator;
-    private readonly BaseState state=state;
+    private readonly BaseState state = state;
 
- 
+
     [HttpPost("")]
     [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
@@ -53,11 +53,11 @@ public class JobsController(IMediator mediator, BaseState state) : ControllerBas
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Update([FromRoute] int jobId, [FromBody] JobSaveRequest request)
     {
-         request.Id = jobId;
+        request.Id = jobId;
         var initialState = JobState.JobDetails;
         var initialStateInstance = state.CreateState(initialState);
-        return Ok(await initialStateInstance.SaveDetails (request));
-    } 
+        return Ok(await initialStateInstance.SaveDetails(request));
+    }
     [HttpPut("{jobId}/activate")]
     [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
@@ -76,7 +76,7 @@ public class JobsController(IMediator mediator, BaseState state) : ControllerBas
         return Ok(await mediator.Send(new JobSearchQuery(request)));
     }
 
-    //JobGetApplicantsQuery
+
     [HttpGet("{jobId}/applicants")]
     [ProducesResponseType(typeof(IEnumerable<Applicant>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
@@ -84,5 +84,14 @@ public class JobsController(IMediator mediator, BaseState state) : ControllerBas
     public async Task<IActionResult> FindJobApplicants([FromRoute] int jobId)
     {
         return Ok(await mediator.Send(new JobGetApplicantsQuery(jobId)));
+    }
+
+    [HttpDelete("{id}")]
+    [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteAsync([FromRoute] int id)
+    {
+        return Ok(await mediator.Send(new JobDeleteCommand(id)));
     }
 }

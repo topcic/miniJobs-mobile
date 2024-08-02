@@ -37,6 +37,8 @@ public class JobDetailsSaveCommandHandler : IRequestHandler<JobDetailsSaveComman
         using var ts = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         Job job = await _jobRepository.TryFindAsync(command.Request.Id);
         ExceptionExtension.Validate("JOB_NOT_EXISTS", () => job == null);
+        ExceptionExtension.Validate("CAN_NOT_UPDATE_JOB_IN_THIS_STATUS", () => job.Status == JobStatus.Inactive || job.Status == JobStatus.Completed);
+
         JobType jobType;
         if (command.Request.JobTypeId.HasValue)
         {

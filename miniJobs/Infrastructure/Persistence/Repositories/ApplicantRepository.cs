@@ -31,7 +31,7 @@ public class ApplicantRepository(ApplicationDbContext context) : GenericReposito
 
         var numberOfFinishedJobs = await (from ja in _context.JobApplications
                                           join j in _context.Jobs on ja.JobId equals j.Id
-                                          where ja.CreatedBy == applicant.Id && j.Status == (int)JobStatus.Completed
+                                          where ja.CreatedBy == applicant.Id && j.Status == JobStatus.Completed
                                           select ja).CountAsync();
 
         return new ApplicantDTO
@@ -100,7 +100,7 @@ public class ApplicantRepository(ApplicationDbContext context) : GenericReposito
                                     .Average() ?? 0,
             NumberOfFinishedJobs = (from ja in _context.JobApplications
                                     join j in _context.Jobs on ja.JobId equals j.Id
-                                    where ja.CreatedBy == a.Id && j.Status == (int)JobStatus.Completed
+                                    where ja.CreatedBy == a.Id && j.Status == JobStatus.Completed
                                     select ja)
                                       .Count()
         })
