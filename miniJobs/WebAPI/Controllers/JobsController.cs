@@ -65,6 +65,15 @@ public class JobsController(IMediator mediator, BaseState state) : ControllerBas
     public async Task<IActionResult> ActivateJob([FromRoute] int jobId, [FromBody] int request)
     {
         return Ok(await mediator.Send(new JobActivateCommand(jobId, request)));
+    } 
+
+    [HttpPut("{jobId}/finish")]
+    [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> FinishJob([FromRoute] int jobId)
+    {
+        return Ok(await mediator.Send(new JobFinishCommand(jobId)));
     }
 
     [HttpGet("search")]

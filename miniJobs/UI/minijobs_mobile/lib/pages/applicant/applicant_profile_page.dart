@@ -8,11 +8,17 @@ import 'package:minijobs_mobile/pages/user-profile/user_ratings_view.dart';
 
 import '../../utils/photo_view.dart';
 import 'applicant_info.dart';
-import 'applicant_info_view.dart'; // Import your User model
+import 'applicant_info_view.dart';
 
 class ApplicantProfilePage extends StatefulWidget {
   final int userId;
-  const ApplicantProfilePage({super.key, required this.userId});
+  final bool showBackButton; // Add this parameter
+
+  const ApplicantProfilePage({
+    super.key,
+    required this.userId,
+    this.showBackButton = false, // Default to false if not provided
+  });
 
   @override
   _ApplicantProfilePageState createState() => _ApplicantProfilePageState();
@@ -22,14 +28,13 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
   late int userId;
   Applicant? applicant;
   bool isLoading = true;
-  bool isAbleTodoEdit=false;
+  bool isAbleTodoEdit = false;
 
   @override
   void initState() {
     super.initState();
-    //userId = int.parse(GetStorage().read('userId'));
-    userId=widget.userId;
-    isAbleTodoEdit=userId==int.parse(GetStorage().read('userId'));
+    userId = widget.userId;
+    isAbleTodoEdit = userId == int.parse(GetStorage().read('userId'));
     fetchUserData();
   }
 
@@ -57,6 +62,14 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
         length: 3,
         child: Scaffold(
           appBar: AppBar(
+            leading: widget.showBackButton
+                ? IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+                : null,
             title: const Text('Profile'),
           ),
           body: isLoading
@@ -73,7 +86,7 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
                     // Profile photo
                     GestureDetector(
                       onTap: () {
-                        if(isAbleTodoEdit) {
+                        if (isAbleTodoEdit) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -91,7 +104,7 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
                     const SizedBox(height: 10),
                     // Name
                     Text(
-                       '${applicant?.firstName ?? ''} ${applicant?.lastName ?? ''}',
+                      '${applicant?.firstName ?? ''} ${applicant?.lastName ?? ''}',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -127,9 +140,8 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
               Expanded(
                 child: TabBarView(
                   children: [
-                    ApplicantInfoView(applicantId:userId),
+                    ApplicantInfoView(applicantId: userId),
                     FinishedJobsView(userId: userId),
-                    // Utisci tab
                     UserRatingsView(userId: userId),
                   ],
                 ),

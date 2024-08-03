@@ -103,7 +103,7 @@ class _JobListState extends State<JobList> {
                         value: 'applicants',
                         child: ListTile(
                           leading: Icon(Icons.people, color: Colors.blue),
-                          title: Text('Applicants'),
+                          title: Text('Aplikanti'),
                         ),
                       ),
                     const PopupMenuItem<String>(

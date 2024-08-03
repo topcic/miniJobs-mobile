@@ -4,7 +4,8 @@ import 'package:provider/provider.dart';
 import '../../../utils/photo_view.dart';
 import '../../models/rating/rating_save_request.dart';
 import '../rate_user_card.dart';
-import '../../providers/rating_provider.dart'; // Ensure you have a provider for rating
+import '../../providers/rating_provider.dart';
+import 'applicant_profile_page.dart';
 
 class ApplicantCard extends StatefulWidget {
   final Applicant applicant;
@@ -74,80 +75,90 @@ class _ApplicantCardState extends State<ApplicantCard> {
 
     return Stack(
       children: [
-        Card(
-          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          elevation: 4,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  child: ClipOval(
-                    child: PhotoView(
-                      photo: widget.applicant.photo,
-                      editable: false,
-                      userId: widget.applicant.id!,
+        InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ApplicantProfilePage(userId: widget.applicant.id!,showBackButton: true),
+              ),
+            );
+          },
+          child: Card(
+            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    child: ClipOval(
+                      child: PhotoView(
+                        photo: widget.applicant.photo,
+                        editable: false,
+                        userId: widget.applicant.id!,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${widget.applicant.firstName} ${widget.applicant.lastName}',
-                        style: Theme.of(context).textTheme.subtitle1,
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
-                          const SizedBox(width: 4),
-                          Text(
-                            widget.applicant.city?.name ?? 'No City',
-                            style: TextStyle(color: Colors.grey[600]),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      if (widget.applicant.numberOfFinishedJobs != null &&
-                          widget.applicant.numberOfFinishedJobs! > 0)
-                        CircleAvatar(
-                          radius: 12,
-                          backgroundColor: Colors.blue,
-                          child: Text(
-                            '${widget.applicant.numberOfFinishedJobs}', // Replace with actual completed jobs count
-                            style: const TextStyle(color: Colors.white, fontSize: 12),
-                          ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${widget.applicant.firstName} ${widget.applicant.lastName}',
+                          style: Theme.of(context).textTheme.subtitle1,
                         ),
-                      const SizedBox(height: 8),
-                    ],
-                  ),
-                ),
-                if (widget.showChooseButton)
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: isRated
-                        ? Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        'Ocijenjen',
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    )
-                        : ElevatedButton(
-                      onPressed: () => _handleRating(context),
-                      child: const Text('Izaberi'),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
+                            const SizedBox(width: 4),
+                            Text(
+                              widget.applicant.city?.name ?? 'No City',
+                              style: TextStyle(color: Colors.grey[600]),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        if (widget.applicant.numberOfFinishedJobs != null &&
+                            widget.applicant.numberOfFinishedJobs! > 0)
+                          CircleAvatar(
+                            radius: 12,
+                            backgroundColor: Colors.blue,
+                            child: Text(
+                              '${widget.applicant.numberOfFinishedJobs}', // Replace with actual completed jobs count
+                              style: const TextStyle(color: Colors.white, fontSize: 12),
+                            ),
+                          ),
+                        const SizedBox(height: 8),
+                      ],
                     ),
                   ),
-              ],
+                  if (widget.showChooseButton)
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: isRated
+                          ? Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          'Ocijenjen',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      )
+                          : ElevatedButton(
+                        onPressed: () => _handleRating(context),
+                        child: const Text('Izaberi'),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         ),

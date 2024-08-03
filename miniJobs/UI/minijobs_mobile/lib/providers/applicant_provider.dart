@@ -29,7 +29,6 @@ class ApplicantProvider extends BaseProvider<Applicant> {
         url += "&JobTypeId=$jobTypeId";
       }
 
-      var dio = Dio();
       var response = await dio.get(url);
       var data = response.data;
 
