@@ -14,4 +14,11 @@ public class EmailSender(IEmailService emailService) : IEmailSender
 
         await emailService.SendEmailAsync(email, "Potvrda registracije na Mini Jobs", body);
     }
+
+    public async Task SendUserRatingNotificationEmailAsync(string creatorFullName, string ratedUserMail, string jobName)
+    {
+        var body = string.Format("Poštovani,<br /><br />Obavještavamo vas da je korisnik {0} ocijenio vaš rad na poslu {1}.<br />Mini Jobs", creatorFullName, jobName);
+
+        await emailService.SendEmailAsync(ratedUserMail, "Obavještenje o ocjeni rada", body);
+    }
 }

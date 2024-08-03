@@ -1,22 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/user_provider.dart';
+import '../models/rating/rating_save_request.dart';
 import '../models/user.dart';
 
 class RateUserCard extends StatefulWidget {
   final int ratedUserId;
+  final int jobApplicationId;
 
-  const RateUserCard({Key? key, required this.ratedUserId}) : super(key: key);
+  const RateUserCard({Key? key, required this.ratedUserId, required this.jobApplicationId}) : super(key: key);
 
   @override
   _RateUserCardState createState() => _RateUserCardState();
 }
 
 class _RateUserCardState extends State<RateUserCard> {
+  final _formKey = GlobalKey<FormState>();
   late UserProvider userProvider;
   User? ratedUser;
-  double rating = 0.0;
+  double rating = 0;
   String comment = '';
+  bool isLoading = false;
+  String? ratingError;
+  String? commentError;
 
   @override
   void didChangeDependencies() {
@@ -38,65 +44,102 @@ class _RateUserCardState extends State<RateUserCard> {
           : Text('Ocijenite ${ratedUser!.fullName}'),
       content: ratedUser == null
           ? const Center(child: CircularProgressIndicator())
-          : Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Koliko ste zadovoljni sa poslovanjem sa korisnikom?',
-            style: Theme.of(context).textTheme.bodyText2,
-          ),
-          const SizedBox(height: 8.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(5, (index) {
-              return Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      rating = index + 1.0;
-                    });
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: rating == index + 1.0
-                            ? Colors.blue
-                            : Colors.grey,
-                      ),
-                      borderRadius: BorderRadius.circular(4),
-                      color: rating == index + 1.0
-                          ? Colors.blue.withOpacity(0.2)
-                          : Colors.transparent,
-                    ),
-                    child: Center(
-                      child: Text(
-                        '${index + 1}',
-                        style: TextStyle(
-                          color: rating == index + 1.0
-                              ? Colors.blue
-                              : Colors.black,
+          : Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Koliko ste zadovoljni sa poslovanjem sa korisnikom?',
+              style: Theme.of(context).textTheme.bodyText2,
+            ),
+            const SizedBox(height: 8.0),
+            Container(
+              padding: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: ratingError != null ? Colors.red : Colors.grey,
+                ),
+                borderRadius: BorderRadius.circular(4),
+                color: ratingError != null ? Colors.red.withOpacity(0.1) : Colors.transparent,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(5, (index) {
+                  return Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          rating = index + 1.0;
+                          ratingError = null; // Clear the error when a rating is selected
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8.0),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: rating == index + 1.0 ? Colors.blue : Colors.grey,
+                          ),
+                          borderRadius: BorderRadius.circular(4),
+                          color: rating == index + 1.0 ? Colors.blue.withOpacity(0.2) : Colors.transparent,
+                        ),
+                        child: Center(
+                          child: Text(
+                            '${index + 1}',
+                            style: TextStyle(
+                              color: rating == index + 1.0 ? Colors.blue : Colors.black,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-              );
-            }),
-          ),
-          const SizedBox(height: 16.0),
-          TextFormField(
-            maxLines: 3,
-            decoration: InputDecoration(
-              labelText: 'Komentar',
-              border: OutlineInputBorder(),
+                  );
+                }),
+              ),
             ),
-            onChanged: (value) {
-              comment = value;
-            },
-          ),
-        ],
+            if (ratingError != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  ratingError!,
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            const SizedBox(height: 16.0),
+            TextFormField(
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: 'Komentar',
+                border: OutlineInputBorder(),
+                errorBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.red),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.red),
+                ),
+              ),
+              onChanged: (value) {
+                comment = value;
+                commentError = null; // Clear the error when a comment is entered
+              },
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Komentar je obavezan';
+                }
+                return null;
+              },
+            ),
+            if (commentError != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  commentError!,
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+          ],
+        ),
       ),
       actions: <Widget>[
         TextButton(
@@ -108,24 +151,37 @@ class _RateUserCardState extends State<RateUserCard> {
         TextButton(
           child: const Text('Ocijeni'),
           onPressed: () {
-            // Handle the rating and comment submission here
-            _submitRating();
-            Navigator.of(context).pop(); // Close the dialog
+            if (_formKey.currentState?.validate() == true && rating > 0) {
+              setState(() {
+                isLoading = true;
+                ratingError = null; // Clear the error when validation passes
+              });
+              _submitRating();
+            } else {
+              setState(() {
+                if (rating == 0) {
+                  ratingError = 'Ocjena je obavezna';
+                }
+              });
+            }
           },
         ),
       ],
+      contentPadding: EdgeInsets.only(top: 20, left: 24, right: 24, bottom: isLoading ? 24 : 0),
     );
   }
 
-  void _submitRating() {
+  Future<void> _submitRating() async {
     if (ratedUser != null) {
-      // Submit rating and comment logic
-      // For example, call a method in the UserProvider to save the rating
-    //  userProvider.submitRating(
-     //   ratedUserId: ratedUser!.id,
-      //  rating: rating.toInt(),
-//comment: comment,
-   //   );
+      final ratingSaveRequest = RatingSaveRequest(
+        comment,
+        rating.toInt(),
+        widget.jobApplicationId,
+        ratedUser!.id!,
+      );
+
+      // Return the RatingSaveRequest object to the calling component
+      Navigator.of(context).pop(ratingSaveRequest);
     }
   }
 }

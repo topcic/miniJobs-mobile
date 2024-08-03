@@ -260,7 +260,8 @@ namespace Infrastructure.Persistence.Repositories
                                  Applicant = a,
                                  User = u,
                                  City = c,
-                                 ApplicantJobTypes = a.ApplicantJobTypes
+                                 ApplicantJobTypes = a.ApplicantJobTypes,
+                                 JobApplicationId = ja.Id
                              };
 
             var applicantDetails = from app in applicants
@@ -272,6 +273,9 @@ namespace Infrastructure.Persistence.Repositories
                                                             join j in _context.Jobs on ja.JobId equals j.Id
                                                             where ja.CreatedBy == app.Applicant.Id && j.Status == JobStatus.Completed
                                                             select ja).Count()
+                                   let isRated = _context.Ratings
+                                                       .Any(r => r.RatedUserId == app.Applicant.Id &&
+                                                                 r.JobApplicationId == app.JobApplicationId)
                                    select new ApplicantDTO
                                    {
                                        Id = app.Applicant.Id,
@@ -294,12 +298,13 @@ namespace Infrastructure.Persistence.Repositories
                                        ApplicantJobTypes = app.ApplicantJobTypes,
                                        City = app.City,
                                        AverageRating = ratings.Any() ? (decimal)ratings.Average() : 0,
-                                       NumberOfFinishedJobs = finishedJobsCount
+                                       NumberOfFinishedJobs = finishedJobsCount,
+                                       JobApplicationId = app.JobApplicationId,
+                                       IsRated = isRated // Add this line
                                    };
 
             var result = await applicantDetails.ToListAsync();
             return result;
-
         }
     }
 }

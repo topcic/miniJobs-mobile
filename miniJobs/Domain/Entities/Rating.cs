@@ -22,6 +22,9 @@ public class Rating : BaseAuditableEntity, IEntity<int>
     [Column("rated_user_id")]
     public int RatedUserId { get; set; }
 
+    [Column("is_active")]
+    public bool IsActive { get; set; }
+
     [NotMapped]
     public string CreatedByFullName { get; set; }
 

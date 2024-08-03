@@ -24,4 +24,6 @@ public class EmployerDTO
     public City City { get; set; }
     public decimal AverageRating { get; set; }
     public string StreetAddressAndNumber { get; set; }
+    public bool IsRated { get; set; }
+
 }

@@ -17,6 +17,8 @@ class Applicant extends User {
   int? numberOfFinishedJobs;
   Decimal? averageRating;
   List<JobType>? jobTypes;
+  int?  jobApplicationId;
+  bool? isRated;
 
   Applicant(
       super.id,
@@ -38,7 +40,9 @@ class Applicant extends User {
       this.jobType,
       this.numberOfFinishedJobs,
       this.averageRating,
-      this.jobTypes);
+      this.jobTypes,
+      this.jobApplicationId,
+      this.isRated);
 
   factory Applicant.fromJson(Map<String, dynamic> json) => _$ApplicantFromJson(json);
 

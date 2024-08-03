@@ -36,7 +36,9 @@ Applicant _$ApplicantFromJson(Map<String, dynamic> json) => Applicant(
           : null,
     (json['jobTypes'] as List<dynamic>?)
         ?.map((e) => JobType.fromJson(e as Map<String, dynamic>))
-        .toList()
+        .toList(),
+      (json['jobApplicationId'] as num?)?.toInt(),
+      json['isRated'] as bool?,
 );
 
 Map<String, dynamic> _$ApplicantToJson(Applicant instance) => <String, dynamic>{
@@ -60,4 +62,6 @@ Map<String, dynamic> _$ApplicantToJson(Applicant instance) => <String, dynamic>{
       'numberOfFinishedJobs': instance.numberOfFinishedJobs,
       'averageRating': instance.averageRating,
       'jobTypes': instance.jobTypes,
+      'jobApplicationId': instance.jobApplicationId,
+      'isRated': instance.isRated
 };
