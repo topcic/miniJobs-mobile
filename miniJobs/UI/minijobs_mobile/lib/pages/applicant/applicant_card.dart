@@ -45,19 +45,13 @@ class _ApplicantCardState extends State<ApplicantCard> {
       try {
         final success = await ratingProvider.insert(ratingSaveRequest);
 
-        if (success.id != null) {
-          setState(() {
-            widget.applicant.isRated = true; // Start loading
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Uspješno ste ocijenili korisnika.')),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Došlo je do greške prilikom ocjenjivanja.')),
-          );
-        }
-      } catch (e) {
+        setState(() {
+          widget.applicant.isRated = true; // Start loading
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Uspješno ste ocijenili korisnika.')),
+        );
+            } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Došlo je do greške: $e')),
         );
@@ -109,7 +103,7 @@ class _ApplicantCardState extends State<ApplicantCard> {
                       children: [
                         Text(
                           '${widget.applicant.firstName} ${widget.applicant.lastName}',
-                          style: Theme.of(context).textTheme.subtitle1,
+                          style: Theme.of(context).textTheme.titleMedium,
                         ),
                         const SizedBox(height: 8),
                         Row(
@@ -147,9 +141,9 @@ class _ApplicantCardState extends State<ApplicantCard> {
                           color: Colors.green,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Text(
+                        child: const Text(
                           'Ocijenjen',
-                          style: const TextStyle(color: Colors.white),
+                          style: TextStyle(color: Colors.white),
                         ),
                       )
                           : ElevatedButton(
@@ -166,7 +160,7 @@ class _ApplicantCardState extends State<ApplicantCard> {
           Positioned.fill(
             child: Container(
               color: Colors.black54,
-              child: Center(
+              child: const Center(
                 child: CircularProgressIndicator(),
               ),
             ),

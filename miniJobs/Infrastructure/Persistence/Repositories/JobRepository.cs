@@ -126,6 +126,7 @@ namespace Infrastructure.Persistence.Repositories
                         where (string.IsNullOrEmpty(searchText) || j.Name.Contains(searchText))
                               && (!cityId.HasValue || j.CityId == cityId)
                               && (!jobTypeId.HasValue || j.JobTypeId == jobTypeId)
+                              && j.Status == JobStatus.Active
                         select new
                         {
                             Job = j,

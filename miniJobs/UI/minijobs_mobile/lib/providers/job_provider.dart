@@ -1,9 +1,14 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:minijobs_mobile/enumerations/job_statuses.dart';
 import 'package:minijobs_mobile/models/applicant/applicant.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/providers/base_provider.dart';
+
+import '../models/search_result.dart';
 
 class JobProvider extends BaseProvider<Job> {
   final List<Job> _jobs = [];
@@ -128,6 +133,39 @@ class JobProvider extends BaseProvider<Job> {
       return responseData;
     } catch (err) {
       throw Exception(err.toString());
+    }
+  }
+
+
+
+  Future<SearchResult<Job>> search({
+    String? searchText,
+    int? cityId,
+    int? jobTypeId,
+    int limit = 10,
+    int offset = 0,
+  }) async {
+    try {
+      var url = "${baseUrl}jobs/search?SearchText=$searchText&Limit=$limit&Offset=$offset";
+
+      if (cityId != null) {
+        url += "&CityId=$cityId";
+      }
+
+      if (jobTypeId != null) {
+        url += "&JobTypeId=$jobTypeId";
+      }
+
+      var response = await dio.get(url);
+      var data = response.data as Map<String, dynamic>;
+
+      var result = (data['result'] as List<dynamic>)
+          .map((item) => Job.fromJson(item as Map<String, dynamic>))
+          .toList();
+      var count = data ['count'] as int;
+      return SearchResult<Job>( count,result);
+    } on DioException catch (err) {
+      throw Exception(err.message);
     }
   }
 }

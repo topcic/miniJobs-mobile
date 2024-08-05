@@ -121,13 +121,14 @@ class _JobListState extends State<JobList> {
                           title: Text('Završi posao'),
                         ),
                       ),
-                    const PopupMenuItem<String>(
-                      value: 'delete',
-                      child: ListTile(
-                        leading: Icon(Icons.delete, color: Colors.red),
-                        title: Text('Obriši'),
+                    if (job.status != JobStatus.Zavrsen) // Hide delete if job is finished
+                      const PopupMenuItem<String>(
+                        value: 'delete',
+                        child: ListTile(
+                          leading: Icon(Icons.delete, color: Colors.red),
+                          title: Text('Obriši'),
+                        ),
                       ),
-                    ),
                   ];
                   return menuItems;
                 },

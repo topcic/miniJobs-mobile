@@ -28,12 +28,6 @@ public class EmployerRepository(ApplicationDbContext _context) : GenericReposito
                         City = c 
                     };
         else
-            /*
-             join a in context.JobApplications on j.Id equals a.JobId into jobApplications
-            from ja in jobApplications.DefaultIfEmpty()
-            join s in context.SavedJobs on j.Id equals s.JobId into savedJobs
-            from sj in savedJobs.DefaultIfEmpty()
-             */
             query = from j in _context.Jobs
                     join c in _context.Cities on j.CityId equals c.Id
                     join a in _context.JobApplications on j.Id equals a.JobId into jobApplications

@@ -1,5 +1,3 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
-
 part of 'job.dart';
 
 // **************************************************************************
@@ -15,7 +13,7 @@ Job _$JobFromJson(Map<String, dynamic> json) => Job()
       ? null
       : City.fromJson(json['city'] as Map<String, dynamic>)
   ..applicationsDuration = (json['applicationsDuration'] as num?)?.toInt()
-  ..status =jobStatusFromInt(json['status'] as int?)
+  ..status = jobStatusFromInt(json['status'] as int?)
   ..requiredEmployees = (json['requiredEmployees'] as num?)?.toInt()
   ..wage = (json['wage'] as num?)?.toInt()
   ..employer = json['employer'] == null
@@ -24,51 +22,50 @@ Job _$JobFromJson(Map<String, dynamic> json) => Job()
   ..state = (json['state'] as num?)?.toInt()
   ..cityId = (json['cityId'] as num?)?.toInt()
   ..created =
-      json['created'] == null ? null : DateTime.parse(json['created'] as String)
+  json['created'] == null ? null : DateTime.parse(json['created'] as String)
   ..numberOfApplications = (json['numberOfApplications'] as num?)?.toInt()
   ..jobTypeId = (json['jobTypeId'] as num?)?.toInt()
   ..jobType = json['jobType'] == null
       ? null
       : JobType.fromJson(json['jobType'] as Map<String, dynamic>)
   ..schedules = (json['schedules'] as List<dynamic>?)
-      ?.map((e) => ProposedAnswer.fromJson(e as Map<String, dynamic>))
+      ?.map((e) => e == null ? null : ProposedAnswer.fromJson(e as Map<String, dynamic>)).cast<ProposedAnswer>()
       .toList()
   ..paymentQuestion = json['paymentQuestion'] == null
       ? null
       : ProposedAnswer.fromJson(json['paymentQuestion'] as Map<String, dynamic>)
   ..additionalPaymentOptions =
-      (json['additionalPaymentOptions'] as List<dynamic>?)
-          ?.map((e) => ProposedAnswer.fromJson(e as Map<String, dynamic>))
-          .toList()
-  ..employerFullName = json['employerFullName'] as String? 
-  ..isApplied = (json['isApplied']  as bool?)
-  ..isSaved = (json['isSaved'] as bool?)    ;
+  (json['additionalPaymentOptions'] as List<dynamic>?)
+      ?.map((e) => e == null ? null : ProposedAnswer.fromJson(e as Map<String, dynamic>)).cast<ProposedAnswer>()
+      .toList()
+  ..employerFullName = json['employerFullName'] as String?
+  ..isApplied = json['isApplied'] as bool?
+  ..isSaved = json['isSaved'] as bool?;
 
 Map<String, dynamic> _$JobToJson(Job instance) => <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
-      'description': instance.description,
-      'streetAddressAndNumber': instance.streetAddressAndNumber,
-      'city': instance.city,
-      'applicationsEndTo': instance.applicationsDuration,
-      'status': instance.status?.index,
-      'requiredEmployees': instance.requiredEmployees,
-      'wage': instance.wage,
-      'employer': instance.employer,
-      'state': instance.state,
-      'cityId': instance.cityId,
-      'created': instance.created?.toIso8601String(),
-      'numberOfApplications': instance.numberOfApplications,
-      'jobTypeId': instance.jobTypeId,
-      'jobType': instance.jobType,
-      'schedules': instance.schedules,
-      'paymentQuestion': instance.paymentQuestion,
-      'additionalPaymentOptions': instance.additionalPaymentOptions,
-      'employerFullName': instance.employerFullName,
-      'isApplied': instance.isApplied,
-      'isSaved': instance.isSaved,
-
-    };
+  'id': instance.id,
+  'name': instance.name,
+  'description': instance.description,
+  'streetAddressAndNumber': instance.streetAddressAndNumber,
+  'city': instance.city,
+  'applicationsDuration': instance.applicationsDuration,
+  'status': instance.status?.index,
+  'requiredEmployees': instance.requiredEmployees,
+  'wage': instance.wage,
+  'employer': instance.employer,
+  'state': instance.state,
+  'cityId': instance.cityId,
+  'created': instance.created?.toIso8601String(),
+  'numberOfApplications': instance.numberOfApplications,
+  'jobTypeId': instance.jobTypeId,
+  'jobType': instance.jobType,
+  'schedules': instance.schedules,
+  'paymentQuestion': instance.paymentQuestion,
+  'additionalPaymentOptions': instance.additionalPaymentOptions,
+  'employerFullName': instance.employerFullName,
+  'isApplied': instance.isApplied,
+  'isSaved': instance.isSaved,
+};
 
 JobStatus? jobStatusFromInt(int? status) {
   if (status == null) return null;

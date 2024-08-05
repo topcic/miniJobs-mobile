@@ -7,7 +7,7 @@ import '../../applicant/applicant_card.dart';
 class JobFinishPage extends StatefulWidget {
   final int jobId;
 
-  const JobFinishPage({Key? key, required this.jobId}) : super(key: key);
+  const JobFinishPage({super.key, required this.jobId});
 
   @override
   _JobFinishPageState createState() => _JobFinishPageState();
@@ -93,12 +93,12 @@ class _JobFinishPageState extends State<JobFinishPage> {
           children: [
             Text(
               'Izaberite aplikanta sa kojim ste surađivali.',
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16.0),
             Text(
               'Da bi ste završili posao potrebno je da ocijenite i dodate komentar za aplikanta koji su Vam obavili posao.',
-              style: Theme.of(context).textTheme.bodyText2,
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 16.0),
             Expanded(

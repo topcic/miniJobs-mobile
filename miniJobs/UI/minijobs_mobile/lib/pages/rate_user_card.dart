@@ -8,7 +8,7 @@ class RateUserCard extends StatefulWidget {
   final int ratedUserId;
   final int jobApplicationId;
 
-  const RateUserCard({Key? key, required this.ratedUserId, required this.jobApplicationId}) : super(key: key);
+  const RateUserCard({super.key, required this.ratedUserId, required this.jobApplicationId});
 
   @override
   _RateUserCardState createState() => _RateUserCardState();
@@ -52,7 +52,7 @@ class _RateUserCardState extends State<RateUserCard> {
           children: [
             Text(
               'Koliko ste zadovoljni sa poslovanjem sa korisnikom?',
-              style: Theme.of(context).textTheme.bodyText2,
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 8.0),
             Container(
@@ -103,13 +103,13 @@ class _RateUserCardState extends State<RateUserCard> {
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Text(
                   ratingError!,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
               ),
             const SizedBox(height: 16.0),
             TextFormField(
               maxLines: 3,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Komentar',
                 border: OutlineInputBorder(),
                 errorBorder: OutlineInputBorder(
@@ -135,7 +135,7 @@ class _RateUserCardState extends State<RateUserCard> {
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Text(
                   commentError!,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
               ),
           ],

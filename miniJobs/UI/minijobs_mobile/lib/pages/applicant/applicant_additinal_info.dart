@@ -209,9 +209,9 @@ class _ApplicantAdditionalInfoState extends State<ApplicantAdditionalInfo> {
               const SizedBox(height: 16),
               MultiSelectDialogField<int>(
                 items: jobTypes?.map((jobType) => MultiSelectItem<int>(jobType.id!, jobType.name!)).toList() ?? [],
-                title: Text("Tipovi posla"),
+                title: const Text("Tipovi posla"),
                 initialValue: selectedJobTypeIds ?? [], // Use initialValue instead of selectedItems
-                  buttonText: Text(
+                  buttonText: const Text(
                     "Izaberite tip posla jim se bavite", // Your placeholder text here
                     style: TextStyle(
                       color: Colors.grey, // Placeholder text color
