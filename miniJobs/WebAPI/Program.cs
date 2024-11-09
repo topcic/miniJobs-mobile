@@ -23,6 +23,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRequestLocalization();
 app.UseMiddleware<UserMiddleware>();
 app.UseMiddleware<UnhandledExceptionMiddleware>();
 app.UseCors("miniJobsCors");

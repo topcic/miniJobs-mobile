@@ -20,7 +20,7 @@ class JobModal extends StatefulWidget {
 class _JobModalState extends State<JobModal> {
   late JobProvider jobProvider;
   late ApplicantProvider applicantProvider;
-  late Future<Job> jobFuture; // Future to hold job fetch
+  late Future<Job?> jobFuture; // Future to hold job fetch
 
   @override
   void didChangeDependencies() {
@@ -51,14 +51,14 @@ class _JobModalState extends State<JobModal> {
   }
 
   Future<void> saveJob(int jobId) async {
-    Future<Job> futureJob = applicantProvider.saveJob(jobId);
+    Future<Job?> futureJob = applicantProvider.saveJob(jobId);
     setState(() {
       this.jobFuture = futureJob;
     });
   }
 
   Future<void> unsaveJob(int jobId) async {
-    Future<Job> futureJob = applicantProvider.unsaveJob(jobId);
+    Future<Job?> futureJob = applicantProvider.unsaveJob(jobId);
     setState(() {
       this.jobFuture = futureJob;
     });
@@ -73,7 +73,7 @@ class _JobModalState extends State<JobModal> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Job>(
+    return FutureBuilder<Job?>(
       future: jobFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {

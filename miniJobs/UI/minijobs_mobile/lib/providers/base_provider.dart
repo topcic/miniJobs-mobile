@@ -4,10 +4,13 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 
+import '../services/notification.service.dart';
+
 abstract class BaseProvider<T> with ChangeNotifier {
   static String? _baseUrl;
   String _endpoint = "";
   final GetStorage _getStorage = GetStorage();
+  final notificationService = NotificationService();
   late final Dio _dio;
 
   BaseProvider(String endpoint) {
@@ -20,12 +23,14 @@ abstract class BaseProvider<T> with ChangeNotifier {
     _dio = Dio(BaseOptions(
       baseUrl: _baseUrl!,
       responseType: ResponseType.json,
-      contentType: "application/json",
+      contentType: "application/json"
     ));
+    _dio.options.headers["Accept-Language"] = "bs";
 
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         options.headers["Accept"] = "application/json";
+        options.headers["Accept-Language"] = "bs";
         String? token = _getStorage.read('accessToken');
         print("Access Token in onRequest: $token"); // Debug statement
         if (token != null) {
@@ -166,4 +171,11 @@ abstract class BaseProvider<T> with ChangeNotifier {
   }
 
   String get baseUrl => _baseUrl!;
+  void handleError(Object err) {
+    if (err is DioException) {
+      if (err.response != null) {
+        notificationService.error(err.response!.data);
+      }
+    }
+  }
 }

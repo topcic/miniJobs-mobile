@@ -1,6 +1,7 @@
 ﻿
 
 using Application.Common.Exceptions;
+using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -13,24 +14,15 @@ public class UnhandledExceptionMiddleware
 {
     private readonly ILogger logger;
     private readonly RequestDelegate next;
+    private readonly ILocalizationService localizationService;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref = "UnhandledExceptionMiddleware" /> middleware. 
-    /// </summary>
-    /// <param name="next">Next action</param>
-    /// <param name="logger">The logger</param>
-    /// <exception cref="ArgumentNullException"></exception>
-    public UnhandledExceptionMiddleware(RequestDelegate next, ILogger<UnhandledExceptionMiddleware> logger)
+    public UnhandledExceptionMiddleware(RequestDelegate next, ILogger<UnhandledExceptionMiddleware> logger, ILocalizationService localizationService)
     {
         this.next = next ?? throw new ArgumentNullException(nameof(next));
         this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        this.localizationService = localizationService;
     }
 
-    /// <summary>
-    /// Catch unhandled exception and format response (Internal server error with details)
-    /// </summary>
-    /// <param name="context">Http context</param>
-    /// <returns></returns>
     public async Task Invoke(HttpContext context)
     {
         try
@@ -42,13 +34,17 @@ public class UnhandledExceptionMiddleware
             logger.LogError(vEx, $"Endpoint: {context.Request.Method}: {context.Request.Path}");
             context.Response.StatusCode = StatusCodes.Status422UnprocessableEntity;
 
+            foreach (var ex in vEx.Errors) //translate validation messages
+                for (var i = 0; i < ex.Value.Length; i++)
+                    ex.Value[i] = localizationService.GetLocalizedString(ex.Value[i]).Value;
+
             await context.Response.WriteAsJsonAsync(vEx.Errors);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, $"Endpoint: {context.Request.Method}: {context.Request.Path}");
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
-            await context.Response.WriteAsJsonAsync(ex.Message);
+            await context.Response.WriteAsJsonAsync(localizationService.GetLocalizedString(ex.Message).Value);
         }
     }
 }

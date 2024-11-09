@@ -31,7 +31,7 @@ public static class ConfigureServices
                builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
-
+        services.AddLocalization();
         AddOptionSetups(services);
         AddRepositories(services);
         AddServices(services);
@@ -68,6 +68,9 @@ public static class ConfigureServices
         services.ConfigureOptions<JwtOptionsSetup>();
         services.ConfigureOptions<JwtBearerOptionsSetup>();
         services.ConfigureOptions<EmailSenderOptionsSetup>();
+        services.ConfigureOptions<MinijobsLocalizationOptionsSetup>();
+        services.ConfigureOptions<LocalizationOptionsSetup>();
+        services.ConfigureOptions<RequestLocalizationOptionsSetup>();
     }
     private static void AddServices(IServiceCollection services)
     {
@@ -75,6 +78,7 @@ public static class ConfigureServices
         services.AddScoped<ISecurityProvider, SecurityProvider>();
         services.AddTransient<IEmailService, EmailService>();
         services.AddTransient<IEmailSender, EmailSender>();
+        services.AddSingleton<ILocalizationService, LocalizationService>();
     }
 
     public static void ExecuteMigrations(this WebApplication webApplication)
