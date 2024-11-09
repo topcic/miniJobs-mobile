@@ -1,12 +1,7 @@
-﻿using Application.Applicants.Models;
-using Domain.Dtos;
-using Domain.Entities;
+﻿using Domain.Dtos;
 using Domain.Enums;
 using Microsoft.Data.SqlClient;
-using Newtonsoft.Json;
 using System.Data;
-using System.Data.Common;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Infrastructure.Persistence.Repositories
 {
@@ -120,12 +115,12 @@ namespace Infrastructure.Persistence.Repositories
             return result;
         }
 
-        public async Task<IEnumerable<Job>> SearchAsync(string searchText, int limit, int offset, int? cityId, int? jobTypeId)
+        public async Task<IEnumerable<Job>> SearchAsync(string searchText, int limit, int offset, int? cityId, Domain.Enums.SortOrder sort)
         {
             var query = from j in _context.Jobs
                         where (string.IsNullOrEmpty(searchText) || j.Name.Contains(searchText))
                               && (!cityId.HasValue || j.CityId == cityId)
-                              && (!jobTypeId.HasValue || j.JobTypeId == jobTypeId)
+                            //  && (!jobTypeId.HasValue || j.JobTypeId == jobTypeId)
                               && j.Status == JobStatus.Active
                         select new
                         {
@@ -146,7 +141,15 @@ namespace Infrastructure.Persistence.Repositories
                             City = _context.Cities.FirstOrDefault(c => c.Id == j.CityId)
                         };
 
-            var jobList = await query.Skip(offset).Take(limit).ToListAsync();
+            var jobList = sort == Domain.Enums.SortOrder.DESC
+    ? await query.OrderByDescending(job => job.Job.Created)
+                 .Skip(offset)
+                 .Take(limit)
+                 .ToListAsync()
+    : await query.OrderBy(job => job.Job.Created)
+                 .Skip(offset)
+                 .Take(limit)
+                 .ToListAsync();
 
             var result = jobList.Select(job => new Job
             {
@@ -174,14 +177,13 @@ namespace Infrastructure.Persistence.Repositories
         }
 
 
-        public async Task<int> SearchCountAsync(string searchText, int? cityId, int? jobTypeId)
+        public async Task<int> SearchCountAsync(string searchText, int? cityId)
         {
             var sqlQuery = @"
         SELECT COUNT(*)
         FROM jobs AS j
         WHERE (@searchText IS NULL OR j.name LIKE '%' + @searchText + '%')
-          AND (@cityId IS NULL OR j.city_id = @cityId)
-          AND (@jobTypeId IS NULL OR j.job_type_id = @jobTypeId);
+          AND (@cityId IS NULL OR j.city_id = @cityId);
     ";
             await using var connection = new SqlConnection(_context.Database.GetConnectionString());
             await connection.OpenAsync();
@@ -190,7 +192,6 @@ namespace Infrastructure.Persistence.Repositories
             command.CommandText = sqlQuery;
             command.Parameters.Add(new SqlParameter("@searchText", (object)searchText ?? DBNull.Value));
             command.Parameters.Add(new SqlParameter("@cityId", (object)cityId ?? DBNull.Value));
-            command.Parameters.Add(new SqlParameter("@jobTypeId", (object)jobTypeId ?? DBNull.Value));
 
             var count = (int)await command.ExecuteScalarAsync();
             return count;

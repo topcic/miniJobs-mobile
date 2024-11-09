@@ -15,7 +15,7 @@ class JobCard extends StatefulWidget {
 
 class _JobCardState extends State<JobCard> {
   late JobProvider jobProvider;
-  Job job = Job();
+  late Job job;
 
   @override
   void didChangeDependencies() {
@@ -25,7 +25,7 @@ class _JobCardState extends State<JobCard> {
   }
 
   Future<void> getJob(int id) async {
-    job = await jobProvider.get(widget.job.id!);
+    job = await jobProvider.get(id);
     setState(() {});
   }
 
@@ -58,7 +58,7 @@ class _JobCardState extends State<JobCard> {
               children: [
                 const Icon(Icons.location_on, size: 16),
                 Text(
-                  job.city?.name ?? '',
+                  job.city!.name!,
                   style: const TextStyle(fontSize: 12),
                 ),
               ],
@@ -71,25 +71,33 @@ class _JobCardState extends State<JobCard> {
               children: [
                 const Icon(Icons.money_sharp, size: 16),
                 Text(
-                  job.wage!=null && job.wage! > 0 ? job.wage.toString() : 'po dogovoru',
+                  job.wage != null && job.wage! > 0
+                      ? '${job.wage}'
+                      : 'po dogovoru',
                   style: const TextStyle(fontSize: 12),
                 ),
               ],
             ),
-            const Spacer(),
+            const SizedBox(height: 8),
             ElevatedButton(
               onPressed: () async {
-                await getJob(job.id!);
-                // Show dialog with job details
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return JobModal(
-                      job: job,
-                      role: GetStorage().read('role'),
-                    );
-                  },
-                );
+                if (job.id != null) {
+                  await getJob(job.id!);
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return JobModal(
+                        job: job,
+                        role: GetStorage().read('role'),
+                      );
+                    },
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Detalji posla nisu dostupni')),
+                  );
+                }
               },
               child: const Text('Pogledaj', style: TextStyle(fontSize: 14)),
             ),

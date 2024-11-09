@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:minijobs_mobile/enumerations/sort_order.dart';
 import 'package:minijobs_mobile/models/city.dart';
 import 'package:minijobs_mobile/models/search_result.dart';
 import 'package:minijobs_mobile/providers/city_provider.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
 import 'package:provider/provider.dart';
-
-import '../../pages/employer/job/job_card.dart';
-import '../job/job.dart';
+import '../employer/job/job_card.dart';
+import '../../models/job/job.dart';
 
 class ApplicantHomePage extends StatefulWidget {
   const ApplicantHomePage({super.key});
@@ -16,7 +16,6 @@ class ApplicantHomePage extends StatefulWidget {
 }
 
 class _ApplicantHomePageState extends State<ApplicantHomePage> {
-  final TextEditingController _locationController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
 
   late JobProvider _jobProvider;
@@ -24,12 +23,12 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
   SearchResult<Job> jobs = SearchResult(0, []); // Initialize jobs directly here
   List<City> cities = [];
   String? selectedCity;
+  String sort="Najnovije";
   bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    // jobs is already initialized
   }
 
   @override
@@ -55,12 +54,14 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
     City? city;
     if (selectedCity != null) {
       city = cities.firstWhere(
-            (city) => city.name == selectedCity,
+              (city) => city.name == selectedCity
       );
     }
+    SortOrder sortOrder= sort=='Najnovije'?SortOrder.DESC:SortOrder.ASC;
     jobs = await _jobProvider.search(
       searchText: searchTerm,
       cityId: city?.id,
+        sort: sortOrder
     );
 
     setState(() {
@@ -72,7 +73,7 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mini Jobs - Prijavi se'),
+        title: const Text('Mini Jobs - Poslovi'),
       ),
       body: Stack(
         children: [
@@ -85,8 +86,16 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
               setState(() {
                 selectedCity = value;
               });
+              searchJobs();
             },
             onSearch: searchJobs,
+            sort: sort,
+            onSortChanged:(String value){
+             setState(() {
+               sort=value;
+             });
+             searchJobs();
+            }
           ),
           JobListWidget(
             isLoading: isLoading,
@@ -99,7 +108,6 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
 
   @override
   void dispose() {
-    _locationController.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -150,12 +158,15 @@ class HeaderWidget extends StatelessWidget {
   }
 }
 
+
 class SearchBarWidget extends StatefulWidget {
   final TextEditingController searchController;
   final List<City> cities;
   final String? selectedCity;
   final ValueChanged<String?> onCityChanged;
   final VoidCallback onSearch;
+  final String sort;
+  final ValueChanged<String> onSortChanged;
 
   const SearchBarWidget({
     super.key,
@@ -164,6 +175,8 @@ class SearchBarWidget extends StatefulWidget {
     required this.selectedCity,
     required this.onCityChanged,
     required this.onSearch,
+    required this.sort,
+    required this.onSortChanged
   });
 
   @override
@@ -171,65 +184,186 @@ class SearchBarWidget extends StatefulWidget {
 }
 
 class _SearchBarWidgetState extends State<SearchBarWidget> {
+  String? selectedSortOption;
+  String? selectedFilterCity;
+
+  @override
+  void initState() {
+    this.selectedSortOption=widget.sort;
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: 100,
+      top: 82,
       left: 0,
       right: 0,
       child: Container(
-        height: 240,
-        decoration: BoxDecoration(
-          color: Colors.grey[100],
-          borderRadius: BorderRadius.circular(10.0),
-        ),
         margin: const EdgeInsets.symmetric(horizontal: 20.0),
         padding: const EdgeInsets.all(20.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 4.0,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
         child: Column(
           children: [
             Row(
               children: [
-                const Icon(Icons.search),
-                const SizedBox(width: 10.0),
                 Expanded(
-                  child: TextFormField(
+                  child: SearchBar(
                     controller: widget.searchController,
-                    decoration: const InputDecoration(
-                      hintText: 'Koji posao tražite?',
-                      border: InputBorder.none,
+                    leading: IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: widget.onSearch,
                     ),
+                    hintText: 'Pretraži...',
                   ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: const Icon(Icons.sort),
+                  onPressed: () {
+                    _showSortOptions();
+                  },
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: const Icon(Icons.filter_list),
+                  onPressed: () {
+                    _showFilterOptions();
+                  },
                 ),
               ],
             ),
-            const Divider(height: 20.0),
-            Row(
-              children: [
-                Expanded(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      double parentWidth = constraints.maxWidth;
-                      double desiredWidth = parentWidth * 0.8;
+          ],
+        ),
+      ),
+    );
+  }
 
-                      return Container(
-                        width: desiredWidth,
-                        height: 60.0,
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(5.0),
-                        ),
+  void _showSortOptions() {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  'Poredaj po',
+                  style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+              const Divider(),
+              ListTile(
+                leading: Icon(
+                  Icons.arrow_downward,
+                  color: selectedSortOption == 'Najnovije' ? Colors.blue : Colors.grey,
+                ),
+                title: const Text(
+                  'Najnovije',
+                  style: TextStyle(fontSize: 16.0),
+                ),
+                onTap: () {
+                  setState(() {
+                    selectedSortOption = 'Najnovije';
+                  });
+                  widget.onSortChanged('Najnovije');
+                  widget.onSearch();
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.arrow_upward,
+                  color: selectedSortOption == 'Najstarije' ? Colors.blue : Colors.grey,
+                ),
+                title: const Text(
+                  'Najstarije',
+                  style: TextStyle(fontSize: 16.0),
+                ),
+                onTap: () {
+                  setState(() {
+                    selectedSortOption = 'Najstarije';
+                  });
+                  widget.onSortChanged('Najstarije');
+                  widget.onSearch();
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showFilterOptions() {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Container(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Izaberi grad',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const Divider(),
+                  Row(
+                    children: [
+                      Expanded(
                         child: DropdownButtonFormField<String>(
-                          value: widget.selectedCity,
-                          decoration: const InputDecoration(
+                          value: selectedFilterCity,
+                          decoration: InputDecoration(
                             filled: true,
                             fillColor: Colors.white,
-                            labelText: 'Izaberi grad',
-                            border: OutlineInputBorder(),
-                            contentPadding: EdgeInsets.symmetric(
+                            contentPadding: const EdgeInsets.symmetric(
                               horizontal: 12.0,
                               vertical: 8.0,
                             ),
+                            suffixIcon: selectedFilterCity != null
+                                ? IconButton(
+                              icon: Icon(Icons.clear, color: Colors.grey),
+                              onPressed: () {
+                                setModalState(() {
+                                  selectedFilterCity = null;
+                                });
+                                widget.onCityChanged(null);
+                                widget.onSearch();
+                              },
+                            )
+                                : null,
                           ),
                           icon: const Icon(Icons.arrow_drop_down),
                           items: widget.cities.isEmpty
@@ -242,45 +376,28 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                               : widget.cities
                               .map((city) => DropdownMenuItem<String>(
                             value: city.name,
-                            child: Row(
-                              children: [
-                                Text(city.name!),
-                              ],
-                            ),
+                            child: Text(city.name!),
                           ))
                               .toList(),
-                          onChanged: widget.onCityChanged,
+                          onChanged: (value) {
+                            setModalState(() {
+                              selectedFilterCity = value;
+                            });
+                            widget.onCityChanged(value);
+                            widget.onSearch();
+                          },
                           isDense: true,
                           isExpanded: true,
                         ),
-                      );
-                    },
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20.0),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: ElevatedButton(
-                onPressed: widget.onSearch,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 15.0, horizontal: 30.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                ),
-                child: const Text(
-                  'Pretraži',
-                  style: TextStyle(color: Colors.white),
-                ),
+                ],
               ),
-            ),
-          ],
-        ),
-      ),
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -298,7 +415,7 @@ class JobListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: 340,
+      top: 180,
       left: 0,
       right: 0,
       bottom: 0,

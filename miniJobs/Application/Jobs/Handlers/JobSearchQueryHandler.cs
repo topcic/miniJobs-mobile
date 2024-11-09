@@ -20,9 +20,9 @@ public class JobSearchQueryHandler : IRequestHandler<JobSearchQuery, SearchRespo
     {
 
         SearchResponseBase<Job> result = new SearchResponseBase<Job>();
-        result.Count = await jobRepository.SearchCountAsync(request.SearchRequest.SearchText, request.SearchRequest.CityId, request.SearchRequest.JobTypeId);
+        result.Count = await jobRepository.SearchCountAsync(request.SearchRequest.SearchText, request.SearchRequest.CityId);
         result.Result = await jobRepository.SearchAsync(request.SearchRequest.SearchText, request.SearchRequest.Limit,
-            request.SearchRequest.Offset, request.SearchRequest.CityId, request.SearchRequest.JobTypeId);
+            request.SearchRequest.Offset, request.SearchRequest.CityId, request.SearchRequest.SortOrder);
         return result;
     }
 }
