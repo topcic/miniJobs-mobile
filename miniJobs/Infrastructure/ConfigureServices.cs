@@ -1,7 +1,6 @@
 ﻿using Application.Common.Interfaces;
 using Infrastructure.Authentication;
 using Infrastructure.Common.Interfaces;
-using Infrastructure.JobStateMachine;
 using Infrastructure.MailSenders;
 using Infrastructure.OptionsSetup;
 using Infrastructure.Persistence;
@@ -76,11 +75,6 @@ public static class ConfigureServices
         services.AddScoped<ISecurityProvider, SecurityProvider>();
         services.AddTransient<IEmailService, EmailService>();
         services.AddTransient<IEmailSender, EmailSender>();
-        services.AddTransient<BaseState>();
-        services.AddTransient<InitialJobState>();
-        services.AddTransient<JobDetailsState>();
-        services.AddTransient<PaymentState>();
-        services.AddTransient<ActiveJobState>();
     }
 
     public static void ExecuteMigrations(this WebApplication webApplication)

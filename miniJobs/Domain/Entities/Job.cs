@@ -35,9 +35,6 @@ public class Job : BaseAuditableEntity, IEntity<int>
     [Column("city_id")]
     public int CityId { get; set; }
 
-    [Column("state")]
-    public int State { get; set; }
-
     [Column("job_type_id")]
     public int? JobTypeId { get; set; }
 

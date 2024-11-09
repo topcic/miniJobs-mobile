@@ -82,12 +82,11 @@ class _JobCardState extends State<JobCard> {
             ElevatedButton(
               onPressed: () async {
                 if (job.id != null) {
-                  await getJob(job.id!);
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
                       return JobModal(
-                        job: job,
+                        jobId: job.id!,
                         role: GetStorage().read('role'),
                       );
                     },

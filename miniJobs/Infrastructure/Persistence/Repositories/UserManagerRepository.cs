@@ -86,7 +86,6 @@ public class UserManagerRepository(ApplicationDbContext context) : GenericReposi
                         RequiredEmployees = j.RequiredEmployees,
                         Wage = j.Wage,
                         CityId = j.CityId,
-                        State = j.State,
                         JobTypeId = j.JobTypeId,
                         City = c
                     };
@@ -107,7 +106,6 @@ public class UserManagerRepository(ApplicationDbContext context) : GenericReposi
                         RequiredEmployees = j.RequiredEmployees,
                         Wage = j.Wage,
                         CityId = j.CityId,
-                        State = j.State,
                         JobTypeId = j.JobTypeId,
                         City = c // Include City information
                     };

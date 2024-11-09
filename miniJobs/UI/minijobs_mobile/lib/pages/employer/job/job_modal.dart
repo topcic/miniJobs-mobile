@@ -3,14 +3,15 @@ import 'package:intl/intl.dart';
 import 'package:minijobs_mobile/enumerations/job_statuses.dart';
 import 'package:minijobs_mobile/enumerations/role.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
+import 'package:minijobs_mobile/providers/applicant_provider.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
 import 'package:provider/provider.dart';
 
 class JobModal extends StatefulWidget {
-  final Job job;
+  final int jobId;
   final String role;
 
-  const JobModal({super.key, required this.job, required this.role});
+  const JobModal({super.key, required this.jobId, required this.role});
 
   @override
   State<JobModal> createState() => _JobModalState();
@@ -18,203 +19,244 @@ class JobModal extends StatefulWidget {
 
 class _JobModalState extends State<JobModal> {
   late JobProvider jobProvider;
-  Job job = Job();
-  String role = '';
+  late ApplicantProvider applicantProvider;
+  late Future<Job> jobFuture; // Future to hold job fetch
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     jobProvider = context.read<JobProvider>();
-    job = widget.job;
-    role = widget.role;
-    setState(() {});
+    applicantProvider = context.read<ApplicantProvider>();
+
+    jobFuture = getJob(widget.jobId);
   }
 
-  bool get canUserApply {
-    return !(job.status != JobStatus.Zavrsen ||
-        job.isApplied! ||
-        role == Role.Employer ||
+  Future<Job> getJob(int jobId) async {
+    return await jobProvider.get(jobId);
+  }
+
+  bool canUserApply(Job job) {
+    return job.status != JobStatus.Zavrsen &&
+        !job.isApplied! &&
+        widget.role != Role.Employer &&
         job.created!
             .add(Duration(days: job.applicationsDuration!))
-            .isBefore(DateTime.now()));
+            .isAfter(DateTime.now());
   }
 
-  bool get canUserSaveJob {
-    return !(job.status != JobStatus.Zavrsen ||
-        role == Role.Employer ||
-        job.created!
-            .add(Duration(days: job.applicationsDuration!))
-            .isBefore(DateTime.now()));
+  bool canUserSaveJob(Job job) {
+    return job.status != JobStatus.Zavrsen &&
+        widget.role != Role.Employer &&
+        !(job.isSaved ?? false);
   }
 
-  Future<void> saveJob(bool save) async {
-    await jobProvider.save(job.id!, save);
+  Future<void> saveJob(int jobId) async {
+    Future<Job> futureJob = applicantProvider.saveJob(jobId);
+    setState(() {
+      this.jobFuture = futureJob;
+    });
   }
 
-  Future<void> applyToJob(bool apply) async {
-    await jobProvider.apply(job.id!, apply);
+  Future<void> unsaveJob(int jobId) async {
+    Future<Job> futureJob = applicantProvider.unsaveJob(jobId);
+    setState(() {
+      this.jobFuture = futureJob;
+    });
+  }
+
+  Future<void> applyToJob(int jobId, bool apply) async {
+    Future<Job> futureJob = jobProvider.apply(jobId, apply);
+    setState(() {
+      this.jobFuture = futureJob;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  if (canUserSaveJob)
-                    IconButton(
-                      onPressed: () async {
-                        await saveJob(true);
-                      },
-                      icon: const Icon(Icons.bookmark_outline),
-                    ),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon: const Icon(Icons.close),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Text(
-                job.name!,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Row(
+    return FutureBuilder<Job>(
+      future: jobFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // Show loading indicator while waiting for data
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          // Show error message if the fetch fails
+          return Center(child: Text('Failed to load job details'));
+        } else if (!snapshot.hasData) {
+          // Show empty state if no job data is available
+          return Center(child: Text('No job data available'));
+        }
+
+        // Job data successfully fetched
+        final job = snapshot.data!;
+
+        return Dialog(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: SingleChildScrollView(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.location_on),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      "${job.employerFullName} - ${job.city!.name}, ${job.streetAddressAndNumber}",
-                      style: const TextStyle(fontSize: 14),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      if (canUserSaveJob(job))
+                        IconButton(
+                          onPressed: () async {
+                            await saveJob(job.id!);
+                          },
+                          icon: const Icon(Icons.bookmark_outline),
+                        ),
+                      if (job.isSaved ?? false)
+                        IconButton(
+                          onPressed: () async {
+                            await unsaveJob(job.id!);
+                          },
+                          icon: const Icon(Icons.bookmark),
+                        ),
+                      IconButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        icon: const Icon(Icons.close),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    job.name!,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                'Opis posla:',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                job.description!,
-                style: const TextStyle(fontSize: 14),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Tip posla: ${job.jobType!.name}',
-                style: const TextStyle(fontSize: 14),
-              ),
-              const SizedBox(height: 10),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(Icons.money),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      "${job.wage != null && job.wage! > 0 ? job.wage : ''} ${job.paymentQuestion!.answer}",
-                      style: const TextStyle(fontSize: 14),
+                  const SizedBox(height: 10),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.location_on),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          "${job.employerFullName} - ${job.city!.name}, ${job.streetAddressAndNumber}",
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Opis posla:',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                'Raspored posla:',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                job.schedules?.map((option) => option.answer).join(', ') ?? '',
-                style: const TextStyle(fontSize: 14),
-              ),
-              const SizedBox(height: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+                  const SizedBox(height: 10),
+                  Text(
+                    job.description!,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Tip posla: ${job.jobType!.name}',
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.money),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          "${job.wage != null && job.wage! > 0 ? job.wage : ''} ${job.paymentQuestion!.answer}",
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Raspored posla:',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    job.schedules?.map((option) => option.answer).join(', ') ??
+                        '',
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  const SizedBox(height: 10),
                   if (job.additionalPaymentOptions != null &&
-                      job.additionalPaymentOptions!.isNotEmpty)...[
+                      job.additionalPaymentOptions!.isNotEmpty)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Dodatno plaća:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          job.additionalPaymentOptions!
+                              .map((option) => option.answer)
+                              .join(', '),
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ],
+                    ),
+                  const SizedBox(height: 10),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.supervisor_account),
+                      const SizedBox(width: 10),
+                      Text("${job.requiredEmployees} radnik/a"),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.date_range),
+                      const SizedBox(width: 10),
+                      Text(DateFormat('dd.MM.yyyy.').format(job.created!
+                          .add(Duration(days: job.applicationsDuration!)))),
+                    ],
+                  ),
+                  if (job.status == JobStatus.Zavrsen)
                     const Text(
-                      'Dodatno plaća:',
+                      'Posao je završen',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    Text(
-                      job.additionalPaymentOptions!
-                          .map((option) => option.answer)
-                          .join(', '),
-                      style: const TextStyle(fontSize: 14),
+                  const SizedBox(height: 20),
+                  if (canUserApply(job))
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () async {
+                            await applyToJob(job.id!, true);
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 20),
+                            child: Text('Apliciraj'),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
                 ],
               ),
-              const SizedBox(height: 10),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(Icons.supervisor_account),
-                  const SizedBox(width: 10),
-                  Text("${job.requiredEmployees} radnik/a"),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(Icons.date_range),
-                  const SizedBox(width: 10),
-                  Text(DateFormat('dd.MM.yyyy.').format(
-                      job.created!.add(Duration(days: job.applicationsDuration!)))),
-                ],
-              ),
-              if (job.status == JobStatus.Zavrsen)
-                const Text(
-                  'Posao je završen',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              const SizedBox(height: 20),
-              if (canUserApply)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () async {
-                        await applyToJob(true);
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        child: Text('Apliciraj'),
-                      ),
-                    ),
-                  ],
-                ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

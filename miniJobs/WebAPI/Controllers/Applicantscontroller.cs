@@ -2,6 +2,7 @@
 using Application.Applicants.Models;
 using Application.Applicants.Queries;
 using Application.Common.Models;
+using Application.Jobs.Commands;
 using Domain.Dtos;
 using Domain.Entities;
 using MediatR;
@@ -59,5 +60,22 @@ public class Applicantscontroller(IMediator mediator) : ControllerBase
     public async Task<IActionResult> UpdateAsync([FromRoute] int applicantId, [FromForm] ApplicantUpdateRequest request)
     {
         return Ok(await mediator.Send(new ApplicantUpdateCommand(applicantId, request)));
+    }
+    [HttpPost("saved-jobs/{jobId}")]
+    [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> SaveJobAsync([FromRoute] int jobId)
+    {
+        return Ok(await mediator.Send(new JobSaveCommand(jobId)));
+    }
+
+    [HttpDelete("saved-jobs/{jobId}")]
+    [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UnsaveJobAsync([FromRoute] int jobId)
+    {
+        return Ok(await mediator.Send(new JobUnsaveCommand(jobId)));
     }
 }

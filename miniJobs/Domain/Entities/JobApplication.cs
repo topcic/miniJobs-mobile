@@ -16,4 +16,7 @@ public class JobApplication : BaseAuditableEntity, IEntity<int>
 
     [Column("status")]
     public JobApplicationStatus Status { get; set; }
+
+    [Column("is_deleted")]
+    public bool IsDeleted { get; set; }
 }

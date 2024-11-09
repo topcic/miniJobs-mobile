@@ -23,7 +23,6 @@ public class EmployerRepository(ApplicationDbContext _context) : GenericReposito
                         RequiredEmployees = j.RequiredEmployees,
                         Wage = j.Wage,
                         CityId = j.CityId,
-                        State = j.State,
                         JobTypeId = j.JobTypeId,
                         City = c 
                     };
@@ -46,7 +45,6 @@ public class EmployerRepository(ApplicationDbContext _context) : GenericReposito
                         RequiredEmployees = j.RequiredEmployees,
                         Wage = j.Wage,
                         CityId = j.CityId,
-                        State = j.State,
                         JobTypeId = j.JobTypeId,
                         City = c,
                         IsSaved = sj != null && sj.CreatedBy == userId,

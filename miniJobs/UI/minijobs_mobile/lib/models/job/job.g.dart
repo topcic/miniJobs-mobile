@@ -43,8 +43,8 @@ Job _$JobFromJson(Map<String, dynamic> json) => Job()
       .whereType<ProposedAnswer>() // Filter out null values
       .toList()
   ..employerFullName = json['employerFullName'] as String?
-  ..isApplied = json['isApplied'] as bool?
-  ..isSaved = json['isSaved'] as bool?;
+  ..isApplied = json['isApplied'] as bool
+  ..isSaved = json['isSaved'] as bool;
 
 Map<String, dynamic> _$JobToJson(Job instance) => <String, dynamic>{
       'id': instance.id,

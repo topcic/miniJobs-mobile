@@ -100,31 +100,6 @@ class JobProvider extends BaseProvider<Job> {
     }
   }
 
-  Future<Job> save(int id, bool save) async {
-    try {
-      var url = "${baseUrl}jobs/$id/save";
-      dio.options.headers['Content-Type'] = 'application/json';
-
-      // Send the request with the status serialized as JSON
-      var response = await dio.post(url, data: save);
-      Job responseData = Job.fromJson(response.data);
-      if (save) {
-        Fluttertoast.showToast(
-          msg: "Uspješno ste spremili posao",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.green,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-      }
-      return responseData;
-    } catch (err) {
-      throw Exception(err.toString());
-    }
-  }
-
   Future<List<Applicant>> getApplicantsForJob(int jobId) async {
     try {
       var url = "${baseUrl}jobs/$jobId/applicants";
@@ -152,7 +127,7 @@ class JobProvider extends BaseProvider<Job> {
       if (cityId != null) {
         url += "&CityId=$cityId";
       }
-      
+
       url += "&SortOrder=${sort.name}";
 
       var response = await dio.get(url);

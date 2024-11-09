@@ -63,7 +63,6 @@ public class JobDetailsSaveCommandHandler : IRequestHandler<JobDetailsSaveComman
 
         job.LastModified = DateTime.UtcNow;
         job.LastModifiedBy = command.UserId;
-        job.State = (int)JobState.JobDetails;
 
         await _jobRepository.UpdateAsync(job);
 

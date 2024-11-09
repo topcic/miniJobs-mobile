@@ -1,50 +1,54 @@
-﻿//using Domain.Interfaces;
-//using Microsoft.EntityFrameworkCore;
-//using System.Linq.Expressions;
+﻿using Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
-//namespace Infrastructure.Persistence.Repositories;
+namespace Infrastructure.Persistence.Repositories;
 
-//public class RepositoryBase<T>(ApplicationDbContext context) : IRepositoryBase<T> where T : class
-//{
-//    protected ApplicationDbContext context = context;
+public class RepositoryBase<T>(ApplicationDbContext context) : IRepositoryBase<T> where T : class, IEntity<int>
+{
+    protected ApplicationDbContext _context = context;
+    
+    protected readonly DbSet<T> _dbSet;
 
-//    protected readonly DbSet<T> DbSet;
 
 
-//    public async Task<T> TryFindAsync(int id)
-//    {
-//        //return await DbSet.SingleOrDefaultAsync(x => x.Id.Equals(id));
-//    }
+    public async Task<IEnumerable<T>> FindAllAsync()
+    {
+        return await _dbSet.ToListAsync();
+    }
 
-//    public async Task<T> FindOneAsync(Expression<Func<T, bool>> condition)
-//    {
-//        return await DbSet.SingleOrDefaultAsync(condition);
-//    }
+    public async Task<T> TryFindAsync(int id)
+    {
+        var entity = await _dbSet.FindAsync(id);
+        return entity;
+    }
 
-//    public IEnumerable<T> Find(Expression<Func<T, bool>>? condition = null)
-//    {
-//        return condition != null ? DbSet.Where(condition).AsEnumerable() : DbSet.AsEnumerable();
-//    }
-//    public IEnumerable<T> FindAll()
-//    {
-//        return DbSet.AsEnumerable();
-//    }
-//    public async Task InsertAsync(T entity)
-//    {
-//        await DbSet.AddAsync(entity);
-//        await context.SaveChangesAsync();
-//    }
+    public async Task InsertAsync(T entity)
+    {
+        await _dbSet.AddAsync(entity);
+        await _context.SaveChangesAsync();
+    }
 
-//    public async Task UpdateAsync(T entity)
-//    {
-//        DbSet.Update(entity);
-//        await context.SaveChangesAsync();
+    public async Task UpdateAsync(T entity)
+    {
+        _dbSet.Update(entity);
+        await _context.SaveChangesAsync();
+    }
 
-//    }
+    public async Task DeleteAsync(int id)
+    {
+        var entity = await TryFindAsync(id); 
+        _dbSet.Remove(entity);
+        await _context.SaveChangesAsync();
+    }
 
-//    public async Task DeleteAsync(int id)
-//    {
-//        //  DbSet.SingleOrDefaultAsync(x => x.Id.Equals(id));
-//        await context.SaveChangesAsync();
-//    }
-//}
+    public IEnumerable<T> Find(Expression<Func<T, bool>> predicate)
+    {
+        return _dbSet.Where(predicate).AsEnumerable();
+    }
+
+    public async Task<T> FindOneAsync(Expression<Func<T, bool>> predicate)
+    {
+        return await _dbSet.SingleOrDefaultAsync(predicate);
+    }
+}

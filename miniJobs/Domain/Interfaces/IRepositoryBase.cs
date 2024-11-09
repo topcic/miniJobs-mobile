@@ -1,8 +1,7 @@
 ﻿using System.Linq.Expressions;
-
 namespace Domain.Interfaces;
 
-public interface IRepositoryBase<T> where T : class
+public interface IRepositoryBase<T> where T : IEntity<int>
 {
     /// <summary>
     /// Find all async

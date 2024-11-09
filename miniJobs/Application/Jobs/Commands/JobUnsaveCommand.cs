@@ -3,7 +3,7 @@ using Domain.Entities;
 
 namespace Application.Jobs.Commands;
 
-public class JobSaveCommand(int id) : CommandBase<Job>
+public class JobUnsaveCommand(int jobId) : CommandBase<Job>
 {
-    public int Id { get; set; } = id;
+    public int JobId { get; set; } = jobId;
 }

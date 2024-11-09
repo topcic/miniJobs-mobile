@@ -1,21 +1,16 @@
-﻿using Application.Applicants.Queries;
-using Application.Jobs.Queries;
-using Application.Users;
+﻿using Application.Users;
 using Application.Users.Commands;
 using Application.Users.Models;
 using Application.Users.Queries;
-using Domain.Dtos;
 using Domain.Entities;
-using Infrastructure.JobStateMachine;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers;
 [Route("api/users")]
-public class UsersController(IMediator mediator, BaseState state) : ControllerBase
+public class UsersController(IMediator mediator) : ControllerBase
 {
     private readonly IMediator mediator = mediator;
-    private readonly BaseState state = state;
 
 
     [HttpGet("")]

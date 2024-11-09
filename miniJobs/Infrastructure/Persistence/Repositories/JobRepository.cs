@@ -71,7 +71,7 @@ namespace Infrastructure.Persistence.Repositories
             if (isApplicant)
             {
                 var hasApplied = await _context.JobApplications.AnyAsync(ja => ja.JobId == id && ja.CreatedBy == userId);
-                var hasSaved = await _context.SavedJobs.AnyAsync(sj => sj.JobId == id && sj.CreatedBy == userId);
+                var hasSaved = await _context.SavedJobs.AnyAsync(sj => sj.JobId == id && sj.CreatedBy == userId && sj.IsDeleted==false);
 
                 result.IsApplied = hasApplied;
                 result.IsSaved = hasSaved;
@@ -107,7 +107,6 @@ namespace Infrastructure.Persistence.Repositories
                 RequiredEmployees = job.Job.RequiredEmployees,
                 Wage = job.Job.Wage,
                 CityId = job.Job.CityId,
-                State = job.Job.State,
                 JobTypeId = job.Job.JobTypeId,
                 NumberOfApplications = job.NumberOfApplications
             }).ToList();
@@ -162,7 +161,6 @@ namespace Infrastructure.Persistence.Repositories
                 RequiredEmployees = job.Job.RequiredEmployees,
                 Wage = job.Job.Wage,
                 CityId = job.Job.CityId,
-                State = job.Job.State,
                 JobTypeId = job.Job.JobTypeId,
                 Created = job.Job.Created,
                 CreatedBy = job.Job.CreatedBy,
@@ -214,7 +212,6 @@ namespace Infrastructure.Persistence.Repositories
                             RequiredEmployees = j.RequiredEmployees,
                             Wage = j.Wage,
                             CityId = j.CityId,
-                            State = j.State,
                             JobTypeId = j.JobTypeId,
                             City = c // Include City information
                         };
@@ -240,7 +237,6 @@ namespace Infrastructure.Persistence.Repositories
                             RequiredEmployees = j.RequiredEmployees,
                             Wage = j.Wage,
                             CityId = j.CityId,
-                            State = j.State,
                             JobTypeId = j.JobTypeId,
                             City = c // Include City information
                         };

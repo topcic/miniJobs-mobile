@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:minijobs_mobile/models/applicant/applicant.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/models/search_result.dart';
@@ -100,5 +102,52 @@ if (request.cvFile != null) {
     var response = await dio.put(url, data: formData);
 
     return fromJson(response.data);
+  }
+
+  Future<Job> saveJob(int jobId) async {
+    try {
+      var url = "${baseUrl}applicants/saved-jobs/$jobId";
+     // dio.options.headers['Content-Type'] = 'application/json';
+
+      // Send the request with the status serialized as JSON
+      var response = await dio.post(url);
+      Job responseData = Job.fromJson(response.data);
+
+        Fluttertoast.showToast(
+          msg: "Uspješno ste spremili posao",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      return responseData;
+    } catch (err) {
+      throw Exception(err.toString());
+    }
+  }
+  Future<Job> unsaveJob(int jobId) async {
+    try {
+      var url = "${baseUrl}applicants/saved-jobs/$jobId";
+  //    dio.options.headers['Content-Type'] = 'application/json';
+
+      // Send the request with the status serialized as JSON
+      var response = await dio.delete(url);
+      Job responseData = Job.fromJson(response.data);
+
+      Fluttertoast.showToast(
+        msg: "Uspješno ste uklonili posao",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      return responseData;
+    } catch (err) {
+      throw Exception(err.toString());
+    }
   }
 }

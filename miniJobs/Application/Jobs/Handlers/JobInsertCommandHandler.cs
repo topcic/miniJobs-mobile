@@ -27,7 +27,6 @@ namespace Application.Jobs.Handlers
             job.Created = DateTime.UtcNow;
             job.CreatedBy = command.UserId;
             job.Status = (int)JobStatus.Draft;
-            job.State = (int)JobState.Initial;
 
             await _jobRepository.InsertAsync(job);
             ts.Complete();

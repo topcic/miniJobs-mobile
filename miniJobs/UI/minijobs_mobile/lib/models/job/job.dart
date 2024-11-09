@@ -28,8 +28,8 @@ class Job {
   ProposedAnswer? paymentQuestion;
   List<ProposedAnswer>? additionalPaymentOptions;
   String? employerFullName;
-  bool? isApplied;
-  bool? isSaved;
+  bool isApplied = false;
+  bool isSaved = false;
 
   Job();
   Job.withData(this.id, this.name, this.description, this.streetAddressAndNumber,
