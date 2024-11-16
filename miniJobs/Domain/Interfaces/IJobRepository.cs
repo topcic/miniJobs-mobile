@@ -13,4 +13,6 @@ public interface IJobRepository : IGenericRepository<Job, int>
     Task<IEnumerable<Job>> GetApplicantSavedJobsAsync(int applicantId);
     Task<IEnumerable<Job>> GetApplicantAppliedJobsAsync(int applicantId);
     Task<IEnumerable<ApplicantDTO>> GetApplicants(int jobId);
+    Task<IEnumerable<Job>> GetJobsExpiringInTwoDaysAsync();
+    Task<IEnumerable<Job>> GetExpiredActiveJobsAsync();
 }

@@ -1,5 +1,7 @@
 ﻿using Application.Common.Interfaces;
+using Hangfire;
 using Infrastructure.Authentication;
+using Infrastructure.BackgroundServices;
 using Infrastructure.Common.Interfaces;
 using Infrastructure.MailSenders;
 using Infrastructure.OptionsSetup;
@@ -35,9 +37,19 @@ public static class ConfigureServices
         AddOptionSetups(services);
         AddRepositories(services);
         AddServices(services);
+        AddMailSenders(services);
 
+        AddBackgroundJobs(services,configuration);
         return services;
     }
+
+    private static void AddBackgroundJobs(IServiceCollection services, IConfiguration configuration)
+    {
+        string connectionString = configuration.GetConnectionString("DefaultConnectionHangfire");
+        services.AddHangfire(config => config.UseSqlServerStorage(connectionString));
+        services.AddHangfireServer(options=> options.SchedulePollingInterval=TimeSpan.FromSeconds(1));
+    }
+
     private static void AddRepositories(IServiceCollection services)
     {
         services.AddScoped<IJobRepository, JobRepository>();
@@ -60,8 +72,11 @@ public static class ConfigureServices
         services.AddScoped<IProposedAnswerRepository, ProposedAnswerRepository>();
         services.AddScoped<IJobQuestionRepository, JobQuestionRepository>();
         services.AddScoped<IJobQuestionAnswerRepository, JobQuestionAnswerRepository>();
+    }
 
-
+    private static void AddMailSenders(IServiceCollection services)
+    {
+        services.AddSingleton<IEmailSender, EmailSender>();
     }
     private static void AddOptionSetups(IServiceCollection services)
     {
@@ -71,13 +86,13 @@ public static class ConfigureServices
         services.ConfigureOptions<MinijobsLocalizationOptionsSetup>();
         services.ConfigureOptions<LocalizationOptionsSetup>();
         services.ConfigureOptions<RequestLocalizationOptionsSetup>();
+        services.ConfigureOptions<BackgroundJobServicesOptionsSetup>();
     }
     private static void AddServices(IServiceCollection services)
     {
         services.AddTransient<IJwtProvider, JwtProvider>();
         services.AddScoped<ISecurityProvider, SecurityProvider>();
         services.AddTransient<IEmailService, EmailService>();
-        services.AddTransient<IEmailSender, EmailSender>();
         services.AddSingleton<ILocalizationService, LocalizationService>();
     }
 

@@ -1,5 +1,7 @@
 using Application.Common.Middlewares;
+using Hangfire;
 using NLog.Web;
+using WebAPI.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +11,7 @@ builder.Host.UseNLog();
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddWebAPIServices(builder.Configuration);
+builder.Services.AddJobManagerAndServices();
 
 var app = builder.Build();
 
@@ -17,7 +20,13 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    app.UseHangfireDashboard(string.Empty, new DashboardOptions()
+    {
+        Authorization = []
+    });
 }
+app.StartRecurringJobs();
 
 app.UseHttpsRedirection();
 

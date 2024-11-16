@@ -1,4 +1,5 @@
 ﻿using Domain.Dtos;
+using Domain.Entities;
 using Domain.Enums;
 using Microsoft.Data.SqlClient;
 using System.Data;
@@ -71,7 +72,7 @@ namespace Infrastructure.Persistence.Repositories
             if (isApplicant)
             {
                 var hasApplied = await _context.JobApplications.AnyAsync(ja => ja.JobId == id && ja.CreatedBy == userId);
-                var hasSaved = await _context.SavedJobs.AnyAsync(sj => sj.JobId == id && sj.CreatedBy == userId && sj.IsDeleted==false);
+                var hasSaved = await _context.SavedJobs.AnyAsync(sj => sj.JobId == id && sj.CreatedBy == userId && sj.IsDeleted == false);
 
                 result.IsApplied = hasApplied;
                 result.IsSaved = hasSaved;
@@ -119,7 +120,7 @@ namespace Infrastructure.Persistence.Repositories
             var query = from j in _context.Jobs
                         where (string.IsNullOrEmpty(searchText) || j.Name.Contains(searchText))
                               && (!cityId.HasValue || j.CityId == cityId)
-                            //  && (!jobTypeId.HasValue || j.JobTypeId == jobTypeId)
+                              //  && (!jobTypeId.HasValue || j.JobTypeId == jobTypeId)
                               && j.Status == JobStatus.Active
                         select new
                         {
@@ -303,6 +304,28 @@ namespace Infrastructure.Persistence.Repositories
 
             var result = await applicantDetails.ToListAsync();
             return result;
+        }
+
+        public async Task<IEnumerable<Job>> GetJobsExpiringInTwoDaysAsync()
+        {
+            var twoDaysAgo = DateTime.UtcNow.AddDays(2);
+
+            var query = from j in _context.Jobs
+                        where j.Status == JobStatus.Active
+                        && EF.Functions.DateDiffDay(DateTime.UtcNow, j.Created.AddDays(j.ApplicationsDuration.Value)) == 2
+                        select j;
+
+            return await query.ToListAsync();
+        }
+
+        public async Task<IEnumerable<Job>> GetExpiredActiveJobsAsync()
+        {
+            var query = from j in _context.Jobs
+                        where j.Status == JobStatus.Active
+                              && DateTime.UtcNow > j.Created.AddDays(j.ApplicationsDuration.Value)
+                        select j;
+
+            return await query.ToListAsync();
         }
     }
 }

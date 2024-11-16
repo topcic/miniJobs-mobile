@@ -21,4 +21,18 @@ public class EmailSender(IEmailService emailService) : IEmailSender
 
         await emailService.SendEmailAsync(ratedUserMail, "Obavještenje o ocjeni rada", body);
     }
+
+    public async Task SendJobExpiringReminderEmailAsync(string creatorFullName, string creatorEmail, string jobName)
+    {
+        var body = string.Format(
+            "Poštovani {0},<br /><br />" +
+            "Obavještavamo vas da rok za prijavu na posao \"{1}\" ističe za dva dana.<br />" +
+            "Ako želite omogućiti više prijava, možete produžiti rok za prijavu kako biste privukli dodatne kandidate.<br /><br />" +
+            "Srdačan pozdrav,<br />Mini Jobs tim",
+            creatorFullName,
+            jobName
+        );
+
+        await emailService.SendEmailAsync(creatorEmail, "Obavještenje o isteku roka za prijavu", body);
+    }
 }
