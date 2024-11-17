@@ -3,13 +3,17 @@ using Hangfire;
 using Infrastructure.Authentication;
 using Infrastructure.BackgroundServices;
 using Infrastructure.Common.Interfaces;
+using Infrastructure.Mails;
 using Infrastructure.MailSenders;
+using Infrastructure.MessageProcessors;
 using Infrastructure.OptionsSetup;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
 using Infrastructure.Services;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.CodeAnalysis.FlowAnalysis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -40,6 +44,8 @@ public static class ConfigureServices
         AddMailSenders(services);
 
         AddBackgroundJobs(services,configuration);
+        AddMassTransitAndRabbitMq(services, configuration);
+        //AddConsumers(services);
         return services;
     }
 
@@ -48,6 +54,26 @@ public static class ConfigureServices
         string connectionString = configuration.GetConnectionString("DefaultConnectionHangfire");
         services.AddHangfire(config => config.UseSqlServerStorage(connectionString));
         services.AddHangfireServer(options=> options.SchedulePollingInterval=TimeSpan.FromSeconds(1));
+    }
+    private static void AddMassTransitAndRabbitMq(IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddMassTransit(configure =>
+        {
+            configure.SetKebabCaseEndpointNameFormatter();
+            configure.AddConsumer<ApplicationExpiryEmailConsumer>();
+            configure.UsingRabbitMq((context, cfg) =>
+            {
+                cfg.Host(new Uri(configuration["RabbitMQ:Host"]!), h =>
+                {
+                    h.Username(configuration["RabbitMQ:Username"]!);
+                    h.Password(configuration["RabbitMQ:Password"]!);
+                });
+
+                cfg.ConfigureEndpoints(context);
+                Console.WriteLine("MassTransit RabbitMQ endpoints configured.");
+            });
+        });
+
     }
 
     private static void AddRepositories(IServiceCollection services)
@@ -78,6 +104,12 @@ public static class ConfigureServices
     {
         services.AddSingleton<IEmailSender, EmailSender>();
     }
+
+
+    //private static void AddConsumers(IServiceCollection services)
+    //{
+    //    services.AddScoped<IConsumer<ApplicationExpiryMail>, ApplicationExpiryEmailConsumer>();
+    //}
     private static void AddOptionSetups(IServiceCollection services)
     {
         services.ConfigureOptions<JwtOptionsSetup>();

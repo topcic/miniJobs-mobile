@@ -1,0 +1,52 @@
+version: '3.4'
+
+services:
+  webapi:
+    image: ${DOCKER_REGISTRY-}webapi
+    build:
+      context: .
+      dockerfile: WebAPI/Dockerfile
+    environment:
+      - DefaultConnection=Server=host.docker.internal,1433;Database=miniJobs;User Id=sa;MultipleActiveResultSets=true;TrustServerCertificate=True;
+      - RABBITMQ_HOST=rabbitmq  # Define RabbitMQ host to connect WebAPI to RabbitMQ container
+      - RABBITMQ_USER=guest      # Default RabbitMQ user
+      - RABBITMQ_PASSWORD=guest
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+    depends_on:
+      - rabbitmq
+      - db
+
+  db:
+    container_name: app_db
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    restart: unless-stopped
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - 1405:1433
+    expose:
+      - 1433
+    networks:
+      - webnet
+
+  
+  rabbitmq:
+    image: rabbitmq:management  # RabbitMQ with management UI
+    container_name: rabbitmq_container
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "15672:15672"  # Expose RabbitMQ management UI (accessible at http://localhost:15672)
+      - "5672:5672"    # Expose RabbitMQ AMQP protocol port (used for communication with consumers/producers)
+    networks:
+      - webnet 
+
+volumes:
+  sql_data:  # Optional: Define volume for persistence
+
+networks:
+  webnet:  # Optional: Define network to connect services
+    driver: bridge
