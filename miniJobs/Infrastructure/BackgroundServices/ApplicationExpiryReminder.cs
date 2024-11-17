@@ -26,7 +26,7 @@ public class ApplicationExpiryReminder : IBackgroundService
         foreach (var job in jobs)
         {
             var creator = await userManagerRepository.TryFindAsync(job.CreatedBy.Value);
-            await emailSender.SendJobExpiringReminderEmailAsync(creator.FirstName, "27topcic.mahir@gmail.com", job.Name);
+            await emailSender.SendJobExpiringReminderEmailAsync(creator.FirstName, creator.Email, job.Name);
         }
     }
 }
