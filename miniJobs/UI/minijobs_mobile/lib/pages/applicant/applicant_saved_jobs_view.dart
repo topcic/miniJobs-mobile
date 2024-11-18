@@ -27,17 +27,16 @@ class _ApplicantSavedJobsViewState extends State<ApplicantSavedJobsView> {
     try {
       jobs = await _applicantProvider.getSavedJobs();
     } catch (error) {
-      // Handle error if necessary
       jobs = [];
     } finally {
-      setState(() {}); // Triggers rebuild after jobs are fetched
+      setState(() {}); // Rebuild UI after data is fetched
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Saved Jobs')),
+      appBar: AppBar(title: const Text('Spašeni poslovi')),
       body: jobs.isEmpty
           ? const Center(
         child: Text(
@@ -49,13 +48,7 @@ class _ApplicantSavedJobsViewState extends State<ApplicantSavedJobsView> {
         itemCount: jobs.length,
         itemBuilder: (context, index) {
           final job = jobs[index];
-          return ListView.builder(
-            itemCount: jobs.length,
-            itemBuilder: (context, index) {
-              final job = jobs[index];
-              return JobCard(job: job);
-            },
-          );
+          return JobCard(job: job); // Display each job using JobCard
         },
       ),
     );

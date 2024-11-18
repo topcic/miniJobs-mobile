@@ -201,7 +201,7 @@ namespace Infrastructure.Persistence.Repositories
             var query = from j in _context.Jobs
                         join sj in _context.SavedJobs on j.Id equals sj.JobId
                         join c in _context.Cities on j.CityId equals c.Id
-                        where sj.CreatedBy == applicantId
+                        where sj.CreatedBy == applicantId && sj.IsDeleted==false
                         select new Job
                         {
                             Id = j.Id,

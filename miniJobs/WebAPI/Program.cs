@@ -21,10 +21,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 
-    app.UseHangfireDashboard(string.Empty, new DashboardOptions()
-    {
-        Authorization = []
-    });
+    //app.UseHangfireDashboard(string.Empty, new DashboardOptions()
+    //{
+    //    Authorization = []
+    //});
 }
 app.StartRecurringJobs();
 
