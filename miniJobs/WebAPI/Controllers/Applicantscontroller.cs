@@ -35,7 +35,8 @@ public class Applicantscontroller(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(new ApplicantGetAppliedJobsQuery()));
     }
 
-    [HttpGet("savedjobs")]
+    [HttpGet("saved-jobs" +
+        "")]
     [ProducesResponseType(typeof(IEnumerable<Job>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]

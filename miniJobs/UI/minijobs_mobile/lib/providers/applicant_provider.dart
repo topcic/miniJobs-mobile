@@ -53,7 +53,7 @@ class ApplicantProvider extends BaseProvider<Applicant> {
 
   Future<List<Job>> getSavedJobs() async {
     try {
-      var url = "${baseUrl}applicants/savedjobs";
+      var url = "${baseUrl}applicants/saved-jobs";
       var response = await dio.get(url); // Use the dio getter here
       List<Job> responseData =
           List<Job>.from(response.data.map((item) => Job.fromJson(item)));
