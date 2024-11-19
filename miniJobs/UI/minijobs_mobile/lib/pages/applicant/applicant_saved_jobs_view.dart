@@ -1,54 +1,64 @@
 import 'package:flutter/material.dart';
-import 'package:minijobs_mobile/providers/applicant_provider.dart';
 import 'package:provider/provider.dart';
-
-import '../../models/job/job.dart';
+import '../../providers/applicant_provider.dart';
 import '../employer/job/job_card.dart';
 
 class ApplicantSavedJobsView extends StatefulWidget {
   const ApplicantSavedJobsView({super.key});
 
   @override
-  State<ApplicantSavedJobsView> createState() => _ApplicantSavedJobsViewState();
+  _ApplicantSavedJobsViewState createState() => _ApplicantSavedJobsViewState();
 }
 
 class _ApplicantSavedJobsViewState extends State<ApplicantSavedJobsView> {
-  late ApplicantProvider _applicantProvider;
-  List<Job> jobs = [];
+  late Future<void> _savedJobsFuture;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _applicantProvider = context.read<ApplicantProvider>();
-    getJobs();
+  void initState() {
+    super.initState();
+    // Fetch the saved jobs when the view is created
+    _savedJobsFuture = _fetchSavedJobs();
   }
 
-  Future<void> getJobs() async {
-    try {
-      jobs = await _applicantProvider.getSavedJobs();
-    } catch (error) {
-      jobs = [];
-    } finally {
-      setState(() {}); // Rebuild UI after data is fetched
-    }
+  Future<void> _fetchSavedJobs() async {
+    final applicantProvider = context.read<ApplicantProvider>();
+    await applicantProvider.getSavedJobs();
   }
 
   @override
   Widget build(BuildContext context) {
+    final applicantProvider = context.watch<ApplicantProvider>();
+    final savedJobs = applicantProvider.savedJobs;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Spašeni poslovi')),
-      body: jobs.isEmpty
-          ? const Center(
-        child: Text(
-          'Nemate spremljenih poslova',
-          style: TextStyle(fontSize: 16),
-        ),
-      )
-          : ListView.builder(
-        itemCount: jobs.length,
-        itemBuilder: (context, index) {
-          final job = jobs[index];
-          return JobCard(job: job); // Display each job using JobCard
+      appBar:  AppBar(title: Text('Spašeni poslovi')),
+      body: FutureBuilder<void>(
+        future: _savedJobsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
+          if (savedJobs == null || savedJobs.isEmpty) {
+            return const Center(
+              child: Text(
+                'Nemate spremljenih poslova',
+                style: TextStyle(fontSize: 16),
+              ),
+            );
+          }
+
+          return ListView.builder(
+            itemCount: savedJobs.length,
+            itemBuilder: (context, index) {
+              final job = savedJobs[index];
+              return JobCard(job: job,isInSavedJobs: true);
+            },
+          );
         },
       ),
     );

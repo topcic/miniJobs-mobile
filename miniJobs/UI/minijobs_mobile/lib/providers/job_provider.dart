@@ -31,6 +31,7 @@ class JobProvider extends BaseProvider<Job> {
     return _currentJob;
   }
 
+
   Future<Job> apply(int id, bool apply) async {
     try {
       var url = "${baseUrl}jobs/$id/apply";

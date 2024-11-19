@@ -7,7 +7,8 @@ import 'package:provider/provider.dart';
 
 class JobCard extends StatefulWidget {
   final Job job;
-  const JobCard({super.key, required this.job});
+  final bool isInSavedJobs;
+  const JobCard({super.key, required this.job,this.isInSavedJobs = false});
 
   @override
   State<JobCard> createState() => _JobCardState();
@@ -88,6 +89,7 @@ class _JobCardState extends State<JobCard> {
                       return JobModal(
                         jobId: job.id!,
                         role: GetStorage().read('role'),
+                          isInSavedJobs: widget.isInSavedJobs
                       );
                     },
                   );

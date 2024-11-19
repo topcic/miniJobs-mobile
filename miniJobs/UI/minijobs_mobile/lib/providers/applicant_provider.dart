@@ -12,11 +12,14 @@ import '../services/notification.service.dart';
 
 class ApplicantProvider extends BaseProvider<Applicant> {
   final notificationService = NotificationService();
+  List<Job>? _savedJobs;
+
   ApplicantProvider() : super("applicants");
   @override
   Applicant fromJson(data) {
     return Applicant.fromJson(data);
   }
+  List<Job>? get savedJobs => _savedJobs;
 
   Future<SearchResult<Applicant>> searchApplicants({
     String? searchText,
@@ -57,6 +60,8 @@ class ApplicantProvider extends BaseProvider<Applicant> {
       var response = await dio.get(url); // Use the dio getter here
       List<Job> responseData =
           List<Job>.from(response.data.map((item) => Job.fromJson(item)));
+      _savedJobs = responseData;
+      notifyListeners();
       return responseData;
     } catch (err) {
       throw Exception(err.toString());

@@ -120,8 +120,9 @@ class _NavbarState extends State<Navbar> {
 
     if (role == 'Applicant') {
       return [
-       const  ApplicantHomePage(),
         const ApplicantSavedJobsView(),
+       const  ApplicantHomePage(),
+       // const ApplicantSavedJobsView(),
         _buildPage("View List Page"),
         ApplicantProfilePage(userId: userId ),
       ];

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:minijobs_mobile/enumerations/job_statuses.dart';
@@ -10,8 +12,8 @@ import 'package:provider/provider.dart';
 class JobModal extends StatefulWidget {
   final int jobId;
   final String role;
-
-  const JobModal({super.key, required this.jobId, required this.role});
+  final bool isInSavedJobs;
+  const JobModal({super.key, required this.jobId, required this.role,this.isInSavedJobs = false});
 
   @override
   State<JobModal> createState() => _JobModalState();
@@ -51,16 +53,30 @@ class _JobModalState extends State<JobModal> {
   }
 
   Future<void> saveJob(int jobId) async {
-    Future<Job?> futureJob = applicantProvider.saveJob(jobId);
     setState(() {
-      this.jobFuture = futureJob;
+      jobFuture = applicantProvider.saveJob(jobId);
+    });
+
+    jobFuture.then((job) {
+      if (job != null) {
+        if (widget.isInSavedJobs) {
+          applicantProvider.getSavedJobs();
+        }
+      }
     });
   }
 
   Future<void> unsaveJob(int jobId) async {
-    Future<Job?> futureJob = applicantProvider.unsaveJob(jobId);
     setState(() {
-      this.jobFuture = futureJob;
+      jobFuture = applicantProvider.unsaveJob(jobId);
+    });
+
+    jobFuture.then((job) {
+      if (job != null) {
+        if (widget.isInSavedJobs) {
+          applicantProvider.getSavedJobs();
+        }
+      }
     });
   }
 
