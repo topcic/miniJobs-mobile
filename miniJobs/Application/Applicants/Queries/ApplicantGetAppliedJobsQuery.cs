@@ -3,7 +3,7 @@ using Domain.Entities;
 
 namespace Application.Applicants.Queries;
 
-public class ApplicantGetAppliedJobsQuery : QueryBase<IEnumerable<Job>>
+public class ApplicantGetAppliedJobsQuery : QueryBase<IEnumerable<JobApplication>>
 {
 
 }

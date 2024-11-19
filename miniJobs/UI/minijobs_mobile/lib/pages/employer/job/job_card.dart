@@ -32,6 +32,7 @@ class _JobCardState extends State<JobCard> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return Card(
       margin: const EdgeInsets.all(10.0),
       color: Colors.blue[50],
@@ -46,9 +47,10 @@ class _JobCardState extends State<JobCard> {
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 14,
+              style: TextStyle(
+                fontSize: screenWidth * 0.045,
                 fontWeight: FontWeight.bold,
+                color: Colors.blueGrey[900],
               ),
             ),
             const SizedBox(height: 8),
@@ -60,7 +62,10 @@ class _JobCardState extends State<JobCard> {
                 const Icon(Icons.location_on, size: 16),
                 Text(
                   job.city!.name!,
-                  style: const TextStyle(fontSize: 12),
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.035,
+                    color: Colors.grey[700],
+                  ),
                 ),
               ],
             ),
@@ -70,12 +75,15 @@ class _JobCardState extends State<JobCard> {
               crossAxisAlignment: WrapCrossAlignment.center,
               spacing: 8,
               children: [
-                const Icon(Icons.money_sharp, size: 16),
+                const Icon(Icons.money_sharp, size: 16, color: Colors.green),
                 Text(
-                  job.wage != null && job.wage! > 0
-                      ? '${job.wage}'
+                  job!.wage != null && job!.wage! > 0
+                      ? '${job!.wage} KM'
                       : 'po dogovoru',
-                  style: const TextStyle(fontSize: 12),
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.035,
+                    color: Colors.green[800],
+                  ),
                 ),
               ],
             ),

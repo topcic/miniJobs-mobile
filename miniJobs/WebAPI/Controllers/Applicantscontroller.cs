@@ -26,8 +26,8 @@ public class Applicantscontroller(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(new ApplicantSearchAsyncQuery(request)));
     }
 
-    [HttpGet("appliedjobs")]
-    [ProducesResponseType(typeof(IEnumerable<Job>), StatusCodes.Status200OK)]
+    [HttpGet("applied-jobs")]
+    [ProducesResponseType(typeof(IEnumerable<JobApplication>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAppliedJobs()
@@ -35,8 +35,7 @@ public class Applicantscontroller(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(new ApplicantGetAppliedJobsQuery()));
     }
 
-    [HttpGet("saved-jobs" +
-        "")]
+    [HttpGet("saved-jobs")]
     [ProducesResponseType(typeof(IEnumerable<Job>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]

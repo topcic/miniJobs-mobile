@@ -19,4 +19,7 @@ public class JobApplication : BaseAuditableEntity, IEntity<int>
 
     [Column("is_deleted")]
     public bool IsDeleted { get; set; }
+
+    [NotMapped]
+    public Job Job { get; set; }
 }

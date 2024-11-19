@@ -1,18 +1,16 @@
-import 'dart:developer';
-
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:minijobs_mobile/models/applicant/applicant.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/models/search_result.dart';
 import 'package:minijobs_mobile/providers/base_provider.dart';
 
+import '../models/job/job_application.dart';
 import '../services/notification.service.dart';
 
 class ApplicantProvider extends BaseProvider<Applicant> {
   final notificationService = NotificationService();
   List<Job>? _savedJobs;
+  List<JobApplication>? _appliedJobs;
 
   ApplicantProvider() : super("applicants");
   @override
@@ -20,6 +18,8 @@ class ApplicantProvider extends BaseProvider<Applicant> {
     return Applicant.fromJson(data);
   }
   List<Job>? get savedJobs => _savedJobs;
+  List<JobApplication>? get appliedJobs => _appliedJobs;
+
 
   Future<SearchResult<Applicant>> searchApplicants({
     String? searchText,
@@ -68,12 +68,14 @@ class ApplicantProvider extends BaseProvider<Applicant> {
     }
   }
 
-  Future<List<Job>> getAppliedJobs(int userId) async {
+  Future<List<JobApplication>> getAppliedJobs() async {
     try {
-      var url = "${baseUrl}applicants/appliedjobs";
+      var url = "${baseUrl}applicants/applied-jobs";
       var response = await dio.get(url); // Use the dio getter here
-      List<Job> responseData =
-          List<Job>.from(response.data.map((item) => Job.fromJson(item)));
+      List<JobApplication> responseData =
+          List<JobApplication>.from(response.data.map((item) => JobApplication.fromJson(item)));
+      _appliedJobs = responseData;
+      notifyListeners();
       return responseData;
     } catch (err) {
       throw Exception(err.toString());

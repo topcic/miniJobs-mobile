@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:minijobs_mobile/enumerations/job_statuses.dart';
 
+import '../enumerations/job_application_status.dart';
+
 // Default Badge Widget
 class Badge extends StatelessWidget {
   final String text;
@@ -96,6 +98,62 @@ class JobBadge extends StatelessWidget {
         break;
       case JobStatus.Izbrisan:
         statusText = 'Izbrisan';
+        backgroundColor = Colors.red[400]!;
+        break;
+      default:
+        statusText = 'Unknown';
+        backgroundColor = Colors.grey[300]!;
+        break;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.black.withOpacity(0.1), // Subtle border to add depth
+          width: 1,
+        ),
+      ),
+      child: Text(
+        statusText,
+        style: TextStyle(
+          color: textColor,
+          fontWeight: FontWeight.bold,
+          fontSize: 14, // Adjust font size as needed
+        ),
+      ),
+    );
+  }
+}
+
+class JobApplicationBadge extends StatelessWidget {
+  final JobApplicationStatus status;
+
+  const JobApplicationBadge({
+    required this.status,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    String statusText;
+    Color backgroundColor;
+    Color textColor = Colors.white;
+
+    // Customize appearance based on status
+    switch (status) {
+      case JobApplicationStatus.Poslano:
+        statusText = 'Poslano';
+        backgroundColor = Colors.blue[400]!;
+        break;
+      case JobApplicationStatus.Prihvaceno:
+        statusText = 'Prihvaćeno';
+        backgroundColor = Colors.green[400]!;
+        break;
+      case JobApplicationStatus.Odbijeno:
+        statusText = 'Odbijeno';
         backgroundColor = Colors.red[400]!;
         break;
       default:

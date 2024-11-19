@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Application.Applicants.Handlers;
 
-public class ApplicantGetAppliedJobsQueryHandler : IRequestHandler<ApplicantGetAppliedJobsQuery, IEnumerable<Job>>
+public class ApplicantGetAppliedJobsQueryHandler : IRequestHandler<ApplicantGetAppliedJobsQuery, IEnumerable<JobApplication>>
 {
     private readonly IJobRepository jobRepository;
 
@@ -15,7 +15,7 @@ public class ApplicantGetAppliedJobsQueryHandler : IRequestHandler<ApplicantGetA
     }
 
 
-    public async Task<IEnumerable<Job>> Handle(ApplicantGetAppliedJobsQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<JobApplication>> Handle(ApplicantGetAppliedJobsQuery request, CancellationToken cancellationToken)
     {
         return await jobRepository.GetApplicantAppliedJobsAsync(request.UserId.Value);
     }

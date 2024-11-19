@@ -5,15 +5,19 @@ import 'package:intl/intl.dart';
 import 'package:minijobs_mobile/enumerations/job_statuses.dart';
 import 'package:minijobs_mobile/enumerations/role.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
+import 'package:minijobs_mobile/models/job/job_application.dart';
 import 'package:minijobs_mobile/providers/applicant_provider.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
 import 'package:provider/provider.dart';
+
+import '../../../providers/job_application_provider.dart';
 
 class JobModal extends StatefulWidget {
   final int jobId;
   final String role;
   final bool isInSavedJobs;
-  const JobModal({super.key, required this.jobId, required this.role,this.isInSavedJobs = false});
+  final bool isInAppliedJobs;
+  const JobModal({super.key, required this.jobId, required this.role,this.isInSavedJobs = false,this.isInAppliedJobs = false});
 
   @override
   State<JobModal> createState() => _JobModalState();
@@ -22,13 +26,16 @@ class JobModal extends StatefulWidget {
 class _JobModalState extends State<JobModal> {
   late JobProvider jobProvider;
   late ApplicantProvider applicantProvider;
+  late JobApplicationProvider jobApplicationProvider;
   late Future<Job?> jobFuture; // Future to hold job fetch
+  late Future<JobApplication?> jobApplicationFuture; // Future to hold job fetch
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     jobProvider = context.read<JobProvider>();
     applicantProvider = context.read<ApplicantProvider>();
+    jobApplicationProvider = context.read<JobApplicationProvider>();
 
     jobFuture = getJob(widget.jobId);
   }
@@ -51,7 +58,14 @@ class _JobModalState extends State<JobModal> {
         widget.role != Role.Employer &&
         !(job.isSaved ?? false);
   }
-
+  bool canUserDeleteApplication(Job job) {
+    return job.status != JobStatus.Zavrsen &&
+        job.isApplied! &&
+        widget.role != Role.Employer &&
+        job.created!
+            .add(Duration(days: job.applicationsDuration!))
+            .isAfter(DateTime.now());
+  }
   Future<void> saveJob(int jobId) async {
     setState(() {
       jobFuture = applicantProvider.saveJob(jobId);
@@ -79,13 +93,55 @@ class _JobModalState extends State<JobModal> {
       }
     });
   }
-
-  Future<void> applyToJob(int jobId, bool apply) async {
-    Future<Job> futureJob = jobProvider.apply(jobId, apply);
+  Future<void> applyToJob(int jobId) async {
     setState(() {
-      this.jobFuture = futureJob;
+      jobApplicationFuture = jobApplicationProvider.apply(jobId);
+    });
+
+    jobApplicationFuture.then((jobApplication) {
+      if (jobApplication != null) {
+        if (widget.isInAppliedJobs) {
+          applicantProvider.getAppliedJobs();
+        }
+        setState(() {
+          jobFuture = jobFuture.then((job) {
+            if (job != null) {
+              // Update the job's isApplied field
+              job.isApplied = true;
+            }
+            return job;
+          });
+        });
+
+      }
     });
   }
+
+  Future<void> deleteJobApplication(int jobId) async {
+    setState(() {
+      jobApplicationFuture = jobApplicationProvider.delete(jobId);
+    });
+
+    jobApplicationFuture.then((jobApplication) {
+      if (jobApplication != null) {
+        if (widget.isInAppliedJobs) {
+          applicantProvider.getAppliedJobs();
+        }
+        setState(() {
+          jobFuture = jobFuture.then((job) {
+            if (job != null) {
+              // Update the job's isApplied field
+              job.isApplied = false;
+            }
+            return job;
+          });
+        });
+      }
+    });
+  }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -258,11 +314,29 @@ class _JobModalState extends State<JobModal> {
                       children: [
                         ElevatedButton(
                           onPressed: () async {
-                            await applyToJob(job.id!, true);
+                            await applyToJob(job.id!);
                           },
                           child: const Padding(
                             padding: EdgeInsets.symmetric(horizontal: 20),
                             child: Text('Apliciraj'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  if (canUserDeleteApplication(job))
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () async {
+                            await deleteJobApplication(job.id!);
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 20),
+                            child: Text('Poništi aplikaciju',
+                              style: TextStyle(
+                                color: Colors.red, // Set text color to red
+                              ),),
                           ),
                         ),
                       ],

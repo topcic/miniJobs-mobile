@@ -71,7 +71,7 @@ namespace Infrastructure.Persistence.Repositories
             result.AdditionalPaymentOptions = additionalPaymentOptions;
             if (isApplicant)
             {
-                var hasApplied = await _context.JobApplications.AnyAsync(ja => ja.JobId == id && ja.CreatedBy == userId);
+                var hasApplied = await _context.JobApplications.AnyAsync(ja => ja.JobId == id && ja.CreatedBy == userId && ja.IsDeleted == false);
                 var hasSaved = await _context.SavedJobs.AnyAsync(sj => sj.JobId == id && sj.CreatedBy == userId && sj.IsDeleted == false);
 
                 result.IsApplied = hasApplied;
@@ -221,26 +221,35 @@ namespace Infrastructure.Persistence.Repositories
             return await query.ToListAsync();
         }
 
-        public async Task<IEnumerable<Job>> GetApplicantAppliedJobsAsync(int applicantId)
+        public async Task<IEnumerable<JobApplication>> GetApplicantAppliedJobsAsync(int applicantId)
         {
-            var query = from j in _context.Jobs
-                        join a in _context.JobApplications on j.Id equals a.JobId
+            var query = from a in _context.JobApplications
+                        join j in _context.Jobs on a.JobId equals j.Id
                         join c in _context.Cities on j.CityId equals c.Id
-                        where a.CreatedBy == applicantId
-                        select new Job
+                        where a.CreatedBy == applicantId && a.IsDeleted == false
+                        select new JobApplication
                         {
-                            Id = j.Id,
-                            Name = j.Name,
-                            Description = j.Description,
-                            StreetAddressAndNumber = j.StreetAddressAndNumber,
-                            ApplicationsDuration = j.ApplicationsDuration,
-                            Status = j.Status,
-                            RequiredEmployees = j.RequiredEmployees,
-                            Wage = j.Wage,
-                            CityId = j.CityId,
-                            JobTypeId = j.JobTypeId,
-                            City = c // Include City information
+                            Id = a.Id,
+                            JobId = a.JobId,
+                            Status = a.Status,
+                            IsDeleted = a.IsDeleted,
+                            Created= a.Created,
+                            Job = new Job
+                            {
+                                Id = j.Id,
+                                Name = j.Name,
+                                Description = j.Description,
+                                StreetAddressAndNumber = j.StreetAddressAndNumber,
+                                ApplicationsDuration = j.ApplicationsDuration,
+                                Status = j.Status,
+                                RequiredEmployees = j.RequiredEmployees,
+                                Wage = j.Wage,
+                                CityId = j.CityId,
+                                JobTypeId = j.JobTypeId,
+                                City = c // Include City information
+                            }
                         };
+
 
 
             return await query.ToListAsync();
