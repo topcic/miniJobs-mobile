@@ -22,4 +22,7 @@ public class JobApplication : BaseAuditableEntity, IEntity<int>
 
     [NotMapped]
     public Job Job { get; set; }
+
+    [NotMapped]
+    public bool HasRated { get; set; }
 }

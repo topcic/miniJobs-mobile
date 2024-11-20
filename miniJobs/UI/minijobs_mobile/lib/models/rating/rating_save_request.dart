@@ -8,12 +8,10 @@ class RatingSaveRequest {
   String comment;
   int value;
   int jobApplicationId;
-  int ratedUserId;
   RatingSaveRequest(
       this.comment,
       this.value,
-      this.jobApplicationId,
-      this.ratedUserId
+      this.jobApplicationId
       );
 
   factory RatingSaveRequest.fromJson(Map<String, dynamic> json) => _$RatingSaveRequestFromJson(json);

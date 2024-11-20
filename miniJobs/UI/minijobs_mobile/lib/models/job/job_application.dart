@@ -14,6 +14,7 @@ class JobApplication {
   DateTime? created;
   int? createdBy;
   Job? job;
+  bool hasRated = false;
   JobApplication();
   JobApplication.withData(this.id, this.status, this.jobId,
       this.created,this.createdBy);

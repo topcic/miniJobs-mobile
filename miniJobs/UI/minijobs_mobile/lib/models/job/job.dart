@@ -30,7 +30,7 @@ class Job {
   String? employerFullName;
   bool isApplied = false;
   bool isSaved = false;
-
+  int? createdBy;
   Job();
   Job.withData(this.id, this.name, this.description, this.streetAddressAndNumber,
       this.city,this.applicationsDuration,this.status, this.requiredEmployees,

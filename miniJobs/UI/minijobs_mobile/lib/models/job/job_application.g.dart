@@ -11,6 +11,7 @@ JobApplication _$JobApplicationFromJson(Map<String, dynamic> json) => JobApplica
   ..created =
   json['created'] == null ? null : DateTime.parse(json['created'] as String)
   ..createdBy = (json['createdBy'] as num?)?.toInt()
+  ..hasRated = json['hasRated'] as bool
   ..job = json['job'] == null
       ? null
       : Job.fromJson(json['job'] as Map<String, dynamic>);
@@ -23,6 +24,7 @@ Map<String, dynamic> _$JobApplicationToJson(JobApplication instance) => <String,
   'jobId': instance.jobId,
   'createdBy': instance.createdBy,
   'job': instance.job,
+  'hasRated': instance.hasRated,
 };
 
 JobApplicationStatus? jobApplicationStatusFromInt(int? status) {

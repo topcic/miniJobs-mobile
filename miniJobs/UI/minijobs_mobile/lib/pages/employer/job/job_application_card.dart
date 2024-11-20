@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
+import 'package:minijobs_mobile/enumerations/job_application_status.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/pages/employer/job/job_modal.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
 import 'package:minijobs_mobile/widgets/badges.dart';
 import 'package:provider/provider.dart';
 
+import '../../../enumerations/job_statuses.dart';
 import '../../../models/job/job_application.dart';
+import '../../rate_user_card.dart';
 
 class JobApplicationCard extends StatefulWidget {
   final JobApplication jobApplication;
@@ -28,7 +31,11 @@ class _JobApplicationCardState extends State<JobApplicationCard> {
     jobProvider = context.read<JobProvider>();
     jobApplication = widget.jobApplication;
   }
-
+  bool canUserRate() {
+    return jobApplication.job!.status == JobStatus.Zavrsen &&
+        !jobApplication.hasRated &&
+        jobApplication.status == JobApplicationStatus.Prihvaceno ;
+  }
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -46,6 +53,46 @@ class _JobApplicationCardState extends State<JobApplicationCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+           if( canUserRate())
+            Row(
+
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+            Spacer(),
+              InkWell(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return RateUserCard(
+                            jobApplicationId: jobApplication.id!,
+                            ratedUserId: jobApplication.job!.createdBy!,
+                          );
+                        },
+                      );
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 4,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.star_border,
+                        color: Colors.amber,
+                        size: 28,
+                      ),
+                    ),
+                ),
+              ],
+            ),
+
             // Job Name
             Text(
               jobApplication.job!.name!,

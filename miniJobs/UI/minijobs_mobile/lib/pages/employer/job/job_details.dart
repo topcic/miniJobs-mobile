@@ -284,7 +284,8 @@ class _JobDetailsState extends State<JobDetails> {
         if (_job.id == null || _job.id == 0) {
           var job = await _jobProvider.insert(_job);
           setState(() {
-            _job = job;
+            if(job!=null)
+             _job = job;
             _jobProvider.setCurrentJob(job);
             _currentStep += 1;
           });

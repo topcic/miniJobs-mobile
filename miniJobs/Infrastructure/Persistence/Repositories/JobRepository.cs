@@ -1,6 +1,7 @@
 ﻿using Domain.Dtos;
 using Domain.Entities;
 using Domain.Enums;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
@@ -226,6 +227,11 @@ namespace Infrastructure.Persistence.Repositories
             var query = from a in _context.JobApplications
                         join j in _context.Jobs on a.JobId equals j.Id
                         join c in _context.Cities on j.CityId equals c.Id
+                        join r in _context.Ratings
+                            on new { a.Id, a.CreatedBy }
+                            equals new { Id = r.JobApplicationId, CreatedBy = r.CreatedBy }
+                            into ratingsGroup
+                        from r in ratingsGroup.DefaultIfEmpty() 
                         where a.CreatedBy == applicantId && a.IsDeleted == false
                         select new JobApplication
                         {
@@ -233,7 +239,8 @@ namespace Infrastructure.Persistence.Repositories
                             JobId = a.JobId,
                             Status = a.Status,
                             IsDeleted = a.IsDeleted,
-                            Created= a.Created,
+                            Created = a.Created,
+                            HasRated = r != null, 
                             Job = new Job
                             {
                                 Id = j.Id,
@@ -246,9 +253,11 @@ namespace Infrastructure.Persistence.Repositories
                                 Wage = j.Wage,
                                 CityId = j.CityId,
                                 JobTypeId = j.JobTypeId,
+                                CreatedBy= j.CreatedBy,
                                 City = c // Include City information
                             }
                         };
+
 
 
 

@@ -76,14 +76,14 @@ class ImpressionCard extends StatelessWidget {
           child: PhotoView(
               photo: rating.photo,
               editable: false,
-              userId: rating.createdBy
+              userId: rating.createdBy!
             ),
           ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              rating.createdByFullName,
+              rating.createdByFullName!,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
@@ -98,7 +98,7 @@ class ImpressionCard extends StatelessWidget {
             ),
             const SizedBox(height: 5),
             Text(
-              DateFormat('dd.MM.yyyy.').format(rating.created),
+              DateFormat('dd.MM.yyyy.').format(rating.created!),
               style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],

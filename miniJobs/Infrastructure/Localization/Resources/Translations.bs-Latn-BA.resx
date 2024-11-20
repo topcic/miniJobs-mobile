@@ -117,8 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ALREADY_RATED" xml:space="preserve">
+    <value>Već ste ocjenili korisnika.</value>
+  </data>
   <data name="IT_IS_NOT_POSSIBLE_TO_SAVE_JOB" xml:space="preserve">
     <value>Nije moguće spasiti posao.</value>
+  </data>
+  <data name="JOB_APPLICATION_NOT_EXISTS" xml:space="preserve">
+    <value>Aplikacija na posao ne postoji.</value>
   </data>
   <data name="JOB_IS_ALREADY_SAVED" xml:space="preserve">
     <value>Posao je već spremljen.</value>
@@ -126,7 +132,13 @@
   <data name="JOB_IS_COMPLETED" xml:space="preserve">
     <value>Posao je završen.</value>
   </data>
+  <data name="JOB_NOT_COMPLETED" xml:space="preserve">
+    <value>Posao nije završen.</value>
+  </data>
   <data name="JOB_NOT_EXIST" xml:space="preserve">
     <value>Posao ne postoji.</value>
+  </data>
+  <data name="NOT_ALLOWED_TO_RATE" xml:space="preserve">
+    <value>Nije moguće ocjeniti,</value>
   </data>
 </root>

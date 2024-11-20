@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/user_provider.dart';
 import '../models/rating/rating_save_request.dart';
 import '../models/user.dart';
+import '../providers/rating_provider.dart';
 
 class RateUserCard extends StatefulWidget {
   final int ratedUserId;
@@ -17,7 +20,8 @@ class RateUserCard extends StatefulWidget {
 class _RateUserCardState extends State<RateUserCard> {
   final _formKey = GlobalKey<FormState>();
   late UserProvider userProvider;
-  User? ratedUser;
+  late RatingProvider ratingProvider;
+  late Future<User?> ratedUserFuture;
   double rating = 0;
   String comment = '';
   bool isLoading = false;
@@ -28,160 +32,184 @@ class _RateUserCardState extends State<RateUserCard> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     userProvider = context.read<UserProvider>();
-    _fetchUser();
+    ratingProvider = context.read<RatingProvider>();
+
+    ratedUserFuture = userProvider.get(widget.ratedUserId);
   }
 
-  Future<void> _fetchUser() async {
-    ratedUser = await userProvider.get(widget.ratedUserId);
-    setState(() {});
+  Future<void> rate() async {
+    final request = RatingSaveRequest(
+        comment,
+        rating.toInt(),
+        widget.jobApplicationId
+    );
+
+    ratingProvider.insert(request).then((response) {
+      Navigator.of(context).pop();
+    });
   }
+
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: ratedUser == null
-          ? const Text('Loading...')
-          : Text('Ocijenite ${ratedUser!.fullName}'),
-      content: ratedUser == null
-          ? const Center(child: CircularProgressIndicator())
-          : Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Koliko ste zadovoljni sa poslovanjem sa korisnikom?',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 8.0),
-            Container(
-              padding: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: ratingError != null ? Colors.red : Colors.grey,
-                ),
-                borderRadius: BorderRadius.circular(4),
-                color: ratingError != null ? Colors.red.withOpacity(0.1) : Colors.transparent,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: List.generate(5, (index) {
-                  return Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          rating = index + 1.0;
-                          ratingError = null; // Clear the error when a rating is selected
-                        });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(8.0),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: rating == index + 1.0 ? Colors.blue : Colors.grey,
-                          ),
-                          borderRadius: BorderRadius.circular(4),
-                          color: rating == index + 1.0 ? Colors.blue.withOpacity(0.2) : Colors.transparent,
-                        ),
-                        child: Center(
-                          child: Text(
-                            '${index + 1}',
-                            style: TextStyle(
-                              color: rating == index + 1.0 ? Colors.blue : Colors.black,
-                            ),
-                          ),
-                        ),
+    return FutureBuilder<User?>(
+      future: ratedUserFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError || !snapshot.hasData) {
+          return const Center(child: Text('Failed to load user data.'));
+        }
+
+        final ratedUser = snapshot.data;
+
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: SingleChildScrollView(
+              child: Form(
+                key: _formKey, // Attach the GlobalKey to the Form
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title
+                    Text(
+                      'Ocijenite ${ratedUser!.fullName}',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blueGrey,
                       ),
                     ),
-                  );
-                }),
+                    const SizedBox(height: 16),
+
+                    // Question
+                    Text(
+                      'Koliko ste zadovoljni sa poslovanjem sa korisnikom?',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Rating stars
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: List.generate(5, (index) {
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              rating = index + 1.0;
+                              ratingError = null; // Clear the error when a rating is selected
+                            });
+                          },
+                          child: Icon(
+                            Icons.star,
+                            color: rating >= index + 1 ? Colors.blue : Colors.grey,
+                            size: 32,
+                          ),
+                        );
+                      }),
+                    ),
+                    if (ratingError != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          ratingError!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    const SizedBox(height: 16),
+
+                    // Comment field
+                    TextFormField(
+                      maxLines: 3,
+                      decoration: const InputDecoration(
+                        labelText: 'Komentar',
+                        border: OutlineInputBorder(),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.blue),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.red),
+                        ),
+                      ),
+                      onChanged: (value) {
+                        comment = value;
+                        setState(() {
+                          commentError = null; // Clear the error when a comment is entered
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Komentar je obavezan';
+                        }
+                        return null;
+                      },
+                    ),
+                    if (commentError != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          commentError!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    const SizedBox(height: 16),
+
+                    // Buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          child: const Text('Odustani'),
+                          onPressed: () {
+                            Navigator.of(context).pop(); // Close the dialog
+                          },
+                        ),
+                        const SizedBox(width: 16),
+                        ElevatedButton(
+                          onPressed: () async {
+                            if (_formKey.currentState?.validate() == true && rating > 0) {
+                              setState(() {
+                                isLoading = true;
+                                ratingError = null; // Clear the error when validation passes
+                              });
+                              await rate();
+                              setState(() {
+                                isLoading = false;
+                              });
+                            } else {
+                              setState(() {
+                                if (rating == 0) {
+                                  ratingError = 'Ocjena je obavezna';
+                                }
+                              });
+                            }
+                          },
+                          child: isLoading
+                              ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                              : const Text('Ocijeni'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-            if (ratingError != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Text(
-                  ratingError!,
-                  style: const TextStyle(color: Colors.red),
-                ),
-              ),
-            const SizedBox(height: 16.0),
-            TextFormField(
-              maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: 'Komentar',
-                border: OutlineInputBorder(),
-                errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red),
-                ),
-                focusedErrorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red),
-                ),
-              ),
-              onChanged: (value) {
-                comment = value;
-                commentError = null; // Clear the error when a comment is entered
-              },
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Komentar je obavezan';
-                }
-                return null;
-              },
-            ),
-            if (commentError != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Text(
-                  commentError!,
-                  style: const TextStyle(color: Colors.red),
-                ),
-              ),
-          ],
-        ),
-      ),
-      actions: <Widget>[
-        TextButton(
-          child: const Text('Odustani'),
-          onPressed: () {
-            Navigator.of(context).pop(); // Close the dialog
-          },
-        ),
-        TextButton(
-          child: const Text('Ocijeni'),
-          onPressed: () {
-            if (_formKey.currentState?.validate() == true && rating > 0) {
-              setState(() {
-                isLoading = true;
-                ratingError = null; // Clear the error when validation passes
-              });
-              _submitRating();
-            } else {
-              setState(() {
-                if (rating == 0) {
-                  ratingError = 'Ocjena je obavezna';
-                }
-              });
-            }
-          },
-        ),
-      ],
-      contentPadding: EdgeInsets.only(top: 20, left: 24, right: 24, bottom: isLoading ? 24 : 0),
+          ),
+        );
+
+      },
     );
-  }
-
-  Future<void> _submitRating() async {
-    if (ratedUser != null) {
-      final ratingSaveRequest = RatingSaveRequest(
-        comment,
-        rating.toInt(),
-        widget.jobApplicationId,
-        ratedUser!.id!,
-      );
-
-      // Return the RatingSaveRequest object to the calling component
-      Navigator.of(context).pop(ratingSaveRequest);
-    }
   }
 }

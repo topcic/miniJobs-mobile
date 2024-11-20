@@ -1,5 +1,6 @@
 
 import 'dart:convert';
+import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
@@ -104,7 +105,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
     }
   }
 
-  Future<T> insert(dynamic request) async {
+  Future<T?> insert(dynamic request) async {
     var jsonRequest = jsonEncode(request);
     var response = await _dio.post(_endpoint, data: jsonRequest);
     return fromJson(response.data);

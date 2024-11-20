@@ -10,6 +10,7 @@ import 'package:minijobs_mobile/providers/city_provider.dart';
 import 'package:minijobs_mobile/providers/user_registration_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../../services/notification.service.dart';
 import '../../utils/util_widgets.dart';
 
 class SignupPage extends StatefulWidget {
@@ -21,6 +22,7 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
+  final notificationService = NotificationService();
   final _formKey = GlobalKey<FormBuilderState>();
   List<City>? cities;
   bool isLoading = true;
@@ -254,22 +256,16 @@ class _SignupPageState extends State<SignupPage> {
                                   var result =
                                   await _userRegistrationProvider
                                       .insert(request);
-                                  if (result.isRegistered == true) {
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(const SnackBar(
-                                        content: Text(
-                                            "Uspješno ste se registrovali. Molimo Vas provjerite Vaš email")));
+                                  if (result!= null && result.isRegistered == true) {
+                                    notificationService.success("Uspješno ste se registrovali. Molimo Vas provjerite Vaš email");
                                     Navigator.of(context).push(
                                         MaterialPageRoute(
                                             builder: (context) =>
                                                 const VerificationPage()));
                                   }
-                                } else {}
+                                }
                               } catch (e) {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(const SnackBar(
-                                    content: Text(
-                                        " Email adresa se već koristi. Molimo izaberite drugu email adresu.")));
+                                notificationService.error("Email adresa se već koristi. Molimo izaberite drugu email adresu");
                               }
                             },
                             child: const Text("Registruj se"),
