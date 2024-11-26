@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:minijobs_mobile/pages/applicant/applicant_recommendations.dart';
 import 'package:minijobs_mobile/pages/employer/employeer_home_page.dart';
 import 'package:minijobs_mobile/pages/employer/employer_profile_page.dart';
 import 'package:minijobs_mobile/pages/employer/job/job_details.dart';
@@ -12,6 +13,7 @@ import '../pages/applicant/applicant_applied_jobs.dart';
 import '../pages/applicant/applicant_home_page.dart';
 import '../pages/applicant/applicant_profile_page.dart';
 import '../pages/applicant/applicant_saved_jobs_view.dart';
+import '../pages/applicant/applicat_jobs.dart';
 
 class Navbar extends StatefulWidget {
   const Navbar({super.key});
@@ -101,8 +103,8 @@ class _NavbarState extends State<Navbar> {
     if (role == 'Applicant') {
       return [
         Icons.home,
-        Icons.bookmark,
         Icons.view_list,
+        Icons.mail,
         Icons.person,
       ];
     } else {
@@ -122,8 +124,8 @@ class _NavbarState extends State<Navbar> {
     if (role == 'Applicant') {
       return [
         const  ApplicantHomePage(),
-        const ApplicantSavedJobsView(),
-        const ApplicantAppliedJobsView(),
+        const ApplicantJobs(),
+        const ApplicantRecommendations(),
         ApplicantProfilePage(userId: userId ),
       ];
     } else {

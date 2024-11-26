@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <Folder Include="AuthTokens\" />
+    <Folder Include="JobRecommendations\Queries\" />
   </ItemGroup>
 
 </Project>

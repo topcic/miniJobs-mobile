@@ -13,6 +13,9 @@ public class JobEntityTypeConfiguration : IEntityTypeConfiguration<Job>
             .WithMany()
             .HasForeignKey(x => x.CityId)
             .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedBy);
+        builder.HasOne<User>().WithMany().HasForeignKey(x => x.LastModifiedBy);
         builder.Ignore(x => x.JobType);
         builder.Ignore(x => x.City);
         builder.Ignore(x => x.Schedules);
