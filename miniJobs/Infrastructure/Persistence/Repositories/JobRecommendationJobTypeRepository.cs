@@ -1,17 +1,12 @@
 ﻿namespace Infrastructure.Persistence.Repositories;
 
-internal class JobRecommendationJobTypeRepository(ApplicationDbContext context) : IJobRecommendationJobTypeRepository
+public class JobRecommendationJobTypeRepository(ApplicationDbContext context) : IJobRecommendationJobTypeRepository
 {
-    private ApplicationDbContext context = context;
     protected readonly DbSet<JobRecommendationJobType> dbSet = context.Set<JobRecommendationJobType>();
 
-    public async Task<IEnumerable<JobType>> FindAllAsync(int jobRecommendationId)
+    public async Task<IEnumerable<JobRecommendationJobType>> FindAllAsync(int jobRecommendationId)
     {
-        return await dbSet.Where(x => x.JobRecommendationId == jobRecommendationId)
-               .Join(context.Set<JobType>(),
-                jrjt => jrjt.JobTypeId,
-                jt => jt.Id,
-                (jrjt, jt) => jt).ToListAsync();
+        return await dbSet.Where(x => x.JobRecommendationId == jobRecommendationId).ToListAsync();
     }
 
     public async Task InsertAsync(JobRecommendationJobType jobRecommendationJobType)
@@ -44,6 +39,12 @@ internal class JobRecommendationJobTypeRepository(ApplicationDbContext context) 
     public async Task InsertRangeAsync(IEnumerable<JobRecommendationJobType> jobRecommendationJobTypes)
     {
         await dbSet.AddRangeAsync(jobRecommendationJobTypes);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task DeleteRangeAsync(List<JobRecommendationJobType> entites)
+    {
+        dbSet.RemoveRange(entites);
         await context.SaveChangesAsync();
     }
 }

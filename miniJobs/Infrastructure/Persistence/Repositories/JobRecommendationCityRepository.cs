@@ -1,10 +1,7 @@
-﻿using Domain.Entities;
-
-namespace Infrastructure.Persistence.Repositories;
+﻿namespace Infrastructure.Persistence.Repositories;
 
 public class JobRecommendationCityRepository(ApplicationDbContext context) : IJobRecommendationCityRepository
 {
-    private ApplicationDbContext context = context;
     protected readonly DbSet<JobRecommendationCity> dbSet = context.Set<JobRecommendationCity>();
 
     public async Task<JobRecommendationCity> TryFindAsync(int jobRecommendationId, int cityId)
@@ -27,6 +24,11 @@ public class JobRecommendationCityRepository(ApplicationDbContext context) : IJo
 
         return true;
     }
+    public async Task DeleteRangeAsync(List<JobRecommendationCity> entites)
+    {
+        dbSet.RemoveRange(entites);
+        await context.SaveChangesAsync();
+    }
 
     public async Task InsertRangeAsync(IEnumerable<JobRecommendationCity> jobRecommendationCities)
     {
@@ -34,13 +36,8 @@ public class JobRecommendationCityRepository(ApplicationDbContext context) : IJo
         await context.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<City>> FindAllAsync(int jobRecommendationId)
+    public async Task<IEnumerable<JobRecommendationCity>> FindAllAsync(int jobRecommendationId)
     {
-        return await dbSet.Where(x => x.JobRecommendationId == jobRecommendationId)
-                 .Join(context.Set<City>(),
-                      jrc => jrc.CityId,
-                      c => c.Id,
-                      (jrc, c) => c)
-                 .ToListAsync();
+        return await dbSet.Where(x => x.JobRecommendationId == jobRecommendationId).ToListAsync();
     }
 }

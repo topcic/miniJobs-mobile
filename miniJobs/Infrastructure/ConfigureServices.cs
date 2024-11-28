@@ -98,6 +98,9 @@ public static class ConfigureServices
         services.AddScoped<IProposedAnswerRepository, ProposedAnswerRepository>();
         services.AddScoped<IJobQuestionRepository, JobQuestionRepository>();
         services.AddScoped<IJobQuestionAnswerRepository, JobQuestionAnswerRepository>();
+        services.AddScoped<IJobRecommendationRepository, JobRecommendationRepository>();
+        services.AddScoped<IJobRecommendationJobTypeRepository, JobRecommendationJobTypeRepository>();
+        services.AddScoped<IJobRecommendationCityRepository, JobRecommendationCityRepository>();
     }
 
     private static void AddMailSenders(IServiceCollection services)
@@ -126,6 +129,7 @@ public static class ConfigureServices
         services.AddScoped<ISecurityProvider, SecurityProvider>();
         services.AddTransient<IEmailService, EmailService>();
         services.AddSingleton<ILocalizationService, LocalizationService>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 
     public static void ExecuteMigrations(this WebApplication webApplication)

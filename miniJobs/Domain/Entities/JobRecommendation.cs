@@ -9,14 +9,9 @@ public class JobRecommendation : BaseAuditableEntity, IEntity<int>
     [Column("id")]
     public int Id { get; set; }
 
-    private JobRecommendation() { }
+    [NotMapped]
+    public List<int> Cities { get; set; }
 
-    public static JobRecommendation Create(int userId)
-    {
-        return new JobRecommendation
-        {
-            Created = DateTime.UtcNow,
-            CreatedBy = userId
-        };
-    }
+    [NotMapped]
+    public List<int> JobTypes { get; set; }
 }

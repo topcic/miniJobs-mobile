@@ -6,6 +6,7 @@ public interface IJobRecommendationCityRepository
 {
     Task InsertRangeAsync(IEnumerable<JobRecommendationCity> jobRecommendationCities);
     Task<bool> DeleteAsync(int jobRecommendationId, int cityId);
-    Task<IEnumerable<City>> FindAllAsync(int jobRecommendationId);
+    Task<IEnumerable<JobRecommendationCity>> FindAllAsync(int jobRecommendationId);
     Task<JobRecommendationCity> TryFindAsync(int jobRecommendationId, int cityId);
+    Task DeleteRangeAsync(List<JobRecommendationCity> entities);
 }
