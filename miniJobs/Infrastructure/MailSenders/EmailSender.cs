@@ -35,4 +35,18 @@ public class EmailSender(IEmailService emailService) : IEmailSender
 
         await emailService.SendEmailAsync(creatorEmail, "Obavještenje o isteku roka za prijavu", body);
     }
+
+    public async Task SendJobRecommendationEmailAsync(string fullName, string email, string jobName)
+    {
+        var body = string.Format(
+             "Poštovani {0},<br /><br />" +
+             "Obavještavamo vas da je otvoren novi posao \"{1}\" koji odgovara vašim preferencijama.<br />" +
+             "Pozivamo vas da se prijavite na ovaj posao što prije kako ne biste propustili priliku.<br /><br />" +
+             "Srdačan pozdrav,<br />Mini Jobs tim",
+             fullName,
+             jobName
+         );
+
+        await emailService.SendEmailAsync(email, "Obavještenje o novom otvorenom poslu", body);
+    }
 }

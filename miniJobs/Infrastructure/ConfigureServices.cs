@@ -3,9 +3,9 @@ using Hangfire;
 using Infrastructure.Authentication;
 using Infrastructure.BackgroundServices;
 using Infrastructure.Common.Interfaces;
+using Infrastructure.Consumers;
 using Infrastructure.Mails;
 using Infrastructure.MailSenders;
-using Infrastructure.MessageProcessors;
 using Infrastructure.OptionsSetup;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
@@ -61,6 +61,7 @@ public static class ConfigureServices
         {
             configure.SetKebabCaseEndpointNameFormatter();
             configure.AddConsumer<ApplicationExpiryEmailConsumer>();
+            configure.AddConsumer<JobRecommendationEmailConsumer>();
             configure.UsingRabbitMq((context, cfg) =>
             {
                 cfg.Host(new Uri(configuration["RabbitMQ:Host"]!), h =>
@@ -130,6 +131,7 @@ public static class ConfigureServices
         services.AddTransient<IEmailService, EmailService>();
         services.AddSingleton<ILocalizationService, LocalizationService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddTransient(typeof(IMessagePublisher<>), typeof(MessagePublisher<>));
     }
 
     public static void ExecuteMigrations(this WebApplication webApplication)

@@ -29,6 +29,10 @@ public class ApplicationDbContext : DbContext
     public DbSet<Question> Questions => Set<Question>();
     public DbSet<JobQuestionAnswer> JobQuestionAnswers => Set<JobQuestionAnswer>();
     public DbSet<JobQuestion> JobQuestions => Set<JobQuestion>();
+    public DbSet<JobRecommendation> JobRecommendations => Set<JobRecommendation>();
+    public DbSet<JobRecommendationCity> JobRecommendationCities => Set<JobRecommendationCity>();
+    public DbSet<JobRecommendationJobType> JobRecommendationJobTypes => Set<JobRecommendationJobType>();
+
 
 
     protected override void OnModelCreating(ModelBuilder builder)
