@@ -7,6 +7,7 @@ import 'package:minijobs_mobile/providers/city_provider.dart';
 import 'package:minijobs_mobile/providers/employer_provider.dart';
 import 'package:minijobs_mobile/providers/job_application_provider.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
+import 'package:minijobs_mobile/providers/job_recommendation_provider.dart';
 import 'package:minijobs_mobile/providers/job_type_provider.dart';
 import 'package:minijobs_mobile/providers/proposed_answer_provider.dart';
 import 'package:minijobs_mobile/providers/rating_provider.dart';
@@ -30,7 +31,8 @@ void main() async {
       ChangeNotifierProvider(create: (s) => ApplicantProvider()),
       ChangeNotifierProvider(create: (s) => EmployerProvider()),
       ChangeNotifierProvider(create: (s) => RatingProvider()),
-      ChangeNotifierProvider(create: (s) => JobApplicationProvider())
+      ChangeNotifierProvider(create: (s) => JobApplicationProvider()),
+      ChangeNotifierProvider(create: (s) => JobRecommendationProvider())
     ],
     child: const MyApp(),
   ));

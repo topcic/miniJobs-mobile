@@ -21,14 +21,7 @@ public class JobRecommendationsController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(new JobRecommendationInsertCommand(request)));
     }
 
-    [HttpGet("{jobRecommendationId}")]
-    [ProducesResponseType(typeof(JobRecommendation), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> FindJob([FromRoute] int jobRecommendationId)
-    {
-        return Ok(await mediator.Send(new JobRecommendationTryFindQuery(jobRecommendationId)));
-    }
+
     [HttpPut("{jobRecommendationId}")]
     [ProducesResponseType(typeof(JobRecommendation), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]

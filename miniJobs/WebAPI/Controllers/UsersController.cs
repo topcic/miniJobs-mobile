@@ -1,4 +1,5 @@
-﻿using Application.Users;
+﻿using Application.JobRecommendations.Queries;
+using Application.Users;
 using Application.Users.Commands;
 using Application.Users.Models;
 using Application.Users.Queries;
@@ -68,5 +69,14 @@ public class UsersController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> FindUser([FromRoute] int userId)
     {
         return Ok(await mediator.Send(new UserTryFindQuery(userId)));
+    }
+
+    [HttpGet("{userId}/job-recommendations")]
+    [ProducesResponseType(typeof(JobRecommendation), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> FindJob([FromRoute] int userId)
+    {
+        return Ok(await mediator.Send(new JobRecommendationTryFindQuery(userId)));
     }
 }

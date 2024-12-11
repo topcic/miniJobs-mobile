@@ -9,9 +9,12 @@ sealed class JobRecommendationTryFindQueryHandler(IJobRecommendationRepository j
 {
     public async Task<JobRecommendation> Handle(JobRecommendationTryFindQuery query, CancellationToken cancellationToken)
     {
-        var jobRecommendation = await jobRecommendationRepository.TryFindAsync(query.Id);
-        jobRecommendation.Cities = (await jobRecommendationCityRepository.FindAllAsync(jobRecommendation.Id)).Select(x => x.CityId).ToList();
-        jobRecommendation.JobTypes = (await jobRecommendationJobTypeRepository.FindAllAsync(jobRecommendation.Id)).Select(x => x.JobTypeId).ToList();
+        var jobRecommendation = await jobRecommendationRepository.FindOneAsync(x => x.CreatedBy == query.UserId);
+        if (jobRecommendation != null)
+        {
+            jobRecommendation.Cities = (await jobRecommendationCityRepository.FindAllAsync(jobRecommendation.Id)).Select(x => x.CityId).ToList();
+            jobRecommendation.JobTypes = (await jobRecommendationJobTypeRepository.FindAllAsync(jobRecommendation.Id)).Select(x => x.JobTypeId).ToList();
+        }
 
         return jobRecommendation;
     }

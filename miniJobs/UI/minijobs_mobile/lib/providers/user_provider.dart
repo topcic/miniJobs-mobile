@@ -1,38 +1,44 @@
+import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
+import 'package:minijobs_mobile/models/job_recommendation/job_recommendation.dart';
 import 'package:minijobs_mobile/models/rating.dart';
 import 'package:minijobs_mobile/models/user.dart';
 import 'package:minijobs_mobile/providers/base_provider.dart';
 
 class UserProvider extends BaseProvider<User> {
-  UserProvider(): super("users");
-    @override
+  UserProvider() : super("users");
+
+  @override
   User fromJson(data) {
     return User.fromJson(data);
   }
-    Future<List<Rating>> getUserRatings(int userId) async {
-    try {
-        var url = "${baseUrl}users/$userId/ratings";
-      var response = await dio.get(url);
-     List<Rating> responseData = List<Rating>.from(response.data.map((item) => Rating.fromJson(item)));
-    return responseData;
 
+  Future<List<Rating>> getUserRatings(int userId) async {
+    try {
+      var url = "${baseUrl}users/$userId/ratings";
+      var response = await dio.get(url);
+      List<Rating> responseData =
+          List<Rating>.from(response.data.map((item) => Rating.fromJson(item)));
+      return responseData;
     } catch (err) {
       throw Exception(err.toString());
     }
   }
-   Future<List<Job>> getUserFinishedJobs(int userId) async {
-    try {
-        var url = "${baseUrl}users/$userId/finishedjobs";
-      var response = await dio.get(url);
-     List<Job> responseData = List<Job>.from(response.data.map((item) => Job.fromJson(item)));
-    return responseData;
 
+  Future<List<Job>> getUserFinishedJobs(int userId) async {
+    try {
+      var url = "${baseUrl}users/$userId/finishedjobs";
+      var response = await dio.get(url);
+      List<Job> responseData =
+          List<Job>.from(response.data.map((item) => Job.fromJson(item)));
+      return responseData;
     } catch (err) {
       throw Exception(err.toString());
     }
   }
+
   Future<User> uploadUserPhoto(int userId, MultipartFile photo) async {
     try {
       var url = "${baseUrl}users/$userId/photo";
@@ -43,6 +49,19 @@ class UserProvider extends BaseProvider<User> {
       return User.fromJson(response.data);
     } catch (err) {
       throw Exception(err.toString());
+    }
+  }
+
+  Future<JobRecommendation?> findJobRecommendation(int userId) async {
+    try {
+      var url = "${baseUrl}users/$userId/job-recommendations";
+      var response = await dio.get(url);
+      JobRecommendation responseData = JobRecommendation.fromJson(
+          response.data);
+      return responseData;
+    } catch (err) {
+      handleError(err);
+      return null;
     }
   }
 }

@@ -3,7 +3,7 @@ using Domain.Entities;
 
 namespace Application.JobRecommendations.Queries;
 
-public class JobRecommendationTryFindQuery(int id) : QueryBase<JobRecommendation>
+public class JobRecommendationTryFindQuery(int userId) : QueryBase<JobRecommendation>
 {
-    public int Id { get; set; } = id;
+    public int UserId { get; set; } = userId;
 }

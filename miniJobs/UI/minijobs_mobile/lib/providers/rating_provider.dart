@@ -1,7 +1,5 @@
 import 'dart:convert';
-
 import 'package:minijobs_mobile/providers/base_provider.dart';
-
 import '../models/rating.dart';
 import '../services/notification.service.dart';
 

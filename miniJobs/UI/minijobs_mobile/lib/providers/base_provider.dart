@@ -108,6 +108,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
   Future<T?> insert(dynamic request) async {
     var jsonRequest = jsonEncode(request);
     var response = await _dio.post(_endpoint, data: jsonRequest);
+    notificationService.success("Uspješno ste dodali.");
     return fromJson(response.data);
   }
 
@@ -115,6 +116,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
     var url = "$_endpoint/$id";
     var jsonRequest = jsonEncode(request);
     var response = await _dio.put(url, data: jsonRequest);
+    notificationService.success("Uspješno ste spasili promjene.");
     return fromJson(response.data);
   }
 
@@ -122,6 +124,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
     try {
       var url = "$_endpoint/$id";
       await _dio.delete(url);
+      notificationService.success("Uspješno ste izbrisali.");
     } catch (err) {
       throw Exception(err.toString());
     }

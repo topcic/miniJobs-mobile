@@ -1,7 +1,15 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:minijobs_mobile/providers/job_recommendation_provider.dart';
+import 'package:minijobs_mobile/providers/user_provider.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/city.dart';
+import '../../models/job_recommendation/job_recommendation.dart';
+import '../../models/job_recommendation/job_recommendation_request.dart';
 import '../../models/job_type.dart';
 import '../../providers/city_provider.dart';
 import '../../providers/job_type_provider.dart';
@@ -10,15 +18,20 @@ class ApplicantRecommendations extends StatefulWidget {
   const ApplicantRecommendations({Key? key}) : super(key: key);
 
   @override
-  _ApplicantRecommendationsState createState() => _ApplicantRecommendationsState();
+  _ApplicantRecommendationsState createState() =>
+      _ApplicantRecommendationsState();
 }
 
 class _ApplicantRecommendationsState extends State<ApplicantRecommendations> {
   late CityProvider _cityProvider;
+  late JobRecommendationProvider _jobRecommendationProvider;
+  late UserProvider _userProvider;
   late JobTypeProvider _jobTypeProvider;
+
   late Future<List<City>> _citiesFuture;
   late Future<List<JobType>> _jobTypesFuture;
 
+  JobRecommendation? jobRecommendation;
   List<int> selectedCityIds = [];
   List<int> selectedJobTypeIds = [];
 
@@ -27,46 +40,63 @@ class _ApplicantRecommendationsState extends State<ApplicantRecommendations> {
     super.initState();
     _cityProvider = context.read<CityProvider>();
     _jobTypeProvider = context.read<JobTypeProvider>();
+    _jobRecommendationProvider = context.read<JobRecommendationProvider>();
+    _userProvider = context.read<UserProvider>();
+
     _citiesFuture = _cityProvider.getAll();
     _jobTypesFuture = _jobTypeProvider.getAll();
-    _loadSavedPreferences();
+
+    _loadJobRecommendation();
   }
 
-  Future<void> _loadSavedPreferences() async {
-    // Mock: Load previously saved preferences (Replace with actual API call)
-    // For example, fetch from shared preferences or user API
-    setState(() {
-      selectedCityIds = [1, 3]; // Replace with actual saved city IDs
-      selectedJobTypeIds = [2]; // Replace with actual saved job type IDs
-    });
+  Future<void> _loadJobRecommendation() async {
+    final userId = int.parse( GetStorage().read('userId'));
+    final recommendation = await _userProvider.findJobRecommendation(userId);
+    if (recommendation != null) {
+      setState(() {
+        jobRecommendation = recommendation;
+        selectedCityIds = recommendation.cities ?? [];
+        selectedJobTypeIds = recommendation.jobTypes ?? [];
+      });
+    }
   }
 
-  void _toggleCitySelection(int cityId) {
-    setState(() {
-      if (selectedCityIds.contains(cityId)) {
-        selectedCityIds.remove(cityId);
-      } else {
-        selectedCityIds.add(cityId);
-      }
-    });
-  }
-
-  void _toggleJobTypeSelection(int jobTypeId) {
-    setState(() {
-      if (selectedJobTypeIds.contains(jobTypeId)) {
-        selectedJobTypeIds.remove(jobTypeId);
-      } else {
-        selectedJobTypeIds.add(jobTypeId);
-      }
-    });
-  }
-
-  Future<void> _savePreferences() async {
-    // Mock: Save preferences (Replace with actual API call)
-    // Example: Call API to save selectedCityIds and selectedJobTypeIds
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Preferences saved successfully!')),
+  Future<void> _saveRecommendation() async {
+    final request = JobRecommendationRequest(
+      cities: selectedCityIds,
+      jobTypes: selectedJobTypeIds,
     );
+
+    if (jobRecommendation == null) {
+      // Insert new recommendation
+      final newRecommendation =
+      await _jobRecommendationProvider.insert(request);
+      setState(() {
+        jobRecommendation = newRecommendation;
+      });
+
+    } else {
+      // Update existing recommendation
+      final updatedRecommendation =
+      await _jobRecommendationProvider.update(
+        jobRecommendation!.id!,
+        request,
+      );
+      setState(() {
+        jobRecommendation = updatedRecommendation;
+      });
+    }
+  }
+
+  Future<void> _resetRecommendation() async {
+    if (jobRecommendation != null) {
+      await _jobRecommendationProvider.delete(jobRecommendation!.id!);
+      setState(() {
+        jobRecommendation = null;
+        selectedCityIds = [];
+        selectedJobTypeIds = [];
+      });
+    }
   }
 
   @override
@@ -104,19 +134,21 @@ class _ApplicantRecommendationsState extends State<ApplicantRecommendations> {
                         }
 
                         final cities = snapshot.data!;
-                        return Wrap(
-                          spacing: 8.0,
-                          runSpacing: 8.0,
-                          children: cities.map((city) {
-                            final isSelected = selectedCityIds.contains(city.id);
-                            return FilterChip(
-                              label: Text(city.name!),
-                              selected: isSelected,
-                              onSelected: (_) => _toggleCitySelection(city.id!),
-                              selectedColor: Colors.blue.withOpacity(0.2),
-                              checkmarkColor: Colors.blue,
-                            );
-                          }).toList(),
+                        return MultiSelectDialogField<int>(
+                          items: cities
+                              .map((city) => MultiSelectItem<int>(city.id!, city.name!))
+                              .toList(),
+                          title: const Text("Gradovi"),
+                          initialValue: selectedCityIds,
+                          buttonText: const Text(
+                            "Izaberite gradove",
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                          onConfirm: (values) {
+                            setState(() {
+                              selectedCityIds = values.cast<int>();
+                            });
+                          },
                         );
                       },
                     ),
@@ -135,19 +167,21 @@ class _ApplicantRecommendationsState extends State<ApplicantRecommendations> {
                         }
 
                         final jobTypes = snapshot.data!;
-                        return Wrap(
-                          spacing: 8.0,
-                          runSpacing: 8.0,
-                          children: jobTypes.map((jobType) {
-                            final isSelected = selectedJobTypeIds.contains(jobType.id);
-                            return FilterChip(
-                              label: Text(jobType.name!),
-                              selected: isSelected,
-                              onSelected: (_) => _toggleJobTypeSelection(jobType.id!),
-                              selectedColor: Colors.green.withOpacity(0.2),
-                              checkmarkColor: Colors.green,
-                            );
-                          }).toList(),
+                        return MultiSelectDialogField<int>(
+                          items: jobTypes
+                              .map((jobType) => MultiSelectItem<int>(jobType.id!, jobType.name!))
+                              .toList(),
+                          title: const Text("Tipovi posla"),
+                          initialValue: selectedJobTypeIds,
+                          buttonText: const Text(
+                            "Izaberite tip posla kojim se bavite",
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                          onConfirm: (values) {
+                            setState(() {
+                              selectedJobTypeIds = values.cast<int>();
+                            });
+                          },
                         );
                       },
                     ),
@@ -159,13 +193,23 @@ class _ApplicantRecommendationsState extends State<ApplicantRecommendations> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                if (jobRecommendation != null)
+                  TextButton(
+                    onPressed: _resetRecommendation,
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.red,
+                    ),
+                    child: const Text('Resetuj'),
+                  ),
                 ElevatedButton(
-                  onPressed: _savePreferences,
-                  child: const Text('Dodaj Preporuke'),
-                ),
-                TextButton(
-                  onPressed: _loadSavedPreferences,
-                  child: const Text('Resetuj'),
+                  onPressed: (selectedCityIds.isNotEmpty || selectedJobTypeIds.isNotEmpty)
+                      ? _saveRecommendation
+                      : null, // Disable the button when no cities or job types are selected
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green, // The button's background color when enabled
+                    disabledBackgroundColor: Colors.grey, // The button's background color when disabled
+                  ),
+                  child: const Text('Dodaj preporuke'),
                 ),
               ],
             ),
