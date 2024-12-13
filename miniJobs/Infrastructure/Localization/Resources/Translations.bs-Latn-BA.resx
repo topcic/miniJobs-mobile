@@ -117,11 +117,23 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ACTION_NOT_POSSIBLE_IN_THIS_JOB_STATUS" xml:space="preserve">
+    <value>Akcija nije moguća za trenutni status posla.</value>
+  </data>
   <data name="ALREADY_RATED" xml:space="preserve">
     <value>Već ste ocjenili korisnika.</value>
   </data>
   <data name="IT_IS_NOT_POSSIBLE_TO_SAVE_JOB" xml:space="preserve">
     <value>Nije moguće spasiti posao.</value>
+  </data>
+  <data name="JOB_APPLICATION_ALREADY_ACCEPTED" xml:space="preserve">
+    <value>Aplikant je već prihvaćen.</value>
+  </data>
+  <data name="JOB_APPLICATION_ALREADY_REJECTED" xml:space="preserve">
+    <value>Aplikant je već odbijen.</value>
+  </data>
+  <data name="JOB_APPLICATION_IS_DELETED" xml:space="preserve">
+    <value>Aplikacija je obrisana.</value>
   </data>
   <data name="JOB_APPLICATION_NOT_EXISTS" xml:space="preserve">
     <value>Aplikacija na posao ne postoji.</value>

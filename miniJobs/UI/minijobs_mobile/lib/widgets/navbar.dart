@@ -1,5 +1,7 @@
 // File path: lib/navbar.dart
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:get_storage/get_storage.dart';
@@ -100,6 +102,7 @@ class _NavbarState extends State<Navbar> {
   List<IconData> _getIconsForRole() {
     String role = GetStorage().read('role') ?? '';
    int userId = int.parse( GetStorage().read('userId'));
+
     if (role == 'Applicant') {
       return [
         Icons.home,

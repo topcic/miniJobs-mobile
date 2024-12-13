@@ -52,112 +52,121 @@ class _JobListState extends State<JobList> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
-        itemCount: jobs.length,
-        itemBuilder: (context, index) {
-          final job = jobs[index];
-          return Card(
-            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            elevation: 4,
-            child: ListTile(
-              contentPadding: const EdgeInsets.all(16),
-              title: Text(job.name ?? 'No Name'),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (job.created != null)
-                    Text(
-                      'Kreirano: ${DateFormat('dd.MM.yyyy.').format(job.created!)}',
-                      style: TextStyle(color: Colors.grey[600]),
+              itemCount: jobs.length,
+              itemBuilder: (context, index) {
+                final job = jobs[index];
+                return Card(
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  elevation: 4,
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.all(16),
+                    title: Text(job.name ?? 'No Name'),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (job.created != null)
+                          Text(
+                            'Kreirano: ${DateFormat('dd.MM.yyyy.').format(job.created!)}',
+                            style: TextStyle(color: Colors.grey[600]),
+                          ),
+                        if (job.applicationsDuration != null)
+                          Text(
+                            'Prijave traju do: ${DateFormat('dd.MM.yyyy.').format(DateTime.now().add(Duration(days: job.applicationsDuration!)))}',
+                            style: TextStyle(color: Colors.grey[600]),
+                          ),
+                        if (job.numberOfApplications != null &&
+                            job.numberOfApplications! > 0)
+                          Text(
+                            'Broj prijava: ${job.numberOfApplications}',
+                            style: TextStyle(color: Colors.grey[600]),
+                          ),
+                      ],
                     ),
-                  if (job.applicationsDuration != null)
-                    Text(
-                      'Prijave traju do: ${DateFormat('dd.MM.yyyy.').format(DateTime.now().add(Duration(days: job.applicationsDuration!)))}',
-                      style: TextStyle(color: Colors.grey[600]),
+                    trailing: JobBadge(status: job.status!),
+                    isThreeLine: true,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => JobDetails(jobId: job.id!),
+                        ),
+                      );
+                    },
+                    onLongPress: () {
+                      _showActionDialog(context, job);
+                    },
+                    leading: PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert, size: 24),
+                      itemBuilder: (BuildContext context) {
+                        List<PopupMenuEntry<String>> menuItems = [
+                          if (job.numberOfApplications != null &&
+                              job.numberOfApplications! > 0)
+                            const PopupMenuItem<String>(
+                              value: 'applicants',
+                              child: ListTile(
+                                leading: Icon(Icons.people, color: Colors.blue),
+                                title: Text('Aplikanti'),
+                              ),
+                            ),
+                          const PopupMenuItem<String>(
+                            value: 'details',
+                            child: ListTile(
+                              leading: Icon(Icons.reorder),
+                              title: Text('Detalji'),
+                            ),
+                          ),
+                          if (job.numberOfApplications != null &&
+                              job.numberOfApplications! > 0 &&
+                              job.status == JobStatus.Aktivan)
+                            const PopupMenuItem<String>(
+                              value: 'complete',
+                              child: ListTile(
+                                leading: Icon(Icons.check, color: Colors.green),
+                                title: Text('Završi posao'),
+                              ),
+                            ),
+                          if (job.status !=
+                              JobStatus
+                                  .Zavrsen) // Hide delete if job is finished
+                            const PopupMenuItem<String>(
+                              value: 'delete',
+                              child: ListTile(
+                                leading: Icon(Icons.delete, color: Colors.red),
+                                title: Text('Obriši'),
+                              ),
+                            ),
+                        ];
+                        return menuItems;
+                      },
+                      onSelected: (String value) {
+                        if (value == 'details') {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => JobDetails(jobId: job.id!),
+                            ),
+                          );
+                        } else if (value == 'delete') {
+                          _handleDelete(job);
+                        } else if (value == 'complete') {
+                          _handleComplete(job);
+                        } else if (value == 'applicants') {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => JobApplicantsView(
+                                  jobId: job.id!,
+                                  jobStatus: job.status!)
+                            ),
+                          );
+                        }
+                      },
                     ),
-                  if (job.numberOfApplications != null && job.numberOfApplications! > 0)
-                    Text(
-                      'Broj prijava: ${job.numberOfApplications}',
-                      style: TextStyle(color: Colors.grey[600]),
-                    ),
-                ],
-              ),
-              trailing: JobBadge(status: job.status!),
-              isThreeLine: true,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => JobDetails(jobId: job.id!),
                   ),
                 );
               },
-              onLongPress: () {
-                _showActionDialog(context, job);
-              },
-              leading: PopupMenuButton<String>(
-                icon: const Icon(Icons.more_vert, size: 24),
-                itemBuilder: (BuildContext context) {
-                  List<PopupMenuEntry<String>> menuItems = [
-                    if (job.numberOfApplications != null && job.numberOfApplications! > 0)
-                      const PopupMenuItem<String>(
-                        value: 'applicants',
-                        child: ListTile(
-                          leading: Icon(Icons.people, color: Colors.blue),
-                          title: Text('Aplikanti'),
-                        ),
-                      ),
-                    const PopupMenuItem<String>(
-                      value: 'details',
-                      child: ListTile(
-                        leading: Icon(Icons.reorder),
-                        title: Text('Detalji'),
-                      ),
-                    ),
-                    if (job.numberOfApplications != null && job.numberOfApplications! > 0 && job.status == JobStatus.Aktivan)
-                      const PopupMenuItem<String>(
-                        value: 'complete',
-                        child: ListTile(
-                          leading: Icon(Icons.check, color: Colors.green),
-                          title: Text('Završi posao'),
-                        ),
-                      ),
-                    if (job.status != JobStatus.Zavrsen) // Hide delete if job is finished
-                      const PopupMenuItem<String>(
-                        value: 'delete',
-                        child: ListTile(
-                          leading: Icon(Icons.delete, color: Colors.red),
-                          title: Text('Obriši'),
-                        ),
-                      ),
-                  ];
-                  return menuItems;
-                },
-                onSelected: (String value) {
-                  if (value == 'details') {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => JobDetails(jobId: job.id!),
-                      ),
-                    );
-                  } else if (value == 'delete') {
-                    _handleDelete(job);
-                  } else if (value == 'complete') {
-                    _handleComplete(job);
-                  } else if (value == 'applicants') {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => JobApplicantsView(jobId: job.id!),
-                      ),
-                    );
-                  }
-                },
-              ),
             ),
-          );
-        },
-      ),
     );
   }
 
@@ -179,7 +188,8 @@ class _JobListState extends State<JobList> {
               child: const Text('Obriši'),
               onPressed: () async {
                 try {
-                  await jobProvider.delete(job.id!); // Ensure deletion is completed
+                  await jobProvider
+                      .delete(job.id!); // Ensure deletion is completed
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Uspješno obrisano')),
                   );
@@ -190,7 +200,8 @@ class _JobListState extends State<JobList> {
                 } catch (e) {
                   // Handle errors here, e.g., show a snackbar or alert
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Došlo je do greške pri brisanju')),
+                    const SnackBar(
+                        content: Text('Došlo je do greške pri brisanju')),
                   );
                 }
               },

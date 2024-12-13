@@ -278,7 +278,8 @@ namespace Infrastructure.Persistence.Repositories
                                  User = u,
                                  City = c,
                                  ApplicantJobTypes = a.ApplicantJobTypes,
-                                 JobApplicationId = ja.Id
+                                 JobApplicationId = ja.Id,
+                                 ApplicationStatus = ja.Status
                              };
 
             var applicantDetails = from app in applicants
@@ -293,6 +294,10 @@ namespace Infrastructure.Persistence.Repositories
                                    let isRated = _context.Ratings
                                                        .Any(r => r.RatedUserId == app.Applicant.Id &&
                                                                  r.JobApplicationId == app.JobApplicationId)
+
+                                   let jobApplication = (from ja in _context.JobApplications
+                                                         where ja.CreatedBy == app.Applicant.Id && ja.JobId == jobId
+                                                         select ja).FirstOrDefault()
                                    select new ApplicantDTO
                                    {
                                        Id = app.Applicant.Id,
@@ -317,7 +322,8 @@ namespace Infrastructure.Persistence.Repositories
                                        AverageRating = ratings.Any() ? (decimal)ratings.Average() : 0,
                                        NumberOfFinishedJobs = finishedJobsCount,
                                        JobApplicationId = app.JobApplicationId,
-                                       IsRated = isRated // Add this line
+                                       IsRated = isRated,
+                                       ApplicationStatus= app.ApplicationStatus
                                    };
 
             var result = await applicantDetails.ToListAsync();

@@ -1,5 +1,4 @@
-﻿using Application.Common.Extensions;
-using Application.Jobs.Commands;
+﻿using Application.Jobs.Commands;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.Interfaces;
@@ -8,35 +7,24 @@ using System.Transactions;
 
 namespace Application.Jobs.Handlers;
 
-public class JobFinishCommandHandler : IRequestHandler<JobFinishCommand, Job>
+public class JobFinishCommandHandler(IJobRepository jobRepository) : IRequestHandler<JobFinishCommand, Job>
 {
-    private readonly IJobRepository _jobRepository;
-
-    public JobFinishCommandHandler(IJobRepository jobRepository)
-    {
-        _jobRepository = jobRepository;
-    }
-
     public async Task<Job> Handle(JobFinishCommand command, CancellationToken cancellationToken)
 
     {
         using var ts = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-        Job job = await _jobRepository.TryFindAsync(command.JobId);
-
-        ExceptionExtension.Validate("JOB_NOT_EXISTS", () => job == null);
+        Job job = await jobRepository.TryFindAsync(command.JobId);
 
         job.MoveNext(JobCommand.Complete);
 
-        var applications= await _jobRepository.GetApplicants(command.JobId);
+        var acceptedApplicants = (await jobRepository.GetApplicantAppliedJobsAsync(command.JobId))
+            .Where(x => x.Status == JobApplicationStatus.Accepted)
+            .ToList();
 
-        ExceptionExtension.Validate("CANNOT_FINISH_JOB_WITHOUT_APPLICANTS", () => applications.Count()==0);
-        var ratedApplicants= applications.Where(x=>x.IsRated==true).ToList();
-        ExceptionExtension.Validate("AT_LEAST_ONE_APPLICANT_NEED_TO_BE_RATED", () => ratedApplicants.Count() == 0);
+        job.CompletedWithApplicants = acceptedApplicants.Count != 0;
+        await jobRepository.UpdateAsync(job);
 
-        await _jobRepository.UpdateAsync(job);
-
-        var isApplicant = command.RoleId == Roles.Applicant.ToString();
-        job = await _jobRepository.GetWithDetailsAsync(job.Id, isApplicant, command.UserId.Value);
+        job = await jobRepository.GetWithDetailsAsync(job.Id, false, command.UserId.Value);
 
         ts.Complete();
 

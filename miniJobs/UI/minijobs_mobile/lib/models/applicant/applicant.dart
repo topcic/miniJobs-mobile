@@ -6,6 +6,8 @@ import 'package:minijobs_mobile/models/city.dart';
 import 'package:minijobs_mobile/models/job_type.dart';
 import 'package:minijobs_mobile/models/user.dart';
 
+import '../../enumerations/job_application_status.dart';
+
 part 'applicant.g.dart';
 @JsonSerializable()
 class Applicant extends User {
@@ -19,6 +21,7 @@ class Applicant extends User {
   List<JobType>? jobTypes;
   int?  jobApplicationId;
   bool? isRated;
+  JobApplicationStatus? applicationStatus;
 
   Applicant(
       super.id,
@@ -42,7 +45,8 @@ class Applicant extends User {
       this.averageRating,
       this.jobTypes,
       this.jobApplicationId,
-      this.isRated);
+      this.isRated,
+      this.applicationStatus);
 
   factory Applicant.fromJson(Map<String, dynamic> json) => _$ApplicantFromJson(json);
 

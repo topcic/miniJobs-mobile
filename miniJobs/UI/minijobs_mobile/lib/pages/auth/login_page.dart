@@ -35,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
   // Method to authenticate user
   Future<void> authenticateUser() async {
     var autCodeRequest = AuthCodeRequest(
-      "27topcic.mahir+aplikant@gmail.com",
+      "27topcic.mahir@gmail.com",
       "Arni1234",
       "password",
       "",

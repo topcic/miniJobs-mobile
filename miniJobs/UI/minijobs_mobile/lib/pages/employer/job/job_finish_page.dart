@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:minijobs_mobile/enumerations/job_statuses.dart';
 import 'package:provider/provider.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
 import '../../../models/applicant/applicant.dart';
@@ -110,7 +111,8 @@ class _JobFinishPageState extends State<JobFinishPage> {
                   final applicant = applicants[index];
                   return ApplicantCard(
                     applicant: applicant,
-                    showChooseButton: true,
+                    jobStatus: JobStatus.AplikacijeZavrsene,
+                    jobId: widget.jobId,
                   );
                 },
               ),

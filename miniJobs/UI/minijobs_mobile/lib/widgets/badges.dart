@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:minijobs_mobile/enumerations/job_statuses.dart';
-
 import '../enumerations/job_application_status.dart';
 
-// Default Badge Widget
 class Badge extends StatelessWidget {
   final String text;
   final Color backgroundColor;
@@ -37,7 +35,6 @@ class Badge extends StatelessWidget {
   }
 }
 
-// User Badge Widget extending Badge
 class UserBadge extends StatelessWidget {
   final String status;
 
@@ -48,22 +45,18 @@ class UserBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color backgroundColor = Colors.grey[200]!;
-    Color textColor = Colors.grey[800]!;
+    // Map status to colors
+    final badgeColors = {
+      'Obrisan': [Colors.redAccent[100]!, Colors.redAccent[700]!],
+      'Aktivan': [Colors.greenAccent[100]!, Colors.greenAccent[700]!],
+    };
 
-    // Customize appearance based on status
-    if (status == 'Obrisan') {
-      backgroundColor = Colors.redAccent[100]!;
-      textColor = Colors.redAccent[700]!;
-    } else if (status == 'Aktivan') {
-      backgroundColor = Colors.greenAccent[100]!;
-      textColor = Colors.greenAccent[700]!;
-    }
+    final colors = badgeColors[status] ?? [Colors.grey[200]!, Colors.grey[800]!];
 
     return Badge(
       text: status,
-      backgroundColor: backgroundColor,
-      textColor: textColor,
+      backgroundColor: colors[0],
+      textColor: colors[1],
     );
   }
 }
@@ -78,50 +71,39 @@ class JobBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String statusText;
-    Color backgroundColor;
-    Color textColor = Colors.white;
+    // Map status to appearance
+    const statusMap = {
+      JobStatus.Kreiran: ['Kreiran', Colors.blue],
+      JobStatus.Aktivan: ['Aktivan', Colors.green],
+      JobStatus.AplikacijeZavrsene: ['Aplikacije završene', Colors.orange],
+      JobStatus.Zavrsen: ['Završen', Colors.purple],
+      JobStatus.Izbrisan: ['Izbrisan', Colors.red],
+    };
 
-    // Customize appearance based on status
-    switch (status) {
-      case JobStatus.Kreiran:
-        statusText = 'Kreiran';
-        backgroundColor = Colors.blue[400]!;
-        break;
-      case JobStatus.Aktivan:
-        statusText = 'Aktivan';
-        backgroundColor = Colors.green[400]!;
-        break;
-      case JobStatus.Zavrsen:
-        statusText = 'Završen';
-        backgroundColor = Colors.purple[400]!;
-        break;
-      case JobStatus.Izbrisan:
-        statusText = 'Izbrisan';
-        backgroundColor = Colors.red[400]!;
-        break;
-      default:
-        statusText = 'Unknown';
-        backgroundColor = Colors.grey[300]!;
-        break;
-    }
+    final statusDetails = statusMap[status] ?? ['Unknown', Colors.grey];
+    final statusText = statusDetails[0];
+    final backgroundColor = (statusDetails[1] as MaterialColor)[400]!;
 
+    return _buildBadge(statusText.toString(), backgroundColor);
+  }
+
+  Widget _buildBadge(String text, Color backgroundColor) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.black.withOpacity(0.1), // Subtle border to add depth
+          color: Colors.black.withOpacity(0.1),
           width: 1,
         ),
       ),
       child: Text(
-        statusText,
-        style: TextStyle(
-          color: textColor,
+        text,
+        style: const TextStyle(
+          color: Colors.white,
           fontWeight: FontWeight.bold,
-          fontSize: 14, // Adjust font size as needed
+          fontSize: 10,
         ),
       ),
     );
@@ -138,48 +120,101 @@ class JobApplicationBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String statusText;
-    Color backgroundColor;
-    Color textColor = Colors.white;
+    // Map status to appearance
+    const statusMap = {
+      JobApplicationStatus.Poslano: ['Poslano', Colors.blue],
+      JobApplicationStatus.Prihvaceno: ['Prihvaćeno', Colors.green],
+      JobApplicationStatus.Odbijeno: ['Odbijeno', Colors.red],
+    };
 
-    // Customize appearance based on status
-    switch (status) {
-      case JobApplicationStatus.Poslano:
-        statusText = 'Poslano';
-        backgroundColor = Colors.blue[400]!;
-        break;
-      case JobApplicationStatus.Prihvaceno:
-        statusText = 'Prihvaćeno';
-        backgroundColor = Colors.green[400]!;
-        break;
-      case JobApplicationStatus.Odbijeno:
-        statusText = 'Odbijeno';
-        backgroundColor = Colors.red[400]!;
-        break;
-      default:
-        statusText = 'Unknown';
-        backgroundColor = Colors.grey[300]!;
-        break;
-    }
+    final statusDetails = statusMap[status] ?? ['Unknown', Colors.grey];
+    final statusText = statusDetails[0];
+    final backgroundColor = (statusDetails[1] as MaterialColor)[400]!;
 
+    return _buildBadge(statusText.toString(), backgroundColor);
+  }
+
+  Widget _buildBadge(String text, Color backgroundColor) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.black.withOpacity(0.1), // Subtle border to add depth
+          color: Colors.black.withOpacity(0.1),
           width: 1,
         ),
       ),
       child: Text(
-        statusText,
-        style: TextStyle(
-          color: textColor,
+        text,
+        style: const TextStyle(
+          color: Colors.white,
           fontWeight: FontWeight.bold,
-          fontSize: 14, // Adjust font size as needed
+          fontSize: 14,
         ),
       ),
     );
+  }
+}
+
+class ApplicationActions extends StatelessWidget {
+  final JobApplicationStatus status;
+  final VoidCallback onAccept;
+  final VoidCallback onReject;
+
+  const ApplicationActions({
+    required this.status,
+    required this.onAccept,
+    required this.onReject,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (status == JobApplicationStatus.Prihvaceno) {
+      return Badge(
+        text: 'Prihvaćen',
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
+    } else if (status == JobApplicationStatus.Odbijeno) {
+      return Badge(
+        text: 'Odbijen',
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    } else {
+      return Row(
+        children: [
+          Tooltip(
+            message: 'Prihvati aplikanta',
+            child: ElevatedButton(
+              onPressed: onAccept,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text('Prihvati'),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Tooltip(
+            message: 'Odbij aplikanta',
+            child: ElevatedButton(
+              onPressed: onReject,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text('Odbij'),
+            ),
+          ),
+        ],
+      );
+    }
   }
 }

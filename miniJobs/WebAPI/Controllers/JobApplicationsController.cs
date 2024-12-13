@@ -34,4 +34,17 @@ public class JobApplicationsController(IMediator mediator) : ControllerBase
     {
         return Ok(await mediator.Send(new JobApplicationDeleteCommand(jobId)));
     }
+
+    /// Accept job application
+    /// </summary>
+    /// <returns></returns>
+    [HttpPatch("{jobApplicationId}/accept")]
+    [ProducesResponseType(typeof(JobApplication), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> AcceptJobApplication([FromRoute] int jobId, [FromRoute] int jobApplicationId, [FromBody] bool accept)
+    {
+        return Ok(await mediator.Send(new JobApplicationAcceptCommand(jobId, jobApplicationId, accept)));
+    }
+
 }

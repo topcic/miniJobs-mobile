@@ -28,6 +28,6 @@ public class ApplicantDTO
     public int NumberOfFinishedJobs { get; set; }
     public int JobApplicationId { get; set; }
     public bool IsRated { get; set; }
-
+    public JobApplicationStatus ApplicationStatus { get; set; }
     public IEnumerable<JobType> JobTypes { get; set; }
 }

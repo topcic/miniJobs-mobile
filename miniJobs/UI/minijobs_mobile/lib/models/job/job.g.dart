@@ -81,8 +81,10 @@ JobStatus? jobStatusFromInt(int? status) {
     case 1:
       return JobStatus.Aktivan;
     case 2:
-      return JobStatus.Zavrsen;
+      return JobStatus.AplikacijeZavrsene;
     case 3:
+      return JobStatus.Zavrsen;
+    case 4:
       return JobStatus.Izbrisan;
     default:
       return null;
