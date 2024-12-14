@@ -3,7 +3,7 @@ import 'applicant_applied_jobs.dart';
 import 'applicant_saved_jobs_view.dart';
 
 class ApplicantJobs extends StatelessWidget {
-  const ApplicantJobs({Key? key}) : super(key: key);
+  const ApplicantJobs({super.key});
 
   @override
   Widget build(BuildContext context) {

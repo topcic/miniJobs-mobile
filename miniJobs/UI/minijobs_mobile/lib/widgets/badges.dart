@@ -172,13 +172,13 @@ class ApplicationActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (status == JobApplicationStatus.Prihvaceno) {
-      return Badge(
+      return const Badge(
         text: 'Prihvaćen',
         backgroundColor: Colors.green,
         textColor: Colors.white,
       );
     } else if (status == JobApplicationStatus.Odbijeno) {
-      return Badge(
+      return const Badge(
         text: 'Odbijen',
         backgroundColor: Colors.red,
         textColor: Colors.white,

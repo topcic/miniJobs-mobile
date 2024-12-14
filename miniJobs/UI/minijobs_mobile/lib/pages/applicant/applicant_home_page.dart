@@ -189,7 +189,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
 
   @override
   void initState() {
-    this.selectedSortOption=widget.sort;
+    selectedSortOption=widget.sort;
     super.initState();
   }
   @override
@@ -204,7 +204,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8.0),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               color: Colors.black26,
               blurRadius: 4.0,
@@ -251,7 +251,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
   void _showSortOptions() {
     showModalBottomSheet(
       context: context,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
       ),
       builder: (BuildContext context) {
@@ -261,8 +261,8 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
                   'Poredaj po',
                   style: TextStyle(
@@ -319,7 +319,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
   void _showFilterOptions() {
     showModalBottomSheet(
       context: context,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
       ),
       builder: (BuildContext context) {
@@ -331,7 +331,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Izaberi grad',
                     style: TextStyle(
                       fontSize: 18.0,
@@ -354,7 +354,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                             ),
                             suffixIcon: selectedFilterCity != null
                                 ? IconButton(
-                              icon: Icon(Icons.clear, color: Colors.grey),
+                              icon: const Icon(Icons.clear, color: Colors.grey),
                               onPressed: () {
                                 setModalState(() {
                                   selectedFilterCity = null;

@@ -8,7 +8,6 @@ import '../../providers/rating_provider.dart';
 import '../../models/applicant/applicant.dart';
 import '../../providers/job_application_provider.dart';
 import '../rate_user_card.dart';
-import 'applicant_profile_page.dart';
 
 class ApplicantCard extends StatefulWidget {
   final Applicant applicant;

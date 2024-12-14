@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
@@ -15,7 +14,7 @@ import '../../providers/city_provider.dart';
 import '../../providers/job_type_provider.dart';
 
 class ApplicantRecommendations extends StatefulWidget {
-  const ApplicantRecommendations({Key? key}) : super(key: key);
+  const ApplicantRecommendations({super.key});
 
   @override
   _ApplicantRecommendationsState createState() =>

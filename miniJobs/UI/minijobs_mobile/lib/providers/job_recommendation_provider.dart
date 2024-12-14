@@ -5,6 +5,7 @@ import '../services/notification.service.dart';
 import 'base_provider.dart';
 
 class JobRecommendationProvider extends BaseProvider<JobRecommendation> {
+  @override
   final notificationService = NotificationService();
 
   JobRecommendationProvider() : super("job-recommendations");

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:minijobs_mobile/enumerations/job_application_status.dart';
-import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/pages/employer/job/job_modal.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
 import 'package:minijobs_mobile/widgets/badges.dart';
@@ -58,7 +57,7 @@ class _JobApplicationCardState extends State<JobApplicationCard> {
 
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-            Spacer(),
+            const Spacer(),
               InkWell(
                     onTap: () {
                       showDialog(
@@ -83,7 +82,7 @@ class _JobApplicationCardState extends State<JobApplicationCard> {
                           ),
                         ],
                       ),
-                      child: Icon(
+                      child: const Icon(
                         Icons.star_border,
                         color: Colors.amber,
                         size: 28,

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/applicant_provider.dart';
 import '../employer/job/job_application_card.dart';
-import '../employer/job/job_card.dart';
 
 class ApplicantAppliedJobsView extends StatefulWidget {
   const ApplicantAppliedJobsView({super.key});
@@ -31,7 +30,7 @@ class _ApplicantAppliedJobsViewState extends State<ApplicantAppliedJobsView> {
     final appliedJobs = applicantProvider.appliedJobs;
 
     return Scaffold(
-      appBar:  AppBar(title: Text('Aplicirani poslovi')),
+      appBar:  AppBar(title: const Text('Aplicirani poslovi')),
       body: FutureBuilder<void>(
         future: _appliedJobsFuture,
         builder: (context, snapshot) {

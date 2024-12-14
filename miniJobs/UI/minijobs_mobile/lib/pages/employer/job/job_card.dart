@@ -77,8 +77,8 @@ class _JobCardState extends State<JobCard> {
               children: [
                 const Icon(Icons.money_sharp, size: 16, color: Colors.green),
                 Text(
-                  job!.wage != null && job!.wage! > 0
-                      ? '${job!.wage} KM'
+                  job.wage != null && job.wage! > 0
+                      ? '${job.wage} KM'
                       : 'po dogovoru',
                   style: TextStyle(
                     fontSize: screenWidth * 0.035,

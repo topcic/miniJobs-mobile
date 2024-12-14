@@ -4,6 +4,7 @@ import '../models/rating.dart';
 import '../services/notification.service.dart';
 
 class RatingProvider extends BaseProvider<Rating> {
+  @override
   final notificationService = NotificationService();
   RatingProvider(): super("ratings");
   @override

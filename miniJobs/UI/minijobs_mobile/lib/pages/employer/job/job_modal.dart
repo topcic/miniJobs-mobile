@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -46,7 +45,7 @@ class _JobModalState extends State<JobModal> {
 
   bool canUserApply(Job job) {
     return job.status != JobStatus.Zavrsen &&
-        !job.isApplied! &&
+        !job.isApplied &&
         widget.role != Role.Employer &&
         job.created!
             .add(Duration(days: job.applicationsDuration!))
@@ -60,7 +59,7 @@ class _JobModalState extends State<JobModal> {
   }
   bool canUserDeleteApplication(Job job) {
     return job.status != JobStatus.Zavrsen &&
-        job.isApplied! &&
+        job.isApplied &&
         widget.role != Role.Employer &&
         job.created!
             .add(Duration(days: job.applicationsDuration!))
@@ -150,13 +149,13 @@ class _JobModalState extends State<JobModal> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Show loading indicator while waiting for data
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           // Show error message if the fetch fails
-          return Center(child: Text('Failed to load job details'));
+          return const Center(child: Text('Failed to load job details'));
         } else if (!snapshot.hasData) {
           // Show empty state if no job data is available
-          return Center(child: Text('No job data available'));
+          return const Center(child: Text('No job data available'));
         }
 
         // Job data successfully fetched

@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -81,7 +80,7 @@ class _RateUserCardState extends State<RateUserCard> {
                     // Title
                     Text(
                       'Ocijenite ${ratedUser!.fullName}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Colors.blueGrey,
@@ -90,7 +89,7 @@ class _RateUserCardState extends State<RateUserCard> {
                     const SizedBox(height: 16),
 
                     // Question
-                    Text(
+                    const Text(
                       'Koliko ste zadovoljni sa poslovanjem sa korisnikom?',
                       style: TextStyle(
                         fontSize: 16,

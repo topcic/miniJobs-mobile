@@ -3,6 +3,7 @@ import '../services/notification.service.dart';
 import 'base_provider.dart';
 
 class JobApplicationProvider extends BaseProvider<JobApplication> {
+  @override
   final notificationService = NotificationService();
 
   JobApplicationProvider() : super("jobs");
@@ -25,6 +26,7 @@ class JobApplicationProvider extends BaseProvider<JobApplication> {
     }
   }
 
+  @override
   Future<JobApplication?> delete(int jobId) async {
     try {
       var url = "${baseUrl}jobs/$jobId/applications";
@@ -45,10 +47,11 @@ class JobApplicationProvider extends BaseProvider<JobApplication> {
 
       var response = await dio.patch(url, data: {"accept": accept});
       JobApplication responseData = JobApplication.fromJson(response.data);
-      if (accept)
+      if (accept) {
         notificationService.success("Uspješno ste odobrili aplikanta.");
-      else
+      } else {
         notificationService.success("Uspješno ste odbili aplikanta.");
+      }
 
       return responseData;
     } catch (err) {

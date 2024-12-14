@@ -31,7 +31,7 @@ class _ApplicantSavedJobsViewState extends State<ApplicantSavedJobsView> {
     final savedJobs = applicantProvider.savedJobs;
 
     return Scaffold(
-      appBar:  AppBar(title: Text('Spašeni poslovi')),
+      appBar:  AppBar(title: const Text('Spašeni poslovi')),
       body: FutureBuilder<void>(
         future: _savedJobsFuture,
         builder: (context, snapshot) {

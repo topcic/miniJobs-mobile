@@ -1,6 +1,5 @@
 // File path: lib/navbar.dart
 
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
@@ -11,10 +10,8 @@ import 'package:minijobs_mobile/pages/employer/employer_profile_page.dart';
 import 'package:minijobs_mobile/pages/employer/job/job_details.dart';
 import 'package:minijobs_mobile/pages/employer/job_list.dart';
 
-import '../pages/applicant/applicant_applied_jobs.dart';
 import '../pages/applicant/applicant_home_page.dart';
 import '../pages/applicant/applicant_profile_page.dart';
-import '../pages/applicant/applicant_saved_jobs_view.dart';
 import '../pages/applicant/applicat_jobs.dart';
 
 class Navbar extends StatefulWidget {

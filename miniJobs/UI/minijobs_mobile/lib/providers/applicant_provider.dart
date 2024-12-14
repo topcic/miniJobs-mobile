@@ -8,6 +8,7 @@ import '../models/job/job_application.dart';
 import '../services/notification.service.dart';
 
 class ApplicantProvider extends BaseProvider<Applicant> {
+  @override
   final notificationService = NotificationService();
   List<Job>? _savedJobs;
   List<JobApplication>? _appliedJobs;
