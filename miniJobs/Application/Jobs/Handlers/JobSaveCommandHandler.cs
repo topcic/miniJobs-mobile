@@ -5,17 +5,8 @@ using MediatR;
 
 namespace Application.Jobs.Handlers;
 
-public class JobSaveCommandHandler : IRequestHandler<JobSaveCommand, Job>
+sealed class JobSaveCommandHandler(IJobRepository jobRepository, ISavedJobRepository savedJobRepository) : IRequestHandler<JobSaveCommand, Job>
 {
-    private readonly IJobRepository jobRepository;
-    private readonly ISavedJobRepository savedJobRepository;
-
-    public JobSaveCommandHandler(IJobRepository jobRepository, ISavedJobRepository savedJobRepository)
-    {
-        this.jobRepository = jobRepository;
-        this.savedJobRepository = savedJobRepository;
-    }
-
     public async Task<Job> Handle(JobSaveCommand command, CancellationToken cancellationToken)
     {
         Job job = await jobRepository.GetWithDetailsAsync(command.Id, true, command.UserId.Value);

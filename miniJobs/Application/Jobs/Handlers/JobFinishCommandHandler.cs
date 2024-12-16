@@ -7,7 +7,7 @@ using System.Transactions;
 
 namespace Application.Jobs.Handlers;
 
-public class JobFinishCommandHandler(IJobRepository jobRepository) : IRequestHandler<JobFinishCommand, Job>
+sealed class JobFinishCommandHandler(IJobRepository jobRepository) : IRequestHandler<JobFinishCommand, Job>
 {
     public async Task<Job> Handle(JobFinishCommand command, CancellationToken cancellationToken)
 

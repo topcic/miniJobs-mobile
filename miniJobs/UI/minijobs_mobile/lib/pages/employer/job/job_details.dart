@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:minijobs_mobile/enumerations/job_statuses.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
@@ -276,7 +278,9 @@ class _JobDetailsState extends State<JobDetails> {
   }
 
   nextStep() async {
+
     if (_currentStep == 0  && !isCalledCanAccessStep) {
+
       var jobStep1State = _jobStep1Key.currentState;
 
       if (jobStep1State != null && jobStep1State.validateAndSave() && !isCalledCanAccessStep) {

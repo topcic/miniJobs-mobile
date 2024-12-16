@@ -1,52 +1,27 @@
-﻿using Application.Common.Extensions;
-using Application.Jobs.Commands;
+﻿using Application.Jobs.Commands;
 using AutoMapper;
 using Domain.Entities;
-using Domain.Enums;
 using Domain.Interfaces;
 using MediatR;
-using System.Collections.Generic;
 using System.Transactions;
 
 namespace Application.Jobs.Handlers;
 
 
-public class JobDetailsSaveCommandHandler : IRequestHandler<JobDetailsSaveCommand, Job>
+sealed class JobUpdateCommandHandler(IJobRepository jobRepository, IMapper mapper, IJobQuestionRepository jobQuestionRepository,
+    IJobQuestionAnswerRepository jobQuestionAnswerRepository, IJobTypeRepository jobTypeRepository) : IRequestHandler<JobUpdateCommand, Job>
 {
-    private readonly IJobRepository _jobRepository;
-    private readonly IMapper _mapper;
-    private readonly IJobQuestionRepository _jobQuestionRepository;
-    private readonly IJobQuestionAnswerRepository _jobQuestionAnswerRepository;
-    private readonly IJobTypeRepository _jobTypeRepository;   
-
-
-
-    public JobDetailsSaveCommandHandler(IJobRepository jobRepository, IMapper mapper, IJobQuestionRepository jobQuestionRepository,
-        IJobQuestionAnswerRepository jobQuestionAnswerRepository, IJobTypeRepository jobTypeRepository)
-    {
-        _jobRepository = jobRepository;
-        _mapper = mapper;
-        _jobQuestionRepository = jobQuestionRepository;
-        _jobQuestionAnswerRepository = jobQuestionAnswerRepository;
-        _jobTypeRepository = jobTypeRepository;
-    }
-
-    public async Task<Job> Handle(JobDetailsSaveCommand command, CancellationToken cancellationToken)
+    public async Task<Job> Handle(JobUpdateCommand command, CancellationToken cancellationToken)
      
     {
         using var ts = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-        Job job = await _jobRepository.TryFindAsync(command.Request.Id);
-        ExceptionExtension.Validate("JOB_NOT_EXISTS", () => job == null);
-        ExceptionExtension.Validate("CAN_NOT_UPDATE_JOB_IN_THIS_STATUS", () => job.Status == JobStatus.Inactive || job.Status == JobStatus.Completed);
+        Job job = await jobRepository.TryFindAsync(command.Request.Id);
 
         JobType jobType;
         if (command.Request.JobTypeId.HasValue)
-        {
-            jobType = await _jobTypeRepository.TryFindAsync(command.Request.JobTypeId.Value);
-            ExceptionExtension.Validate("JOB_TYPE_NOT_EXISTS", () => jobType == null);
-        }
+            jobType = await jobTypeRepository.TryFindAsync(command.Request.JobTypeId.Value);
 
-        _mapper.Map(command.Request, job);
+        mapper.Map(command.Request, job);
         if (command.Request.JobSchedule != null)
         {
             await ProcessJobQuestions(job, command.Request.JobSchedule.QuestionId, command.Request.JobSchedule.Answers);
@@ -64,10 +39,9 @@ public class JobDetailsSaveCommandHandler : IRequestHandler<JobDetailsSaveComman
         job.LastModified = DateTime.UtcNow;
         job.LastModifiedBy = command.UserId;
 
-        await _jobRepository.UpdateAsync(job);
+        await jobRepository.UpdateAsync(job);
 
-        var isApplicant = command.RoleId == Roles.Applicant.ToString();
-        job = await _jobRepository.GetWithDetailsAsync(job.Id, isApplicant, command.UserId.Value);
+        job = await jobRepository.GetWithDetailsAsync(job.Id, false, command.UserId.Value);
 
         ts.Complete();
 
@@ -82,7 +56,7 @@ public class JobDetailsSaveCommandHandler : IRequestHandler<JobDetailsSaveComman
                 JobQuestionId = jobQuestionId,
                 ProposedAnswerId = answear
             };
-            await _jobQuestionAnswerRepository.InsertAsync(jobQuestionAnswer);
+            await jobQuestionAnswerRepository.InsertAsync(jobQuestionAnswer);
 
 
         }
@@ -92,14 +66,14 @@ public class JobDetailsSaveCommandHandler : IRequestHandler<JobDetailsSaveComman
     {
         foreach (var answear in answers)
         {
-            await _jobQuestionAnswerRepository.DeleteAsync(jobQuestionAnswers.First(x=>x.ProposedAnswerId==answear && x.JobQuestionId== jobQuestionId));
+            await jobQuestionAnswerRepository.DeleteAsync(jobQuestionAnswers.First(x=>x.ProposedAnswerId==answear && x.JobQuestionId== jobQuestionId));
         }
     }
 
     private async Task ProcessJobQuestions(Job job, int questionId, IEnumerable<int> answers)
     {
         JobQuestion jobQuestion;
-        jobQuestion = _jobQuestionRepository.Find(x => x.JobId == job.Id && x.QuestionId == questionId).FirstOrDefault();
+        jobQuestion = jobQuestionRepository.Find(x => x.JobId == job.Id && x.QuestionId == questionId).FirstOrDefault();
         if (jobQuestion == null)
         {
             jobQuestion = new JobQuestion
@@ -107,10 +81,10 @@ public class JobDetailsSaveCommandHandler : IRequestHandler<JobDetailsSaveComman
                 QuestionId = questionId,
                 JobId = job.Id
             };
-            await _jobQuestionRepository.InsertAsync(jobQuestion);
+            await jobQuestionRepository.InsertAsync(jobQuestion);
         }
 
-        var jobQuestionAnswersOrg = _jobQuestionAnswerRepository.Find(x => x.JobQuestionId == jobQuestion.Id);
+        var jobQuestionAnswersOrg = jobQuestionAnswerRepository.Find(x => x.JobQuestionId == jobQuestion.Id);
         IEnumerable<int> jobQuestionAnswers= new List<int>();
         if (jobQuestionAnswersOrg.Any())
             jobQuestionAnswers = jobQuestionAnswersOrg.Select(x => x.ProposedAnswerId);

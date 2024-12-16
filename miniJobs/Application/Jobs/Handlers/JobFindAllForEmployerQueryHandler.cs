@@ -5,17 +5,8 @@ using MediatR;
 
 namespace Application.Jobs.Handlers;
 
-sealed class JobFindAllForEmployerQueryHandler : IRequestHandler<JobFindAllForEmployerQuery, IEnumerable<Job>>
+sealed class JobFindAllForEmployerQueryHandler(IJobRepository jobRepository) : IRequestHandler<JobFindAllForEmployerQuery, IEnumerable<Job>>
 {
-    private readonly IJobRepository jobRepository;
-
-
-    public JobFindAllForEmployerQueryHandler(IJobRepository jobRepository)
-    {
-        this.jobRepository = jobRepository;
-    }
-
-
     public async Task<IEnumerable<Job>> Handle(JobFindAllForEmployerQuery request, CancellationToken cancellationToken)
     {
 
