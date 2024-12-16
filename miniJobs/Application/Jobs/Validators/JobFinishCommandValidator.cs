@@ -17,7 +17,7 @@ public class JobFinishCommandValidator : AbstractValidator<JobFinishCommand>
 
     private async Task<bool> ValidateEntity(JobFinishCommand command)
     {
-        Job job = await jobRepository.GetWithDetailsAsync(command.JobId, true, command.UserId.Value);
+        Job job = await jobRepository.TryFindAsync(command.JobId);
         ExceptionExtension.Validate("JOB_NOT_EXISTS", () => job == null);
         return true;
     }

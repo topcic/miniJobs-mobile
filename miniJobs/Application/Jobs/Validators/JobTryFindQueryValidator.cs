@@ -17,7 +17,7 @@ public class JobTryFindQueryValidator : AbstractValidator<JobTryFindQuery>
 
     private async Task<bool> ValidateEntity(JobTryFindQuery command)
     {
-        Job job = await jobRepository.TryFindAsync(command.Id);
+        Job job = await jobRepository.TryFindAsync(command.JobId);
         ExceptionExtension.Validate("JOB_NOT_EXISTS", () => job == null);
         return true;
     }
