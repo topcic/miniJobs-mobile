@@ -39,7 +39,7 @@ Applicant _$ApplicantFromJson(Map<String, dynamic> json) => Applicant(
         .toList(),
       (json['jobApplicationId'] as num?)?.toInt(),
       json['isRated'] as bool?,
-      jobApplicationStatusFromInt(json['status'] as int?),
+      jobApplicationStatusFromInt(json['applicationStatus'] as int?),
 );
 
 Map<String, dynamic> _$ApplicantToJson(Applicant instance) => <String, dynamic>{

@@ -91,7 +91,7 @@ namespace Infrastructure.Persistence.Repositories
                        {
                            Job = j,
                            NumberOfApplications = _context.JobApplications
-                                                .Where(ja => ja.JobId == j.Id && ja.Status != 0)
+                                                .Where(ja => ja.JobId == j.Id)
                                                 .Count()
                        };
 

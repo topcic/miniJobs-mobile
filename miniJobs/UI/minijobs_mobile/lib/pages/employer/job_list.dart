@@ -133,9 +133,7 @@ class _JobListState extends State<JobList> {
                               title: Text('Detalji'),
                             ),
                           ),
-                          if (job.numberOfApplications != null &&
-                              job.numberOfApplications! > 0 &&
-                              job.status == JobStatus.Aktivan)
+                          if (job.status == JobStatus.Aktivan || job.status == JobStatus.AplikacijeZavrsene)
                             const PopupMenuItem<String>(
                               value: 'complete',
                               child: ListTile(
@@ -236,7 +234,7 @@ class _JobListState extends State<JobList> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => JobFinishPage(jobId: job.id!),
+        builder: (context) => JobFinishPage(jobId: job.id!,jobStatus: job.status!),
       ),
     );
   }
