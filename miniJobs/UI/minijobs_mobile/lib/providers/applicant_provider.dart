@@ -4,6 +4,7 @@ import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/models/search_result.dart';
 import 'package:minijobs_mobile/providers/base_provider.dart';
 
+import '../enumerations/sort_order.dart';
 import '../models/job/job_application.dart';
 import '../services/notification.service.dart';
 
@@ -25,6 +26,7 @@ class ApplicantProvider extends BaseProvider<Applicant> {
   Future<SearchResult<Applicant>> searchApplicants({
     String? searchText,
     int? cityId,
+    required SortOrder sort,
     int? jobTypeId,
     int limit = 10,
     int offset = 0,
@@ -39,7 +41,7 @@ class ApplicantProvider extends BaseProvider<Applicant> {
       if (jobTypeId != null) {
         url += "&JobTypeId=$jobTypeId";
       }
-
+      url += "&SortOrder=${sort.name}";
       var response = await dio.get(url);
       var data = response.data;
 
