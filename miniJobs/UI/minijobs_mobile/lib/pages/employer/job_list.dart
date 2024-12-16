@@ -21,8 +21,8 @@ class JobList extends StatefulWidget {
 class _JobListState extends State<JobList> {
   late EmployerProvider employerProvider;
   late JobProvider jobProvider;
+  late Future<List<Job>> jobsFuture;
   List<Job> jobs = [];
-  bool isLoading = true;
   int userId = int.parse(GetStorage().read('userId'));
 
   @override
@@ -30,17 +30,18 @@ class _JobListState extends State<JobList> {
     super.initState();
     employerProvider = EmployerProvider();
     jobProvider = JobProvider();
-    getJobs();
+    jobsFuture = getJobs(); // Initialize the jobs fetch
   }
 
-  Future<void> getJobs() async {
-    setState(() {
-      isLoading = true;
-    });
-    jobs = await employerProvider.getJobs(userId);
-    setState(() {
-      isLoading = false;
-    });
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Re-fetch jobs when the widget is rebuilt after navigation
+    jobsFuture = getJobs();
+  }
+
+  Future<List<Job>> getJobs() async {
+    return await employerProvider.getJobs(userId); // Fetch jobs from the provider
   }
 
   @override
@@ -49,15 +50,26 @@ class _JobListState extends State<JobList> {
       appBar: AppBar(
         title: const Text('Vaši poslovi'),
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
+      body: FutureBuilder<List<Job>>(
+        future: jobsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('Došlo je do greške pri učitavanju podataka.'),
+            );
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('Nema poslova za prikaz.'));
+          } else {
+            final jobs = snapshot.data!;
+            return ListView.builder(
               itemCount: jobs.length,
               itemBuilder: (context, index) {
                 final job = jobs[index];
                 return Card(
                   margin:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   elevation: 4,
                   child: ListTile(
                     contentPadding: const EdgeInsets.all(16),
@@ -91,7 +103,12 @@ class _JobListState extends State<JobList> {
                         MaterialPageRoute(
                           builder: (context) => JobDetails(jobId: job.id!),
                         ),
-                      );
+                      ).then((_) {
+                        // Re-fetch jobs when returning from JobDetails
+                        setState(() {
+                          jobsFuture = getJobs();
+                        });
+                      });
                     },
                     onLongPress: () {
                       _showActionDialog(context, job);
@@ -146,7 +163,12 @@ class _JobListState extends State<JobList> {
                             MaterialPageRoute(
                               builder: (context) => JobDetails(jobId: job.id!),
                             ),
-                          );
+                          ).then((_) {
+                            // Re-fetch jobs after returning from details
+                            setState(() {
+                              jobsFuture = getJobs();
+                            });
+                          });
                         } else if (value == 'delete') {
                           _handleDelete(job);
                         } else if (value == 'complete') {
@@ -157,7 +179,8 @@ class _JobListState extends State<JobList> {
                             MaterialPageRoute(
                               builder: (context) => JobApplicantsView(
                                   jobId: job.id!,
-                                  jobStatus: job.status!)
+                                  jobStatus: job.status!
+                              ),
                             ),
                           );
                         }
@@ -166,7 +189,10 @@ class _JobListState extends State<JobList> {
                   ),
                 );
               },
-            ),
+            );
+          }
+        },
+      ),
     );
   }
 
@@ -187,23 +213,17 @@ class _JobListState extends State<JobList> {
             TextButton(
               child: const Text('Obriši'),
               onPressed: () async {
-                try {
                   await jobProvider
                       .delete(job.id!); // Ensure deletion is completed
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Uspješno obrisano')),
-                  );
                   setState(() {
-                    jobs.remove(job); // Remove the job from the list
+                    jobsFuture = Future.value(
+                      (jobsFuture as Future<List<Job>>).then((jobsList) {
+                        return jobsList.where((j) => j.id != job.id).toList();
+                      }),
+                    );
                   });
                   Navigator.of(context).pop(); // Close the dialog
-                } catch (e) {
-                  // Handle errors here, e.g., show a snackbar or alert
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Došlo je do greške pri brisanju')),
-                  );
-                }
+
               },
             ),
           ],
