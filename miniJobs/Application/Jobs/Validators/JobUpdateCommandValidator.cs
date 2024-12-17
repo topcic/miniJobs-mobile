@@ -30,7 +30,7 @@ internal class JobUpdateCommandValidator : AbstractValidator<JobUpdateCommand>
     {
         var job = await jobRepository.TryFindAsync(command.Request.Id);
         ExceptionExtension.Validate("JOB_NOT_EXIST", () => job == null);
-        ExceptionExtension.Validate("CAN_NOT_UPDATE_JOB_IN_THIS_STATUS", () => job.Status == JobStatus.Inactive || job.Status == JobStatus.Completed);
+        ExceptionExtension.Validate("CAN_NOT_UPDATE_JOB_IN_THIS_STATUS", () => job.Status == JobStatus.Inactive || job.Status == JobStatus.Completed || job.Status == JobStatus.ApplicationsCompleted);
 
 
         if (command.Request.JobTypeId.HasValue)

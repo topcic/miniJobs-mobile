@@ -9,9 +9,10 @@ import 'package:minijobs_mobile/providers/base_provider.dart';
 
 import '../enumerations/sort_order.dart';
 import '../models/search_result.dart';
+import '../services/notification.service.dart';
 
 class JobProvider extends BaseProvider<Job> {
-  final List<Job> _jobs = [];
+  final notificationService = NotificationService();
   Job? _currentJob;
 
   JobProvider() : super("jobs");
@@ -31,7 +32,7 @@ class JobProvider extends BaseProvider<Job> {
   }
 
 
-  Future<Job> apply(int id, bool apply) async {
+  Future<Job?> apply(int id, bool apply) async {
     try {
       var url = "${baseUrl}jobs/$id/apply";
       dio.options.headers['Content-Type'] = 'application/json';
@@ -40,23 +41,17 @@ class JobProvider extends BaseProvider<Job> {
       var response = await dio.post(url, data: apply);
       Job responseData = Job.fromJson(response.data);
       if (apply) {
-        Fluttertoast.showToast(
-          msg: "Uspješno ste aplicirali na posao",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.green,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
+        notificationService.success("Uspješno steaplicirali na posao");
       }
       return responseData;
     } catch (err) {
-      throw Exception(err.toString());
+      handleError(err);
+      handleError(err);
+      return null;
     }
   }
 
-  Future<Job> activate(int id, JobStatus status) async {
+  Future<Job?> activate(int id, JobStatus status) async {
     try {
       var url = "${baseUrl}jobs/$id/activate";
       dio.options.headers['Content-Type'] = 'application/json';
@@ -64,39 +59,25 @@ class JobProvider extends BaseProvider<Job> {
       // Send the request with the status serialized as JSON
       var response = await dio.put(url, data: status.index.toString());
       Job responseData = Job.fromJson(response.data);
-      Fluttertoast.showToast(
-        msg: "Uspješno postavljen posao",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+      notificationService.success("Uspješno postavljen posao");
       return responseData;
     } catch (err) {
-      throw Exception(err.toString());
+      handleError(err);
+      return null;
     }
   }
 
-  Future<Job> finish(int id) async {
+  Future<Job?> finish(int id) async {
     try {
       var url = "${baseUrl}jobs/$id/finish";
 
       var response = await dio.put(url);
       Job responseData = Job.fromJson(response.data);
-      Fluttertoast.showToast(
-        msg: "Uspješno završen posao",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+      notificationService.success("Uspješno završen posao");
       return responseData;
     } catch (err) {
-      throw Exception(err.toString());
+      handleError(err);
+      return null;
     }
   }
 

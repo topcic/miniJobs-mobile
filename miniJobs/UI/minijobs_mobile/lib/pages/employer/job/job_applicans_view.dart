@@ -9,8 +9,7 @@ class JobApplicantsView extends StatefulWidget {
   final int jobId;
   final JobStatus jobStatus;
 
-  const JobApplicantsView(
-      {super.key, required this.jobId, required this.jobStatus});
+  const JobApplicantsView({super.key, required this.jobId, required this.jobStatus});
 
   @override
   State<JobApplicantsView> createState() => _JobApplicantsViewState();
@@ -19,11 +18,6 @@ class JobApplicantsView extends StatefulWidget {
 class _JobApplicantsViewState extends State<JobApplicantsView> {
   late JobProvider jobProvider;
   List<Applicant> applicants = [];
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   void didChangeDependencies() {
@@ -40,9 +34,7 @@ class _JobApplicantsViewState extends State<JobApplicantsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Aplikanti'),
-      ),
+      appBar: AppBar(title: const Text('Aplikanti')),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -53,7 +45,7 @@ class _JobApplicantsViewState extends State<JobApplicantsView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Izaberite aplikanta/ke sa kojima ste surađivali na poslu',
+                  'Izaberite aplikanta/e sa kojima ste surađivali na poslu',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 8),
@@ -67,22 +59,18 @@ class _JobApplicantsViewState extends State<JobApplicantsView> {
           const Divider(height: 1),
           Expanded(
             child: applicants.isEmpty
-                ? const Center(
-                    child: Text(
-                      'Nema dostupnih aplikanta za ovaj posao.',
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
-                    ),
-                  )
+                ? const Center(child: CircularProgressIndicator()) // Added loading indicator
                 : ListView.builder(
-                    itemCount: applicants.length,
-                    itemBuilder: (context, index) {
-                      final applicant = applicants[index];
-                      return ApplicantCard(
-                          applicant: applicant,
-                          jobStatus: widget.jobStatus,
-                          jobId: widget.jobId);
-                    },
-                  ),
+              itemCount: applicants.length,
+              itemBuilder: (context, index) {
+                final applicant = applicants[index];
+                return ApplicantCard(
+                  applicant: applicant,
+                  jobStatus: widget.jobStatus,
+                  jobId: widget.jobId,
+                );
+              },
+            ),
           ),
         ],
       ),

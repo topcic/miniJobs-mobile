@@ -23,7 +23,7 @@ class JobRecommendationProvider extends BaseProvider<JobRecommendation> {
 
       var response = await dio.post(url, data: jsonRequest);
 
-      notificationService.success("Uspješno ste Dodali preporuke");
+      notificationService.success("Uspješno ste dodali preporuke");
       return fromJson(response.data);
     } catch (err) {
       handleError(err);

@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 import '../models/job/job_application.dart';
 import '../services/notification.service.dart';
 import 'base_provider.dart';
@@ -45,14 +47,11 @@ class JobApplicationProvider extends BaseProvider<JobApplication> {
     try {
       var url = "${baseUrl}jobs/$jobId/applications/$jobApplicationId/accept";
 
-      var response = await dio.patch(url, data: {"accept": accept});
+      var response = await dio.patch(url, data:  accept);
       JobApplication responseData = JobApplication.fromJson(response.data);
-      if (accept) {
-        notificationService.success("Uspješno ste odobrili aplikanta.");
-      } else {
-        notificationService.success("Uspješno ste odbili aplikanta.");
-      }
-
+      notificationService.success(accept
+          ? "Uspješno ste odobrili aplikanta."
+          : "Uspješno ste odbili aplikanta.");
       return responseData;
     } catch (err) {
       handleError(err);

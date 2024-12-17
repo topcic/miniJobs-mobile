@@ -65,7 +65,8 @@ public class Job : BaseAuditableEntity, IEntity<int>
             { new StatusTransition(JobStatus.Draft, JobCommand.Delete), JobStatus.Inactive },
             { new StatusTransition(JobStatus.Draft, JobCommand.Activate), JobStatus.Active },
             { new StatusTransition(JobStatus.Active, JobCommand.Delete), JobStatus.Inactive },
-            { new StatusTransition(JobStatus.Active, JobCommand.Complete), JobStatus.Completed }
+            { new StatusTransition(JobStatus.Active, JobCommand.ApplicationsCompleted), JobStatus.ApplicationsCompleted },
+            { new StatusTransition(JobStatus.ApplicationsCompleted, JobCommand.Complete), JobStatus.Completed }
         };
 
     private JobStatus GetNext(JobCommand command)

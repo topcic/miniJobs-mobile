@@ -1,6 +1,7 @@
 ﻿using Application.Common.Extensions;
 using Application.Jobs.Commands;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.Interfaces;
 using FluentValidation;
 
@@ -19,6 +20,11 @@ public class JobFinishCommandValidator : AbstractValidator<JobFinishCommand>
     {
         Job job = await jobRepository.TryFindAsync(command.JobId);
         ExceptionExtension.Validate("JOB_NOT_EXISTS", () => job == null);
+        var acceptedApplicants = (await jobRepository.GetApplicants(command.JobId))
+        .Where(x => x.ApplicationStatus == JobApplicationStatus.Accepted)
+        .ToList();
+        ExceptionExtension.Validate("JOB_NEED_ACCEPTED_APPLICANTS", () => acceptedApplicants.Count() == 0);
+
         return true;
     }
 }

@@ -144,6 +144,9 @@
   <data name="JOB_IS_COMPLETED" xml:space="preserve">
     <value>Posao je završen.</value>
   </data>
+  <data name="JOB_NEED_ACCEPTED_APPLICANTS" xml:space="preserve">
+    <value>Da biste mogli završiti ovaj posao potrebno je odobriti barem jednog aplikanta.</value>
+  </data>
   <data name="JOB_NOT_COMPLETED" xml:space="preserve">
     <value>Posao nije završen.</value>
   </data>

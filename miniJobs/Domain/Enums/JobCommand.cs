@@ -3,6 +3,7 @@ public enum JobCommand
 {
     Create,
     Activate,
+    ApplicationsCompleted,
     Complete,
     Delete
 }

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:minijobs_mobile/enumerations/job_statuses.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
@@ -48,9 +47,7 @@ class _JobDetailsState extends State<JobDetails> {
     }
   }
 
-
   void _initializeJob(int jobId) async {
-
     // Reset the state to default before loading new job data
     setState(() {
       _currentStep = 0;
@@ -64,6 +61,16 @@ class _JobDetailsState extends State<JobDetails> {
     if (jobId != 0) {
       final job = await _jobProvider.get(jobId); // Fetch new job data
       _jobProvider.setCurrentJob(job);
+      if (job.status != JobStatus.Kreiran) {
+        setState(() {
+          _currentStep = 3;
+        });
+      }
+      if (job.status == JobStatus.Zavrsen || job.status == JobStatus.AplikacijeZavrsene) {
+        setState(() {
+          isCompleted = true;
+        });
+      }
       setState(() {
         _job = job; // Update state with fetched job data
       });
@@ -141,7 +148,7 @@ class _JobDetailsState extends State<JobDetails> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-      _jobProvider = Provider.of<JobProvider>(context, listen: false);
+    _jobProvider = Provider.of<JobProvider>(context, listen: false);
     _initializeJob(widget.jobId);
   }
 
@@ -218,16 +225,16 @@ class _JobDetailsState extends State<JobDetails> {
                             Expanded(
                               child: ElevatedButton(
                                 onPressed: details.onStepContinue,
-                                child:
-                                    Text('Objavi posao' ),
+                                child: Text('Objavi posao'),
                               ),
                             ),
-                          if (_job.id==0 || _job.id==null || (_job.status == JobStatus.Kreiran && !isLastStep))
+                          if (_job.id == 0 ||
+                              _job.id == null ||
+                              ((_job.status == JobStatus.Kreiran || _job.status == JobStatus.Aktivan )&& !isLastStep))
                             Expanded(
                               child: ElevatedButton(
                                 onPressed: details.onStepContinue,
-                                child:
-                                Text( 'Dalje'),
+                                child: Text('Dalje'),
                               ),
                             ),
                         ],
@@ -292,6 +299,7 @@ class _JobDetailsState extends State<JobDetails> {
   Widget buildCompleted() {
     return const JobPreview(); // Display JobPreview when completed
   }
+
   nextStep() async {
     if (_currentStep == 0 && !isCalledCanAccessStep) {
       var jobStep1State = _jobStep1Key.currentState;

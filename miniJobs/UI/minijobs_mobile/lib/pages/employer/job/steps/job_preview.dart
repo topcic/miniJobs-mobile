@@ -6,8 +6,15 @@ import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
 import 'package:provider/provider.dart';
 
-class JobPreview extends StatelessWidget {
+class JobPreview extends StatefulWidget {
   const JobPreview({super.key});
+
+  @override
+  _JobPreviewState createState() => _JobPreviewState();
+}
+
+class _JobPreviewState extends State<JobPreview> {
+  bool isJobCompleted = false;
 
   @override
   Widget build(BuildContext context) {
@@ -17,10 +24,44 @@ class JobPreview extends StatelessWidget {
         '${GetStorage().read('givenname')} ${GetStorage().read('surname')}';
     final DateTime currentDate = DateTime.now();
     final DateTime applicationsEndDate =
-        currentDate.add(Duration(days: job.applicationsDuration!));
+    currentDate.add(Duration(days: job.applicationsDuration!));
     final String formattedDate =
-        DateFormat('dd.MM.yyyy.').format(applicationsEndDate);
-bool isJobCompleted = job.status == JobStatus.Zavrsen;
+    DateFormat('dd.MM.yyyy.').format(applicationsEndDate);
+
+    Future<void> _finishJob() async {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Završi posao'),
+            content: Text(
+              'Jeste li sigurni da želite završiti posao? Provjerite jeste li odabrali sve aplikante koji su sudjelovali.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Ne'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Da'),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (confirmed ?? false) {
+        var response = await jobProvider.finish(job.id!);
+
+        if (response != null && response.id != null) {
+          setState(() {
+            isJobCompleted = true;
+          });
+        }
+      }
+    }
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Container(
@@ -56,9 +97,10 @@ bool isJobCompleted = job.status == JobStatus.Zavrsen;
             Text(
               'Opis posla:',
               style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.deepPurple[700]),
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.deepPurple[700],
+              ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -165,7 +207,7 @@ bool isJobCompleted = job.status == JobStatus.Zavrsen;
               ),
             ],
             const SizedBox(height: 12),
-             if (isJobCompleted) ...[
+            if (isJobCompleted) ...[
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -222,6 +264,15 @@ bool isJobCompleted = job.status == JobStatus.Zavrsen;
                 ),
               ),
             ],
+            const SizedBox(height: 16.0),
+            if (job.status == JobStatus.AplikacijeZavrsene && !isJobCompleted)
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _finishJob,
+                  child: const Text('Završi posao'),
+                ),
+              ),
           ],
         ),
       ),

@@ -27,7 +27,7 @@ public class JobApplicationAcceptCommandValidator : AbstractValidator<JobApplica
         ExceptionExtension.Validate("JOB_APPLICATION_ALREADY_REJECTED", () => jobApplication.Status == JobApplicationStatus.Rejected);
 
         Job job = await jobRepository.GetWithDetailsAsync(command.JobId, true, command.UserId.Value);
-        ExceptionExtension.Validate("ACTION_NOT_POSSIBLE_IN_THIS_JOB_STATUS", () => job.Status != JobStatus.Active);
+        ExceptionExtension.Validate("ACTION_NOT_POSSIBLE_IN_THIS_JOB_STATUS", () => job.Status != JobStatus.ApplicationsCompleted);
         return true;
     }
 }
