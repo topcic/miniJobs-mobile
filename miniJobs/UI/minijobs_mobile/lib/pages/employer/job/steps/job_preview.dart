@@ -10,12 +10,24 @@ class JobPreview extends StatefulWidget {
   const JobPreview({super.key});
 
   @override
-  _JobPreviewState createState() => _JobPreviewState();
+  State<JobPreview> createState() => _JobPreviewState();
 }
 
 class _JobPreviewState extends State<JobPreview> {
   bool isJobCompleted = false;
 
+  @override
+  void initState() {
+    super.initState();
+    // Initialize job status
+    final jobProvider = Provider.of<JobProvider>(context, listen: false);
+    final Job job = jobProvider.getCurrentJob()!;
+    if (job.status == JobStatus.Zavrsen) {
+      setState(() {
+        isJobCompleted = true;
+      });
+    }
+  }
   @override
   Widget build(BuildContext context) {
     final jobProvider = Provider.of<JobProvider>(context);
