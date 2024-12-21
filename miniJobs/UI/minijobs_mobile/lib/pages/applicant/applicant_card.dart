@@ -4,7 +4,6 @@ import '../../../utils/photo_view.dart';
 import '../../enumerations/job_application_status.dart';
 import '../../enumerations/job_statuses.dart';
 import '../../models/rating/rating_save_request.dart';
-import '../../providers/rating_provider.dart';
 import '../../models/applicant/applicant.dart';
 import '../../providers/job_application_provider.dart';
 import '../../widgets/badges.dart';
@@ -62,32 +61,9 @@ class _ApplicantCardState extends State<ApplicantCard> {
     );
 
     if (ratingSaveRequest != null) {
-      final ratingProvider =
-          Provider.of<RatingProvider>(context, listen: false);
-
       setState(() {
-        _isLoading = true;
+        widget.applicant.isRated = true;
       });
-
-      try {
-        final success = await ratingProvider.insert(ratingSaveRequest);
-
-        setState(() {
-          widget.applicant.isRated = true;
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Successfully rated the applicant.')),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error occurred: $e')),
-        );
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
-      }
     }
   }
 
@@ -200,10 +176,34 @@ class _ApplicantCardState extends State<ApplicantCard> {
                   ),
                   const Divider(height: 24),
                   if ((widget.jobStatus == JobStatus.Aktivan ||
-                      widget.jobStatus == JobStatus.AplikacijeZavrsene) &&
+                          widget.jobStatus == JobStatus.AplikacijeZavrsene) &&
                       widget.applicant.applicationStatus ==
                           JobApplicationStatus.Poslano)
                     _buildApplicationStatusButtons(),
+                  if (widget.jobStatus == JobStatus.Zavrsen &&
+                      widget.applicant.applicationStatus ==
+                          JobApplicationStatus
+                              .Prihvaceno) //widget.showChooseButton
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: isRated
+                          ? Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.green,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                'Ocijenjen',
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            )
+                          : ElevatedButton(
+                              onPressed: () => _handleRating(context),
+                              child: const Text('Ocjeni'),
+                            ),
+                    ),
                 ],
               ),
             ),

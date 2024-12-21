@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 
 import '../../../enumerations/job_statuses.dart';
 import '../../../models/job/job_application.dart';
+import '../../../models/rating/rating_save_request.dart';
 import '../../rate_user_card.dart';
 
 class JobApplicationCard extends StatefulWidget {
@@ -35,6 +36,23 @@ class _JobApplicationCardState extends State<JobApplicationCard> {
         !jobApplication.hasRated &&
         jobApplication.status == JobApplicationStatus.Prihvaceno ;
   }
+  Future<void> _handleRating(BuildContext context) async {
+    final ratingSaveRequest = await showDialog<RatingSaveRequest>(
+      context: context,
+      builder: (BuildContext context) {
+        return RateUserCard(
+          jobApplicationId: jobApplication.id!,
+          ratedUserId: jobApplication.job!.createdBy!,
+        );
+      },
+    );
+
+    if (ratingSaveRequest != null) {
+      setState(() {
+        jobApplication.hasRated = true;
+      });
+    }
+  }
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -60,15 +78,7 @@ class _JobApplicationCardState extends State<JobApplicationCard> {
             const Spacer(),
               InkWell(
                     onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return RateUserCard(
-                            jobApplicationId: jobApplication.id!,
-                            ratedUserId: jobApplication.job!.createdBy!,
-                          );
-                        },
-                      );
+                      _handleRating(context);
                     },
                     child: Container(
                       decoration: BoxDecoration(

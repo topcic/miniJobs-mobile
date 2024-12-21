@@ -44,7 +44,7 @@ class _RateUserCardState extends State<RateUserCard> {
     );
 
     ratingProvider.insert(request).then((response) {
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(request);
     });
   }
 

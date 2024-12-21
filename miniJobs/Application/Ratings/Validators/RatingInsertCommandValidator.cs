@@ -28,7 +28,10 @@ public class RatingInsertCommandValidator : AbstractValidator<RatingInsertComman
         ExceptionExtension.Validate("NOT_ALLOWED_TO_RATE", () => jobApplication.Status != JobApplicationStatus.Accepted);
         Job job = await jobRepository.TryFindAsync(jobApplication.JobId);
         ExceptionExtension.Validate("JOB_NOT_COMPLETED", () => job.Status != JobStatus.Completed);
-        var rating = await ratingRepository.FindOneAsync(x=>x.JobApplicationId== command.Request.JobApplicationId && x.RatedUserId==job.CreatedBy && x.CreatedBy==command.UserId );
+
+        command.Request.RatedUserId = job.CreatedBy == command.UserId.Value ? jobApplication.CreatedBy.Value 
+                                      : jobApplication.CreatedBy.Value == command.UserId.Value ? job.CreatedBy.Value : jobApplication.CreatedBy.Value;
+        var rating = await ratingRepository.FindOneAsync(x=>x.JobApplicationId== command.Request.JobApplicationId && x.RatedUserId == command.Request.RatedUserId);
         ExceptionExtension.Validate("ALREADY_RATED", () => rating!=null);
         return true;
     }

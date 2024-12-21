@@ -19,7 +19,6 @@ public class RatingInsertCommandHandler : IRequestHandler<RatingInsertCommand, R
     public RatingInsertCommandHandler(IJobApplicationRepository jobApplicationRepository, IUserManagerRepository userManagerRepository,
         IRatingRepository ratingRepository, IJobRepository jobRepository, IEmailSender emailSender)
     {
-
         this.jobApplicationRepository = jobApplicationRepository;
         this.ratingRepository = ratingRepository;
         this.jobRepository = jobRepository;
