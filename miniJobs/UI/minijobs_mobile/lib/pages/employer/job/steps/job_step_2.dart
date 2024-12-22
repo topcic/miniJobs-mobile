@@ -62,9 +62,11 @@ class JobStep2State extends State<JobStep2> {
     _jobProvider = Provider.of<JobProvider>(context);
 
     _job = _jobProvider.getCurrentJob();
-    if (_job != null) {
-      _setInitialFormValues();
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_job != null) {
+        _setInitialFormValues();
+      }
+    });
     widget.setValidateAndSaveCallback(validateAndSave);
   }
 
@@ -282,13 +284,15 @@ class JobStep2State extends State<JobStep2> {
                         ),
                       ),
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Molimo unesite broj dana";
-                        } else if (int.tryParse(value) == null ||
-                            int.tryParse(value)! <= 0) {
-                          return "Unesite validan broj dana";
+                        // Check if the field is empty
+                        if (value != null && value.isNotEmpty) {
+                          final parsedValue = int.tryParse(value);
+                          // Validate only if the input is not null and is <= 0
+                          if (parsedValue == null || parsedValue <= 0) {
+                            return "Unesite validan broj dana";
+                          }
                         }
-                        return null;
+                        return null; // No validation errors for empty fields
                       },
                     ),
                   ),
@@ -357,34 +361,6 @@ class JobStep2State extends State<JobStep2> {
     );
   }
 
-  Expanded _textField(String name, String label) {
-    return Expanded(
-      child: Row(
-        children: [
-          Text(label, style: const TextStyle(fontSize: 14)),
-          const SizedBox(width: 8),
-          Flexible(
-            child: FormBuilderTextField(
-              name: name,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return "$label je obavezno polje";
-                } else {
-                  return null;
-                }
-              },
-              style: const TextStyle(fontSize: 12),
-              decoration: InputDecoration(
-                labelText: label,
-                labelStyle: const TextStyle(fontSize: 14),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   validateAndSave() {
     _formKey.currentState?.save();
     setState(() {
@@ -400,9 +376,13 @@ class JobStep2State extends State<JobStep2> {
           .firstWhere((jobType) => jobType.name == selectedJobTypeName);
       var jobScheduleInfo =
           JobScheduleInfo(_jobSchedules![0].questionId, selectedJobSchedules);
+      var extendApplicationsDurationValue =
+      formValues['extendApplicationsDuration'] != null
+          ? int.tryParse(formValues['extendApplicationsDuration'].toString()) ?? 0
+          : 0;
+
       var applicationsEndToDays = _job!.status == JobStatus.Aktivan
-          ? _job!.applicationsDuration! +
-              int.tryParse(formValues['extendApplicationsDuration'])!
+          ? _job!.applicationsDuration! + extendApplicationsDurationValue
           : applicationsEndTo!['days']!;
       var saveRequest = JobSaveRequest(
         _job!.id!,
@@ -433,7 +413,7 @@ class JobStep2State extends State<JobStep2> {
     if (_formKey.currentState!.validate() &&
         selectedJobSchedules != null &&
         selectedJobSchedules!.isNotEmpty &&
-        applicationsEndTo != null) {
+        (_job!.status == JobStatus.Aktivan || applicationsEndTo != null)) {
       return true;
     } else {
       return false;

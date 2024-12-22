@@ -264,7 +264,7 @@ class _JobPreviewState extends State<JobPreview> {
                     Text(
                       DateFormat('dd.MM.yyyy').format(job!.status ==
                               JobStatus.Kreiran
-                          ? job!.created!
+                          ? DateTime.now()
                           : job!.applicationsStart!
                               .add(Duration(days: job!.applicationsDuration!))),
                       style: TextStyle(
