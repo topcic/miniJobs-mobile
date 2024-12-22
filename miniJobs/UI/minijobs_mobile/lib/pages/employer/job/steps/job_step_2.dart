@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:intl/intl.dart';
 import 'package:minijobs_mobile/enumerations/questions.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/models/job/job_save_request.dart';
@@ -13,9 +14,12 @@ import 'package:minijobs_mobile/providers/proposed_answer_provider.dart';
 import 'package:minijobs_mobile/utils/util_widgets.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../enumerations/job_statuses.dart';
+
 class JobStep2 extends StatefulWidget {
   final Function(bool, JobSaveRequest) onNextButton;
   final Function(Function()) setValidateAndSaveCallback;
+
   const JobStep2({
     super.key,
     required this.onNextButton,
@@ -39,6 +43,7 @@ class JobStep2State extends State<JobStep2> {
     {'label': '1 do 2 sedmice', 'days': 14},
     {'label': '2 do 4 sedmice', 'days': 28},
   ];
+  final TextEditingController _daysController = TextEditingController();
   bool showAllSchedules = false;
   List<int>? selectedJobSchedules = [];
   Map<String, dynamic>? applicationsEndTo;
@@ -83,26 +88,28 @@ class JobStep2State extends State<JobStep2> {
 
   void _setInitialFormValues() {
     _formKey.currentState?.patchValue({
-  'requiredEmployees': _job?.requiredEmployees?.toString() ?? '',
-  'jobType': _job?.jobType?.name ?? '',
-});
+      'requiredEmployees': _job?.requiredEmployees?.toString() ?? '',
+      'jobType': _job?.jobType?.name ?? '',
+    });
 
-selectedJobSchedules = _job?.schedules?.map((schedule) => schedule.id!).toList() ?? [];
+    selectedJobSchedules =
+        _job?.schedules?.map((schedule) => schedule.id!).toList() ?? [];
 
-if (_job?.applicationsDuration != null) {
-  applicationsEndTo = durationOptions.firstWhere(
-    (option) => option['days'] == _job!.applicationsDuration,
-    orElse: () => {},
-  );
-}
+    if (_job?.applicationsDuration != null) {
+      applicationsEndTo = durationOptions.firstWhere(
+        (option) => option['days'] == _job!.applicationsDuration,
+        orElse: () => {},
+      );
+    }
 
-JobType? selectedJobType;
-if (_jobTypes != null && _job?.jobTypeId != null) {
-  selectedJobType = _jobTypes!.firstWhere((jobType) => jobType.id == _job!.jobTypeId);
-}
-if (selectedJobType != null) {
-  _jobTypeController.text = selectedJobType.name!;
-}
+    JobType? selectedJobType;
+    if (_jobTypes != null && _job?.jobTypeId != null) {
+      selectedJobType =
+          _jobTypes!.firstWhere((jobType) => jobType.id == _job!.jobTypeId);
+    }
+    if (selectedJobType != null) {
+      _jobTypeController.text = selectedJobType.name!;
+    }
   }
 
   @override
@@ -138,8 +145,8 @@ if (selectedJobType != null) {
                           ?.didChange(selectedId.toString());
                       _jobTypeController.text = selection;
                     },
-                    optionsViewBuilder: (context,
-                        Function(String) onSelected, Iterable<String> options) {
+                    optionsViewBuilder: (context, Function(String) onSelected,
+                        Iterable<String> options) {
                       return Align(
                         alignment: Alignment.topLeft,
                         child: Material(
@@ -151,7 +158,8 @@ if (selectedJobType != null) {
                               children: options
                                   .map((option) => ListTile(
                                         title: Text(option,
-                                            style: const TextStyle(fontSize: 12)),
+                                            style:
+                                                const TextStyle(fontSize: 12)),
                                         onTap: () => onSelected(option),
                                       ))
                                   .toList(),
@@ -160,8 +168,8 @@ if (selectedJobType != null) {
                         ),
                       );
                     },
-                    fieldViewBuilder: (context, controller, focusNode,
-                        onEditingComplete) {
+                    fieldViewBuilder:
+                        (context, controller, focusNode, onEditingComplete) {
                       return FormBuilderTextField(
                         controller: controller,
                         focusNode: focusNode,
@@ -255,36 +263,69 @@ if (selectedJobType != null) {
                 rowMethod(Text("Raspored posla je obavezno polje",
                     style: TextStyle(color: Colors.red[800], fontSize: 12))),
               const SizedBox(height: 20),
-              rowMethod(const Text("Koliko brzo želite da pronađete?")),
-              const SizedBox(height: 10),
-              rowMethod(
-                Expanded(
-                  child: Wrap(
-                    spacing: 8.0,
-                    children: durationOptions
-                        .map(
-                          (option) => Padding(
-                            padding: const EdgeInsets.all(2),
-                            child: FilterChip(
-                              label: Text(option['label'],
-                                  style: const TextStyle(fontSize: 10)),
-                              selected: applicationsEndTo == option,
-                              onSelected: (bool selected) {
-                                setState(() {
-                                  applicationsEndTo = selected ? option : null;
-                                });
-                              },
-                            ),
-                          ),
-                        )
-                        .toList(),
+              if (_job!.status == JobStatus.Aktivan) ...[
+                Text(
+                  'Aplikacije traju do: ${DateFormat('dd.MM.yyyy').format(_job!.applicationsStart!.add(Duration(days: _job!.applicationsDuration!)))}',
+                  style: TextStyle(fontSize: 14),
+                ),
+                SizedBox(height: 10),
+                rowMethod(
+                  Expanded(
+                    child: FormBuilderTextField(
+                      name: 'extendApplicationsDuration',
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      decoration: const InputDecoration(
+                        label: Text(
+                          "Dodajte broj dana za produženje trajanja aplikacija",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Molimo unesite broj dana";
+                        } else if (int.tryParse(value) == null ||
+                            int.tryParse(value)! <= 0) {
+                          return "Unesite validan broj dana";
+                        }
+                        return null;
+                      },
+                    ),
                   ),
                 ),
-              ),
-              if (isClickedBtnNext &&
-                  (applicationsEndTo == null || applicationsEndTo!.isEmpty))
-                rowMethod(Text("Ovo je obavezno polje",
-                    style: TextStyle(color: Colors.red[800], fontSize: 12))),
+              ] else ...[
+                rowMethod(const Text("Koliko brzo želite da pronađete?")),
+                const SizedBox(height: 10),
+                rowMethod(
+                  Expanded(
+                    child: Wrap(
+                      spacing: 8.0,
+                      children: durationOptions
+                          .map(
+                            (option) => Padding(
+                              padding: const EdgeInsets.all(2),
+                              child: FilterChip(
+                                label: Text(option['label'],
+                                    style: const TextStyle(fontSize: 10)),
+                                selected: applicationsEndTo == option,
+                                onSelected: (bool selected) {
+                                  setState(() {
+                                    applicationsEndTo =
+                                        selected ? option : null;
+                                  });
+                                },
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ),
+                ),
+                if (isClickedBtnNext &&
+                    (applicationsEndTo == null || applicationsEndTo!.isEmpty))
+                  rowMethod(Text("Ovo je obavezno polje",
+                      style: TextStyle(color: Colors.red[800], fontSize: 12))),
+              ],
               const SizedBox(height: 20),
               rowMethod(
                 Expanded(
@@ -308,7 +349,7 @@ if (selectedJobType != null) {
                     },
                   ),
                 ),
-              ),
+              )
             ],
           ),
         ),
@@ -359,7 +400,10 @@ if (selectedJobType != null) {
           .firstWhere((jobType) => jobType.name == selectedJobTypeName);
       var jobScheduleInfo =
           JobScheduleInfo(_jobSchedules![0].questionId, selectedJobSchedules);
-
+      var applicationsEndToDays = _job!.status == JobStatus.Aktivan
+          ? _job!.applicationsDuration! +
+              int.tryParse(formValues['extendApplicationsDuration'])!
+          : applicationsEndTo!['days']!;
       var saveRequest = JobSaveRequest(
         _job!.id!,
         _job!.name,
@@ -372,7 +416,7 @@ if (selectedJobType != null) {
         jobScheduleInfo,
         null,
         null,
-        applicationsEndTo!['days']!,
+        applicationsEndToDays,
       );
 
       setState(() {
@@ -383,17 +427,19 @@ if (selectedJobType != null) {
       widget.onNextButton(false, _jobSaveRequest!);
     }
   }
-bool isValidForm(){
-  _formKey.currentState?.save();
-  if (_formKey.currentState!.validate() &&
-      selectedJobSchedules != null &&
-      selectedJobSchedules!.isNotEmpty &&
-      applicationsEndTo != null) {
-   return true;
-  } else {
-    return false;
+
+  bool isValidForm() {
+    _formKey.currentState?.save();
+    if (_formKey.currentState!.validate() &&
+        selectedJobSchedules != null &&
+        selectedJobSchedules!.isNotEmpty &&
+        applicationsEndTo != null) {
+      return true;
+    } else {
+      return false;
+    }
   }
-}
+
   JobSaveRequest getUpdatedJob() {
     return _jobSaveRequest!;
   }

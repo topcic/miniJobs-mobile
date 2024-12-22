@@ -15,6 +15,10 @@ sealed class JobActivateCommandHandler(IJobRepository jobRepository, IMediator m
 
         job.MoveNext(JobCommand.Activate);
 
+        job.ApplicationsStart = DateTime.UtcNow;
+        job.LastModified = DateTime.UtcNow;
+        job.LastModifiedBy = command.UserId.Value;
+
         await jobRepository.UpdateAsync(job);
 
         job = await jobRepository.GetWithDetailsAsync(job.Id, false, command.UserId.Value);

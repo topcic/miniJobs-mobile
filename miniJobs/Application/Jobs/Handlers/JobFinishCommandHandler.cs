@@ -21,7 +21,6 @@ sealed class JobFinishCommandHandler(IJobRepository jobRepository) : IRequestHan
             .Where(x => x.Status == JobApplicationStatus.Accepted)
             .ToList();
 
-        job.CompletedWithApplicants = acceptedApplicants.Count != 0;
         await jobRepository.UpdateAsync(job);
 
         job = await jobRepository.GetWithDetailsAsync(job.Id, false, command.UserId.Value);

@@ -31,11 +31,12 @@ class Job {
   bool isApplied = false;
   bool isSaved = false;
   int? createdBy;
+  DateTime? applicationsStart;
   Job();
   Job.withData(this.id, this.name, this.description, this.streetAddressAndNumber,
       this.city,this.applicationsDuration,this.status, this.requiredEmployees,
       this.wage,this.employer,this.state,this.cityId,
-      this.employerFullName,this.isApplied,this.isSaved);
+      this.employerFullName,this.isApplied,this.isSaved,this.applicationsStart);
 
   factory Job.fromJson(Map<String, dynamic> json) => _$JobFromJson(json);
 

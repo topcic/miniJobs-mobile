@@ -28,17 +28,13 @@ class _JobPreviewState extends State<JobPreview> {
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final jobProvider = Provider.of<JobProvider>(context);
     final Job job = jobProvider.getCurrentJob()!;
     final userName =
         '${GetStorage().read('givenname')} ${GetStorage().read('surname')}';
-    final DateTime currentDate = DateTime.now();
-    final DateTime applicationsEndDate =
-    currentDate.add(Duration(days: job.applicationsDuration!));
-    final String formattedDate =
-    DateFormat('dd.MM.yyyy.').format(applicationsEndDate);
 
     Future<void> _finishJob() async {
       final confirmed = await showDialog<bool>(
@@ -266,7 +262,11 @@ class _JobPreviewState extends State<JobPreview> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      formattedDate,
+                      DateFormat('dd.MM.yyyy').format(job!.status ==
+                              JobStatus.Kreiran
+                          ? job!.created!
+                          : job!.applicationsStart!
+                              .add(Duration(days: job!.applicationsDuration!))),
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.blue[800],

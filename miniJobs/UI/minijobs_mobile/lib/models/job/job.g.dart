@@ -45,7 +45,9 @@ Job _$JobFromJson(Map<String, dynamic> json) => Job()
   ..employerFullName = json['employerFullName'] as String?
   ..isApplied = (json['isApplied'] as bool?) ?? false // Default to false
   ..isSaved = (json['isSaved'] as bool?) ?? false // Default to false
-  ..createdBy = (json['createdBy'] as num?)?.toInt();
+  ..createdBy = (json['createdBy'] as num?)?.toInt()
+  ..applicationsStart =
+  json['applicationsStart'] == null ? null : DateTime.parse(json['applicationsStart'] as String);
 
 Map<String, dynamic> _$JobToJson(Job instance) => <String, dynamic>{
       'id': instance.id,

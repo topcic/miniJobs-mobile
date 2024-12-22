@@ -38,8 +38,8 @@ public class Job : BaseAuditableEntity, IEntity<int>
     [Column("job_type_id")]
     public int? JobTypeId { get; set; }
 
-    [Column("completed_with_applicants")]
-    public bool CompletedWithApplicants { get; set; }
+    [Column("applications_start")]
+    public DateTime? ApplicationsStart { get; set; }
 
     public virtual JobType JobType { get; set; }
     public virtual City City { get; set; }
