@@ -56,7 +56,7 @@ class _JobListState extends State<JobList> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(
+            return const Center(
               child: Text('Došlo je do greške pri učitavanju podataka.'),
             );
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -215,7 +215,7 @@ class _JobListState extends State<JobList> {
                       .delete(job.id!); // Ensure deletion is completed
                   setState(() {
                     jobsFuture = Future.value(
-                      (jobsFuture as Future<List<Job>>).then((jobsList) {
+                      (jobsFuture).then((jobsList) {
                         return jobsList.where((j) => j.id != job.id).toList();
                       }),
                     );

@@ -225,7 +225,7 @@ class _JobDetailsState extends State<JobDetails> {
                             Expanded(
                               child: ElevatedButton(
                                 onPressed: details.onStepContinue,
-                                child: Text('Objavi posao'),
+                                child: const Text('Objavi posao'),
                               ),
                             ),
                           if (_job.id == 0 ||
@@ -234,7 +234,7 @@ class _JobDetailsState extends State<JobDetails> {
                             Expanded(
                               child: ElevatedButton(
                                 onPressed: details.onStepContinue,
-                                child: Text('Dalje'),
+                                child: const Text('Dalje'),
                               ),
                             ),
                         ],

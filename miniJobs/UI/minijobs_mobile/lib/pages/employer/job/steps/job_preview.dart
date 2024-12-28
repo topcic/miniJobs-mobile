@@ -40,13 +40,13 @@ class _JobPreviewState extends State<JobPreview> {
     final String formattedDate =
     DateFormat('dd.MM.yyyy.').format(applicationsEndDate);
 
-    Future<void> _finishJob() async {
+    Future<void> finishJob() async {
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Završi posao'),
-            content: Text(
+            content: const Text(
               'Jeste li sigurni da želite završiti posao? Provjerite jeste li odabrali sve aplikante koji su sudjelovali.',
             ),
             actions: [
@@ -281,7 +281,7 @@ class _JobPreviewState extends State<JobPreview> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _finishJob,
+                  onPressed: finishJob,
                   child: const Text('Završi posao'),
                 ),
               ),
