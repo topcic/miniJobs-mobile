@@ -25,7 +25,6 @@ class _JobDetailsState extends State<JobDetails> {
   Job _job = Job();
   late JobProvider _jobProvider;
   final GlobalKey<JobStep1State> _jobStep1Key = GlobalKey<JobStep1State>();
-  JobSaveRequest? _jobSaveRequest;
   late Function() _validateAndSaveStep2Callback;
   late Function() _validateAndSaveStep3Callback;
   bool isCalledCanAccessStep = false;
@@ -53,7 +52,6 @@ class _JobDetailsState extends State<JobDetails> {
       _currentStep = 0;
       isCompleted = false;
       _job = Job(); // Clear old job data
-      _jobSaveRequest = null;
       isCalledCanAccessStep = false;
       requestedStep = 0;
     });
@@ -66,7 +64,8 @@ class _JobDetailsState extends State<JobDetails> {
           _currentStep = 3;
         });
       }
-      if (job.status == JobStatus.Zavrsen || job.status == JobStatus.AplikacijeZavrsene) {
+      if (job.status == JobStatus.Zavrsen ||
+          job.status == JobStatus.AplikacijeZavrsene) {
         setState(() {
           isCompleted = true;
         });
@@ -130,15 +129,20 @@ class _JobDetailsState extends State<JobDetails> {
       var jobStep1State = _jobStep1Key.currentState;
       if (jobStep1State != null && jobStep1State.validateAndSave()) {
         _job = jobStep1State.getUpdatedJob();
-        return true;
+        return _validateAndSaveStep2Callback();
       }
       return false;
     } else if (step == 3) {
       var jobStep1State = _jobStep1Key.currentState;
       if (jobStep1State != null && jobStep1State.validateAndSave()) {
         _job = jobStep1State.getUpdatedJob();
-        return _validateAndSaveStep2Callback() &&
-            _validateAndSaveStep3Callback();
+
+        _validateAndSaveStep2Callback();
+        setState(() {
+          isCalledCanAccessStep = true;
+        });
+        _validateAndSaveStep3Callback();
+        return true;
       }
       return false;
     }
@@ -170,6 +174,16 @@ class _JobDetailsState extends State<JobDetails> {
     }
   }
 
+  void updateJobForStep1(Job currentJob){
+    setState(() {
+
+      _job.name=currentJob.name;
+      _job.description=currentJob.description;
+      _job.cityId=currentJob.cityId;
+      _job.streetAddressAndNumber=currentJob.streetAddressAndNumber;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -185,6 +199,9 @@ class _JobDetailsState extends State<JobDetails> {
                   steps: getSteps(),
                   currentStep: _currentStep,
                   onStepContinue: () async {
+                    setState(() {
+                      isCalledCanAccessStep = false;
+                    });
                     await nextStep();
                   },
                   onStepTapped: (step) async {
@@ -225,16 +242,18 @@ class _JobDetailsState extends State<JobDetails> {
                             Expanded(
                               child: ElevatedButton(
                                 onPressed: details.onStepContinue,
-                                child: Text('Objavi posao'),
+                                child: const Text('Objavi posao'),
                               ),
                             ),
                           if (_job.id == 0 ||
                               _job.id == null ||
-                              ((_job.status == JobStatus.Kreiran || _job.status == JobStatus.Aktivan )&& !isLastStep))
+                              ((_job.status == JobStatus.Kreiran ||
+                                      _job.status == JobStatus.Aktivan) &&
+                                  !isLastStep))
                             Expanded(
                               child: ElevatedButton(
                                 onPressed: details.onStepContinue,
-                                child: Text('Dalje'),
+                                child: const Text('Dalje'),
                               ),
                             ),
                         ],
@@ -318,6 +337,7 @@ class _JobDetailsState extends State<JobDetails> {
             _currentStep += 1;
           });
         } else {
+          updateJobForStep1(currentJob);
           var saveRequest = createJobSaveRequest(_job);
           var job = await _jobProvider.update(_job.id!, saveRequest);
           _jobProvider.setCurrentJob(job);

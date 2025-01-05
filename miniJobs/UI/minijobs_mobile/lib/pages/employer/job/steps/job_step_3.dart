@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:minijobs_mobile/enumerations/questions.dart';
@@ -14,6 +13,7 @@ import 'package:provider/provider.dart';
 class JobStep3 extends StatefulWidget {
   final Function(bool, JobSaveRequest) onNextButton;
   final Function(Function()) setValidateAndSaveCallback;
+
   const JobStep3({
     super.key,
     required this.onNextButton,
@@ -27,6 +27,7 @@ class JobStep3 extends StatefulWidget {
 class _JobStep3State extends State<JobStep3> {
   final _formKey = GlobalKey<FormBuilderState>();
   bool isClickedBtnNext = false;
+
   //int? wage;
   List<ProposedAnswer>? paymentOptions;
   List<ProposedAnswer>? additionalPaymentOptions;
@@ -90,13 +91,14 @@ class _JobStep3State extends State<JobStep3> {
 
   void _setInitialFormValues() {
     if (_job != null) {
-  if (_job!.additionalPaymentOptions != null) {
-    selectedAdditionalPayments =
-        _job!.additionalPaymentOptions!.map((option) => option.id!).toList();
-  }
-  if (_job!.paymentQuestion != null) {
-    paymentChoice = _job!.paymentQuestion!.id!;
-  }
+      if (_job!.additionalPaymentOptions != null) {
+        selectedAdditionalPayments = _job!.additionalPaymentOptions!
+            .map((option) => option.id!)
+            .toList();
+      }
+      if (_job!.paymentQuestion != null) {
+        paymentChoice = _job!.paymentQuestion!.id!;
+      }
     }
   }
 
@@ -237,8 +239,21 @@ class _JobStep3State extends State<JobStep3> {
 
   validateAndSave() {
     _formKey.currentState?.save();
-    if (_formKey.currentState!.validate()) {
+    bool isFormValid = _formKey.currentState!.validate();
 
+    // Validate 'Način plaćanja'
+    if (paymentChoice == null) {
+      setState(() {
+        isClickedBtnNext = true; // Ensure error message is shown
+      });
+      isFormValid = false;
+    } else {
+      setState(() {
+        isClickedBtnNext = false;
+      });
+    }
+
+    if (isFormValid) {
       final Map<String, dynamic> formValues = _formKey.currentState!.value;
       saveAnswersToPaymentQuestions();
       var jobScheduleInfo = JobScheduleInfo(
@@ -256,7 +271,7 @@ class _JobStep3State extends State<JobStep3> {
         _job?.requiredEmployees!,
         jobScheduleInfo,
         answersToPaymentQuestions,
-       formValues['wage']!=null? int.tryParse(formValues['wage']) : 0,
+        formValues['wage'] != null ? int.tryParse(formValues['wage']) : 0,
         _job?.applicationsDuration!,
       );
 

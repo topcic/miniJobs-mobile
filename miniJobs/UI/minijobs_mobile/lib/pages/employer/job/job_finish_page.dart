@@ -10,7 +10,7 @@ class JobFinishPage extends StatefulWidget {
   final int jobId;
   final JobStatus jobStatus;
 
-  const JobFinishPage({Key? key, required this.jobId,required this.jobStatus}) : super(key: key);
+  const JobFinishPage({super.key, required this.jobId,required this.jobStatus});
 
   @override
   _JobFinishPageState createState() => _JobFinishPageState();

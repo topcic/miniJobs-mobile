@@ -27,7 +27,7 @@ class ApplicantCard extends StatefulWidget {
 }
 
 class _ApplicantCardState extends State<ApplicantCard> {
-  bool _isLoading = false;
+  final bool _isLoading = false;
   late JobApplicationProvider jobApplicationProvider;
 
   @override
@@ -194,9 +194,9 @@ class _ApplicantCardState extends State<ApplicantCard> {
                                 color: Colors.green,
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: Text(
+                              child: const Text(
                                 'Ocijenjen',
-                                style: const TextStyle(color: Colors.white),
+                                style: TextStyle(color: Colors.white),
                               ),
                             )
                           : ElevatedButton(

@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 
 import '../models/job/job_application.dart';
 import '../services/notification.service.dart';

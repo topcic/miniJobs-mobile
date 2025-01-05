@@ -36,13 +36,13 @@ class _JobPreviewState extends State<JobPreview> {
     final userName =
         '${GetStorage().read('givenname')} ${GetStorage().read('surname')}';
 
-    Future<void> _finishJob() async {
+    Future<void> finishJob() async {
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Završi posao'),
-            content: Text(
+            content: const Text(
               'Jeste li sigurni da želite završiti posao? Provjerite jeste li odabrali sve aplikante koji su sudjelovali.',
             ),
             actions: [
@@ -262,11 +262,11 @@ class _JobPreviewState extends State<JobPreview> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      DateFormat('dd.MM.yyyy').format(job!.status ==
+                      DateFormat('dd.MM.yyyy').format(job.status ==
                               JobStatus.Kreiran
                           ? DateTime.now()
-                          : job!.applicationsStart!
-                              .add(Duration(days: job!.applicationsDuration!))),
+                          : job.applicationsStart!
+                              .add(Duration(days: job.applicationsDuration!))),
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.blue[800],
@@ -281,7 +281,7 @@ class _JobPreviewState extends State<JobPreview> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _finishJob,
+                  onPressed: finishJob,
                   child: const Text('Završi posao'),
                 ),
               ),

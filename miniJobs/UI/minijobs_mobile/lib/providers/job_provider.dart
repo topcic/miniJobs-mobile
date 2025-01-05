@@ -1,7 +1,5 @@
 
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:minijobs_mobile/enumerations/job_statuses.dart';
 import 'package:minijobs_mobile/models/applicant/applicant.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
@@ -12,6 +10,7 @@ import '../models/search_result.dart';
 import '../services/notification.service.dart';
 
 class JobProvider extends BaseProvider<Job> {
+  @override
   final notificationService = NotificationService();
   Job? _currentJob;
 

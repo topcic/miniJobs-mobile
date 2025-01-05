@@ -268,9 +268,9 @@ class JobStep2State extends State<JobStep2> {
               if (_job!.status == JobStatus.Aktivan) ...[
                 Text(
                   'Aplikacije traju do: ${DateFormat('dd.MM.yyyy').format(_job!.applicationsStart!.add(Duration(days: _job!.applicationsDuration!)))}',
-                  style: TextStyle(fontSize: 14),
+                  style: const TextStyle(fontSize: 14),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 rowMethod(
                   Expanded(
                     child: FormBuilderTextField(
