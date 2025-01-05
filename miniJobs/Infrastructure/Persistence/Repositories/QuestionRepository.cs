@@ -1,5 +1,21 @@
-﻿namespace Infrastructure.Persistence.Repositories;
+﻿
+using Microsoft.EntityFrameworkCore;
 
- public class QuestionRepository(ApplicationDbContext context) : GenericRepository<Question, int, ApplicationDbContext>(context), IQuestionRepository
+namespace Infrastructure.Persistence.Repositories;
+
+public class QuestionRepository(ApplicationDbContext context) : GenericRepository<Question, int, ApplicationDbContext>(context), IQuestionRepository
 {
+    public IEnumerable<ProposedAnswer> GetAnswersForQuestion(string questionName)
+    {
+        return context.ProposedAnswers
+         .Join(
+             context.Questions,
+             answer => answer.QuestionId, 
+             question => question.Id,
+             (answer, question) => new { answer, question } 
+         )
+         .Where(joined => joined.question.Name == questionName) 
+         .Select(joined => joined.answer) 
+         .ToList();
+    }
 }

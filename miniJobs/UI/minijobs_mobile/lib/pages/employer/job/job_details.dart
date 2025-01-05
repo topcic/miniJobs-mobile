@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:minijobs_mobile/enumerations/job_statuses.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
@@ -159,9 +161,14 @@ class _JobDetailsState extends State<JobDetails> {
   void _onNextButton(bool isValid, JobSaveRequest? jobSaveRequest) async {
     if (isValid) {
       if (!isCalledCanAccessStep) {
-        var saveRequest = jobSaveRequest;
-        var job = await _jobProvider.update(saveRequest!.id!, saveRequest);
-        _jobProvider.setCurrentJob(job);
+        Job? job;
+        if (_currentStep == 1) {
+          job = await _jobProvider.updateStep2(jobSaveRequest!.id!, jobSaveRequest);
+        } else if (_currentStep == 2) {
+          job = await _jobProvider.updateStep3(
+              jobSaveRequest!.id!, jobSaveRequest);
+        }
+        _jobProvider.setCurrentJob(job!);
         setState(() {
           _currentStep += 1;
         });
@@ -174,13 +181,12 @@ class _JobDetailsState extends State<JobDetails> {
     }
   }
 
-  void updateJobForStep1(Job currentJob){
+  void updateJobForStep1(Job currentJob) {
     setState(() {
-
-      _job.name=currentJob.name;
-      _job.description=currentJob.description;
-      _job.cityId=currentJob.cityId;
-      _job.streetAddressAndNumber=currentJob.streetAddressAndNumber;
+      _job.name = currentJob.name;
+      _job.description = currentJob.description;
+      _job.cityId = currentJob.cityId;
+      _job.streetAddressAndNumber = currentJob.streetAddressAndNumber;
     });
   }
 
@@ -339,10 +345,10 @@ class _JobDetailsState extends State<JobDetails> {
         } else {
           updateJobForStep1(currentJob);
           var saveRequest = createJobSaveRequest(_job);
-          var job = await _jobProvider.update(_job.id!, saveRequest);
+          var job = await _jobProvider.updateStep1(_job.id!, saveRequest);
           _jobProvider.setCurrentJob(job);
           setState(() {
-            _job = job;
+            _job = job!;
             _currentStep += 1;
           });
         }

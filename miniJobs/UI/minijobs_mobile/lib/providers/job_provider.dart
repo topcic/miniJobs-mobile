@@ -1,3 +1,4 @@
+import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:minijobs_mobile/enumerations/job_statuses.dart';
@@ -30,7 +31,6 @@ class JobProvider extends BaseProvider<Job> {
     return _currentJob;
   }
 
-
   Future<Job?> apply(int id, bool apply) async {
     try {
       var url = "${baseUrl}jobs/$id/apply";
@@ -45,6 +45,51 @@ class JobProvider extends BaseProvider<Job> {
       return responseData;
     } catch (err) {
       handleError(err);
+      handleError(err);
+      return null;
+    }
+  }
+
+  Future<Job?> updateStep1(int id, [dynamic request]) async {
+    try {
+      var url = "${baseUrl}jobs/$id/step1";
+      var jsonRequest = jsonEncode(request);
+
+      var response = await dio.put(url, data: jsonRequest);
+      Job responseData = Job.fromJson(response.data);
+      notificationService.success("Uspješno ste spasili promjene.");
+      return responseData;
+    } catch (err) {
+      handleError(err);
+      return null;
+    }
+  }
+
+  Future<Job?> updateStep2(int id, [dynamic request]) async {
+    try {
+      var url = "${baseUrl}jobs/$id/step2";
+      var jsonRequest = jsonEncode(request);
+
+      var response = await dio.put(url, data: jsonRequest);
+      Job responseData = Job.fromJson(response.data);
+      notificationService.success("Uspješno ste spasili promjene.");
+      return responseData;
+    } catch (err) {
+      handleError(err);
+      return null;
+    }
+  }
+
+  Future<Job?> updateStep3(int id, [dynamic request]) async {
+    try {
+      var url = "${baseUrl}jobs/$id/step3";
+      var jsonRequest = jsonEncode(request);
+
+      var response = await dio.put(url, data: jsonRequest);
+      Job responseData = Job.fromJson(response.data);
+      notificationService.success("Uspješno ste spasili promjene.");
+      return responseData;
+    } catch (err) {
       handleError(err);
       return null;
     }
@@ -85,14 +130,13 @@ class JobProvider extends BaseProvider<Job> {
       var url = "${baseUrl}jobs/$jobId/applicants";
       var response = await dio.get(url);
 
-      List<Applicant> responseData = List<Applicant>.from(response.data.map((item) => Applicant.fromJson(item)));
+      List<Applicant> responseData = List<Applicant>.from(
+          response.data.map((item) => Applicant.fromJson(item)));
       return responseData;
     } catch (err) {
       throw Exception(err.toString());
     }
   }
-
-
 
   Future<SearchResult<Job>> search({
     String? searchText,
@@ -102,7 +146,8 @@ class JobProvider extends BaseProvider<Job> {
     int offset = 0,
   }) async {
     try {
-      var url = "${baseUrl}jobs/search?SearchText=$searchText&Limit=$limit&Offset=$offset";
+      var url =
+          "${baseUrl}jobs/search?SearchText=$searchText&Limit=$limit&Offset=$offset";
 
       if (cityId != null) {
         url += "&CityId=$cityId";
@@ -116,8 +161,8 @@ class JobProvider extends BaseProvider<Job> {
       var result = (data['result'] as List<dynamic>)
           .map((item) => Job.fromJson(item as Map<String, dynamic>))
           .toList();
-      var count = data ['count'] as int;
-      return SearchResult<Job>( count,result);
+      var count = data['count'] as int;
+      return SearchResult<Job>(count, result);
     } on DioException catch (err) {
       throw Exception(err.message);
     }

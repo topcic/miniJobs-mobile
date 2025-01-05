@@ -39,14 +39,34 @@ public class JobsController(IMediator mediator) : ControllerBase
     {
         return Ok(await mediator.Send(new JobTryFindQuery(jobId)));
     }
-    [HttpPut("{jobId}")]
+    [HttpPut("{jobId}/step1")]
     [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> Update([FromRoute] int jobId, [FromBody] JobSaveRequest request)
+    public async Task<IActionResult> UpdateStep1([FromRoute] int jobId, [FromBody] Job request)
     {
         request.Id = jobId;
-        return Ok(await mediator.Send(new JobUpdateCommand(request)));
+        return Ok(await mediator.Send(new JobStep1UpdateCommand(request)));
+    }
+
+    [HttpPut("{jobId}/step2")]
+    [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UpdateStep2([FromRoute] int jobId, [FromBody] JobSaveRequest request)
+    {
+        request.Id = jobId;
+        return Ok(await mediator.Send(new JobStep2UpdateCommand(request)));
+    }
+
+    [HttpPut("{jobId}/step3")]
+    [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UpdateStep3([FromRoute] int jobId, [FromBody] JobSaveRequest request)
+    {
+        request.Id = jobId;
+        return Ok(await mediator.Send(new JobStep3UpdateCommand(request)));
     }
     [HttpPut("{jobId}/activate")]
     [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
