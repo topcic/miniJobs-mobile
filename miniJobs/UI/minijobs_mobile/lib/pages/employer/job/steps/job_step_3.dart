@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:minijobs_mobile/enumerations/questions.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
@@ -163,28 +164,31 @@ class _JobStep3State extends State<JobStep3> {
               ),
               if (paymentChoice != null &&
                   paymentOptions!
-                          .firstWhere((option) =>
-                              option.id.toString() == paymentChoice.toString())
-                          .answer !=
+                      .firstWhere((option) =>
+                  option.id.toString() == paymentChoice.toString())
+                      .answer !=
                       "po dogovoru")
                 FormBuilderTextField(
-                    name: 'wage',
-                    initialValue: _job?.wage?.toString(),
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Cijena',
-                    ),
-                    // onChanged: (value) {
-                    //   setState(() {
-                    //     wage = int.tryParse(value!);
-                    //   });
-                    // },
-                    validator: ((value) {
-                      if (value == null || value.isEmpty) {
-                        return "Cijena je obavezno polje";
-                      }
-                      return null;
-                    })),
+                  name: 'wage',
+                  initialValue: _job?.wage?.toString(),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly, // Allows only positive numbers
+                  ],
+                  decoration: const InputDecoration(
+                    labelText: 'Cijena',
+                  ),
+                  validator: ((value) {
+                    if (value == null || value.isEmpty) {
+                      return "Cijena je obavezno polje";
+                    }
+                    final intValue = int.tryParse(value);
+                    if (intValue == null || intValue <= 0) {
+                      return "Cijena mora biti veća od 0";
+                    }
+                    return null;
+                  }),
+                ),
               if (isClickedBtnNext &&
                   (answersToPaymentQuestions == null ||
                       paymentChoiceQuestionId == null ||

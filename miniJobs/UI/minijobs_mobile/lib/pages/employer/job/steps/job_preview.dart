@@ -166,7 +166,7 @@ class _JobPreviewState extends State<JobPreview> {
                 ),
                 if (job.wage != null && job.wage! > 0)
                   Text(
-                    '${job.wage!} KM',
+                    ': ${job.wage!} KM',
                     style: TextStyle(fontSize: 15, color: Colors.grey[700]),
                   ),
               ],

@@ -9,7 +9,7 @@ import '../../enumerations/job_statuses.dart';
 import '../../providers/employer_provider.dart';
 import '../../providers/job_provider.dart';
 import 'job/job_applicans_view.dart';
-import 'job/job_finish_page.dart';
+
 
 class JobList extends StatefulWidget {
   const JobList({super.key});
@@ -133,14 +133,6 @@ class _JobListState extends State<JobList> {
                               title: Text('Detalji'),
                             ),
                           ),
-                          if (job.status == JobStatus.Aktivan || job.status == JobStatus.AplikacijeZavrsene)
-                            const PopupMenuItem<String>(
-                              value: 'complete',
-                              child: ListTile(
-                                leading: Icon(Icons.check, color: Colors.green),
-                                title: Text('Završi posao'),
-                              ),
-                            ),
                           if (job.status !=
                               JobStatus
                                   .Zavrsen) // Hide delete if job is finished
@@ -169,9 +161,7 @@ class _JobListState extends State<JobList> {
                           });
                         } else if (value == 'delete') {
                           _handleDelete(job);
-                        } else if (value == 'complete') {
-                          _handleComplete(job);
-                        } else if (value == 'applicants') {
+                        }else if (value == 'applicants') {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -230,15 +220,6 @@ class _JobListState extends State<JobList> {
     );
   }
 
-  void _handleComplete(Job job) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => JobFinishPage(jobId: job.id!,jobStatus: job.status!),
-      ),
-    );
-  }
-
   void _showActionDialog(BuildContext context, Job job) {
     showDialog(
       context: context,
@@ -258,13 +239,7 @@ class _JobListState extends State<JobList> {
                 Navigator.of(context).pop();
               },
             ),
-            TextButton(
-              child: const Text('Complete'),
-              onPressed: () {
-                // Handle complete action
-                Navigator.of(context).pop();
-              },
-            ),
+
             TextButton(
               child: const Text('Delete'),
               onPressed: () {

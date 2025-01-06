@@ -134,16 +134,15 @@ class JobStep2State extends State<JobStep2> {
                       }
                       return _jobTypes!
                           .where((element) => element.name!
-                              .toLowerCase()
-                              .contains(textEditingValue.text.toLowerCase()))
+                          .toLowerCase()
+                          .contains(textEditingValue.text.toLowerCase()))
                           .map((e) => e.name!);
                     },
                     onSelected: (String selection) {
-                      int selectedId = _jobTypes!
-                          .firstWhere((element) => element.name == selection)
-                          .id!;
+                      final selectedJobType = _jobTypes!
+                          .firstWhere((jobType) => jobType.name == selection);
                       _formKey.currentState?.fields['jobTypeId']
-                          ?.didChange(selectedId.toString());
+                          ?.didChange(selectedJobType.id.toString());
                       _jobTypeController.text = selection;
                     },
                     optionsViewBuilder: (context, Function(String) onSelected,
@@ -158,11 +157,10 @@ class JobStep2State extends State<JobStep2> {
                             child: ListView(
                               children: options
                                   .map((option) => ListTile(
-                                        title: Text(option,
-                                            style:
-                                                const TextStyle(fontSize: 12)),
-                                        onTap: () => onSelected(option),
-                                      ))
+                                title: Text(option,
+                                    style: const TextStyle(fontSize: 12)),
+                                onTap: () => onSelected(option),
+                              ))
                                   .toList(),
                             ),
                           ),
@@ -178,9 +176,14 @@ class JobStep2State extends State<JobStep2> {
                         validator: ((value) {
                           if (value == null || value.isEmpty) {
                             return "Tip posla je obavezno polje";
-                          } else {
-                            return null;
                           }
+                          final isValid = _jobTypes!
+                              .any((jobType) => jobType.name == value);
+                          if (!isValid) {
+                            controller.clear(); // Clear the invalid input
+                            return "Molimo odaberite validan tip posla";
+                          }
+                          return null;
                         }),
                         name: 'jobType',
                         decoration: const InputDecoration(
