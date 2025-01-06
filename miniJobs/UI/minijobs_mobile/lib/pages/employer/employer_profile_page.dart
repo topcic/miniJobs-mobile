@@ -7,10 +7,9 @@ import 'package:minijobs_mobile/pages/user-profile/active_jobs_view.dart';
 import 'package:minijobs_mobile/pages/user-profile/finished_job_view.dart';
 import 'package:minijobs_mobile/pages/user-profile/user_ratings_view.dart';
 
+import '../../providers/authentication_provider.dart';
 import '../../providers/employer_provider.dart';
 import '../../utils/photo_view.dart';
-// Import your UserProvider
-// Import your User model
 
 class EmployerProfilePage extends StatefulWidget {
   final int userId;
@@ -25,13 +24,14 @@ class _EmployerProfilePageState extends State<EmployerProfilePage> {
   Employer? employer;
   bool isLoading = true;
   bool isAbleTodoEdit=false;
+  late AuthenticationProvider _authenticationProvider;
 
   @override
   void initState() {
     super.initState();
-   //userId = int.parse(GetStorage().read('userId'));
     userId=widget.userId;
     isAbleTodoEdit=userId==int.parse(GetStorage().read('userId'));
+    _authenticationProvider = context.read<AuthenticationProvider>();
     fetchUserData();
   }
 
@@ -50,7 +50,9 @@ class _EmployerProfilePageState extends State<EmployerProfilePage> {
       });
     }
   }
-
+  void  _handleLogout(BuildContext context)  {
+    _authenticationProvider.logout(context);
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -60,6 +62,17 @@ class _EmployerProfilePageState extends State<EmployerProfilePage> {
         child: Scaffold(
           appBar: AppBar(
             title: const Text('Profile'),
+            actions: isAbleTodoEdit
+                ? [
+              IconButton(
+                icon: const Icon(Icons.logout),
+                tooltip: 'Odjavi se',
+                onPressed: () {
+                  _handleLogout(context);
+                },
+              ),
+            ]
+                : null,
           ),
           body: isLoading
               ? const Center(child: CircularProgressIndicator())

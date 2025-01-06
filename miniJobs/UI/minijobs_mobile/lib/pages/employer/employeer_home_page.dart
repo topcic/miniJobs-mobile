@@ -1,4 +1,3 @@
-// lib/screens/employer_home_page.dart
 import 'package:flutter/material.dart';
 import 'package:minijobs_mobile/models/applicant/applicant.dart';
 import 'package:minijobs_mobile/models/city.dart';

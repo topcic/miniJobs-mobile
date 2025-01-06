@@ -1,10 +1,14 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:minijobs_mobile/models/auth_code_request.dart';
 import 'package:minijobs_mobile/models/auth_token_response.dart';
 import 'package:minijobs_mobile/providers/base_provider.dart';
+
+import '../pages/auth/login_page.dart';
 
 class AuthenticationProvider extends BaseProvider<AuthTokenResponse> {
   AuthenticationProvider() : super("tokens");
@@ -67,6 +71,21 @@ class AuthenticationProvider extends BaseProvider<AuthTokenResponse> {
       // Log the error for debugging
       print('Error: $e');
       return false;
+    }
+  }
+  void logout(BuildContext context) {
+    try {
+      // Clear all stored data
+      GetStorage().erase();
+
+      // Navigate to the LoginPage and clear the navigation stack
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+            (route) => false, // Removes all previous routes
+      );
+    } catch (e) {
+      print('Error during logout: $e');
     }
   }
 }
