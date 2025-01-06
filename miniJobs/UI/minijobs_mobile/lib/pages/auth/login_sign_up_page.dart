@@ -22,10 +22,8 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
   }
 
   void _checkLoginStatus() {
-    // Check if user is logged in
-    bool isLoggedIn = GetStorage().read('accessToken') != "";
-
-    if (isLoggedIn) {
+    final String? accessToken = GetStorage().read('accessToken');
+    if (accessToken != null && accessToken.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const Navbar()),
