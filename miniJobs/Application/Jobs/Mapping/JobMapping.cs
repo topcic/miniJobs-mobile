@@ -7,7 +7,7 @@ public class JobMapping : Profile
 {
     public JobMapping()
     {
-        CreateMap<JobInsertRequest, Job>();
+        CreateMap<JobStep1Request, Job>();
         CreateMap<JobSaveRequest, Job>()
           .ForMember(model => model.Created, option => option.Ignore())
           .ForMember(model => model.CreatedBy, option => option.Ignore());

@@ -17,7 +17,7 @@ public class JobsController(IMediator mediator) : ControllerBase
     [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> PostAsync([FromBody] JobInsertRequest request)
+    public async Task<IActionResult> PostAsync([FromBody] JobStep1Request request)
     {
         return Ok(await mediator.Send(new JobInsertCommand(request)));
     }
@@ -43,7 +43,7 @@ public class JobsController(IMediator mediator) : ControllerBase
     [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UpdateStep1([FromRoute] int jobId, [FromBody] Job request)
+    public async Task<IActionResult> UpdateStep1([FromRoute] int jobId, [FromBody] JobStep1Request request)
     {
         request.Id = jobId;
         return Ok(await mediator.Send(new JobStep1UpdateCommand(request)));
