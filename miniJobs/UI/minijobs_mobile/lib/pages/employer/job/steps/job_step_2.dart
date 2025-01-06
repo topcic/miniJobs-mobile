@@ -4,7 +4,6 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl/intl.dart';
 import 'package:minijobs_mobile/enumerations/questions.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
-import 'package:minijobs_mobile/models/job/job_save_request.dart';
 import 'package:minijobs_mobile/models/job/job_schedule_info.dart';
 import 'package:minijobs_mobile/models/job_type.dart';
 import 'package:minijobs_mobile/models/proposed_answer.dart';
@@ -13,11 +12,11 @@ import 'package:minijobs_mobile/providers/job_type_provider.dart';
 import 'package:minijobs_mobile/providers/proposed_answer_provider.dart';
 import 'package:minijobs_mobile/utils/util_widgets.dart';
 import 'package:provider/provider.dart';
-
 import '../../../../enumerations/job_statuses.dart';
+import '../../../../models/job/job_step2.request.dart';
 
 class JobStep2 extends StatefulWidget {
-  final Function(bool, JobSaveRequest) onNextButton;
+  final Function(bool,int, JobStep2Request) onNextButton;
   final Function(Function()) setValidateAndSaveCallback;
 
   const JobStep2({
@@ -33,7 +32,7 @@ class JobStep2 extends StatefulWidget {
 class JobStep2State extends State<JobStep2> {
   final _formKey = GlobalKey<FormBuilderState>();
   Job? _job;
-  JobSaveRequest? _jobSaveRequest;
+  JobStep2Request? _jobStep2Request;
   List<ProposedAnswer>? _jobSchedules;
   List<JobType>? _jobTypes;
   String selectedOption = '';
@@ -384,27 +383,19 @@ class JobStep2State extends State<JobStep2> {
       var applicationsEndToDays = _job!.status == JobStatus.Aktivan
           ? _job!.applicationsDuration! + extendApplicationsDurationValue
           : applicationsEndTo!['days']!;
-      var saveRequest = JobSaveRequest(
-        _job!.id!,
-        _job!.name,
-        _job!.description,
-        _job!.streetAddressAndNumber,
-        _job!.cityId,
-        0,
+      var saveRequest = JobStep2Request(
         selectedJobType.id,
         int.tryParse(formValues['requiredEmployees']),
         jobScheduleInfo,
-        null,
-        null,
         applicationsEndToDays,
       );
 
       setState(() {
-        _jobSaveRequest = saveRequest;
+        _jobStep2Request = saveRequest;
       });
-      widget.onNextButton(true, _jobSaveRequest!);
+      widget.onNextButton(true,_job!.id!, _jobStep2Request!);
     } else {
-      widget.onNextButton(false, _jobSaveRequest!);
+      widget.onNextButton(false,_job!.id!, _jobStep2Request!);
     }
   }
 
@@ -418,9 +409,5 @@ class JobStep2State extends State<JobStep2> {
     } else {
       return false;
     }
-  }
-
-  JobSaveRequest getUpdatedJob() {
-    return _jobSaveRequest!;
   }
 }

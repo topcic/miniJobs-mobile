@@ -53,7 +53,7 @@ public class JobStep2UpdateCommandValidator : AbstractValidator<JobStep2UpdateCo
         ExceptionExtension.Validate("JOB_NOT_EXIST", () => job == null);
         ExceptionExtension.Validate("CAN_NOT_UPDATE_JOB_IN_THIS_STATUS", () => job.Status == JobStatus.Inactive || job.Status == JobStatus.Completed || job.Status == JobStatus.ApplicationsCompleted);
 
-        var jobType = await jobTypeRepository.TryFindAsync(command.Request.JobTypeId.Value);
+        var jobType = await jobTypeRepository.TryFindAsync(command.Request.JobTypeId);
         ExceptionExtension.Validate("JOB_TYPE_NOT_EXISTS", () => jobType == null);
         return true;
     }

@@ -7,6 +7,9 @@ import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/providers/base_provider.dart';
 
 import '../enumerations/sort_order.dart';
+import '../models/job/job_step1_request.dart';
+import '../models/job/job_step2.request.dart';
+import '../models/job/job_step3_request.dart';
 import '../models/search_result.dart';
 import '../services/notification.service.dart';
 
@@ -50,7 +53,7 @@ class JobProvider extends BaseProvider<Job> {
     }
   }
 
-  Future<Job?> updateStep1(int id, [dynamic request]) async {
+  Future<Job?> updateStep1(int id, JobStep1Request request) async {
     try {
       var url = "${baseUrl}jobs/$id/step1";
       var jsonRequest = jsonEncode(request);
@@ -65,7 +68,7 @@ class JobProvider extends BaseProvider<Job> {
     }
   }
 
-  Future<Job?> updateStep2(int id, [dynamic request]) async {
+  Future<Job?> updateStep2(int id, JobStep2Request request) async {
     try {
       var url = "${baseUrl}jobs/$id/step2";
       var jsonRequest = jsonEncode(request);
@@ -80,7 +83,7 @@ class JobProvider extends BaseProvider<Job> {
     }
   }
 
-  Future<Job?> updateStep3(int id, [dynamic request]) async {
+  Future<Job?> updateStep3(int id, JobStep3Request request) async {
     try {
       var url = "${baseUrl}jobs/$id/step3";
       var jsonRequest = jsonEncode(request);

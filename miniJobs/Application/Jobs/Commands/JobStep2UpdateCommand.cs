@@ -4,7 +4,7 @@ using Domain.Entities;
 
 namespace Application.Jobs.Commands;
 
-public class JobStep2UpdateCommand(JobSaveRequest request) : CommandBase<Job>
+public class JobStep2UpdateCommand(JobStep2Request request) : CommandBase<Job>
 {
-    public JobSaveRequest Request { get; set; } = request;
+    public JobStep2Request Request { get; set; } = request;
 }

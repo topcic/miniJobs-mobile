@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:minijobs_mobile/enumerations/questions.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
-import 'package:minijobs_mobile/models/job/job_save_request.dart';
-import 'package:minijobs_mobile/models/job/job_schedule_info.dart';
 import 'package:minijobs_mobile/models/proposed_answer.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
 import 'package:minijobs_mobile/providers/proposed_answer_provider.dart';
 import 'package:minijobs_mobile/utils/util_widgets.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../models/job/job_step3_request.dart';
+
 class JobStep3 extends StatefulWidget {
-  final Function(bool, JobSaveRequest) onNextButton;
+  final Function(bool,int, JobStep3Request) onNextButton;
   final Function(Function()) setValidateAndSaveCallback;
 
   const JobStep3({
@@ -39,7 +39,7 @@ class _JobStep3State extends State<JobStep3> {
   late final ProposedAnswerProvider _proposedAnswerProvider =
       ProposedAnswerProvider();
   int? paymentChoiceQuestionId;
-  JobSaveRequest? _jobSaveRequest;
+  JobStep3Request? _jobStep3Request;
 
   @override
   void didChangeDependencies() {
@@ -256,37 +256,20 @@ class _JobStep3State extends State<JobStep3> {
     if (isFormValid) {
       final Map<String, dynamic> formValues = _formKey.currentState!.value;
       saveAnswersToPaymentQuestions();
-      var jobScheduleInfo = JobScheduleInfo(
-          questionValues[Questions.workingHours]!,
-          _job?.schedules?.map((e) => e.id!).toList() ?? []);
-
-      var saveRequest = JobSaveRequest(
-        _job!.id!,
-        _job!.name,
-        _job!.description,
-        _job!.streetAddressAndNumber,
-        _job!.cityId,
-        _job?.status?.index,
-        _job?.jobTypeId,
-        _job?.requiredEmployees!,
-        jobScheduleInfo,
+      var saveRequest = JobStep3Request(
         answersToPaymentQuestions,
-        formValues['wage'] != null ? int.tryParse(formValues['wage']) : 0,
-        _job?.applicationsDuration!,
+        formValues['wage'] != null ? int.tryParse(formValues['wage']) : 0
       );
 
       setState(() {
-        _jobSaveRequest = saveRequest;
+        _jobStep3Request = saveRequest;
       });
-      widget.onNextButton(true, _jobSaveRequest!);
+      widget.onNextButton(true,_job!.id!, _jobStep3Request!);
     } else {
-      widget.onNextButton(false, _jobSaveRequest!);
+      widget.onNextButton(false,_job!.id!, _jobStep3Request!);
     }
   }
 
-  JobSaveRequest getUpdatedJob() {
-    return _jobSaveRequest!;
-  }
 }
 
 final Map<Questions, int> questionValues = {

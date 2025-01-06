@@ -16,9 +16,6 @@ IJobQuestionAnswerRepository jobQuestionAnswerRepository) : IRequestHandler<JobS
 
         job.Wage = command.Request.Wage;
 
-        await ProcessJobQuestions(job, command.Request.JobSchedule.QuestionId, command.Request.JobSchedule.Answers);
-
-
         foreach (var kvp in command.Request.AnswersToPaymentQuestions)
         {
             await ProcessJobQuestions(job, kvp.Key, kvp.Value);

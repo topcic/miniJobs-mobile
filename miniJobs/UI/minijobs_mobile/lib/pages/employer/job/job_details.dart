@@ -1,16 +1,15 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:minijobs_mobile/enumerations/job_statuses.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
-import 'package:minijobs_mobile/models/job/job_save_request.dart';
-import 'package:minijobs_mobile/models/job/job_schedule_info.dart';
 import 'package:minijobs_mobile/pages/employer/job/steps/job_preview.dart';
 import 'package:minijobs_mobile/pages/employer/job/steps/job_step_1.dart';
 import 'package:minijobs_mobile/pages/employer/job/steps/job_step_2.dart';
 import 'package:minijobs_mobile/pages/employer/job/steps/job_step_3.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
 import 'package:provider/provider.dart';
+
+import '../../../models/job/job_step1_request.dart';
 
 class JobDetails extends StatefulWidget {
   final int jobId;
@@ -84,42 +83,6 @@ class _JobDetailsState extends State<JobDetails> {
     return _job.status == JobStatus.Zavrsen;
   }
 
-  JobSaveRequest createJobSaveRequest(Job job) {
-    var schedules = job.schedules != null && job.schedules!.isNotEmpty
-        ? JobScheduleInfo(
-            job.schedules![0].questionId,
-            job.schedules!.map((e) => e.id!).toList(),
-          )
-        : null;
-
-    var answersToPaymentQuestions = job.additionalPaymentOptions != null &&
-            job.additionalPaymentOptions!.isNotEmpty
-        ? job.additionalPaymentOptions!.fold<Map<int, List<int>>>(
-            {},
-            (map, answer) {
-              if (answer.questionId != null && answer.id != null) {
-                map.putIfAbsent(answer.questionId!, () => []).add(answer.id!);
-              }
-              return map;
-            },
-          )
-        : null;
-
-    return JobSaveRequest(
-      job.id!,
-      job.name,
-      job.description,
-      job.streetAddressAndNumber,
-      job.cityId,
-      job.status!.index,
-      job.jobTypeId,
-      job.requiredEmployees,
-      schedules,
-      answersToPaymentQuestions,
-      job.wage,
-      job.applicationsDuration,
-    );
-  }
 
   Future<bool> canAccessStep(int step) async {
     if (step == 0) {
@@ -158,15 +121,14 @@ class _JobDetailsState extends State<JobDetails> {
     _initializeJob(widget.jobId);
   }
 
-  void _onNextButton(bool isValid, JobSaveRequest? jobSaveRequest) async {
+  void _onNextButton(bool isValid,int id,[dynamic request]) async {
     if (isValid) {
       if (!isCalledCanAccessStep) {
         Job? job;
         if (_currentStep == 1) {
-          job = await _jobProvider.updateStep2(jobSaveRequest!.id!, jobSaveRequest);
+          job = await _jobProvider.updateStep2(id, request);
         } else if (_currentStep == 2) {
-          job = await _jobProvider.updateStep3(
-              jobSaveRequest!.id!, jobSaveRequest);
+          job = await _jobProvider.updateStep3(id, request);
         }
         _jobProvider.setCurrentJob(job!);
         setState(() {
@@ -344,7 +306,7 @@ class _JobDetailsState extends State<JobDetails> {
           });
         } else {
           updateJobForStep1(currentJob);
-          var saveRequest = createJobSaveRequest(_job);
+          var saveRequest = JobStep1Request(_job.name,_job.description,_job.streetAddressAndNumber,_job.cityId);
           var job = await _jobProvider.updateStep1(_job.id!, saveRequest);
           _jobProvider.setCurrentJob(job);
           setState(() {
