@@ -24,10 +24,11 @@ class _JobApplicantsViewState extends State<JobApplicantsView> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     jobProvider = context.read<JobProvider>();
-    if(widget.jobStatus==JobStatus.Zavrsen)
+    if(widget.jobStatus==JobStatus.Zavrsen) {
       setState(() {
         isJobCompleted = true; // Update state to reflect job completion
       });
+    }
     getAppplicants();
   }
 

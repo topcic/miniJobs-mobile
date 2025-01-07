@@ -49,4 +49,19 @@ public class EmailSender(IEmailService emailService) : IEmailSender
 
         await emailService.SendEmailAsync(email, "Obavještenje o novom otvorenom poslu", body);
     }
+
+    public async Task SendSetPasswordAsync(string fullName, string email, string verificationCode)
+    {
+        var body = $@"
+        <p>Poštovani {fullName},</p>
+        <p>Zaprimili smo Vaš zahtjev za resetiranje lozinke na Mini Jobs nalogu.</p>
+        <p>Molimo Vas da koristite sljedeći kod za resetiranje lozinke:</p>
+        <h2 style='text-align: center; color: #2d89ef;'>{verificationCode}</h2>
+        <p>Unesite ovaj kod u aplikaciju zajedno s Vašom novom lozinkom kako biste završili proces resetiranja lozinke.</p>
+        <p>Ako niste zatražili resetiranje lozinke, zanemarite ovaj email ili nas kontaktirajte ukoliko imate bilo kakvih pitanja ili zabrinutosti.</p>
+        <p>S poštovanjem,</p>
+        <p>Vaš Mini Jobs tim</p>";
+
+        await emailService.SendEmailAsync(email, "Resetiranje lozinke na Mini Jobs", body);
+    }
 }

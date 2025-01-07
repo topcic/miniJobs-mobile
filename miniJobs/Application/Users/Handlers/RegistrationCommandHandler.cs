@@ -7,6 +7,7 @@ using Application.Users.Models;
 using AutoMapper;
 using Data.Entities;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.Interfaces;
 using MediatR;
 
@@ -61,6 +62,7 @@ public class RegistrationCommandHandler(IUserManagerRepository userManager,
             var code = GenerateCode.Generate();
             var userAuthCode = new UserAuthCode()
             {
+                Type = UserAuthCodeType.TwoFactorAuthCode,
                 GeneratedAt = DateTime.UtcNow,
                 Code = code,
                 UserId = user.Id,

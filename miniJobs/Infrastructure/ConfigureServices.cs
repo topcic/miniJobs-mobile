@@ -123,6 +123,8 @@ public static class ConfigureServices
         services.ConfigureOptions<LocalizationOptionsSetup>();
         services.ConfigureOptions<RequestLocalizationOptionsSetup>();
         services.ConfigureOptions<BackgroundJobServicesOptionsSetup>();
+        services.ConfigureOptions<AuthCodeOptionsSetup>();
+
     }
     private static void AddServices(IServiceCollection services)
     {

@@ -1,9 +1,4 @@
-﻿using Domain.Entities;
-using Domain.Enums;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Any;
-using Newtonsoft.Json.Linq;
+﻿using Domain.Enums;
 
 namespace Infrastructure.Persistence.Repositories;
 

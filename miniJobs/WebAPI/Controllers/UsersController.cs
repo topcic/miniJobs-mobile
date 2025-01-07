@@ -5,6 +5,7 @@ using Application.Users.Models;
 using Application.Users.Queries;
 using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers;
@@ -78,5 +79,23 @@ public class UsersController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> FindJob([FromRoute] int userId)
     {
         return Ok(await mediator.Send(new JobRecommendationTryFindQuery(userId)));
+    }
+
+    /// <summary>
+    /// Forgot password
+    /// </summary>
+    /// <param name="email"></param>
+    /// <returns>Returns result of forgot password command</returns>
+    /// <response code="200">Returns boolean result</response>
+    /// <response code="400">Bad request</response>
+    /// <response code="500">Detailed exception for lower environments.</response>
+    [HttpPost("forgotpassword")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> ForgotPassword([FromBody] string email)
+    {
+        return Ok(await mediator.Send(new UserForgotPasswordCommand(email)));
     }
 }

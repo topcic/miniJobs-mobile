@@ -63,4 +63,20 @@ class UserProvider extends BaseProvider<User> {
       return null;
     }
   }
+
+  Future<bool?> forgotPassword(String email) async {
+    try {
+      var url = "${baseUrl}users/forgotpassword";
+      dio.options.headers['Content-Type'] = 'application/json';
+      var response = await dio.post(
+        url,
+        data: '"$email"', // Wrap the email in double quotes to send it as a plain JSON string
+      );
+      var responseData = response.data;
+      return responseData;
+    } catch (err) {
+      handleError(err);
+      return null;
+    }
+  }
 }
