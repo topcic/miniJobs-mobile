@@ -6,6 +6,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:minijobs_mobile/models/auth_code_request.dart';
 import 'package:minijobs_mobile/models/auth_token_response.dart';
+import 'package:minijobs_mobile/pages/auth/login_sign_up_page.dart';
 import 'package:minijobs_mobile/providers/base_provider.dart';
 
 import '../pages/auth/login_page.dart';
@@ -81,7 +82,7 @@ class AuthenticationProvider extends BaseProvider<AuthTokenResponse> {
       // Navigate to the LoginPage and clear the navigation stack
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
+        MaterialPageRoute(builder: (context) => LoginSignupPage()),
             (route) => false, // Removes all previous routes
       );
     } catch (e) {

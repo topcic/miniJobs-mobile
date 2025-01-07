@@ -3,7 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:minijobs_mobile/models/city.dart';
-import 'package:minijobs_mobile/pages/verification_page.dart';
+import 'package:minijobs_mobile/pages/auth/verification_page.dart';
 import 'package:minijobs_mobile/providers/city_provider.dart';
 import 'package:minijobs_mobile/providers/employer_provider.dart';
 import 'package:provider/provider.dart';

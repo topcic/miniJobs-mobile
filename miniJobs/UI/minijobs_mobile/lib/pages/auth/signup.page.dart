@@ -5,7 +5,7 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:minijobs_mobile/enumerations/gender.dart';
 import 'package:minijobs_mobile/enumerations/role.dart';
 import 'package:minijobs_mobile/models/city.dart';
-import 'package:minijobs_mobile/pages/verification_page.dart';
+import 'package:minijobs_mobile/pages/auth/verification_page.dart';
 import 'package:minijobs_mobile/providers/city_provider.dart';
 import 'package:minijobs_mobile/providers/user_registration_provider.dart';
 import 'package:provider/provider.dart';

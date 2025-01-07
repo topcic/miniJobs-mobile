@@ -28,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Ensure provider is available after initial build
       _authenticationProvider = context.read<AuthenticationProvider>();
-      authenticateUser();
+      //authenticateUser();
     });
   }
 

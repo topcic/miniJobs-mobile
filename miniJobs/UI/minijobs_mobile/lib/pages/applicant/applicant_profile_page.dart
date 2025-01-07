@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:minijobs_mobile/pages/user-profile/finished_job_view.dart';
 import 'package:minijobs_mobile/pages/user-profile/user_ratings_view.dart';
 
+import '../../providers/authentication_provider.dart';
 import '../../utils/photo_view.dart';
 import 'applicant_info.dart';
 import 'applicant_info_view.dart';
@@ -29,12 +30,13 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
   Applicant? applicant;
   bool isLoading = true;
   bool isAbleTodoEdit = false;
-
+  late AuthenticationProvider _authenticationProvider;
   @override
   void initState() {
     super.initState();
     userId = widget.userId;
     isAbleTodoEdit = userId == int.parse(GetStorage().read('userId'));
+    _authenticationProvider = context.read<AuthenticationProvider>();
     fetchUserData();
   }
 
@@ -53,7 +55,9 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
       });
     }
   }
-
+  void  _handleLogout(BuildContext context)  {
+    _authenticationProvider.logout(context);
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -71,6 +75,16 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
             )
                 : null,
             title: const Text('Profile'),
+            actions: isAbleTodoEdit
+            ? [
+            IconButton(
+              icon: const Icon(Icons.logout),
+              tooltip: 'Odjavi se',
+              onPressed: () {
+                _handleLogout(context);
+              },
+            ),
+            ]: null,
           ),
           body: isLoading
               ? const Center(child: CircularProgressIndicator())

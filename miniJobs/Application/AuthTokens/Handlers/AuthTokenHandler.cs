@@ -18,7 +18,7 @@ public class AuthTokenHandler(IUserManagerRepository userManager, ISecurityProvi
     private readonly IJwtProvider jwtProvider = jwtProvider;
     private readonly ISecurityProvider securityProvider = securityProvider;
     private readonly IUserAuthCodeRepository userAuthCodeRepository = userAuthCodeRepository;
-    private const int authCodeExpirationTimeInMinutes = 5;
+    private const int authCodeExpirationTimeInMinutes = 60;
 
     public async Task<AuthTokenResponse> Handle(AuthTokenCommand command, CancellationToken cancellationToken)
     {
