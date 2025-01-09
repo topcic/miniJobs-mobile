@@ -1,10 +1,14 @@
 
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/models/job_recommendation/job_recommendation.dart';
 import 'package:minijobs_mobile/models/rating.dart';
-import 'package:minijobs_mobile/models/user.dart';
+import 'package:minijobs_mobile/models/user/user.dart';
 import 'package:minijobs_mobile/providers/base_provider.dart';
+
+import '../models/user/user_change_password_request.dart';
 
 class UserProvider extends BaseProvider<User> {
   UserProvider() : super("users");
@@ -74,6 +78,25 @@ class UserProvider extends BaseProvider<User> {
       );
       var responseData = response.data;
       return responseData;
+    } catch (err) {
+      handleError(err);
+      return null;
+    }
+  }
+  Future<bool?> changePassword(UserChangePasswordRequest request) async {
+    try {
+      var url = "${baseUrl}users/password";
+      var jsonRequest = jsonEncode(request);
+
+      var response = await dio.post(url, data: jsonRequest);
+      if (response.data is bool) {
+        bool responseData = response.data;
+        if(responseData)
+        notificationService.success("Uspješno ste promjenili lozinku.");
+        return responseData;
+      }
+   else
+      return false;
     } catch (err) {
       handleError(err);
       return null;

@@ -4,7 +4,7 @@ import 'package:decimal/decimal.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:minijobs_mobile/models/city.dart';
 import 'package:minijobs_mobile/models/job_type.dart';
-import 'package:minijobs_mobile/models/user.dart';
+import 'package:minijobs_mobile/models/user/user.dart';
 
 import '../../enumerations/job_application_status.dart';
 

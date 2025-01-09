@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:minijobs_mobile/models/user/user_change_password_request.dart';
 import 'package:minijobs_mobile/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/notification.service.dart';
+import 'login_sign_up_page.dart';
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
 
@@ -35,6 +37,23 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         setState(() {
           showPasswordReset = true; // Update UI if needed
         });
+      }
+    } catch (err) {
+
+    }
+  }
+  Future<void> changePassword(String authCode,String newPassword) async {
+    try {
+      UserChangePasswordRequest request=new UserChangePasswordRequest(authCode,newPassword);
+      // Call the forgotPassword method
+      bool? result = await _userProvider.changePassword(request);
+
+      if (result == true) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginSignupPage()),
+              (route) => false, // Removes all previous routes
+        );
       }
     } catch (err) {
 
@@ -238,15 +257,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                     final password =
                                         _formKey.currentState?.fields['password']
                                             ?.value;
+                                    final kod =
+                                        _formKey.currentState?.fields['kod']
+                                            ?.value;
                                     // Handle password reset logic here
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          "Vaša lozinka je uspješno promijenjena.",
-                                        ),
-                                      ),
-                                    );
-                                    Navigator.pop(context);
+                                    changePassword(kod,password);
                                   }
                                 }
                               },

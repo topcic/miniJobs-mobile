@@ -98,4 +98,14 @@ public class UsersController(IMediator mediator) : ControllerBase
     {
         return Ok(await mediator.Send(new UserForgotPasswordCommand(email)));
     }
+
+    [HttpPost("password")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> ChangePassword([FromBody] UserChangePasswordRequest request)
+    {
+        return Ok(await mediator.Send(new UserChangePasswordCommand(request)));
+    }
 }

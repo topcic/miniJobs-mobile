@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:minijobs_mobile/models/search_result.dart';
-import 'package:minijobs_mobile/models/user.dart';
+import 'package:minijobs_mobile/models/user/user.dart';
 import 'package:minijobs_mobile/pages/user.details.dart';
 import 'package:minijobs_mobile/providers/user_provider.dart';
 import 'package:minijobs_mobile/widgets/badges.dart';

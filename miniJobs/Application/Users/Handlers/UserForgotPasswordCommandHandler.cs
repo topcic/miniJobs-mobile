@@ -27,8 +27,6 @@ public class UserForgotPasswordCommandHandler(IUserManagerRepository userManager
             {
                 return false;
             }
-            string expirationMinutes = configuration["AuthCodeOptions:ForgotPasswordCodeExpirationMinutes"];
-
 
             var code = GenerateCode.Generate();
             var userAuthCode = new UserAuthCode()

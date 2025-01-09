@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/user_provider.dart';
 import '../models/rating/rating_save_request.dart';
-import '../models/user.dart';
+import '../models/user/user.dart';
 import '../providers/rating_provider.dart';
 
 class RateUserCard extends StatefulWidget {
