@@ -83,19 +83,6 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Logo at the top
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Column(
-                    children: [
-                      Image.asset(
-                        "assets/images/logo.png",
-                        height: screenHeight * 0.2, // 20% of screen height
-                        fit: BoxFit.contain,
-                      ),
-                    ],
-                  ),
-                ),
                 Container(
                   constraints: const BoxConstraints(maxWidth: 400),
                   margin: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -111,121 +98,136 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ],
                   ),
-                  child: FormBuilder(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // Email Input
-                        FormBuilderTextField(
-                          name: 'email',
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Email is required";
-                            } else if (!RegExp(
-                                r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
-                                .hasMatch(value)) {
-                              return "Invalid email format";
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            labelText: 'Email',
-                            labelStyle: const TextStyle(color: Colors.black54),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Logo inside the card
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Column(
+                          children: [
+                            Image.asset(
+                              "assets/images/logo.png",
+                              height: screenHeight * 0.2, // 20% of screen height
+                              fit: BoxFit.contain,
                             ),
-                            filled: true,
-                            fillColor: Colors.grey[100],
-                            prefixIcon: const Icon(Icons.email, color: Colors.blue),
-                          ),
+                          ],
                         ),
-                        const SizedBox(height: 20),
-                        // Password Input
-                        FormBuilderTextField(
-                          name: 'password',
-                          obscureText: true,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Password is required";
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            labelText: 'Password',
-                            labelStyle: const TextStyle(color: Colors.black54),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.0),
-                            ),
-                            filled: true,
-                            fillColor: Colors.grey[100],
-                            prefixIcon: const Icon(Icons.lock, color: Colors.blue),
-                          ),
-                        ),
-                        const SizedBox(height: 30),
-                        // Log in Button
-                        ElevatedButton(
-                          onPressed: () async {
-                            _formKey.currentState?.save();
-                            if (_formKey.currentState!.validate()) {
-                              final Map<String, dynamic> formValues =
-                                  _formKey.currentState!.value;
-                              final String email = formValues['email'] ?? '';
-                              final String password = formValues['password'] ?? '';
-                              var authCodeRequest = AuthCodeRequest(
-                                email, password, "password", "", "",
-                              );
-
-                              var result = await _authenticationProvider
-                                  .tokens(authCodeRequest);
-
-                              if (result && mounted) {
-                                Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (context) => const Navbar()),
-                                );
-                              } else if (mounted) {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(const SnackBar(
-                                  content: Text('Invalid email or password'),
-                                ));
-                                _formKey.currentState?.reset();
-                              }
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF3A7BD5),
-                            padding: const EdgeInsets.symmetric(vertical: 14.0),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.0),
-                            ),
-                          ),
-                          child: const Text(
-                            'Prijavi se',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ),
-                        const SizedBox(height: 15),
-                        // Forgot Password
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ForgotPasswordPage(), // Replace with the actual target page
+                      ),
+                      const SizedBox(height: 20),
+                      FormBuilder(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // Email Input
+                            FormBuilderTextField(
+                              name: 'email',
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Email je obavezno polje";
+                                } else if (!RegExp(
+                                    r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+                                    .hasMatch(value)) {
+                                  return "Nevalidan format";
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Email',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                prefixIcon:
+                                const Icon(Icons.email, color: Colors.blue),
                               ),
-                            );
-                          },
-                          child: const Text(
-                            "Zaboravili ste lozinku?",
-                            style: TextStyle(
-                              color: Colors.blue,
-                              fontSize: 14,
                             ),
-                          ),
+                            const SizedBox(height: 20),
+                            // Password Input
+                            FormBuilderTextField(
+                              name: 'password',
+                              obscureText: true,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Lozinka je obavezno polje";
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Lozinka',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                                prefixIcon:
+                                const Icon(Icons.lock, color: Colors.blue),
+                              ),
+                            ),
+                            const SizedBox(height: 30),
+                            // Log in Button
+                            ElevatedButton(
+                              onPressed: () async {
+                                _formKey.currentState?.save();
+                                if (_formKey.currentState!.validate()) {
+                                  final Map<String, dynamic> formValues =
+                                      _formKey.currentState!.value;
+                                  final String email =
+                                      formValues['email'] ?? '';
+                                  final String password =
+                                      formValues['password'] ?? '';
+                                  var authCodeRequest = AuthCodeRequest(
+                                    email,
+                                    password,
+                                    "password",
+                                    "",
+                                    "",
+                                  );
+
+                                  var result = await _authenticationProvider
+                                      .tokens(authCodeRequest);
+
+                                  if (result && mounted) {
+                                    Navigator.of(context).pushReplacement(
+                                      MaterialPageRoute(
+                                          builder: (context) => const Navbar()),
+                                    );
+                                  } else if (mounted) {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(const SnackBar(
+                                      content: Text(
+                                          'Nevalidan email ili lozinka.'),
+                                    ));
+                                    _formKey.currentState?.reset();
+                                  }
+                                }
+                              },
+                              child: const Text(
+                                'Prijavi se',
+                              ),
+                            ),
+                            const SizedBox(height: 15),
+                            // Forgot Password
+                            TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        ForgotPasswordPage(),
+                                  ),
+                                );
+                              },
+                              child: const Text(
+                                "Zaboravili ste lozinku?",
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -235,4 +237,5 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+
 }

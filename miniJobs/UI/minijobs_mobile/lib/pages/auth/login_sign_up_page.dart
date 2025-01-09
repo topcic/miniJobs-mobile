@@ -98,7 +98,15 @@ class _SignupMenuState extends State<SignupMenu> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return Container(
+        decoration: const BoxDecoration(
+        gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Color(0xFF3A7BD5), Color(0xFF00D2FF)],
+    ),
+    ),
+    child:  Center(
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -185,6 +193,7 @@ class _SignupMenuState extends State<SignupMenu> {
           ],
         ),
       ),
+    )
     );
   }
 }

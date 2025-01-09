@@ -33,6 +33,7 @@ class _CompanyEmployerSignupPageState extends State<CompanyEmployerSignupPage> {
 
   late CityProvider _cityProvider = CityProvider();
   late EmployerProvider _userCompanyProvider = EmployerProvider();
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -66,280 +67,293 @@ class _CompanyEmployerSignupPageState extends State<CompanyEmployerSignupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Registruj se kao poslodavac"),
-        centerTitle: true,
-      ),
-      body: isLoading
-          ? const SpinKitRing(color: Colors.brown)
-          : SingleChildScrollView(
-        child: FormBuilder(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(45, 20, 45, 20),
-            child: Card(
-              elevation: 4,
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  children: [
-                    Image.asset("assets/images/logo.png",
-                        height: 150, width: 150),
-                    const Row(
-                      children: [
-                        Expanded(
-                            child: Divider()), // First divider widget
-                        SizedBox(
-                            width:
-                            10), // Spacer between first divider and text
-                        Text(
-                          'Podaci o firmi', // Your text
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        SizedBox(
-                            width:
-                            10), // Spacer between text and second divider
-                        Expanded(
-                            child: Divider()), // Second divider widget
-                      ],
-                    ),
-                    rowMethod(
-                      _textField('name', "Naziv firme"),
-                      CrossAxisAlignment.center,
-                    ),
-                    const SizedBox(height: 20),
-                    rowMethod(
-                      _textField('streetAddressAndNumber',
-                          "Adresa i broj ulice"),
-                      CrossAxisAlignment.center,
-                    ),
-                    const SizedBox(height: 20),
-                    rowMethod(
-                      Expanded(
-                        child: FormBuilderDropdown<String>(
-                          name: 'cityId',
-                          validator: (value) {
-                            if (value == null) {
-                              return "Sjedište firme je obavezno polje";
-                            } else {
-                              return null;
-                            }
-                          },
-                          decoration: const InputDecoration(
-                            labelText: "Sjedište firme",
-                          ),
-                          items: cities != null
-                              ? cities!.map((g) {
-                            return DropdownMenuItem(
-                              value: g.id.toString(),
-                              child: Text(g.name ?? ''),
-                            );
-                          }).toList()
-                              : [],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    rowMethod(
-                      Expanded(
-                        child: FormBuilderTextField(
-                            inputFormatters: [idNumberMask],
-                            name: 'idNumber',
-                            decoration: const InputDecoration(
-                              label: Text("ID broj"),
-                            ),
-                            validator: ((value) {
-                              if (value == null || value.isEmpty) {
-                                return "ID broj je obavezno polje";
-                              }
-                              return null;
-                            })),
-                      ),
-                      CrossAxisAlignment.center,
-                    ),
-                    const SizedBox(height: 40),
-                    const Row(
-                      children: [
-                        Expanded(
-                            child: Divider()), // First divider widget
-                        SizedBox(
-                            width:
-                            10), // Spacer between first divider and text
-                        Text(
-                          'Odgovorno lice', // Your text
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        SizedBox(
-                            width:
-                            10), // Spacer between text and second divider
-                        Expanded(
-                            child: Divider()), // Second divider widget
-                      ],
-                    ),
-                    rowMethod(
-                      _textField('firstName', "Ime"),
-                      CrossAxisAlignment.center,
-                    ),
-                    const SizedBox(height: 20),
-                    rowMethod(
-                      _textField('lastName', "Prezime"),
-                      CrossAxisAlignment.center,
-                    ),
-                    const SizedBox(height: 20),
-                    rowMethod(
-                      Expanded(
-                        child: FormBuilderTextField(
-                            inputFormatters: [phoneNumberMask],
-                            name: 'companyPhoneNumber',
-                            decoration: const InputDecoration(
-                              label: Text("Službeni telefon"),
-                            ),
-                            validator: ((value) {
-                              if (value == null || value.isEmpty) {
-                                return "Službeni telefon je obavezno polje";
-                              }
-                              return null;
-                            })),
-                      ),
-                      CrossAxisAlignment.center,
-                    ),
-                    const SizedBox(height: 20),
-                    rowMethod(
-                      Expanded(
-                        child: FormBuilderTextField(
-                          inputFormatters: [phoneNumberMask],
-                          name: 'phoneNumber',
-                          decoration: const InputDecoration(
-                            label: Text("Broj telefona"),
-                          ),
-                        ),
-                      ),
-                      CrossAxisAlignment.center,
-                    ),
-                    const SizedBox(height: 20),
-                    rowMethod(
-                      Expanded(
-                        child: FormBuilderTextField(
-                          name: 'email',
-                          validator: ((value) {
-                            if (value == null || value.isEmpty) {
-                              return "Email je obavezno polje";
-                            } else if (!RegExp(
-                                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                                .hasMatch(value)) {
-                              return "Nevalidan format";
-                            } else {
-                              return null;
-                            }
-                          }),
-                          decoration: const InputDecoration(
-                            label: Text('Email'),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    rowMethod(
-                      Expanded(
-                        child: FormBuilderTextField(
-                          name: 'password',
-                          obscureText: true,
-                          validator: ((value) {
-                            if (value == null || value.isEmpty) {
-                              return "Lozinka je obavezno polje";
-                            } else if (value.length < 8 ||
-                                !value.contains(RegExp(r'[A-Z]')) ||
-                                !value.contains(RegExp(r'[a-z]')) ||
-                                !value.contains(RegExp(r'[0-9]'))) {
-                              return "Lozinka mora sadržavati najmanje 8 karaktera, velika i mala slova i brojeve";
-                            } else {
-                              return null;
-                            }
-                          }),
-                          decoration: const InputDecoration(
-                            label: Text("Lozinka"),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    const SizedBox(height: 20),
-                    rowMethod(
-                      Expanded(
-                        child: FormBuilderTextField(
-                          name: 'repeatPassword',
-                          obscureText: true,
-                          validator: ((value) {
-                            final password = _formKey
-                                .currentState!.fields['password']?.value;
-                            if (value == null || value.isEmpty) {
-                              return "Ponovljena lozinka je obavezno polje";
-                            } else if (value != password) {
-                              return "Lozinke nisu iste";
-                            } else {
-                              return null;
-                            }
-                          }),
-                          decoration: const InputDecoration(
-                            label: Text("Ponovljena lozinka"),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.only(top: 20.0),
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              try {
-                                _formKey.currentState?.save();
-                                if (_formKey.currentState!.validate()) {
-                                  Map<String, dynamic> request = Map.of(
-                                      _formKey.currentState!.value);
-                                  var result = await _userCompanyProvider
-                                      .insert(request);
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(const SnackBar(
-                                      content: Text(
-                                          "Uspješno ste se registrovali. Molimo Vas provjerite Vaš email")));
-
-                                  Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const VerificationPage()));
-                                                                } else {}
-                              } catch (e) {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(const SnackBar(
-                                    content: Text(
-                                        " Email adresa se već koristi. Molimo izaberite drugu email adresu.")));
-                              }
-                            },
-                            child: const Text("Registruj se"),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 40),
-                  ],
-                ),
-              ),
-            ),
-          ),
+        appBar: AppBar(
+          title: const Text("Registruj se kao poslodavac"),
+          centerTitle: true,
         ),
-      ),
-    );
+        body: isLoading
+            ? const SpinKitRing(color: Colors.brown)
+            : Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF3A7BD5), Color(0xFF00D2FF)],
+                  ),
+                ),
+                child: SingleChildScrollView(
+                  child: FormBuilder(
+                    key: _formKey,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(45, 20, 45, 20),
+                      child: Card(
+                        elevation: 4,
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            children: [
+                              Image.asset("assets/images/logo.png",
+                                  height: 150, width: 150),
+                              const Row(
+                                children: [
+                                  Expanded(
+                                      child: Divider()), // First divider widget
+                                  SizedBox(
+                                      width:
+                                          10), // Spacer between first divider and text
+                                  Text(
+                                    'Podaci o firmi', // Your text
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                      width:
+                                          10), // Spacer between text and second divider
+                                  Expanded(
+                                      child:
+                                          Divider()), // Second divider widget
+                                ],
+                              ),
+                              rowMethod(
+                                _textField('name', "Naziv firme"),
+                                CrossAxisAlignment.center,
+                              ),
+                              const SizedBox(height: 20),
+                              rowMethod(
+                                _textField('streetAddressAndNumber',
+                                    "Adresa i broj ulice"),
+                                CrossAxisAlignment.center,
+                              ),
+                              const SizedBox(height: 20),
+                              rowMethod(
+                                Expanded(
+                                  child: FormBuilderDropdown<String>(
+                                    name: 'cityId',
+                                    validator: (value) {
+                                      if (value == null) {
+                                        return "Sjedište firme je obavezno polje";
+                                      } else {
+                                        return null;
+                                      }
+                                    },
+                                    decoration: const InputDecoration(
+                                      labelText: "Sjedište firme",
+                                    ),
+                                    items: cities != null
+                                        ? cities!.map((g) {
+                                            return DropdownMenuItem(
+                                              value: g.id.toString(),
+                                              child: Text(g.name ?? ''),
+                                            );
+                                          }).toList()
+                                        : [],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              rowMethod(
+                                Expanded(
+                                  child: FormBuilderTextField(
+                                      inputFormatters: [idNumberMask],
+                                      name: 'idNumber',
+                                      decoration: const InputDecoration(
+                                        label: Text("ID broj"),
+                                      ),
+                                      validator: ((value) {
+                                        if (value == null || value.isEmpty) {
+                                          return "ID broj je obavezno polje";
+                                        }
+                                        return null;
+                                      })),
+                                ),
+                                CrossAxisAlignment.center,
+                              ),
+                              const SizedBox(height: 40),
+                              const Row(
+                                children: [
+                                  Expanded(
+                                      child: Divider()), // First divider widget
+                                  SizedBox(
+                                      width:
+                                          10), // Spacer between first divider and text
+                                  Text(
+                                    'Odgovorno lice', // Your text
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                      width:
+                                          10), // Spacer between text and second divider
+                                  Expanded(
+                                      child:
+                                          Divider()), // Second divider widget
+                                ],
+                              ),
+                              rowMethod(
+                                _textField('firstName', "Ime"),
+                                CrossAxisAlignment.center,
+                              ),
+                              const SizedBox(height: 20),
+                              rowMethod(
+                                _textField('lastName', "Prezime"),
+                                CrossAxisAlignment.center,
+                              ),
+                              const SizedBox(height: 20),
+                              rowMethod(
+                                Expanded(
+                                  child: FormBuilderTextField(
+                                      inputFormatters: [phoneNumberMask],
+                                      name: 'companyPhoneNumber',
+                                      decoration: const InputDecoration(
+                                        label: Text("Službeni telefon"),
+                                      ),
+                                      validator: ((value) {
+                                        if (value == null || value.isEmpty) {
+                                          return "Službeni telefon je obavezno polje";
+                                        }
+                                        return null;
+                                      })),
+                                ),
+                                CrossAxisAlignment.center,
+                              ),
+                              const SizedBox(height: 20),
+                              rowMethod(
+                                Expanded(
+                                  child: FormBuilderTextField(
+                                    inputFormatters: [phoneNumberMask],
+                                    name: 'phoneNumber',
+                                    decoration: const InputDecoration(
+                                      label: Text("Broj telefona"),
+                                    ),
+                                  ),
+                                ),
+                                CrossAxisAlignment.center,
+                              ),
+                              const SizedBox(height: 20),
+                              rowMethod(
+                                Expanded(
+                                  child: FormBuilderTextField(
+                                    name: 'email',
+                                    validator: ((value) {
+                                      if (value == null || value.isEmpty) {
+                                        return "Email je obavezno polje";
+                                      } else if (!RegExp(
+                                              r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                          .hasMatch(value)) {
+                                        return "Nevalidan format";
+                                      } else {
+                                        return null;
+                                      }
+                                    }),
+                                    decoration: const InputDecoration(
+                                      label: Text('Email'),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              rowMethod(
+                                Expanded(
+                                  child: FormBuilderTextField(
+                                    name: 'password',
+                                    obscureText: true,
+                                    validator: ((value) {
+                                      if (value == null || value.isEmpty) {
+                                        return "Lozinka je obavezno polje";
+                                      } else if (value.length < 8 ||
+                                          !value.contains(RegExp(r'[A-Z]')) ||
+                                          !value.contains(RegExp(r'[a-z]')) ||
+                                          !value.contains(RegExp(r'[0-9]'))) {
+                                        return "Lozinka mora sadržavati najmanje 8 karaktera, velika i mala slova i brojeve";
+                                      } else {
+                                        return null;
+                                      }
+                                    }),
+                                    decoration: const InputDecoration(
+                                      label: Text("Lozinka"),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              const SizedBox(height: 20),
+                              rowMethod(
+                                Expanded(
+                                  child: FormBuilderTextField(
+                                    name: 'repeatPassword',
+                                    obscureText: true,
+                                    validator: ((value) {
+                                      final password = _formKey.currentState!
+                                          .fields['password']?.value;
+                                      if (value == null || value.isEmpty) {
+                                        return "Ponovljena lozinka je obavezno polje";
+                                      } else if (value != password) {
+                                        return "Lozinke nisu iste";
+                                      } else {
+                                        return null;
+                                      }
+                                    }),
+                                    decoration: const InputDecoration(
+                                      label: Text("Ponovljena lozinka"),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 20.0),
+                                    child: ElevatedButton(
+                                      onPressed: () async {
+                                        try {
+                                          _formKey.currentState?.save();
+                                          if (_formKey.currentState!
+                                              .validate()) {
+                                            Map<String, dynamic> request =
+                                                Map.of(_formKey
+                                                    .currentState!.value);
+                                            var result =
+                                                await _userCompanyProvider
+                                                    .insert(request);
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(const SnackBar(
+                                                    content: Text(
+                                                        "Uspješno ste se registrovali. Molimo Vas provjerite Vaš email")));
+
+                                            Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const VerificationPage()));
+                                          } else {}
+                                        } catch (e) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(const SnackBar(
+                                                  content: Text(
+                                                      " Email adresa se već koristi. Molimo izaberite drugu email adresu.")));
+                                        }
+                                      },
+                                      child: const Text("Registruj se"),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 40),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ));
   }
 
   Expanded _textField(String name, String label) {
