@@ -8,6 +8,7 @@ import 'package:minijobs_mobile/pages/user-profile/user_ratings_view.dart';
 
 import '../../providers/authentication_provider.dart';
 import '../../utils/photo_view.dart';
+import '../user-profile/user_change_password.dart';
 import 'applicant_info.dart';
 import 'applicant_info_view.dart';
 
@@ -58,6 +59,12 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
   void  _handleLogout(BuildContext context)  {
     _authenticationProvider.logout(context);
   }
+  void _handleChangePassword(BuildContext context)  {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const UserChangePassword()),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -77,14 +84,28 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
             title: const Text('Profile'),
             actions: isAbleTodoEdit
             ? [
-            IconButton(
-              icon: const Icon(Icons.logout),
-              tooltip: 'Odjavi se',
-              onPressed: () {
-                _handleLogout(context);
-              },
-            ),
-            ]: null,
+              PopupMenuButton<String>(
+                onSelected: (String value) {
+                  if (value == 'logout') {
+                    _handleLogout(context);
+                  } else if (value == 'change_password') {
+                    _handleChangePassword(context);
+                  }
+                },
+                itemBuilder: (BuildContext context) => [
+                  const PopupMenuItem(
+                    value: 'change_password',
+                    child: Text('Promijeni lozinku'),
+                  ),
+                  const PopupMenuItem(
+                    value: 'logout',
+                    child: Text('Odjavi se'),
+                  ),
+                ],
+                icon: const Icon(Icons.more_vert),
+              ),
+            ]
+                : null,
           ),
           body: isLoading
               ? const Center(child: CircularProgressIndicator())
@@ -97,23 +118,37 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Profile photo
-                    GestureDetector(
-                      onTap: () {
-                        if (isAbleTodoEdit) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ApplicantInfo(applicantId: userId),
+                    // Profile photo and edit icon
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center, // Center the row horizontally
+                      children: [
+                        const SizedBox(width: 35),
+
+                        PhotoView(
+                          photo: applicant?.photo,
+                          editable: false,
+                          userId: userId,
+                        ),
+                        if (isAbleTodoEdit)
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ApplicantInfo(applicantId: userId),
+                                ),
+                              );
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 8.0), // Add space between PhotoView and icon
+                              child: Icon(
+                                Icons.edit,
+                                color: Colors.blue, // Blue color for the icon
+                                size: 24.0, // Adjust icon size as needed
+                              ),
                             ),
-                          );
-                        }
-                      },
-                      child: PhotoView(
-                        photo: applicant?.photo,
-                        editable: false,
-                        userId: userId,
-                      ),
+                          ),
+                      ],
                     ),
                     const SizedBox(height: 10),
                     // Name
@@ -142,6 +177,7 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
                   ],
                 ),
               ),
+
               // Tabs section
               const TabBar(
                 tabs: [
