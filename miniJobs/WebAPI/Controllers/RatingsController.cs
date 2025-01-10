@@ -1,11 +1,13 @@
 ﻿using Application.Ratings.Commands;
 using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers;
 
 [Route("api/ratings")]
+[Authorize]
 public class RatingsController(IMediator mediator) : ControllerBase
 {
     private readonly IMediator mediator = mediator;

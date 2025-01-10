@@ -12,12 +12,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebAPI.Controllers;
 
 [Route("api/applicants")]
-[AllowAnonymous]
+[Authorize]
 public class Applicantscontroller(IMediator mediator) : ControllerBase
 {
     private readonly IMediator mediator = mediator;
 
     [HttpGet("search")]
+    [Authorize(Roles = "Employer")]
     [ProducesResponseType(typeof(SearchResponseBase<Job>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -27,6 +28,7 @@ public class Applicantscontroller(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("applied-jobs")]
+    [Authorize(Roles = "Applicant")]
     [ProducesResponseType(typeof(IEnumerable<JobApplication>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -36,6 +38,7 @@ public class Applicantscontroller(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("saved-jobs")]
+    [Authorize(Roles = "Applicant")]
     [ProducesResponseType(typeof(IEnumerable<Job>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -45,6 +48,7 @@ public class Applicantscontroller(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("{applicantId}")]
+    [Authorize(Roles = "Applicant,Employer")]
     [ProducesResponseType(typeof(ApplicantDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -54,6 +58,7 @@ public class Applicantscontroller(IMediator mediator) : ControllerBase
     }
 
     [HttpPut("{applicantId}")]
+    [Authorize(Roles = "Applicant")]
     [ProducesResponseType(typeof(Applicant), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -62,6 +67,7 @@ public class Applicantscontroller(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(new ApplicantUpdateCommand(applicantId, request)));
     }
     [HttpPost("saved-jobs/{jobId}")]
+    [Authorize(Roles = "Applicant")]
     [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -71,6 +77,7 @@ public class Applicantscontroller(IMediator mediator) : ControllerBase
     }
 
     [HttpDelete("saved-jobs/{jobId}")]
+    [Authorize(Roles = "Applicant")]
     [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]

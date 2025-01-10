@@ -2,11 +2,13 @@
 using Application.JobApplications.Commands;
 using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers;
 
 [Route("api/jobs/{jobId}/applications")]
+[Authorize]
 public class JobApplicationsController(IMediator mediator) : ControllerBase
 {
     private readonly IMediator mediator = mediator;
@@ -15,6 +17,7 @@ public class JobApplicationsController(IMediator mediator) : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpPost]
+    [Authorize(Roles = "Applicant")]
     [ProducesResponseType(typeof(JobApplication), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -27,6 +30,7 @@ public class JobApplicationsController(IMediator mediator) : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpDelete]
+    [Authorize(Roles = "Applicant")]
     [ProducesResponseType(typeof(JobApplication), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -39,6 +43,7 @@ public class JobApplicationsController(IMediator mediator) : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpPatch("{jobApplicationId}/accept")]
+    [Authorize(Roles = "Employer")]
     [ProducesResponseType(typeof(JobApplication), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]

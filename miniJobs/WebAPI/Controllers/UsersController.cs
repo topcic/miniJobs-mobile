@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers;
 [Route("api/users")]
+[Authorize]
 public class UsersController(IMediator mediator) : ControllerBase
 {
     private readonly IMediator mediator = mediator;
@@ -26,6 +27,7 @@ public class UsersController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost("")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
@@ -73,6 +75,7 @@ public class UsersController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("{userId}/job-recommendations")]
+    [Authorize(Roles = "Applicant")]
     [ProducesResponseType(typeof(JobRecommendation), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]

@@ -1,12 +1,14 @@
 ﻿using Application.JobTypes.Queries;
 using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers;
 
 
 [Route("api/jobtypes")]
+[Authorize]
 public class JobTypesController(IMediator mediator) : ControllerBase
 {
     private readonly IMediator mediator = mediator;

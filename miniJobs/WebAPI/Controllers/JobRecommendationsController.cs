@@ -1,18 +1,20 @@
 ﻿using Application.JobRecommendations.Commands;
 using Application.JobRecommendations.Models;
-using Application.JobRecommendations.Queries;
 using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers;
 
 [Route("api/job-recommendations")]
+[Authorize]
 public class JobRecommendationsController(IMediator mediator) : ControllerBase
 {
     private readonly IMediator mediator = mediator;
 
     [HttpPost("")]
+    [Authorize(Roles = "Applicant")]
     [ProducesResponseType(typeof(JobRecommendation), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -23,6 +25,7 @@ public class JobRecommendationsController(IMediator mediator) : ControllerBase
 
 
     [HttpPut("{jobRecommendationId}")]
+    [Authorize(Roles = "Applicant")]
     [ProducesResponseType(typeof(JobRecommendation), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -31,6 +34,7 @@ public class JobRecommendationsController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(new JobRecommendationUpdateCommand(jobRecommendationId, request)));
     }
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Applicant")]
     [ProducesResponseType(typeof(JobRecommendation), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]

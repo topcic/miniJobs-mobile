@@ -4,16 +4,19 @@ using Application.Jobs.Queries;
 using Application.Users.Models;
 using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers;
 
 [Route("api/jobs")]
+[Authorize]
 public class JobsController(IMediator mediator) : ControllerBase
 {
     private readonly IMediator mediator = mediator;
 
     [HttpPost("")]
+    [Authorize(Roles = "Employer")]
     [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -22,16 +25,8 @@ public class JobsController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(new JobInsertCommand(request)));
     }
 
-
-    //[HttpGet()]
-    //[ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
-    //[ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-    //[ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    //public async Task<IActionResult> GetAllForUser()
-    //{ 
-    //    return Ok(await mediator.Send(new JobFindAllForEmployerQuery()));
-    //}
     [HttpGet("{jobId}")]
+    [Authorize(Roles = "Applicant,Employer")]
     [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -40,6 +35,7 @@ public class JobsController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(new JobTryFindQuery(jobId)));
     }
     [HttpPut("{jobId}/step1")]
+    [Authorize(Roles = "Employer")]
     [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -50,6 +46,7 @@ public class JobsController(IMediator mediator) : ControllerBase
     }
 
     [HttpPut("{jobId}/step2")]
+    [Authorize(Roles = "Employer")]
     [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -60,6 +57,7 @@ public class JobsController(IMediator mediator) : ControllerBase
     }
 
     [HttpPut("{jobId}/step3")]
+    [Authorize(Roles = "Employer")]
     [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -69,6 +67,7 @@ public class JobsController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(new JobStep3UpdateCommand(request)));
     }
     [HttpPut("{jobId}/activate")]
+    [Authorize(Roles = "Employer")]
     [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -78,6 +77,7 @@ public class JobsController(IMediator mediator) : ControllerBase
     } 
 
     [HttpPut("{jobId}/finish")]
+    [Authorize(Roles = "Employer")]
     [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -87,6 +87,7 @@ public class JobsController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("search")]
+    [Authorize(Roles = "Applicant")]
     [ProducesResponseType(typeof(UserRegistrationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -97,6 +98,7 @@ public class JobsController(IMediator mediator) : ControllerBase
 
 
     [HttpGet("{jobId}/applicants")]
+    [Authorize(Roles = "Employer")]
     [ProducesResponseType(typeof(IEnumerable<Applicant>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -106,6 +108,7 @@ public class JobsController(IMediator mediator) : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Employer")]
     [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]

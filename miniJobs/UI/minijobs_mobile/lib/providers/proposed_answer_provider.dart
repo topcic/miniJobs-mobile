@@ -10,7 +10,7 @@ class ProposedAnswerProvider extends BaseProvider<ProposedAnswer> {
   }
   Future<List<ProposedAnswer>> getByQuestion(String question) async {
     try {
-       var dio = Dio();
+
         var url = "${baseUrl}proposedanswers?question=$question";
       var response = await dio.get(url);
      List<ProposedAnswer> responseData = List<ProposedAnswer>.from(response.data.map((item) => ProposedAnswer.fromJson(item)));
