@@ -4,15 +4,8 @@ using Domain.Interfaces;
 using MediatR;
 
 namespace Application.JobApplications.Handlers;
-sealed class JobApplicationDeleteCommandHandler : IRequestHandler<JobApplicationDeleteCommand, JobApplication>
+sealed class JobApplicationDeleteCommandHandler(IJobApplicationRepository jobApplicationRepository) : IRequestHandler<JobApplicationDeleteCommand, JobApplication>
 {
-    private readonly IJobApplicationRepository jobApplicationRepository;
-
-    public JobApplicationDeleteCommandHandler(IJobApplicationRepository jobApplicationRepository)
-    {
-        this.jobApplicationRepository = jobApplicationRepository;
-    }
-
     public async Task<JobApplication> Handle(JobApplicationDeleteCommand command, CancellationToken cancellationToken)
     {
         var jobApplication = await jobApplicationRepository.FindOneAsync(x => x.CreatedBy == command.UserId.Value && x.JobId == command.JobId && x.IsDeleted == false);

@@ -1,11 +1,13 @@
-﻿using Application.Users.Commands;
+﻿using Application.Common.Extensions;
+using Application.Users.Commands;
 using Domain.Interfaces;
 using FluentValidation;
 
 namespace Application.Users.Validators;
 public class ApplicantRegistrationCommandValidator : AbstractValidator<RegistrationCommand>
 {
-    public ApplicantRegistrationCommandValidator(ICityRepository cityRepository)
+    private readonly IUserManagerRepository userManager;
+    public ApplicantRegistrationCommandValidator(ICityRepository cityRepository, IUserManagerRepository userManager)
     {
         RuleFor(x => x.Request.Email)
             .Cascade(CascadeMode.Stop)
@@ -37,6 +39,14 @@ public class ApplicantRegistrationCommandValidator : AbstractValidator<Registrat
         RuleFor(x => x.Request.Gender)
           .NotNull().OverridePropertyName("Gender").WithMessage("Spol je obavezno polje");
 
-           RuleFor(x => x.Request.CityId).MustAsync(async (id, cancellation) => await cityRepository.TryFindAsync(id) != null).OverridePropertyName("CityId").WithMessage("Grad ne postoji.");
+        RuleFor(x => x.Request.CityId).MustAsync(async (id, cancellation) => await cityRepository.TryFindAsync(id) != null).OverridePropertyName("CityId").WithMessage("Grad ne postoji.");
+        RuleFor(x => x).MustAsync(async (x, cancellation) => await Validate(x));
+        this.userManager = userManager;
+    }
+    private async Task<bool> Validate(RegistrationCommand command)
+    {
+        var registeredUser = await userManager.TryFindByEmailAsync(command.Request.Email.ToLower());
+        ExceptionExtension.Validate("Email adresa se već koristi. Molimo izaberite drugu email adresu.", () => registeredUser != null);
+        return true;
     }
 }

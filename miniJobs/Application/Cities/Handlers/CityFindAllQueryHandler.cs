@@ -8,9 +8,6 @@ namespace Application.Cities.Handlers;
 public class CityFindAllQueryHandler(ICityRepository cityRepository,
                        ICountryRepository countryRepository) : IRequestHandler<CityFindAllQuery, IEnumerable<City>>
 {
-    private readonly ICityRepository cityRepository = cityRepository;
-    private readonly ICountryRepository countryRepository = countryRepository;
-
     public async Task<IEnumerable<City>> Handle(CityFindAllQuery request, CancellationToken cancellationToken)
     {
         var cities = await cityRepository.FindAllAsync();

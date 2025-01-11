@@ -1,15 +1,9 @@
 ﻿using Application.Common.Queries;
 using Domain.Dtos;
-using Domain.Entities;
 
 namespace Application.Employers.Queries;
 
-public class EmployerTryFindQuery : QueryBase<EmployerDTO>
+public class EmployerTryFindQuery(int id) : QueryBase<EmployerDTO>
 {
-    public int Id { get; set; }
-
-    public EmployerTryFindQuery(int id)
-    {
-        Id = id;
-    }
+    public int Id { get; set; } = id;
 }

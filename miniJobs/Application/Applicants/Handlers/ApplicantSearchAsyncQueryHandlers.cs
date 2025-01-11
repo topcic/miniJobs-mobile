@@ -1,24 +1,13 @@
-﻿using Application.Applicants.Models;
-using Application.Applicants.Queries;
+﻿using Application.Applicants.Queries;
 using Application.Common.Models;
-using AutoMapper;
 using Domain.Dtos;
-using Domain.Entities;
 using Domain.Interfaces;
 using MediatR;
 
 namespace Application.Applicants.Handlers;
 
-public class ApplicantSearchAsyncQueryHandlers : IRequestHandler<ApplicantSearchAsyncQuery, SearchResponseBase<ApplicantDTO>>
+public class ApplicantSearchAsyncQueryHandlers(IApplicantRepository applicantRepository) : IRequestHandler<ApplicantSearchAsyncQuery, SearchResponseBase<ApplicantDTO>>
 {
-    private readonly IApplicantRepository applicantRepository;
-
-    public ApplicantSearchAsyncQueryHandlers(IApplicantRepository applicantRepository)
-    {
-        this.applicantRepository = applicantRepository;
-    }
-
-
     public async Task<SearchResponseBase<ApplicantDTO>> Handle(ApplicantSearchAsyncQuery request, CancellationToken cancellationToken)
     {
 

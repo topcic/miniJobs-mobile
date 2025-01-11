@@ -7,25 +7,9 @@ using System.Transactions;
 
 namespace Application.Ratings.Handlers;
 
-public class RatingInsertCommandHandler : IRequestHandler<RatingInsertCommand, Rating>
+public class RatingInsertCommandHandler(IJobApplicationRepository jobApplicationRepository, IUserManagerRepository userManagerRepository,
+    IRatingRepository ratingRepository, IJobRepository jobRepository, IEmailSender emailSender) : IRequestHandler<RatingInsertCommand, Rating>
 {
-    private readonly IRatingRepository ratingRepository;
-    private readonly IJobApplicationRepository jobApplicationRepository;
-    private readonly IJobRepository jobRepository;
-    private readonly IEmailSender emailSender;
-    private readonly IUserManagerRepository userManagerRepository;
-
-
-    public RatingInsertCommandHandler(IJobApplicationRepository jobApplicationRepository, IUserManagerRepository userManagerRepository,
-        IRatingRepository ratingRepository, IJobRepository jobRepository, IEmailSender emailSender)
-    {
-        this.jobApplicationRepository = jobApplicationRepository;
-        this.ratingRepository = ratingRepository;
-        this.jobRepository = jobRepository;
-        this.emailSender = emailSender;
-        this.userManagerRepository = userManagerRepository;
-
-    }
     public async Task<Rating> Handle(RatingInsertCommand command, CancellationToken cancellationToken)
     {
         using var ts = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);

@@ -1,4 +1,5 @@
-﻿using Application.Employers.Commands;
+﻿using Application.Common.Extensions;
+using Application.Employers.Commands;
 using Domain.Interfaces;
 using FluentValidation;
 
@@ -6,7 +7,8 @@ namespace Application.Employers.Vlidators;
 
 public class EmployerInsertCommandValidator : AbstractValidator<EmployerInsertCommand>
 {
-    public EmployerInsertCommandValidator(ICityRepository cityRepository)
+    private readonly IUserManagerRepository userManager;
+    public EmployerInsertCommandValidator(ICityRepository cityRepository, IUserManagerRepository userManager)
     {
         RuleFor(x => x.Request.Email)
             .Cascade(CascadeMode.Stop)
@@ -54,5 +56,13 @@ public class EmployerInsertCommandValidator : AbstractValidator<EmployerInsertCo
            .Length(14, 15).WithMessage("Nevalidna dužina");
 
         RuleFor(x => x.Request.CityId).MustAsync(async (id, cancellation) => await cityRepository.TryFindAsync(id) != null).OverridePropertyName("CityId").WithMessage("Grad ne postoji.");
+        RuleFor(x => x).MustAsync(async (x, cancellation) => await Validate(x));
+        this.userManager = userManager;
+    }
+    private async Task<bool> Validate(EmployerInsertCommand command)
+    {
+        var registeredUser = await userManager.TryFindByEmailAsync(command.Request.Email.ToLower());
+        ExceptionExtension.Validate("Email adresa se već koristi. Molimo izaberite drugu email adresu.", () => registeredUser != null);
+        return true;
     }
 }

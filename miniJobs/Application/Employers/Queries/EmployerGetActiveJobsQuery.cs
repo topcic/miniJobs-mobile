@@ -3,12 +3,7 @@ using Domain.Entities;
 
 namespace Application.Employers.Queries;
 
-public class EmployerGetActiveJobsQuery : QueryBase<IEnumerable<Job>>
+public class EmployerGetActiveJobsQuery(int employerId) : QueryBase<IEnumerable<Job>>
 {
-    public int EmployerId { get; set; }
-
-    public EmployerGetActiveJobsQuery(int employerId)
-    {
-        EmployerId = employerId;
-    }
+    public int EmployerId { get; set; } = employerId;
 }

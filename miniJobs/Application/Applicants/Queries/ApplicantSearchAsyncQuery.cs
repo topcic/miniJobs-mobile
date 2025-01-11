@@ -5,13 +5,8 @@ using Domain.Dtos;
 
 namespace Application.Applicants.Queries;
 
-public class ApplicantSearchAsyncQuery : QueryBase<SearchResponseBase<ApplicantDTO>>
+public class ApplicantSearchAsyncQuery(ApplicantSearchRequest searchRequest) : QueryBase<SearchResponseBase<ApplicantDTO>>
 {
-   
-    public ApplicantSearchRequest SearchRequest { get; set; }
-    
-    public ApplicantSearchAsyncQuery(ApplicantSearchRequest searchRequest)
-    {
-        SearchRequest = searchRequest;
-    }
+
+    public ApplicantSearchRequest SearchRequest { get; set; } = searchRequest;
 }

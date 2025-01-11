@@ -26,17 +26,6 @@ public class UsersController(IMediator mediator) : ControllerBase
         return Ok();
     }
 
-    [HttpPost("")]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> PostAsync([FromBody] UserSaveRequest request)
-    {
-        return Ok(await mediator.Send(new UserInsertCommand(request)));
-    }
-
     [HttpGet("{userId}/ratings")]
     [ProducesResponseType(typeof(IEnumerable<Rating>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]

@@ -2,12 +2,7 @@
 using Domain.Dtos;
 
 namespace Application.Applicants.Queries;
-public class ApplicantTryFindQuery : QueryBase<ApplicantDTO>
+public class ApplicantTryFindQuery(int id) : QueryBase<ApplicantDTO>
 {
-    public int Id { get; set; }
-
-    public ApplicantTryFindQuery(int id)
-    {
-        Id = id;
-    }
+    public int Id { get; set; } = id;
 }

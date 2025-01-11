@@ -1,5 +1,4 @@
 ﻿using Application.Applicants.Commands;
-using Application.Common.Extensions;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Interfaces;
@@ -10,17 +9,10 @@ namespace Application.Applicants.Handlers;
 
 public class ApplicantUpdateCommandHandler(IMapper mapper, IApplicantRepository applicantRepository, IUserManagerRepository userManager, IApplicantJobTypeRepository applicantJobTypeRepository) : IRequestHandler<ApplicantUpdateCommand, Applicant>
 {
-    private readonly IMapper mapper = mapper;
-    private readonly IApplicantRepository applicantRepository = applicantRepository;
-    private readonly IUserManagerRepository userManager = userManager;
-    private readonly IApplicantJobTypeRepository applicantJobTypeRepository = applicantJobTypeRepository;
-
-
     public async Task<Applicant> Handle(ApplicantUpdateCommand command, CancellationToken cancellationToken)
     {
         using var ts = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         var applicant = await applicantRepository.TryFindAsync(command.ApplicantId);
-        ExceptionExtension.Validate("APPLICANT_NOT_EXISTS", () => applicant == null);
         var user = await userManager.TryFindAsync(command.ApplicantId);
 
         mapper.Map(command.Request, user);
@@ -68,7 +60,7 @@ public class ApplicantUpdateCommandHandler(IMapper mapper, IApplicantRepository 
                 if (jobTypeToRemove != null)
                 {
 
-                    applicantJobTypeRepository.DeleteAsync(applicant.Id ,jobTypeToRemove.Id);
+                    applicantJobTypeRepository.DeleteAsync(applicant.Id, jobTypeToRemove.Id);
                 }
             }
 

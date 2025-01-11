@@ -7,8 +7,5 @@ public class RatingInsertCommand : CommandBase<Rating>
 {
     public Rating Request { get; set; }
 
-    public RatingInsertCommand(Rating request)
-    {
-        Request = request;
-    }
+    public RatingInsertCommand(Rating request) => Request = request;
 }

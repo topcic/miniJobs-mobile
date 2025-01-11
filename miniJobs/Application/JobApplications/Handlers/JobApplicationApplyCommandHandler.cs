@@ -6,15 +6,8 @@ using MediatR;
 
 namespace Application.JobApplications.Handlers;
 
-sealed class JobApplicationApplyCommandHandler : IRequestHandler<JobApplicationApplyCommand, JobApplication>
+sealed class JobApplicationApplyCommandHandler(IJobApplicationRepository jobApplicationRepository) : IRequestHandler<JobApplicationApplyCommand, JobApplication>
 {
-    private readonly IJobApplicationRepository jobApplicationRepository;
-
-    public JobApplicationApplyCommandHandler(IJobApplicationRepository jobApplicationRepository)
-    {
-        this.jobApplicationRepository = jobApplicationRepository;
-    }
-
     public async Task<JobApplication> Handle(JobApplicationApplyCommand command, CancellationToken cancellationToken)
     {
         var jobApplication = new JobApplication

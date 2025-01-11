@@ -1,5 +1,4 @@
 ﻿using System.Transactions;
-using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Methods;
 using Application.Users.Commands;
@@ -17,14 +16,6 @@ public class RegistrationCommandHandler(IUserManagerRepository userManager,
     IApplicantRepository applicantRepository, IMapper mapper, IEmployerRepository employerRepository, IEmailSender emailSender,
     IUserAuthCodeRepository userAuthCodeRepository, ISecurityProvider securityProvider) : IRequestHandler<RegistrationCommand, UserRegistrationResponse>
 {
-    private readonly IUserManagerRepository userManager = userManager;
-    private readonly IApplicantRepository applicantRepository = applicantRepository;
-    private readonly IMapper mapper = mapper;
-    private readonly IEmployerRepository employerRepository = employerRepository;
-    private readonly IEmailSender emailSender = emailSender;
-    private readonly IUserAuthCodeRepository userAuthCodeRepository = userAuthCodeRepository;
-    private readonly ISecurityProvider securityProvider = securityProvider;
-  
 
     public async Task<UserRegistrationResponse> Handle(RegistrationCommand command, CancellationToken cancellationToken)
     {
@@ -32,9 +23,6 @@ public class RegistrationCommandHandler(IUserManagerRepository userManager,
 
         using (var ts = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            var registeredUser = await userManager.TryFindByEmailAsync(command.Request.Email.ToLower());
-            ExceptionExtension.Validate("Email adresa se već koristi. Molimo izaberite drugu email adresu.", () => registeredUser != null);
-
             var user = mapper.Map<User>(command.Request);
             var generatedPassword = securityProvider.EncodePassword(command.Request.Password);
             user.PasswordHash = generatedPassword;

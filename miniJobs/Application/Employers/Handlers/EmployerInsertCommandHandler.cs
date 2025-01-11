@@ -1,5 +1,4 @@
-﻿using Application.Common.Extensions;
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
 using Application.Common.Methods;
 using Application.Employers.Commands;
 using AutoMapper;
@@ -14,20 +13,9 @@ namespace Application.Employers.Handlers;
 public class EmployerInsertCommandHandler(IUserManagerRepository userManager, IMapper mapper, IEmployerRepository employerRepository, IEmailSender emailSender,
     IUserAuthCodeRepository userAuthCodeRepository, ISecurityProvider securityProvider) : IRequestHandler<EmployerInsertCommand, Employer>
 {
-    private readonly IUserManagerRepository userManager = userManager;
-    private readonly IMapper mapper = mapper;
-    private readonly IEmployerRepository employerRepository = employerRepository;
-    private readonly IEmailSender emailSender = emailSender;
-    private readonly IUserAuthCodeRepository userAuthCodeRepository = userAuthCodeRepository;
-    private readonly ISecurityProvider securityProvider = securityProvider;
-
-
     public async Task<Employer> Handle(EmployerInsertCommand command, CancellationToken cancellationToken)
     {
         using var ts = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-
-        var registeredUser = await userManager.TryFindByEmailAsync(command.Request.Email.ToLower());
-        ExceptionExtension.Validate("Email adresa se već koristi. Molimo izaberite drugu email adresu.", () => registeredUser != null);
 
         var user = mapper.Map<User>(command.Request);
         var generatedPassword = securityProvider.EncodePassword(command.Request.Password);

@@ -3,11 +3,7 @@ using Domain.Entities;
 
 namespace Application.Jobs.Commands;
 
-public class JobFinishCommand : CommandBase<Job>
+public class JobFinishCommand(int jobId) : CommandBase<Job>
 {
-    public int JobId { get; set; }
-    public JobFinishCommand(int jobId)
-    {
-        JobId = jobId;
-    }
+    public int JobId { get; set; } = jobId;
 }
