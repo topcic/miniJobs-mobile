@@ -24,7 +24,7 @@ public class JobStep2UpdateCommandValidator : AbstractValidator<JobStep2UpdateCo
 
                RuleFor(x => x.Request.JobSchedule.Answers)
                    .NotNull()
-                   .WithMessage("JOB_SCHEDULE_ANSWERS_IS_REQUIRED")
+                   .WithMessage("JOB_SCHEDULE_QUESTION_ID_MUST_BE_GREATER_THAN_ZERO")
                    .Must(answers => answers.Any())
                    .WithMessage("JOB_SCHEDULE_ANSWERS_CANNOT_BE_EMPTY");
            });

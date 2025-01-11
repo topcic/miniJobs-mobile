@@ -17,6 +17,6 @@ public class JobInsertCommandValidator : AbstractValidator<JobInsertCommand>
         RuleFor(x => x.Request.CityId)
              .NotNull().OverridePropertyName("CityId").WithMessage("CITY_IS_REQUIRED");
 
-        RuleFor(x => x.Request.CityId).MustAsync(async (id, cancellation) => await cityRepository.TryFindAsync(id) != null).OverridePropertyName("CityId").WithMessage("Grad ne postoji.");
+        RuleFor(x => x.Request.CityId).MustAsync(async (id, cancellation) => await cityRepository.TryFindAsync(id) != null).OverridePropertyName("CityId").WithMessage("CITY_NOT_EXIST");
     }
 }

@@ -117,11 +117,80 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ACCOUNT_NOT_APPROVED" xml:space="preserve">
+    <value>Račun nije odobren.</value>
+  </data>
+  <data name="ACCOUNT_NOT_VALID" xml:space="preserve">
+    <value>Nevalidan račun.</value>
+  </data>
   <data name="ACTION_NOT_POSSIBLE_IN_THIS_JOB_STATUS" xml:space="preserve">
     <value>Akcija nije moguća za trenutni status posla.</value>
   </data>
+  <data name="ADDRESS_IS_REQUIRED" xml:space="preserve">
+    <value>Adresa i broj ulice je obavezno polje</value>
+  </data>
+  <data name="ALREADY_APPLIED" xml:space="preserve">
+    <value>Već ste aplicirali.</value>
+  </data>
   <data name="ALREADY_RATED" xml:space="preserve">
     <value>Već ste ocjenili korisnika.</value>
+  </data>
+  <data name="ANSWERS_TO_PAYMENT_QUESTIONS_IS_REQUIRED" xml:space="preserve">
+    <value>Način plaćanja je obavezno polje.</value>
+  </data>
+  <data name="APPLICANT_NOT_EXISTS" xml:space="preserve">
+    <value>Aplikant ne postoji.</value>
+  </data>
+  <data name="APPLICATIONS_DURATION_IS_REQUIRED" xml:space="preserve">
+    <value>Aplikacije traju do je obavezno polje.</value>
+  </data>
+  <data name="APPLICATIONS_DURATION_MUST_BE_GREATER_THAN_ZERO" xml:space="preserve">
+    <value>Aplikacije traju do moraju biti veće od nula.</value>
+  </data>
+  <data name="AUTH_CODE_IS_MISSING" xml:space="preserve">
+    <value>Kod ne postoji.</value>
+  </data>
+  <data name="AUTH_CODE_NOT_VALID" xml:space="preserve">
+    <value>Kod nije validan.</value>
+  </data>
+  <data name="BAD_REQUEST" xml:space="preserve">
+    <value>Loš zahtjev.</value>
+  </data>
+  <data name="CAN_NOT_APPLY_TO_JOB_IN_THIS_STATUS" xml:space="preserve">
+    <value>Nije moguće aplicirati u trenutnom statusu posla.</value>
+  </data>
+  <data name="CAN_NOT_UPDATE_JOB_IN_THIS_STATUS" xml:space="preserve">
+    <value>Nije moguće ažurirati u trenutnom statusu.</value>
+  </data>
+  <data name="CIITY_NOT_EXIST" xml:space="preserve">
+    <value>Grad ne postoji.</value>
+  </data>
+  <data name="CITY_IS_REQUIRED" xml:space="preserve">
+    <value>Grad je obavezno polje.</value>
+  </data>
+  <data name="COMPANY_PHONE_NUMBER_IS_REQUIRED" xml:space="preserve">
+    <value>Službeni broj telefona je obavezno polje</value>
+  </data>
+  <data name="DESCRIPTION_IS_REQUIRED" xml:space="preserve">
+    <value>Opis je obavezno polje.</value>
+  </data>
+  <data name="EACH_PAYMENT_QUESTION_MUST_HAVE_AT_LEAST_ONE_ANSWER" xml:space="preserve">
+    <value>Način plaćanja je obavezno polje.</value>
+  </data>
+  <data name="EMAIL_ADDRESS_EXIST" xml:space="preserve">
+    <value>Email adresa se već koristi. Molimo izaberite drugu email adresu.</value>
+  </data>
+  <data name="EMAIL_IS_REQUIRED" xml:space="preserve">
+    <value>Email je obavezno polje</value>
+  </data>
+  <data name="EMPOLOYER_NOT_EXISTS" xml:space="preserve">
+    <value>Poslodavac ne postoji.</value>
+  </data>
+  <data name="FIRST_NAME_IS_REQUIRED" xml:space="preserve">
+    <value>Ime je obavezno polje.</value>
+  </data>
+  <data name="ID_NUMBER_IS_REQUIRED" xml:space="preserve">
+    <value>ID broj je obavezno polje.</value>
   </data>
   <data name="IT_IS_NOT_POSSIBLE_TO_SAVE_JOB" xml:space="preserve">
     <value>Nije moguće spasiti posao.</value>
@@ -131,6 +200,9 @@
   </data>
   <data name="JOB_APPLICATION_ALREADY_REJECTED" xml:space="preserve">
     <value>Aplikant je već odbijen.</value>
+  </data>
+  <data name="JOB_APPLICATION_CAN_NOT_BE_DELETED" xml:space="preserve">
+    <value>Nije moguće obrisati.</value>
   </data>
   <data name="JOB_APPLICATION_IS_DELETED" xml:space="preserve">
     <value>Aplikacija je obrisana.</value>
@@ -153,7 +225,61 @@
   <data name="JOB_NOT_EXIST" xml:space="preserve">
     <value>Posao ne postoji.</value>
   </data>
+  <data name="JOB_RECOMMENDATION_ALREADY_EXISTS" xml:space="preserve">
+    <value>Preporuka za posao već postoji.</value>
+  </data>
+  <data name="JOB_RECOMMENDATION_NEED_TO_HAVE_AT_LEAST_ONE_CITY_OR_JOB_TYPE" xml:space="preserve">
+    <value>Preporuka za posao mora da ima barem jedan grad ili tip posla.</value>
+  </data>
+  <data name="JOB_RECOMMENDATION_NOT_EXISTS" xml:space="preserve">
+    <value>Preporuka za posao ne postoji.</value>
+  </data>
+  <data name="JOB_SCHEDULE_ANSWERS_CANNOT_BE_EMPTY" xml:space="preserve">
+    <value>Odgovori moraju postojati za raspored posla.</value>
+  </data>
+  <data name="JOB_SCHEDULE_IS_REQUIRED" xml:space="preserve">
+    <value>Raspored posla je obavezno polje.</value>
+  </data>
+  <data name="JOB_SCHEDULE_QUESTION_ID_MUST_BE_GREATER_THAN_ZERO" xml:space="preserve">
+    <value>Mora barem jedan biti raspored.</value>
+  </data>
+  <data name="JOB_TYPE_IS_REQUIRED" xml:space="preserve">
+    <value>Tip posla je obavezno polje.</value>
+  </data>
+  <data name="JOB_TYPE_NOT_EXISTS" xml:space="preserve">
+    <value>Tip posla ne postoji.</value>
+  </data>
+  <data name="LAST_NAME_IS_REQUIRED" xml:space="preserve">
+    <value>Prezime je obavezno polje.</value>
+  </data>
+  <data name="NAME_IS_REQUIRED" xml:space="preserve">
+    <value>Naziv je obavezno polje</value>
+  </data>
   <data name="NOT_ALLOWED_TO_RATE" xml:space="preserve">
     <value>Nije moguće ocjeniti,</value>
+  </data>
+  <data name="NOT_VALID_STRING_LENGHT" xml:space="preserve">
+    <value>Nevalidna dužina.</value>
+  </data>
+  <data name="PASSWORD_IS_REQUIRED" xml:space="preserve">
+    <value>Lozinka je obavezno polje</value>
+  </data>
+  <data name="PHOTO_NUMBER_IS_REQUIRED" xml:space="preserve">
+    <value>Broj telefona je obavezno polje.</value>
+  </data>
+  <data name="REQUIRED_EMPLOYEES_IS_REQUIRED" xml:space="preserve">
+    <value>Broj radnika je obavezno polje.</value>
+  </data>
+  <data name="REQUIRED_EMPLOYEES_MUST_BE_GREATER_THAN_ZERO" xml:space="preserve">
+    <value>Broj radnika mora biti veći od nula.</value>
+  </data>
+  <data name="STREETADDRESSANDNUMBER_IS_REQUIRED" xml:space="preserve">
+    <value>Adresa i broj ulice je obavezno polje</value>
+  </data>
+  <data name="USERNAME_OR_PASSWORD_INVALID" xml:space="preserve">
+    <value>Nevalidno ime ili prezime.</value>
+  </data>
+  <data name="WAGE_IS_REQUIRED" xml:space="preserve">
+    <value>Plaća je obavezno polje.</value>
   </data>
 </root>
