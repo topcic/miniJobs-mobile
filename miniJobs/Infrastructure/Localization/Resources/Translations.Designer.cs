@@ -99,6 +99,15 @@ namespace Infrastructure.Localization.Resources {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        internal static string ALREADY_APPLIED {
+            get {
+                return ResourceManager.GetString("ALREADY_APPLIED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         internal static string ALREADY_RATED {
             get {
                 return ResourceManager.GetString("ALREADY_RATED", resourceCulture);
@@ -108,9 +117,36 @@ namespace Infrastructure.Localization.Resources {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        internal static string ANSWERS_TO_PAYMENT_QUESTIONS_IS_REQUIRED {
+            get {
+                return ResourceManager.GetString("ANSWERS_TO_PAYMENT_QUESTIONS_IS_REQUIRED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         internal static string APPLICANT_NOT_EXISTS {
             get {
                 return ResourceManager.GetString("APPLICANT_NOT_EXISTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string APPLICATIONS_DURATION_IS_REQUIRED {
+            get {
+                return ResourceManager.GetString("APPLICATIONS_DURATION_IS_REQUIRED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string APPLICATIONS_DURATION_MUST_BE_GREATER_THAN_ZERO {
+            get {
+                return ResourceManager.GetString("APPLICATIONS_DURATION_MUST_BE_GREATER_THAN_ZERO", resourceCulture);
             }
         }
         
@@ -144,6 +180,24 @@ namespace Infrastructure.Localization.Resources {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        internal static string CAN_NOT_APPLY_TO_JOB_IN_THIS_STATUS {
+            get {
+                return ResourceManager.GetString("CAN_NOT_APPLY_TO_JOB_IN_THIS_STATUS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string CAN_NOT_UPDATE_JOB_IN_THIS_STATUS {
+            get {
+                return ResourceManager.GetString("CAN_NOT_UPDATE_JOB_IN_THIS_STATUS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         internal static string CITY_IS_REQUIRED {
             get {
                 return ResourceManager.GetString("CITY_IS_REQUIRED", resourceCulture);
@@ -153,9 +207,36 @@ namespace Infrastructure.Localization.Resources {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        internal static string CITY_NOT_EXIST {
+            get {
+                return ResourceManager.GetString("CITY_NOT_EXIST", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         internal static string COMPANY_PHONE_NUMBER_IS_REQUIRED {
             get {
                 return ResourceManager.GetString("COMPANY_PHONE_NUMBER_IS_REQUIRED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string DESCRIPTION_IS_REQUIRED {
+            get {
+                return ResourceManager.GetString("DESCRIPTION_IS_REQUIRED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string EACH_PAYMENT_QUESTION_MUST_HAVE_AT_LEAST_ONE_ANSWER {
+            get {
+                return ResourceManager.GetString("EACH_PAYMENT_QUESTION_MUST_HAVE_AT_LEAST_ONE_ANSWER", resourceCulture);
             }
         }
         
@@ -198,6 +279,15 @@ namespace Infrastructure.Localization.Resources {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        internal static string GENDER_IS_REQUIRED {
+            get {
+                return ResourceManager.GetString("GENDER_IS_REQUIRED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         internal static string ID_NUMBER_IS_REQUIRED {
             get {
                 return ResourceManager.GetString("ID_NUMBER_IS_REQUIRED", resourceCulture);
@@ -228,6 +318,15 @@ namespace Infrastructure.Localization.Resources {
         internal static string JOB_APPLICATION_ALREADY_REJECTED {
             get {
                 return ResourceManager.GetString("JOB_APPLICATION_ALREADY_REJECTED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string JOB_APPLICATION_CAN_NOT_BE_DELETED {
+            get {
+                return ResourceManager.GetString("JOB_APPLICATION_CAN_NOT_BE_DELETED", resourceCulture);
             }
         }
         
@@ -270,6 +369,15 @@ namespace Infrastructure.Localization.Resources {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        internal static string JOB_IS_NOT_SAVED {
+            get {
+                return ResourceManager.GetString("JOB_IS_NOT_SAVED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         internal static string JOB_NEED_ACCEPTED_APPLICANTS {
             get {
                 return ResourceManager.GetString("JOB_NEED_ACCEPTED_APPLICANTS", resourceCulture);
@@ -291,6 +399,78 @@ namespace Infrastructure.Localization.Resources {
         internal static string JOB_NOT_EXIST {
             get {
                 return ResourceManager.GetString("JOB_NOT_EXIST", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string JOB_RECOMMENDATION_ALREADY_EXISTS {
+            get {
+                return ResourceManager.GetString("JOB_RECOMMENDATION_ALREADY_EXISTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string JOB_RECOMMENDATION_NEED_TO_HAVE_AT_LEAST_ONE_CITY_OR_JOB_TYPE {
+            get {
+                return ResourceManager.GetString("JOB_RECOMMENDATION_NEED_TO_HAVE_AT_LEAST_ONE_CITY_OR_JOB_TYPE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string JOB_RECOMMENDATION_NOT_EXISTS {
+            get {
+                return ResourceManager.GetString("JOB_RECOMMENDATION_NOT_EXISTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string JOB_SCHEDULE_ANSWERS_CANNOT_BE_EMPTY {
+            get {
+                return ResourceManager.GetString("JOB_SCHEDULE_ANSWERS_CANNOT_BE_EMPTY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string JOB_SCHEDULE_IS_REQUIRED {
+            get {
+                return ResourceManager.GetString("JOB_SCHEDULE_IS_REQUIRED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string JOB_SCHEDULE_QUESTION_ID_MUST_BE_GREATER_THAN_ZERO {
+            get {
+                return ResourceManager.GetString("JOB_SCHEDULE_QUESTION_ID_MUST_BE_GREATER_THAN_ZERO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string JOB_TYPE_IS_REQUIRED {
+            get {
+                return ResourceManager.GetString("JOB_TYPE_IS_REQUIRED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string JOB_TYPE_NOT_EXISTS {
+            get {
+                return ResourceManager.GetString("JOB_TYPE_NOT_EXISTS", resourceCulture);
             }
         }
         
@@ -342,6 +522,15 @@ namespace Infrastructure.Localization.Resources {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        internal static string PHONE_NUMBER_IS_REQUIRED {
+            get {
+                return ResourceManager.GetString("PHONE_NUMBER_IS_REQUIRED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         internal static string PHOTO_NUMBER_IS_REQUIRED {
             get {
                 return ResourceManager.GetString("PHOTO_NUMBER_IS_REQUIRED", resourceCulture);
@@ -351,9 +540,63 @@ namespace Infrastructure.Localization.Resources {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        internal static string QUESTION_NOT_EXIST {
+            get {
+                return ResourceManager.GetString("QUESTION_NOT_EXIST", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string REQUIRED_EMPLOYEES_IS_REQUIRED {
+            get {
+                return ResourceManager.GetString("REQUIRED_EMPLOYEES_IS_REQUIRED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string REQUIRED_EMPLOYEES_MUST_BE_GREATER_THAN_ZERO {
+            get {
+                return ResourceManager.GetString("REQUIRED_EMPLOYEES_MUST_BE_GREATER_THAN_ZERO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string STREETADDRESSANDNUMBER_IS_REQUIRED {
+            get {
+                return ResourceManager.GetString("STREETADDRESSANDNUMBER_IS_REQUIRED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         internal static string USERNAME_OR_PASSWORD_INVALID {
             get {
                 return ResourceManager.GetString("USERNAME_OR_PASSWORD_INVALID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string WAGE_IS_REQUIRED {
+            get {
+                return ResourceManager.GetString("WAGE_IS_REQUIRED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string WAGE_MUST_BE_GREATER_THAN_ZERO {
+            get {
+                return ResourceManager.GetString("WAGE_MUST_BE_GREATER_THAN_ZERO", resourceCulture);
             }
         }
     }

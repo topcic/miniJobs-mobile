@@ -15,7 +15,7 @@ public class ProposedAnswersGetByQuestionQueryValidator : AbstractValidator<Prop
     private async Task<bool> Validate(ProposedAnswersGetByQuestionQuery query)
     {
         var question = await questionRepository.FindOneAsync(x => x.Name == query.Question);
-        ExceptionExtension.Validate("Pitanje ne postoji", () => question == null);
+        ExceptionExtension.Validate("QUESTION_NOT_EXIST", () => question == null);
         return true;
     }
 }

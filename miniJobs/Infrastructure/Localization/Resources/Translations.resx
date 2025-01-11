@@ -162,7 +162,7 @@
   <data name="CAN_NOT_UPDATE_JOB_IN_THIS_STATUS" xml:space="preserve">
     <value />
   </data>
-  <data name="CIITY_NOT_EXIST" xml:space="preserve">
+  <data name="CITY_NOT_EXIST" xml:space="preserve">
     <value />
   </data>
   <data name="CITY_IS_REQUIRED" xml:space="preserve">
@@ -187,6 +187,9 @@
     <value />
   </data>
   <data name="FIRST_NAME_IS_REQUIRED" xml:space="preserve">
+    <value />
+  </data>
+  <data name="GENDER_IS_REQUIRED" xml:space="preserve">
     <value />
   </data>
   <data name="ID_NUMBER_IS_REQUIRED" xml:space="preserve">
@@ -214,6 +217,9 @@
     <value />
   </data>
   <data name="JOB_IS_COMPLETED" xml:space="preserve">
+    <value />
+  </data>
+  <data name="JOB_IS_NOT_SAVED" xml:space="preserve">
     <value />
   </data>
   <data name="JOB_NEED_ACCEPTED_APPLICANTS" xml:space="preserve">
@@ -264,7 +270,13 @@
   <data name="PASSWORD_IS_REQUIRED" xml:space="preserve">
     <value />
   </data>
+  <data name="PHONE_NUMBER_IS_REQUIRED" xml:space="preserve">
+    <value />
+  </data>
   <data name="PHOTO_NUMBER_IS_REQUIRED" xml:space="preserve">
+    <value />
+  </data>
+  <data name="QUESTION_NOT_EXIST" xml:space="preserve">
     <value />
   </data>
   <data name="REQUIRED_EMPLOYEES_IS_REQUIRED" xml:space="preserve">
@@ -282,9 +294,21 @@
   <data name="WAGE_IS_REQUIRED" xml:space="preserve">
     <value />
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="WAGE_MUST_BE_GREATER_THAN_ZERO" type="System.Resources.ResXNullRef, System.Windows.Forms">
+  <data name="WAGE_MUST_BE_GREATER_THAN_ZERO" xml:space="preserve">
     <value />
-    <comment>Plaća mora biti veća od 0.</comment>
+  </data>
+  <data name="AUTH_CODE_IS_REQURED" xml:space="preserve">
+    <value />
+  </data>
+  <data name="NOT_VALID_EMAIL_ADDRESS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="USER_NOT_EXISTS" xml:space="preserve">
+    <value />
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="PHOTO_IS_REQUIRED" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+    <comment>Sika je obavezno polje.</comment>
   </data>
 </root>

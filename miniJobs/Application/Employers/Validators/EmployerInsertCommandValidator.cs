@@ -13,7 +13,7 @@ public class EmployerInsertCommandValidator : AbstractValidator<EmployerInsertCo
         RuleFor(x => x.Request.Email)
             .Cascade(CascadeMode.Stop)
             .NotEmpty().OverridePropertyName("Email").WithMessage("EMAIL_IS_REQUIRED")
-            .EmailAddress().WithMessage("Nevalidna dužina");
+            .EmailAddress().WithMessage("NOT_VALID_STRING_LENGHT");
 
         RuleFor(x => x.Request.Name)
           .Cascade(CascadeMode.Stop)
@@ -55,7 +55,7 @@ public class EmployerInsertCommandValidator : AbstractValidator<EmployerInsertCo
            .NotEmpty().OverridePropertyName("CompanyPhoneNumber").WithMessage("COMPANY_PHONE_NUMBER_IS_REQUIRED")
            .Length(14, 15).WithMessage("NOT_VALID_STRING_LENGHT");
 
-        RuleFor(x => x.Request.CityId).MustAsync(async (id, cancellation) => await cityRepository.TryFindAsync(id) != null).OverridePropertyName("CityId").WithMessage("Grad ne postoji.");
+        RuleFor(x => x.Request.CityId).MustAsync(async (id, cancellation) => await cityRepository.TryFindAsync(id) != null).OverridePropertyName("CityId").WithMessage("CITY_NOT_EXIST");
         RuleFor(x => x).MustAsync(async (x, cancellation) => await Validate(x));
         this.userManager = userManager;
     }

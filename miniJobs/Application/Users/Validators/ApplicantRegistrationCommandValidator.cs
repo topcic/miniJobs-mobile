@@ -11,42 +11,42 @@ public class ApplicantRegistrationCommandValidator : AbstractValidator<Registrat
     {
         RuleFor(x => x.Request.Email)
             .Cascade(CascadeMode.Stop)
-            .NotEmpty().OverridePropertyName("Email").WithMessage("Email je obavezno polje")
-            .EmailAddress().WithMessage("Nevalidna dužina");
+            .NotEmpty().OverridePropertyName("Email").WithMessage("EMAIL_IS_REQUIRED")
+            .EmailAddress().WithMessage("NOT_VALID_STRING_LENGHT");
 
         RuleFor(x => x.Request.FirstName)
-            .Cascade(CascadeMode.Stop)
-            .NotEmpty().OverridePropertyName("FirstName").WithMessage("Ime je obavezno polje")
-            .Length(2, 20).WithMessage("Nevalidna dužina");
+           .Cascade(CascadeMode.Stop)
+           .NotEmpty().OverridePropertyName("FirstName").WithMessage("FIRST_NAME_IS_REQUIRED")
+           .Length(2, 20).WithMessage("NOT_VALID_STRING_LENGHT");
 
         RuleFor(x => x.Request.LastName)
             .Cascade(CascadeMode.Stop)
-            .NotEmpty().OverridePropertyName("LastName").WithMessage("Prezime je obavezno polje")
-            .Length(2, 30).WithMessage("Nevalidna dužina");
-
+            .NotEmpty().OverridePropertyName("LastName").WithMessage("LAST_NAME_IS_REQUIRED")
+            .Length(2, 30).WithMessage("NOT_VALID_STRING_LENGHT");
         RuleFor(x => x.Request.Password)
-            .Cascade(CascadeMode.Stop)
-            .NotEmpty().OverridePropertyName("Password").WithMessage("Lozinka je obavezno polje")
-            .Length(8, 100).WithMessage("Nevalidna dužina");
+             .Cascade(CascadeMode.Stop)
+             .NotEmpty().OverridePropertyName("Password").WithMessage("PASSWORD_IS_REQUIRED")
+             .Length(8, 100).WithMessage("NOT_VALID_STRING_LENGHT");
 
         RuleFor(x => x.Request.PhoneNumber).Cascade(CascadeMode.Stop)
-            .NotEmpty().OverridePropertyName("PhoneNumber").WithMessage("Broj telefona je obavezno polje")
-            .Length(9, 15).WithMessage("Nevalidna dužina");
+            .NotEmpty().OverridePropertyName("PhoneNumber").WithMessage("PHONE_NUMBER_IS_REQUIRED")
+               .Length(14, 15).OverridePropertyName("PhoneNumber").WithMessage("NOT_VALID_STRING_LENGHT");
 
         RuleFor(x => x.Request.CityId)
-            .NotNull().OverridePropertyName("CityId").WithMessage("Grad je obavezno polje");
+         .NotNull().OverridePropertyName("CityId").WithMessage("CITY_IS_REQUIRED");
 
         RuleFor(x => x.Request.Gender)
-          .NotNull().OverridePropertyName("Gender").WithMessage("Spol je obavezno polje");
+          .NotNull().OverridePropertyName("Gender").WithMessage("GENDER_IS_REQUIRED");
 
-        RuleFor(x => x.Request.CityId).MustAsync(async (id, cancellation) => await cityRepository.TryFindAsync(id) != null).OverridePropertyName("CityId").WithMessage("Grad ne postoji.");
+        RuleFor(x => x.Request.CityId).MustAsync(async (id, cancellation) => await cityRepository.TryFindAsync(id) != null).OverridePropertyName("CityId").WithMessage("CITY_NOT_EXIST");
         RuleFor(x => x).MustAsync(async (x, cancellation) => await Validate(x));
         this.userManager = userManager;
     }
     private async Task<bool> Validate(RegistrationCommand command)
     {
         var registeredUser = await userManager.TryFindByEmailAsync(command.Request.Email.ToLower());
-        ExceptionExtension.Validate("Email adresa se već koristi. Molimo izaberite drugu email adresu.", () => registeredUser != null);
+        ExceptionExtension.Validate("EMAIL_ADDRESS_EXIST", () => registeredUser != null);
+
         return true;
     }
 }

@@ -17,7 +17,7 @@ public class UserChangePasswordCommandValidator : AbstractValidator<UserChangePa
         RuleFor(x => x.ChangePasswordRequest.NewPassword)
     .Cascade(CascadeMode.Stop)
     .NotEmpty().OverridePropertyName("NewPassword").WithMessage("PASSWORD_IS_REQUIRED")
-    .Length(8, 100).WithMessage("PASSWORD_NOT_VALID_LENGHT");
+    .Length(8, 100).WithMessage("NOT_VALID_STRING_LENGHT");
 
         RuleFor(x => x.ChangePasswordRequest.AuthCode)
     .NotEmpty().OverridePropertyName("AuthCode").WithMessage("AUTH_CODE_IS_REQURED");
