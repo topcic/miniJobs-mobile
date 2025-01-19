@@ -11,6 +11,7 @@ import 'package:minijobs_mobile/providers/job_recommendation_provider.dart';
 import 'package:minijobs_mobile/providers/job_type_provider.dart';
 import 'package:minijobs_mobile/providers/proposed_answer_provider.dart';
 import 'package:minijobs_mobile/providers/rating_provider.dart';
+import 'package:minijobs_mobile/providers/recommendation_provider.dart';
 import 'package:minijobs_mobile/providers/user_registration_provider.dart';
 import 'package:minijobs_mobile/providers/user_provider.dart';
 import 'package:minijobs_mobile/widgets/navbar.dart';
@@ -32,7 +33,8 @@ void main() async {
       ChangeNotifierProvider(create: (s) => EmployerProvider()),
       ChangeNotifierProvider(create: (s) => RatingProvider()),
       ChangeNotifierProvider(create: (s) => JobApplicationProvider()),
-      ChangeNotifierProvider(create: (s) => JobRecommendationProvider())
+      ChangeNotifierProvider(create: (s) => JobRecommendationProvider()),
+      ChangeNotifierProvider(create: (s) => RecommendationProvider())
     ],
     child: const MyApp(),
   ));
@@ -85,7 +87,7 @@ class MyMaterialApp extends StatelessWidget {
           ),
         ),
       ),
-      home: isLoggedIn ? const Navbar() : const LoginSignupPage(),
+      home: const Navbar() ,
     );
   }
 }

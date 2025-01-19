@@ -5,6 +5,7 @@ import 'package:minijobs_mobile/models/search_result.dart';
 import 'package:minijobs_mobile/providers/city_provider.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
 import 'package:provider/provider.dart';
+import '../../providers/recommendation_provider.dart';
 import '../employer/job/job_card.dart';
 import '../../models/job/job.dart';
 
@@ -19,8 +20,10 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
   final TextEditingController _searchController = TextEditingController();
 
   late JobProvider _jobProvider;
+  late RecommendationProvider _recommendationProvider;
   late CityProvider _cityProvider;
   SearchResult<Job> jobs = SearchResult(0, []); // Initialize jobs directly here
+  List<Job> recommendedJobs=[];
   List<City> cities = [];
   String? selectedCity;
   String sort="Najnovije";
@@ -31,13 +34,17 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
     super.initState();
   }
 
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _jobProvider = context.read<JobProvider>();
     _cityProvider = context.read<CityProvider>();
+    _recommendationProvider = context.read<RecommendationProvider>();
+
     getCities();
     searchJobs();
+    getRecommendedJobs();
   }
 
   Future<void> getCities() async {
@@ -45,6 +52,10 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
     setState(() {});
   }
 
+  Future<void> getRecommendedJobs() async {
+    recommendedJobs = await _recommendationProvider.getRecommendatios();
+    setState(() {});
+  }
   Future<void> searchJobs() async {
     setState(() {
       isLoading = true;
@@ -63,7 +74,10 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
       cityId: city?.id,
         sort: sortOrder
     );
-
+    if (recommendedJobs.length >= 4) {
+      final recommendedJobIds = recommendedJobs.map((job) => job.id).toSet();
+      jobs.result!.removeWhere((job) => recommendedJobIds.contains(job.id));
+    }
     setState(() {
       isLoading = false;
     });
@@ -113,17 +127,68 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
   }
 
   Widget _buildJobs() {
-    if (jobs.result == null || jobs.result!.isEmpty) {
-      return const Center(child: Text('Nema pronađenih poslova'));
-    }
-    return ListView.builder(
-      itemCount: jobs.result!.length,
-      itemBuilder: (context, index) {
-        final job = jobs.result![index];
-        return JobCard(job: job);
-      },
+    return Column(
+      children: [
+        // Display recommended jobs if >=4
+        if (recommendedJobs.length >= 4) _buildRecommendedJobs(),
+        Expanded(
+          child: jobs.result == null || jobs.result!.isEmpty
+              ? const Center(child: Text('Nema pronađenih poslova'))
+              : ListView.builder(
+            itemCount: jobs.result!.length,
+            itemBuilder: (context, index) {
+              final job = jobs.result![index];
+              return JobCard(job: job);
+            },
+          ),
+        ),
+      ],
     );
   }
+
+
+  Widget _buildRecommendedJobs() {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      decoration: BoxDecoration(
+        color: Colors.blue.shade100,
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Preporučeni poslovi',
+            style: TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.bold,
+              color: Colors.blueAccent,
+            ),
+          ),
+          const SizedBox(height: 8.0),
+          SizedBox(
+            height: 200,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: recommendedJobs.length,
+              itemBuilder: (context, index) {
+                final job = recommendedJobs[index];
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: SizedBox(
+                    width: 250,
+                    child: JobCard(job: job),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
 }
 
 class HeaderWidget extends StatelessWidget {
@@ -424,4 +489,6 @@ class JobListWidget extends StatelessWidget {
           : jobs,
     );
   }
+
+
 }
