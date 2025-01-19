@@ -126,8 +126,8 @@ class _EmployerProfilePageState extends State<EmployerProfilePage> {
                                 ),
                               );
                             },
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 8.0), // Add space between PhotoView and icon
+                            child: const Padding(
+                              padding: EdgeInsets.only(left: 8.0), // Add space between PhotoView and icon
                               child: Icon(
                                 Icons.edit,
                                 color: Colors.blue, // Blue color for the icon

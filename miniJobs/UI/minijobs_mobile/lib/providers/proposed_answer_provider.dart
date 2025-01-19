@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:minijobs_mobile/models/proposed_answer.dart';
 import 'package:minijobs_mobile/providers/base_provider.dart';
 

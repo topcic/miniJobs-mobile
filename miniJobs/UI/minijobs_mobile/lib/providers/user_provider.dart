@@ -91,12 +91,14 @@ class UserProvider extends BaseProvider<User> {
       var response = await dio.post(url, data: jsonRequest);
       if (response.data is bool) {
         bool responseData = response.data;
-        if(responseData)
-        notificationService.success("Uspješno ste promjenili lozinku.");
+        if(responseData) {
+          notificationService.success("Uspješno ste promjenili lozinku.");
+        }
         return responseData;
       }
-   else
-      return false;
+   else {
+        return false;
+      }
     } catch (err) {
       handleError(err);
       return null;

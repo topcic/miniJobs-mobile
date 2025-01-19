@@ -134,6 +134,7 @@ public static class ConfigureServices
         services.AddSingleton<ILocalizationService, LocalizationService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddTransient(typeof(IMessagePublisher<>), typeof(MessagePublisher<>));
+        services.AddScoped<IRecommendationService, RecommendationService>();
     }
 
     public static void ExecuteMigrations(this WebApplication webApplication)

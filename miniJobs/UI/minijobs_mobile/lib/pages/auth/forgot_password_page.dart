@@ -44,7 +44,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   }
   Future<void> changePassword(String authCode,String newPassword) async {
     try {
-      UserChangePasswordRequest request=new UserChangePasswordRequest(authCode,newPassword);
+      UserChangePasswordRequest request=UserChangePasswordRequest(authCode,newPassword);
       // Call the forgotPassword method
       bool? result = await _userProvider.changePassword(request);
 
@@ -105,22 +105,22 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 ),
                 const SizedBox(height: 20),
                 // Title and description
-                Center(
+                const Center(
                   child: Column(
                     children: [
-                      const Text(
+                      Text(
                         "Zaboravljena lozinka",
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(height: 10),
-                      const Text(
+                      SizedBox(height: 10),
+                      Text(
                         "Unesite Vaš email da biste promijenili lozinku",
                         style: TextStyle(
                             fontSize: 14, color: Colors.grey),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 30),
+                      SizedBox(height: 30),
                     ],
                   ),
                 ),

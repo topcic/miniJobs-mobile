@@ -8,7 +8,6 @@ import '../../providers/user_provider.dart';
 import '../../services/notification.service.dart';
 import 'package:provider/provider.dart';
 
-import '../auth/login_sign_up_page.dart';
 
 class UserChangePassword extends StatefulWidget {
   const UserChangePassword({super.key});
@@ -49,7 +48,7 @@ class _UserChangePasswordState extends State<UserChangePassword> {
   }
   Future<void> handleChangePassword(String password, String code) async{
     try {
-      UserChangePasswordRequest request=new UserChangePasswordRequest(code,password);
+      UserChangePasswordRequest request=UserChangePasswordRequest(code,password);
       // Call the forgotPassword method
       bool? result = await _userProvider.changePassword(request);
 
