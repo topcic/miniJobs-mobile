@@ -71,7 +71,7 @@ Expanded textFieldReadOnly(String name, String label) {
 }
 
 Widget Spinner() {
-  return SpinKitRing(
+  return const SpinKitRing(
     color: Colors.blue,
     lineWidth: 4,
     size: 50,

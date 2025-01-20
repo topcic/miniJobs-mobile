@@ -7,7 +7,7 @@ part of 'job_type.dart';
 // **************************************************************************
 
 JobType _$JobTypeFromJson(Map<String, dynamic> json) => JobType(
-      json['id'] as int?,
+      (json['id'] as num?)?.toInt(),
       json['name'] as String?,
     );
 

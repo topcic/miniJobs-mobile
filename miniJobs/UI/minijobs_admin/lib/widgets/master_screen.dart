@@ -1,87 +1,84 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:minijobs_admin/pages/company_employer_signup.page.dart';
 import 'package:minijobs_admin/pages/home_page.dart';
 import 'package:minijobs_admin/pages/users.dart';
 
-// ignore: must_be_immutable
 class MasterScreenWidget extends StatefulWidget {
-  Widget? child;
-  String title;
-  MasterScreenWidget({required this.title, this.child, Key? key})
-      : super(key: key);
+  final String title;
+
+  const MasterScreenWidget({required this.title, Key? key}) : super(key: key);
 
   @override
   State<MasterScreenWidget> createState() => _MasterScreenWidgetState();
 }
 
 class _MasterScreenWidgetState extends State<MasterScreenWidget> {
+  int _selectedIndex = 0;
+
+  final List<Widget> _pages = [
+    const HomePage(),
+    const UsersPage(),
+    const UsersPage(), // Replace with Applicants Page
+    const UsersPage(), // Replace with Employers Page
+    const UsersPage(), // Replace with Jobs Page
+  ];
+
+  final List<String> _titles = [
+    'Kontrolna ploča',
+    'Korisnici',
+    'Aplikanti',
+    'Poslodavci',
+    'Poslovi',
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(_titles[_selectedIndex]),
       ),
-      drawer: Drawer(
-          child: ListView(
+      body: Row(
         children: [
-          DrawerHeader(
-            child: Image.asset(
-              "assets/images/logo.png",
-              height: 180,
-              width: 180,
-            ),
+          // Sidebar
+          NavigationRail(
+            selectedIndex: _selectedIndex,
+            onDestinationSelected: _onItemTapped,
+            labelType: NavigationRailLabelType.all,
+            destinations: [
+              NavigationRailDestination(
+                icon: const FaIcon(FontAwesomeIcons.home),
+                label: const Text('Kontrolna ploča'),
+              ),
+              NavigationRailDestination(
+                icon: const FaIcon(FontAwesomeIcons.users),
+                label: const Text('Korisnici'),
+              ),
+              NavigationRailDestination(
+                icon: const FaIcon(FontAwesomeIcons.usersCog),
+                label: const Text('Aplikanti'),
+              ),
+              NavigationRailDestination(
+                icon: const FaIcon(FontAwesomeIcons.building),
+                label: const Text('Poslodavci'),
+              ),
+              NavigationRailDestination(
+                icon: const FaIcon(FontAwesomeIcons.suitcase),
+                label: const Text('Poslovi'),
+              ),
+            ],
           ),
-          ListTile(
-            leading: FaIcon(FontAwesomeIcons.home),
-            title: Text("Kontrolna ploča"),
-            onTap: () {
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) =>  HomePage()));
-            },
+          // Main Content
+          Expanded(
+            child: _pages[_selectedIndex],
           ),
-          ListTile(
-            leading: FaIcon(FontAwesomeIcons.users),
-            title: Text("Korisnici"),
-            onTap: () {
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const UsersPage()));
-            },
-          ),
-          ListTile(
-            leading: FaIcon(FontAwesomeIcons.usersCog),
-            title: Text("Aplikanti"),
-            onTap: () {
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const UsersPage()));
-            },
-          ),
-          ListTile(
-            leading: FaIcon(FontAwesomeIcons.building),
-            title: Text("Poslodavci"),
-            onTap: () {
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const UsersPage()));
-            },
-          ),
-          ListTile(
-            leading: FaIcon(FontAwesomeIcons.suitcase),
-            title: Text("Poslovi"),
-            onTap: () {
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const UsersPage()));
-            },
-          ),
-          ListTile(
-            title: Text("Korisnici 4"),
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const CompanyEmployerSignupPage()));
-            },
-          )
         ],
-      )),
-      body: widget.child,
+      ),
     );
   }
 }

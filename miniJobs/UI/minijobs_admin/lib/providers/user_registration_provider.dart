@@ -1,4 +1,4 @@
-import 'package:minijobs_admin/models/user_registration_response.dart';
+import 'package:minijobs_admin/models/user/user_registration_response.dart';
 import 'package:minijobs_admin/providers/base_provider.dart';
 
 class UserRegistrationProvider extends BaseProvider<UserRegistrationResponse> {

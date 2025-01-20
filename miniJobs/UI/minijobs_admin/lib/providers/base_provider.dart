@@ -1,47 +1,69 @@
+
 import 'dart:convert';
-import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:minijobs_admin/models/search_result.dart';
+
+import '../services/notification.service.dart';
 
 abstract class BaseProvider<T> with ChangeNotifier {
   static String? _baseUrl;
   String _endpoint = "";
   final GetStorage _getStorage = GetStorage();
-  late final Dio _dio; // Declare _dio as late
+  final notificationService = NotificationService();
+  late final Dio _dio;
 
   BaseProvider(String endpoint) {
     _endpoint = endpoint;
-    _baseUrl = const String.fromEnvironment("baseUrl",
-        defaultValue: "https://localhost:44331/api/");
+    _baseUrl = const String.fromEnvironment(//10.0.2.2 //http://localhost:5020/
+      "baseUrl",
+      defaultValue: "http://localhost:5020/api/",
+    );
+
     _dio = Dio(BaseOptions(
       baseUrl: _baseUrl!,
       responseType: ResponseType.json,
-      contentType: "application/json",
+      contentType: "application/json"
     ));
+    _dio.options.headers["Accept-Language"] = "bs";
 
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         options.headers["Accept"] = "application/json";
+        options.headers["Accept-Language"] = "bs";
         String? token = _getStorage.read('accessToken');
+        print("Access Token in onRequest: $token"); // Debug statement
         if (token != null) {
-          options.headers["Authorization"] = "Bearer " + token;
+          options.headers["Authorization"] = "Bearer $token";
+          print("Authorization Header Set: Bearer $token"); // Debug statement
         }
-        return handler.next(options);
+        handler.next(options); // ensure the request continues
       },
       onError: (error, handler) async {
         if (error.response?.statusCode == 401) {
           final newAccessToken = await refreshToken();
           if (newAccessToken != null) {
-            _dio.options.headers["Authorization"] = "Bearer " + newAccessToken;
-            return handler.resolve(await _dio.fetch(error.requestOptions));
+            // Retry the failed request with new access token
+            final opts = error.requestOptions;
+            opts.headers["Authorization"] = "Bearer $newAccessToken";
+            final cloneReq = await _dio.request(
+              opts.path,
+              options: Options(
+                method: opts.method,
+                headers: opts.headers,
+              ),
+              data: opts.data,
+              queryParameters: opts.queryParameters,
+            );
+            return handler.resolve(cloneReq);
           }
         }
-        return handler.next(error);
+        handler.next(error);
       },
     ));
   }
+
+  Dio get dio => _dio;
 
   Future<String?> refreshToken() async {
     try {
@@ -52,63 +74,40 @@ abstract class BaseProvider<T> with ChangeNotifier {
       };
       var response = await _dio.post('tokens', data: refreshTokenRequest);
       final newAccessToken = response.data['accessToken'];
-      GetStorage().write('accessToken', newAccessToken);
+      _getStorage.write('accessToken', newAccessToken);
       return newAccessToken;
     } catch (err) {
       _getStorage.erase();
-// Get.offAllNamed(Route.login);
+      // Get.offAllNamed(Route.login);
     }
     return null;
   }
 
-  Future<SearchResult<T>> search({dynamic filter}) async {
-    //var url = "https://localhost:44343/api/users/search?SearchText=&Limit=10&Offset=0&SortBy=&SortOrder=0";
-    try {
-      _endpoint =
-          "users/search?SearchText=&Limit=10&Offset=0&SortBy=&SortOrder=0";
-      var url = _endpoint;
-      if (filter != null) {
-        var queryString = getQueryString(filter);
-        url = "$url?$queryString";
-      }
-
-      var response = await _dio.get(url);
-
-      var data = jsonDecode(response.data);
-
-      var result = SearchResult<T>();
-
-      result.count = data['count'];
-
-      for (var item in data['result']) {
-        result.result?.add(fromJson(item));
-      }
-
-      return result;
-    } on DioException catch (err) {
-      throw new Exception(err.message);
-    }
-  }
-
-  Future<List<T>> get() async {
+  Future<List<T>> getAll() async {
     try {
       var response = await _dio.get(_endpoint);
-      // List<dynamic> responseData = response.data;
-      // List<T> dataList = responseData.map((item) => fromJson(item)).toList();
-
-      // return dataList;
       List<dynamic> responseData = response.data;
       List<T> dataList = responseData.map((item) => fromJson(item)).toList();
-
       return dataList;
     } catch (err) {
       throw Exception(err.toString());
     }
   }
 
-  Future<T> insert(dynamic request) async {
+  Future<T> get(int id) async {
+    try {
+      var url = "$_endpoint/$id";
+      var response = await _dio.get(url);
+      return fromJson(response.data);
+    } catch (err) {
+      throw Exception(err.toString());
+    }
+  }
+
+  Future<T?> insert(dynamic request) async {
     var jsonRequest = jsonEncode(request);
     var response = await _dio.post(_endpoint, data: jsonRequest);
+    notificationService.success("Uspješno ste dodali.");
     return fromJson(response.data);
   }
 
@@ -116,9 +115,19 @@ abstract class BaseProvider<T> with ChangeNotifier {
     var url = "$_endpoint/$id";
     var jsonRequest = jsonEncode(request);
     var response = await _dio.put(url, data: jsonRequest);
+    notificationService.success("Uspješno ste spasili promjene.");
     return fromJson(response.data);
   }
 
+  Future<void> delete(int id) async {
+    try {
+      var url = "$_endpoint/$id";
+      await _dio.delete(url);
+      notificationService.success("Uspješno ste izbrisali.");
+    } catch (err) {
+      throw Exception(err.toString());
+    }
+  }
   T fromJson(data) {
     throw Exception("Method not implemented");
   }
@@ -134,8 +143,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
     return headers;
   }
 
-  String getQueryString(Map params,
-      {String prefix = '&', bool inRecursion = false}) {
+  String getQueryString(Map params, {String prefix = '&', bool inRecursion = false}) {
     String query = '';
     params.forEach((key, value) {
       if (inRecursion) {
@@ -154,12 +162,11 @@ abstract class BaseProvider<T> with ChangeNotifier {
         }
         query += '$prefix$key=$encoded';
       } else if (value is DateTime) {
-        query += '$prefix$key=${(value as DateTime).toIso8601String()}';
+        query += '$prefix$key=${(value).toIso8601String()}';
       } else if (value is List || value is Map) {
         if (value is List) value = value.asMap();
         value.forEach((k, v) {
-          query +=
-              getQueryString({k: v}, prefix: '$prefix$key', inRecursion: true);
+          query += getQueryString({k: v}, prefix: '$prefix$key', inRecursion: true);
         });
       }
     });
@@ -167,4 +174,30 @@ abstract class BaseProvider<T> with ChangeNotifier {
   }
 
   String get baseUrl => _baseUrl!;
+  void handleError(Object err) {
+    if (err is DioException) {
+      if (err.response != null) {
+        notificationService.error(err.response!.data,lifeTime:4);
+      }
+    }
+  }
+  Map<String, dynamic> buildHttpParams(Map<String, dynamic> data) {
+    final Map<String, dynamic> queryParams = {};
+
+    data.forEach((key, value) {
+      if (value is DateTime) {
+        // Convert DateTime to ISO string
+        queryParams[key] = value.toIso8601String();
+      } else if (value is List) {
+        // Append each value in the list
+        queryParams[key] = value.join(',');
+      } else {
+        // Add other types directly
+        queryParams[key] = value;
+      }
+    });
+
+    return queryParams;
+  }
 }
+
