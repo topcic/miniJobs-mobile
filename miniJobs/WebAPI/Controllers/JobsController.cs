@@ -1,8 +1,11 @@
-﻿using Application.Jobs.Commands;
+﻿using Application.Common.Models;
+using Application.Jobs.Commands;
 using Application.Jobs.Models;
 using Application.Jobs.Queries;
 using Application.Users.Models;
 using Domain.Entities;
+using Domain.Interfaces;
+using Infrastructure.Persistence.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +14,24 @@ namespace WebAPI.Controllers;
 
 [Route("api/jobs")]
 [Authorize]
-public class JobsController(IMediator mediator) : ControllerBase
+public class JobsController(IMediator mediator, IJobRepository
+     jobRepository) : ControllerBase
 {
     private readonly IMediator mediator = mediator;
 
+    [HttpGet("public-search")]
+    [Authorize(Roles = "Administrator")]
+    [ProducesResponseType(typeof(SearchResponseBase<Job>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> SearchAsync([FromQuery] Dictionary<string, string> parammeters)
+    {
+        var results = new SearchResponseBase<Job>();
+
+        results.Result = await jobRepository.FindPaginationAsync(parammeters);
+        results.Count = await jobRepository.CountAsync(parammeters);
+        return Ok(results);
+    }
     [HttpPost("")]
     [Authorize(Roles = "Employer")]
     [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]

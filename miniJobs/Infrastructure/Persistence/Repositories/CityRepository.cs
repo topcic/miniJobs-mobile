@@ -1,5 +1,7 @@
-﻿namespace Infrastructure.Persistence.Repositories;
+﻿using AutoMapper;
 
-public class CityRepository(ApplicationDbContext context) : GenericRepository<City, int, ApplicationDbContext>(context), ICityRepository
+namespace Infrastructure.Persistence.Repositories;
+
+public class CityRepository(ApplicationDbContext context, IMapper mapper) : GenericRepository<City, int, ApplicationDbContext>(context, mapper), ICityRepository
 {
 }

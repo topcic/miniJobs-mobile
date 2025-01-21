@@ -1,7 +1,8 @@
-﻿using System.Linq.Expressions;
+﻿using AutoMapper;
+using System.Linq.Expressions;
 
 namespace Infrastructure.Persistence.Repositories;
-public class TokenRepository(ApplicationDbContext context) : GenericRepository<RefreshToken, string, ApplicationDbContext>(context), ITokenRepository
+public class TokenRepository(ApplicationDbContext context, IMapper mapper) : GenericRepository<RefreshToken, string, ApplicationDbContext>(context, mapper), ITokenRepository
 {
     private ApplicationDbContext context = context;
     protected readonly DbSet<RefreshToken> dbSet = context.Set<RefreshToken>();

@@ -43,5 +43,9 @@ public interface IRepositoryBase<T> where T : IEntity<int>
     /// </summary>
     /// <param name="predicate">Predicate expression</param>
     /// <returns></returns>
-    Task<T> FindOneAsync(Expression<Func<T, bool>> predicate); 
+    Task<T> FindOneAsync(Expression<Func<T, bool>> predicate);
+
+    Task<int> CountAsync(Dictionary<string, string> parameters = null);
+
+    Task<IEnumerable<T>> FindPaginationAsync(Dictionary<string, string> parameters = null);
 }

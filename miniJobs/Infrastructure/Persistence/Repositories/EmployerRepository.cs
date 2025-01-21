@@ -1,9 +1,10 @@
-﻿using Domain.Dtos;
+﻿using AutoMapper;
+using Domain.Dtos;
 using Domain.Enums;
 
 namespace Infrastructure.Persistence.Repositories;
 
-public class EmployerRepository(ApplicationDbContext _context) : GenericRepository<Employer, int, ApplicationDbContext>(_context), IEmployerRepository
+public class EmployerRepository(ApplicationDbContext _context, IMapper mapper) : GenericRepository<Employer, int, ApplicationDbContext>(_context, mapper), IEmployerRepository
 {
     public async  Task<IEnumerable<Job>> GetActiveJobs(int userId, int requestedBy)
     {

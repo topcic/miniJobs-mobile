@@ -1,9 +1,10 @@
 ﻿
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories;
 
-public class QuestionRepository(ApplicationDbContext context) : GenericRepository<Question, int, ApplicationDbContext>(context), IQuestionRepository
+public class QuestionRepository(ApplicationDbContext context, IMapper mapper) : GenericRepository<Question, int, ApplicationDbContext>(context, mapper), IQuestionRepository
 {
     public IEnumerable<ProposedAnswer> GetAnswersForQuestion(string questionName)
     {

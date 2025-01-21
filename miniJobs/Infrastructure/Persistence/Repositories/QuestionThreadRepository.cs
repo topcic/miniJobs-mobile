@@ -1,5 +1,7 @@
-﻿namespace Infrastructure.Persistence.Repositories;
+﻿using AutoMapper;
 
-public class QuestionThreadRepository(ApplicationDbContext context) : GenericRepository<QuestionThread, int, ApplicationDbContext>(context), IQuestionThreadRepository
+namespace Infrastructure.Persistence.Repositories;
+
+public class QuestionThreadRepository(ApplicationDbContext context, IMapper mapper) : GenericRepository<QuestionThread, int, ApplicationDbContext>(context, mapper), IQuestionThreadRepository
 {
 }

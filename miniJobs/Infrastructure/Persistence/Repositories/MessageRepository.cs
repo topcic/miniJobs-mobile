@@ -1,5 +1,7 @@
-﻿namespace Infrastructure.Persistence.Repositories;
+﻿using AutoMapper;
 
-public class MessageRepository(ApplicationDbContext context) : GenericRepository<Message, int, ApplicationDbContext>(context), IMessageRepository
+namespace Infrastructure.Persistence.Repositories;
+
+public class MessageRepository(ApplicationDbContext context, IMapper mapper) : GenericRepository<Message, int, ApplicationDbContext>(context, mapper), IMessageRepository
 {
 }

@@ -1,6 +1,8 @@
-﻿namespace Infrastructure.Persistence.Repositories;
+﻿using AutoMapper;
 
-public class ProposedAnswerRepository(ApplicationDbContext context) : GenericRepository<ProposedAnswer, int, ApplicationDbContext>(context), IProposedAnswerRepository
+namespace Infrastructure.Persistence.Repositories;
+
+public class ProposedAnswerRepository(ApplicationDbContext context, IMapper mapper) : GenericRepository<ProposedAnswer, int, ApplicationDbContext>(context, mapper), IProposedAnswerRepository
 {
 }
 

@@ -1,5 +1,7 @@
-﻿namespace Infrastructure.Persistence.Repositories;
+﻿using AutoMapper;
 
-public class CantonRepository(ApplicationDbContext context) : GenericRepository<Canton, int, ApplicationDbContext>(context), ICantonRepository
+namespace Infrastructure.Persistence.Repositories;
+
+public class CantonRepository(ApplicationDbContext context, IMapper mapper) : GenericRepository<Canton, int, ApplicationDbContext>(context, mapper), ICantonRepository
 {
 }

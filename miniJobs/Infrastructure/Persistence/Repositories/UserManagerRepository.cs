@@ -1,8 +1,9 @@
-﻿using Domain.Enums;
+﻿using AutoMapper;
+using Domain.Enums;
 
 namespace Infrastructure.Persistence.Repositories;
 
-public class UserManagerRepository(ApplicationDbContext context) : GenericRepository<User, int, ApplicationDbContext>(context), IUserManagerRepository
+public class UserManagerRepository(ApplicationDbContext context, IMapper mapper) : GenericRepository<User, int, ApplicationDbContext>(context, mapper), IUserManagerRepository
 {
     private ApplicationDbContext context = context;
     protected readonly DbSet<User> dbSet = context.Set<User>();

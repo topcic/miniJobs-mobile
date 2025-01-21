@@ -1,5 +1,7 @@
-﻿namespace Infrastructure.Persistence.Repositories;
+﻿using AutoMapper;
 
-public class RatingRepository(ApplicationDbContext context) : GenericRepository<Rating, int, ApplicationDbContext>(context), IRatingRepository
+namespace Infrastructure.Persistence.Repositories;
+
+public class RatingRepository(ApplicationDbContext context, IMapper mapper) : GenericRepository<Rating, int, ApplicationDbContext>(context, mapper), IRatingRepository
 {
 }

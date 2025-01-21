@@ -1,6 +1,8 @@
-﻿namespace Infrastructure.Persistence.Repositories;
+﻿using AutoMapper;
 
-public class JobRecommendationRepository(ApplicationDbContext context) : GenericRepository<JobRecommendation, int, ApplicationDbContext>(context), IJobRecommendationRepository
+namespace Infrastructure.Persistence.Repositories;
+
+public class JobRecommendationRepository(ApplicationDbContext context, IMapper mapper) : GenericRepository<JobRecommendation, int, ApplicationDbContext>(context, mapper), IJobRecommendationRepository
 {
     private readonly ApplicationDbContext _context = context;
     public async Task<IEnumerable<User>> GetUsersByMatchingJobRecommendationsAsync(int jobId)

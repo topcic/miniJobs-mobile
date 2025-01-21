@@ -1,4 +1,5 @@
-﻿using Domain.Dtos;
+﻿using AutoMapper;
+using Domain.Dtos;
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -11,7 +12,7 @@ namespace Infrastructure.Persistence.Repositories
     {
         private readonly ApplicationDbContext _context;
 
-        public JobRepository(ApplicationDbContext context) : base(context)
+        public JobRepository(ApplicationDbContext context, IMapper mapper) : base(context, mapper)
         {
             _context = context;
         }

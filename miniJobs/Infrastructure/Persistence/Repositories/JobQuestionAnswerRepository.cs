@@ -1,5 +1,7 @@
-﻿namespace Infrastructure.Persistence.Repositories;
+﻿using AutoMapper;
 
-public class JobQuestionAnswerRepository(ApplicationDbContext context) : GenericRepository<JobQuestionAnswer, int, ApplicationDbContext>(context), IJobQuestionAnswerRepository
+namespace Infrastructure.Persistence.Repositories;
+
+public class JobQuestionAnswerRepository(ApplicationDbContext context, IMapper mapper) : GenericRepository<JobQuestionAnswer, int, ApplicationDbContext>(context, mapper), IJobQuestionAnswerRepository
 {
 }

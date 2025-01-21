@@ -1,12 +1,13 @@
 ﻿
 
+using AutoMapper;
 using Domain.Dtos;
 using Domain.Enums;
 using Microsoft.Data.SqlClient;
 
 namespace Infrastructure.Persistence.Repositories;
 
-public class ApplicantRepository(ApplicationDbContext context) : GenericRepository<Applicant, int, ApplicationDbContext>(context), IApplicantRepository
+public class ApplicantRepository(ApplicationDbContext context,IMapper mapper) : GenericRepository<Applicant, int, ApplicationDbContext>(context,mapper), IApplicantRepository
 {
     private readonly ApplicationDbContext _context = context;
 
