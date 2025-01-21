@@ -65,7 +65,7 @@ public abstract class GenericRepository<TEntity, T, TContext> : IGenericReposito
         return await DbSet.ToListAsync();
     }
 
-    public async Task<int> CountAsync(Dictionary<string, string> parameters = null)
+    public virtual async Task<int> CountAsync(Dictionary<string, string> parameters = null)
     {
         var query = DbSet.AsQueryable();
 
@@ -77,7 +77,7 @@ public abstract class GenericRepository<TEntity, T, TContext> : IGenericReposito
         return await query.CountAsync();
     }
 
-    public async Task<IEnumerable<TEntity>> FindPaginationAsync(Dictionary<string, string> parameters = null)
+    public virtual async Task<IEnumerable<TEntity>> FindPaginationAsync(Dictionary<string, string> parameters = null)
     {
         var query = DbSet.AsQueryable();
         var queryParameters = _mapper.Map<QueryParametersDto>(parameters);

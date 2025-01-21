@@ -167,7 +167,7 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
                         const Icon(Icons.star, color: Colors.yellow),
                         const SizedBox(width: 5),
                         Text(
-                          applicant?.averageRating?.toStringAsFixed(1) ?? 'N/A',
+                          applicant?.averageRating?.toStringAsFixed(1) ?? '-',
                           style: const TextStyle(
                             fontSize: 16,
                           ),

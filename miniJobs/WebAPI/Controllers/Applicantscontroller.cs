@@ -20,15 +20,15 @@ public class Applicantscontroller(IMediator mediator,IApplicantRepository applic
     private readonly IMediator mediator = mediator;
     [HttpGet("public-search")]
     [Authorize(Roles = "Administrator")]
-    [ProducesResponseType(typeof(SearchResponseBase<Applicant>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SearchResponseBase<ApplicantDTO>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> SearchAsync([FromQuery] Dictionary<string,string> parammeters)
     {
-        var results = new SearchResponseBase<Applicant>();
+        var results = new SearchResponseBase<ApplicantDTO>();
 
-        results.Result = await applicantRepository.FindPaginationAsync(parammeters);
-        results.Count = await applicantRepository.CountAsync(parammeters);
+        results.Result = await applicantRepository.PublicFindPaginationAsync(parammeters);
+        results.Count = await applicantRepository.PublicCountAsync(parammeters);
         return Ok(results);
     }
     [HttpGet("search")]

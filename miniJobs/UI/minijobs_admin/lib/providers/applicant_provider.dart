@@ -147,4 +147,23 @@ if (request.cvFile != null) {
 return null;
     }
   }
+  Future<SearchResult<Applicant>> searchPublic(Map<String, dynamic>? params) async {
+    try {
+      var url =
+          "${baseUrl}applicants/public-search";
+      final queryParameters = buildHttpParams(params ?? {});
+
+      // Make GET request
+      final response = await dio.get(url, queryParameters: queryParameters);
+      var data = response.data as Map<String, dynamic>;
+
+      var result = (data['result'] as List<dynamic>)
+          .map((item) => Applicant.fromJson(item as Map<String, dynamic>))
+          .toList();
+      var count = data['count'] as int;
+      return SearchResult<Applicant>(count, result);
+    } on DioException catch (err) {
+      throw Exception(err.message);
+    }
+  }
 }

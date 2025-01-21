@@ -154,7 +154,7 @@ class _EmployerProfilePageState extends State<EmployerProfilePage> {
                         const Icon(Icons.star, color: Colors.yellow),
                         const SizedBox(width: 5),
                         Text(
-                          employer?.averageRating?.toStringAsFixed(1) ?? 'N/A',
+                          employer?.averageRating?.toStringAsFixed(1) ?? '-',
                           style: const TextStyle(
                             fontSize: 16,
                           ),

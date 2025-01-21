@@ -1,27 +1,28 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:minijobs_admin/models/applicant/applicant.dart';
+import 'package:minijobs_admin/providers/applicant_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../models/user/user.dart';
-import '../providers/user_provider.dart';
+import 'applicant_details.page.dart';
 
-class UsersPage extends StatefulWidget {
-  const UsersPage({super.key});
+class ApplicantsView extends StatefulWidget {
+  const ApplicantsView({super.key});
 
   @override
-  _UsersPageState createState() => _UsersPageState();
+  _ApplicantsViewState createState() => _ApplicantsViewState();
 }
 
-class _UsersPageState extends State<UsersPage> {
-  late UserProvider _userProvider;
-  List<User> users = [];
+class _ApplicantsViewState extends State<ApplicantsView> {
+  late ApplicantProvider _applicantProvider;
+  List<Applicant> data = [];
   bool isLoading = true;
 
   // Pagination and filtering parameters
   Map<String, dynamic> filter = {
     'limit': 10,
     'offset': 0,
-    'sortBy': 'fullName', // Default sorting column
+    'sortBy': 'firstName', // Default sorting column
     'sortOrder': 'asc',  // Default sorting order
     'searchText': '',    // Default search text
   };
@@ -32,7 +33,7 @@ class _UsersPageState extends State<UsersPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _userProvider = context.read<UserProvider>();
+    _applicantProvider = context.read<ApplicantProvider>();
     fetchUsers();
   }
 
@@ -42,10 +43,10 @@ class _UsersPageState extends State<UsersPage> {
     });
 
     // Fetch users with the filter object
-    final result = await _userProvider.search( filter);
+    final result = await _applicantProvider.searchPublic( filter);
 
     setState(() {
-      users = result.result!;
+      data = result.result!;
       isLoading = false;
     });
   }
@@ -80,7 +81,7 @@ class _UsersPageState extends State<UsersPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Users')),
+      appBar: AppBar(title: const Text('Aplikanti')),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
@@ -90,7 +91,7 @@ class _UsersPageState extends State<UsersPage> {
             padding: const EdgeInsets.all(16.0),
             child: TextField(
               decoration: const InputDecoration(
-                hintText: 'Search by name, email, phone, or role',
+                hintText: 'Search by name, email, phone',
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(),
               ),
@@ -128,9 +129,6 @@ class _UsersPageState extends State<UsersPage> {
                         'Full Name',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      onSort: (columnIndex, ascending) {
-                        _sort('fullName', ascending);
-                      },
                     ),
                     DataColumn(
                       label: const Text(
@@ -153,15 +151,7 @@ class _UsersPageState extends State<UsersPage> {
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
-                    DataColumn(
-                      label: const Text(
-                        'Role',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      onSort: (columnIndex, ascending) {
-                        _sort('role', ascending);
-                      },
-                    ),
+
                     const DataColumn(
                       label: Text(
                         'Actions',
@@ -169,7 +159,7 @@ class _UsersPageState extends State<UsersPage> {
                       ),
                     ),
                   ],
-                  source: UsersDataSource(users, context),
+                  source: DataSource(data, context),
                 ),
               ),
             ),
@@ -181,7 +171,8 @@ class _UsersPageState extends State<UsersPage> {
 
   int _getColumnIndex(String? sortBy) {
     switch (sortBy) {
-      case 'fullName':
+      case 'firstName': // Sort by firstName or lastName combined
+      case 'lastName':
         return 0;
       case 'email':
         return 1;
@@ -193,39 +184,37 @@ class _UsersPageState extends State<UsersPage> {
   }
 }
 
-class UsersDataSource extends DataTableSource {
-  final List<User> users;
+class DataSource extends DataTableSource {
+  final List<Applicant> applicants;
   final BuildContext context;
 
-  UsersDataSource(this.users, this.context);
+  DataSource(this.applicants, this.context);
 
   @override
   DataRow getRow(int index) {
-    if (index >= users.length) return null as DataRow;
+    if (index >= applicants.length) return null as DataRow;
 
-    final user = users[index];
+    final user = applicants[index];
+    final fullName = '${user.firstName ?? ''} ${user.lastName ?? ''}'.trim();
+
     return DataRow.byIndex(
       index: index,
       cells: [
-        DataCell(Text(user.fullName ?? '-')),
+        DataCell(Text(fullName.isNotEmpty ? fullName : '-')),
         DataCell(Text(user.email ?? '-')),
         DataCell(Text(user.phoneNumber ?? '-')),
         DataCell(
           Row(
             children: [
               Icon(
-                user.accountConfirmed == true
-                    ? Icons.check_circle
-                    : Icons.cancel,
-                color:
-                user.accountConfirmed == true ? Colors.green : Colors.red,
+                user.accountConfirmed == true ? Icons.check_circle : Icons.cancel,
+                color: user.accountConfirmed == true ? Colors.green : Colors.red,
               ),
               const SizedBox(width: 4),
               Text(user.accountConfirmed == true ? 'Yes' : 'No'),
             ],
           ),
         ),
-        DataCell(Text(user.role ?? '-')),
         DataCell(
           Row(
             children: [
@@ -233,6 +222,12 @@ class UsersDataSource extends DataTableSource {
                 icon: const Icon(Icons.edit, color: Colors.blue),
                 tooltip: 'Edit User',
                 onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ApplicantDetailsPage(applicant: applicants[index]),
+                    ),
+                  );
                   // Navigate to edit user page
                 },
               ),
@@ -254,17 +249,17 @@ class UsersDataSource extends DataTableSource {
   bool get isRowCountApproximate => false;
 
   @override
-  int get rowCount => users.length;
+  int get rowCount => applicants.length;
 
   @override
   int get selectedRowCount => 0;
 
-  void _showDeleteConfirmation(BuildContext context, User user) {
+  void _showDeleteConfirmation(BuildContext context, Applicant applicant) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete User'),
-        content: Text('Are you sure you want to delete ${user.fullName}?'),
+        content: Text('Are you sure you want to delete ${applicant.fullName}?'),
         actions: [
           TextButton(
             child: const Text('Cancel'),

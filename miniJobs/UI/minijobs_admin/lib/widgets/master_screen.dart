@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:minijobs_admin/pages/applicants/applicants_view.dart';
 import 'package:minijobs_admin/pages/home_page.dart';
 import 'package:minijobs_admin/pages/users.dart';
 
@@ -18,7 +19,7 @@ class _MasterScreenWidgetState extends State<MasterScreenWidget> {
   final List<Widget> _pages = [
     const HomePage(),
     const UsersPage(),
-    const UsersPage(), // Replace with Applicants Page
+    const ApplicantsView(), // Replace with Applicants Page
     const UsersPage(), // Replace with Employers Page
     const UsersPage(), // Replace with Jobs Page
   ];
