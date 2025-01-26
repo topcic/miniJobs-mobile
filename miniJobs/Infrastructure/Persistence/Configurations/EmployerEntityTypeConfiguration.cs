@@ -6,6 +6,10 @@ public class EmployerEntityTypeConfiguration : IEntityTypeConfiguration<Employer
 {
     public void Configure(EntityTypeBuilder<Employer> builder)
     {
-        builder.HasOne<User>().WithOne().HasForeignKey<Employer>(x => x.Id).OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(e => e.User) // Specify the navigation property explicitly
+            .WithOne()
+            .HasForeignKey<Employer>(e => e.Id) // Use the Employer.Id as the foreign key to User
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:minijobs_admin/models/employer/employer.dart';
 import 'package:minijobs_admin/models/job/job.dart';
 import 'package:minijobs_admin/providers/base_provider.dart';
 import '../models/employer/employer_save_request.dart';
+import '../models/search_result.dart';
 
 class EmployerProvider extends BaseProvider<Employer> {
   EmployerProvider() : super("employers");
@@ -45,5 +47,25 @@ class EmployerProvider extends BaseProvider<Employer> {
     var response = await dio.put(url, data: jsonEncode(jsonRequest)); // Make sure to encode JSON
 
     return fromJson(response.data);
+  }
+
+  Future<SearchResult<Employer>> searchPublic(Map<String, dynamic>? params) async {
+    try {
+      var url =
+          "${baseUrl}employers/public-search";
+      final queryParameters = buildHttpParams(params ?? {});
+
+      // Make GET request
+      final response = await dio.get(url, queryParameters: queryParameters);
+      var data = response.data as Map<String, dynamic>;
+
+      var result = (data['result'] as List<dynamic>)
+          .map((item) => Employer.fromJson(item as Map<String, dynamic>))
+          .toList();
+      var count = data['count'] as int;
+      return SearchResult<Employer>(count, result);
+    } on DioException catch (err) {
+      throw Exception(err.message);
+    }
   }
 }

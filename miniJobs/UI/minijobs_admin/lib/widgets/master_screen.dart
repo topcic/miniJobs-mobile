@@ -4,6 +4,8 @@ import 'package:minijobs_admin/pages/applicants/applicants_view.dart';
 import 'package:minijobs_admin/pages/home_page.dart';
 import 'package:minijobs_admin/pages/users.dart';
 
+import '../pages/employers/employers_view.dart';
+
 class MasterScreenWidget extends StatefulWidget {
   final String title;
 
@@ -20,7 +22,7 @@ class _MasterScreenWidgetState extends State<MasterScreenWidget> {
     const HomePage(),
     const UsersPage(),
     const ApplicantsView(), // Replace with Applicants Page
-    const UsersPage(), // Replace with Employers Page
+    const EmployersView(), // Replace with Employers Page
     const UsersPage(), // Replace with Jobs Page
   ];
 

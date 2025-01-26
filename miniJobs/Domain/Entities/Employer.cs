@@ -21,6 +21,5 @@ public class Employer : IEntity<int>
     [Column("street_address_and_number")]
     public string? StreetAddressAndNumber { get; set; }
 
-    [NotMapped]
-    public User User { get; set; }
+    public virtual User User { get; set; }
 }

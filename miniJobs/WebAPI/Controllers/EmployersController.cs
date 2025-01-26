@@ -4,9 +4,9 @@ using Application.Employers.Models;
 using Application.Employers.Queries;
 using Application.Jobs.Queries;
 using Application.Users.Models;
+using Domain.Dtos;
 using Domain.Entities;
 using Domain.Interfaces;
-using Infrastructure.Persistence.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,15 +20,15 @@ public class EmployersController(IMediator mediator,IEmployerRepository employer
     private readonly IMediator mediator = mediator;
     [HttpGet("public-search")]
     [Authorize(Roles = "Administrator")]
-    [ProducesResponseType(typeof(SearchResponseBase<Employer>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SearchResponseBase<EmployerDTO>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> SearchAsync([FromQuery] Dictionary<string, string> parammeters)
     {
-        var results = new SearchResponseBase<Employer>();
+        var results = new SearchResponseBase<EmployerDTO>();
 
-        results.Result = await employerRepository.FindPaginationAsync(parammeters);
-        results.Count = await employerRepository.CountAsync(parammeters);
+        results.Result = await employerRepository.PublicFindPaginationAsync(parammeters);
+        results.Count = await employerRepository.PublicCountAsync(parammeters);
         return Ok(results);
     }
     [HttpPost]
