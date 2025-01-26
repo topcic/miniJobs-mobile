@@ -124,4 +124,15 @@ class UserProvider extends BaseProvider<User> {
       throw Exception(err.message);
     }
   }
+
+  Future<void> activate(int id) async {
+    try {
+      var url =
+          "${baseUrl}users/${id}/activate";
+      await dio.patch(url);
+      notificationService.success("Uspješno ste aktivirali.");
+    } catch (err) {
+      throw Exception(err.toString());
+    }
+  }
 }

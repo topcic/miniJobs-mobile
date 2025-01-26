@@ -2,8 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:minijobs_admin/models/applicant/applicant.dart';
 import 'package:minijobs_admin/providers/applicant_provider.dart';
+import 'package:minijobs_admin/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../../services/notification.service.dart';
+import '../../widgets/badges.dart';
 import 'applicant_details.page.dart';
 
 class ApplicantsView extends StatefulWidget {
@@ -15,9 +18,9 @@ class ApplicantsView extends StatefulWidget {
 
 class _ApplicantsViewState extends State<ApplicantsView> {
   late ApplicantProvider _applicantProvider;
+  late UserProvider userProvider;
   List<Applicant> data = [];
   bool isLoading = true;
-
   // Pagination and filtering parameters
   Map<String, dynamic> filter = {
     'limit': 10,
@@ -34,6 +37,7 @@ class _ApplicantsViewState extends State<ApplicantsView> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _applicantProvider = context.read<ApplicantProvider>();
+    userProvider = context.read<UserProvider>();
     fetchUsers();
   }
 
@@ -50,7 +54,21 @@ class _ApplicantsViewState extends State<ApplicantsView> {
       isLoading = false;
     });
   }
+  Future<void> blockUser(int userId) async {
+    await userProvider.delete(userId);
+   final userIndex = data.indexWhere((user) => user.id == userId);
+      setState(() {
+        data[userIndex].deleted = true;
+      });
+  }
 
+  Future<void> activateUser(int userId) async {
+    await userProvider.activate(userId);
+    final userIndex = data.indexWhere((user) => user.id == userId);
+    setState(() {
+      data[userIndex].deleted = false;
+    });
+  }
   void _debouncedSearch(String keyword) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
@@ -91,7 +109,7 @@ class _ApplicantsViewState extends State<ApplicantsView> {
             padding: const EdgeInsets.all(16.0),
             child: TextField(
               decoration: const InputDecoration(
-                hintText: 'Search by name, email, phone',
+                hintText: 'Pretraži',
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(),
               ),
@@ -107,10 +125,6 @@ class _ApplicantsViewState extends State<ApplicantsView> {
               child: SizedBox(
                 width: MediaQuery.of(context).size.width, // Make table occupy full width
                 child: PaginatedDataTable(
-                  header: const Text(
-                    'User List',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
                   rowsPerPage: filter['limit'],
                   availableRowsPerPage: const [10, 20, 50],
                   onRowsPerPageChanged: (rows) {
@@ -124,9 +138,15 @@ class _ApplicantsViewState extends State<ApplicantsView> {
                   sortColumnIndex: _getColumnIndex(filter['sortBy']),
                   sortAscending: filter['sortOrder'] == 'asc',
                   columns: [
+                    const DataColumn(
+                      label: Text(
+                        'Akcije',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
                     DataColumn(
                       label: const Text(
-                        'Full Name',
+                        'Ime i prezime',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -141,25 +161,18 @@ class _ApplicantsViewState extends State<ApplicantsView> {
                     ),
                     DataColumn(
                       label: const Text(
-                        'Phone Number',
+                        'Broj telefona',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                     DataColumn(
                       label: const Text(
-                        'Email Confirmed',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-
-                    const DataColumn(
-                      label: Text(
-                        'Actions',
+                        'Status',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
-                  source: DataSource(data, context),
+                  source: DataSource(data, context, blockUser, activateUser),
                 ),
               ),
             ),
@@ -183,12 +196,13 @@ class _ApplicantsViewState extends State<ApplicantsView> {
     }
   }
 }
-
 class DataSource extends DataTableSource {
   final List<Applicant> applicants;
   final BuildContext context;
+  final Function(int) blockUser;
+  final Function(int) activateUser;
 
-  DataSource(this.applicants, this.context);
+  DataSource(this.applicants, this.context, this.blockUser, this.activateUser);
 
   @override
   DataRow getRow(int index) {
@@ -200,47 +214,54 @@ class DataSource extends DataTableSource {
     return DataRow.byIndex(
       index: index,
       cells: [
-        DataCell(Text(fullName.isNotEmpty ? fullName : '-')),
-        DataCell(Text(user.email ?? '-')),
-        DataCell(Text(user.phoneNumber ?? '-')),
-        DataCell(
-          Row(
-            children: [
-              Icon(
-                user.accountConfirmed == true ? Icons.check_circle : Icons.cancel,
-                color: user.accountConfirmed == true ? Colors.green : Colors.red,
-              ),
-              const SizedBox(width: 4),
-              Text(user.accountConfirmed == true ? 'Yes' : 'No'),
-            ],
-          ),
-        ),
         DataCell(
           Row(
             children: [
               IconButton(
                 icon: const Icon(Icons.edit, color: Colors.blue),
-                tooltip: 'Edit User',
+                tooltip: 'Detalji',
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ApplicantDetailsPage(applicant: applicants[index]),
+                      builder: (context) =>
+                          ApplicantDetailsPage(applicant: applicants[index]),
                     ),
                   );
-                  // Navigate to edit user page
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red),
-                tooltip: 'Delete User',
+                icon: Icon(
+                  user.deleted! ? Icons.refresh : Icons.block,
+                  color: user.deleted! ? Colors.green : Colors.red,
+                ),
+                tooltip: user.deleted! ? 'Aktiviraj' : 'Blokiraj',
                 onPressed: () {
-                  _showDeleteConfirmation(context, user);
+                  if (user.deleted!) {
+                    _showActivateConfirmation(context, user);
+                  } else {
+                    _showDeleteConfirmation(context, user);
+                  }
                 },
               ),
             ],
           ),
         ),
+        DataCell(Text(fullName.isNotEmpty ? fullName : '-')),
+        DataCell(
+          Row(
+            children: [
+              Text(user.email ?? '-'),
+              const SizedBox(width: 2),
+              Icon(
+                user.accountConfirmed == true ? Icons.check_circle : Icons.cancel,
+                color: user.accountConfirmed == true ? Colors.green : Colors.red,
+              ),
+            ],
+          ),
+        ),
+        DataCell(Text(user.phoneNumber ?? '-')),
+        DataCell(UserStatusBadge(isBlocked: user.deleted!))
       ],
     );
   }
@@ -258,17 +279,42 @@ class DataSource extends DataTableSource {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete User'),
-        content: Text('Are you sure you want to delete ${applicant.fullName}?'),
+        title: const Text('Blokiraj'),
+        content: Text(
+            'Da li ste sigurni da želite blokirati ${applicant.firstName} ${applicant.lastName}?'),
         actions: [
           TextButton(
-            child: const Text('Cancel'),
+            child: const Text('Odustani'),
             onPressed: () => Navigator.of(context).pop(),
           ),
           TextButton(
-            child: const Text('Delete'),
+            child: const Text('Blokiraj'),
             onPressed: () {
-              // Call delete API
+              blockUser(applicant.id!); // Call blockUser
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showActivateConfirmation(BuildContext context, Applicant applicant) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Aktiviraj'),
+        content: Text(
+            'Da li ste sigurni da želite aktivirati ${applicant.firstName} ${applicant.lastName}?'),
+        actions: [
+          TextButton(
+            child: const Text('Odustani'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          TextButton(
+            child: const Text('Aktiviraj'),
+            onPressed: () {
+              activateUser(applicant.id!); // Call activateUser
               Navigator.of(context).pop();
             },
           ),

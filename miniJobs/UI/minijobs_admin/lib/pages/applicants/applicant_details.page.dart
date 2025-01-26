@@ -1,15 +1,80 @@
 import 'package:flutter/material.dart';
-import 'package:minijobs_admin/models/applicant/applicant.dart';
+import 'package:provider/provider.dart';
+import '../../models/applicant/applicant.dart';
+import '../../providers/applicant_provider.dart';
+import '../../providers/user_provider.dart';
 import '../../utils/photo_view.dart';
 
-class ApplicantDetailsPage extends StatelessWidget {
+class ApplicantDetailsPage extends StatefulWidget {
   final Applicant applicant;
 
-  const ApplicantDetailsPage({Key? key, required this.applicant})
-      : super(key: key);
+  const ApplicantDetailsPage({Key? key, required this.applicant}) : super(key: key);
+
+  @override
+  State<ApplicantDetailsPage> createState() => _ApplicantDetailsPageState();
+}
+
+class _ApplicantDetailsPageState extends State<ApplicantDetailsPage> {
+  late ApplicantProvider _applicantProvider;
+  late UserProvider _userProvider;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _applicantProvider = context.read<ApplicantProvider>();
+    _userProvider = context.read<UserProvider>();
+    fetchUsers();
+  }
+
+  Future<void> fetchUsers() async {
+    // Add logic to fetch user-specific data if required
+  }
+
+  Future<void> blockUser() async {
+    await _userProvider.delete(widget.applicant.id!);
+    setState(() {
+      widget.applicant.deleted = true;
+    });
+  }
+
+  Future<void> activateUser() async {
+    await _userProvider.activate(widget.applicant.id!);
+    setState(() {
+      widget.applicant.deleted = false;
+    });
+  }
+
+  void _showConfirmationDialog({
+    required BuildContext context,
+    required String title,
+    required String content,
+    required VoidCallback onConfirm,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: [
+          TextButton(
+            child: const Text('Odustani'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          TextButton(
+            child: const Text('Potvrdi'),
+            onPressed: () {
+              onConfirm();
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final applicant = widget.applicant;
     return Scaffold(
       appBar: AppBar(
         title: Text('${applicant.firstName} ${applicant.lastName}'),
@@ -18,7 +83,6 @@ class ApplicantDetailsPage extends StatelessWidget {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final isSmallScreen = constraints.maxWidth < 800;
-
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: isSmallScreen
@@ -44,6 +108,8 @@ class ApplicantDetailsPage extends StatelessWidget {
   }
 
   Widget _buildApplicantDetailsCard(BuildContext parentContext) {
+    final applicant = widget.applicant;
+
     return Card(
       elevation: 6,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -69,20 +135,45 @@ class ApplicantDetailsPage extends StatelessWidget {
             _detailRow('Email:', applicant.email ?? '-'),
             _detailRow('Broj telefona:', applicant.phoneNumber ?? '-'),
             _detailRow('Grad:', applicant.city?.name ?? '-'),
-            _detailRow('Uloga:', applicant.role ?? '-'),
             _detailRow('Račun potvrđen:', applicant.accountConfirmed == true ? 'Da' : 'Ne'),
             _detailRow('Broj završenih poslova:', applicant.numberOfFinishedJobs?.toString() ?? '0'),
             _detailRow('Prosječna ocjena:', applicant.averageRating?.toString() ?? '-'),
             const SizedBox(height: 16),
             Center(
               child: ElevatedButton.icon(
-                onPressed: () => _showBlockConfirmation(parentContext),
+                onPressed: () {
+                  if (applicant.deleted!) {
+                    _showConfirmationDialog(
+                      context: context,
+                      title: 'Aktiviraj',
+                      content:
+                      'Da li ste sigurni da želite aktivirati ${applicant.firstName} ${applicant.lastName}?',
+                      onConfirm: activateUser,
+                    );
+                  } else {
+                    _showConfirmationDialog(
+                      context: context,
+                      title: 'Blokiraj',
+                      content:
+                      'Da li ste sigurni da želite blokirati ${applicant.firstName} ${applicant.lastName}?',
+                      onConfirm: blockUser,
+                    );
+                  }
+                },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: applicant.deleted!
+                      ? Colors.greenAccent[700]
+                      : Colors.redAccent[700],
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
-                icon: const Icon(Icons.block),
-                label: const Text('Blokiraj korisnika'),
+                icon: Icon(
+                  applicant.deleted! ? Icons.refresh : Icons.block,
+                  color: Colors.white,
+                ),
+                label: Text(
+                  applicant.deleted! ? 'Aktiviraj korisnika' : 'Blokiraj korisnika',
+                  style: const TextStyle(color: Colors.white),
+                ),
               ),
             ),
           ],
@@ -92,6 +183,8 @@ class ApplicantDetailsPage extends StatelessWidget {
   }
 
   Widget _buildAdditionalDetailsCard() {
+    final applicant = widget.applicant;
+
     return Card(
       elevation: 6,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -115,7 +208,7 @@ class ApplicantDetailsPage extends StatelessWidget {
             ),
             const Divider(),
             SizedBox(
-              height: 200, // Limit list height
+              height: 200,
               child: ListView.builder(
                 itemCount: applicant.jobTypes?.length ?? 0,
                 itemBuilder: (context, index) {
@@ -149,10 +242,7 @@ class ApplicantDetailsPage extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
+          Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -160,29 +250,6 @@ class ApplicantDetailsPage extends StatelessWidget {
               style: const TextStyle(color: Colors.grey),
               softWrap: true,
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showBlockConfirmation(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Blokiraj korisnika'),
-        content: const Text('Da li ste sigurni da želite blokirati ovog korisnika?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Otkaži'),
-          ),
-          TextButton(
-            onPressed: () {
-              // Add block functionality
-              Navigator.of(context).pop();
-            },
-            child: const Text('Blokiraj', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

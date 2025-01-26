@@ -218,3 +218,25 @@ class ApplicationActions extends StatelessWidget {
     }
   }
 }
+class UserStatusBadge extends StatelessWidget {
+  final bool isBlocked;
+
+  const UserStatusBadge({
+    required this.isBlocked,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Determine text and colors based on the user's blocked status
+    final statusText = isBlocked ? 'Blokiran' : 'Aktivan';
+    final backgroundColor = isBlocked ? Colors.red[100]! : Colors.green[100]!;
+    final textColor = isBlocked ? Colors.red[800]! : Colors.green[800]!;
+
+    return Badge(
+      text: statusText,
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+    );
+  }
+}

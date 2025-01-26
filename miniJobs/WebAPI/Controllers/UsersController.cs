@@ -3,6 +3,7 @@ using Application.Users;
 using Application.Users.Commands;
 using Application.Users.Models;
 using Application.Users.Queries;
+using Application.Users.Validators;
 using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -53,7 +54,15 @@ public class UsersController(IMediator mediator) : ControllerBase
     {
         return Ok(await mediator.Send(new UserUpdatePhotoCommand(userId, photo)));
     }
-
+    [HttpPatch("{userId}/activate")]
+    [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> Activate([FromRoute] int userId)
+    {
+        return Ok(await mediator.Send(new UserActivateCommand(userId)));
+    }
+    
     [HttpGet("{userId}")]
     [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
@@ -99,5 +108,14 @@ public class UsersController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> ChangePassword([FromBody] UserChangePasswordRequest request)
     {
         return Ok(await mediator.Send(new UserChangePasswordCommand(request)));
+    }
+
+    [HttpDelete("{userId}")]
+    [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> Delete([FromRoute] int userId)
+    {
+        return Ok(await mediator.Send(new UserDeleteCommand(userId)));
     }
 }

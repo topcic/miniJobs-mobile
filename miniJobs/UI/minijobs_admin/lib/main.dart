@@ -14,6 +14,7 @@ import 'package:minijobs_admin/providers/rating_provider.dart';
 import 'package:minijobs_admin/providers/recommendation_provider.dart';
 import 'package:minijobs_admin/providers/user_registration_provider.dart';
 import 'package:minijobs_admin/providers/user_provider.dart';
+import 'package:minijobs_admin/services/notification.service.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: NotificationService.navigatorKey,
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),

@@ -177,7 +177,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
   void handleError(Object err) {
     if (err is DioException) {
       if (err.response != null) {
-        notificationService.error(err.response!.data,lifeTime:4);
+        notificationService.error(err.response!.data);
       }
     }
   }

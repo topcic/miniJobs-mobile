@@ -311,4 +311,7 @@
     <value />
     <comment>Sika je obavezno polje.</comment>
   </data>
+  <data name="CAN_NOT_ACTIVATE_ANOTHER_USER" xml:space="preserve">
+    <value>Ne možete aktivirati drugog korisnika.</value>
+  </data>
 </root>

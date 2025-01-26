@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:another_flushbar/flushbar.dart';
 
 class NotificationService {
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
   // Show a success message
   void success(String message, {int lifeTime = 3}) {
     _showNotification(message, Colors.green, lifeTime);
@@ -22,16 +24,23 @@ class NotificationService {
     _showNotification(message, Colors.red, lifeTime);
   }
 
-  // Internal function to handle displaying a toast with the specified color and lifetime
+  // Internal function to handle displaying a Flushbar with the specified color and lifetime
   void _showNotification(String message, Color backgroundColor, int lifeTime) {
-    Fluttertoast.showToast(
-      msg: message,
-      toastLength: lifeTime > 3 ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: lifeTime,
-      backgroundColor: backgroundColor,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
+    final context = navigatorKey.currentContext;
+    if (context != null) {
+      Flushbar(
+        message: message,
+        duration: Duration(seconds: lifeTime),
+        backgroundColor: backgroundColor,
+        margin: const EdgeInsets.all(8.0),
+        borderRadius: BorderRadius.circular(8.0),
+        icon: Icon(
+          Icons.info_outline,
+          color: Colors.white,
+        ),
+      )..show(context);
+    } else {
+      debugPrint('Error: No context available for NotificationService.');
+    }
   }
 }
