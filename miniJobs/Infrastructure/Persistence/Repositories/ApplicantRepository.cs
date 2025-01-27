@@ -212,9 +212,9 @@ public class ApplicantRepository(ApplicationDbContext context, IMapper mapper) :
                 "Email" => queryParameters.SortOrder == Domain.Enums.SortOrder.DESC
                     ? query.OrderByDescending(a => a.User.Email)
                     : query.OrderBy(a => a.User.Email),
-                "PhoneNumber" => queryParameters.SortOrder == Domain.Enums.SortOrder.DESC
-                    ? query.OrderByDescending(a => a.User.PhoneNumber)
-                    : query.OrderBy(a => a.User.PhoneNumber),
+                "Deleted" => queryParameters.SortOrder == Domain.Enums.SortOrder.DESC
+                    ? query.OrderByDescending(a => a.User.Deleted)
+                    : query.OrderBy(a => a.User.Deleted),
                 _ => throw new ArgumentException($"Invalid SortBy value: {queryParameters.SortBy}")
             };
         }

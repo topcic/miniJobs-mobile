@@ -1,16 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:horizontal_data_table/horizontal_data_table.dart';
 import 'package:minijobs_admin/models/applicant/applicant.dart';
 import 'package:minijobs_admin/providers/applicant_provider.dart';
 import 'package:minijobs_admin/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../../services/notification.service.dart';
 import '../../widgets/badges.dart';
 import 'applicant_details.page.dart';
 
 class ApplicantsView extends StatefulWidget {
-  const ApplicantsView({super.key});
+  const ApplicantsView({Key? key}) : super(key: key);
 
   @override
   _ApplicantsViewState createState() => _ApplicantsViewState();
@@ -21,17 +21,21 @@ class _ApplicantsViewState extends State<ApplicantsView> {
   late UserProvider userProvider;
   List<Applicant> data = [];
   bool isLoading = true;
+
   // Pagination and filtering parameters
   Map<String, dynamic> filter = {
     'limit': 10,
     'offset': 0,
-    'sortBy': 'firstName', // Default sorting column
-    'sortOrder': 'asc',  // Default sorting order
-    'searchText': '',    // Default search text
+    'sortBy': 'firstName',
+    'sortOrder': 'asc',
+    'searchText': '',
   };
 
   // Debouncing
   Timer? _debounce;
+
+  late ScrollController _verticalScrollController;
+  late ScrollController _horizontalScrollController;
 
   @override
   void didChangeDependencies() {
@@ -46,20 +50,20 @@ class _ApplicantsViewState extends State<ApplicantsView> {
       isLoading = true;
     });
 
-    // Fetch users with the filter object
-    final result = await _applicantProvider.searchPublic( filter);
+    final result = await _applicantProvider.searchPublic(filter);
 
     setState(() {
       data = result.result!;
       isLoading = false;
     });
   }
+
   Future<void> blockUser(int userId) async {
     await userProvider.delete(userId);
-   final userIndex = data.indexWhere((user) => user.id == userId);
-      setState(() {
-        data[userIndex].deleted = true;
-      });
+    final userIndex = data.indexWhere((user) => user.id == userId);
+    setState(() {
+      data[userIndex].deleted = true;
+    });
   }
 
   Future<void> activateUser(int userId) async {
@@ -69,6 +73,7 @@ class _ApplicantsViewState extends State<ApplicantsView> {
       data[userIndex].deleted = false;
     });
   }
+
   void _debouncedSearch(String keyword) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
@@ -84,7 +89,7 @@ class _ApplicantsViewState extends State<ApplicantsView> {
     setState(() {
       filter['sortBy'] = sortBy;
       filter['sortOrder'] = ascending ? 'asc' : 'desc';
-      filter['offset'] = 0; // Reset pagination on new sort
+      filter['offset'] = 0;
     });
     fetchUsers();
   }
@@ -120,61 +125,51 @@ class _ApplicantsViewState extends State<ApplicantsView> {
             ),
           ),
           Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal, // Enable horizontal scrolling
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width, // Make table occupy full width
-                child: PaginatedDataTable(
-                  rowsPerPage: filter['limit'],
-                  availableRowsPerPage: const [10, 20, 50],
-                  onRowsPerPageChanged: (rows) {
-                    setState(() {
-                      filter['limit'] = rows!;
-                      filter['offset'] = 0; // Reset pagination
-                    });
-                    fetchUsers();
-                  },
-                  onPageChanged: _changePage,
-                  sortColumnIndex: _getColumnIndex(filter['sortBy']),
-                  sortAscending: filter['sortOrder'] == 'asc',
-                  columns: [
-                    const DataColumn(
-                      label: Text(
-                        'Akcije',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    DataColumn(
-                      label: const Text(
-                        'Ime i prezime',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    DataColumn(
-                      label: const Text(
-                        'Email',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      onSort: (columnIndex, ascending) {
-                        _sort('email', ascending);
-                      },
-                    ),
-                    DataColumn(
-                      label: const Text(
-                        'Broj telefona',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    DataColumn(
-                      label: const Text(
-                        'Status',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                  source: DataSource(data, context, blockUser, activateUser),
+            child: HorizontalDataTable(
+              leftHandSideColumnWidth: 150,
+              rightHandSideColumnWidth: 800,
+              isFixedHeader: true,
+              headerWidgets: _buildHeaders(),
+              leftSideItemBuilder: (context, index) =>
+                  _buildLeftColumn(context, data[index]),
+              rightSideItemBuilder: (context, index) =>
+                  _buildRightColumn(context, data[index]),
+              itemCount: data.length,
+              rowSeparatorWidget: Divider(color: Colors.grey[300], height: 1.0),
+              onScrollControllerReady: (vertical, horizontal) {
+                _verticalScrollController = vertical;
+                _horizontalScrollController = horizontal;
+              },
+              leftHandSideColBackgroundColor: Colors.white,
+              rightHandSideColBackgroundColor: Colors.white,
+              itemExtent: 56,
+            ),
+          ),
+          // Pagination Controls
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                  onPressed: filter['offset'] > 0
+                      ? () =>
+                      _changePage(
+                          (filter['offset'] / filter['limit']).floor() - 1)
+                      : null,
+                  child: const Text('Previous'),
                 ),
-              ),
+                Text(
+                    'Page ${(filter['offset'] / filter['limit']).floor() + 1}'),
+                ElevatedButton(
+                  onPressed: (filter['offset'] + filter['limit']) < data.length
+                      ? () =>
+                      _changePage(
+                          (filter['offset'] / filter['limit']).floor() + 1)
+                      : null,
+                  child: const Text('Next'),
+                ),
+              ],
             ),
           ),
         ],
@@ -182,144 +177,98 @@ class _ApplicantsViewState extends State<ApplicantsView> {
     );
   }
 
-  int _getColumnIndex(String? sortBy) {
-    switch (sortBy) {
-      case 'firstName': // Sort by firstName or lastName combined
-      case 'lastName':
-        return 0;
-      case 'email':
-        return 1;
-      case 'role':
-        return 4;
-      default:
-        return -1;
-    }
+  List<Widget> _buildHeaders() {
+    return [
+      _buildHeaderItem('Akcije', 150),
+      _buildHeaderItem('Ime i Prezime', 200, sortable: true, sortField: 'firstName'),
+      _buildHeaderItem('Email', 300, sortable: true, sortField: 'email'),
+      _buildHeaderItem('Broj Telefona', 150,),
+      _buildHeaderItem('Status', 150, sortable: true, sortField: 'deleted'),
+    ];
   }
-}
-class DataSource extends DataTableSource {
-  final List<Applicant> applicants;
-  final BuildContext context;
-  final Function(int) blockUser;
-  final Function(int) activateUser;
 
-  DataSource(this.applicants, this.context, this.blockUser, this.activateUser);
-
-  @override
-  DataRow getRow(int index) {
-    if (index >= applicants.length) return null as DataRow;
-
-    final user = applicants[index];
-    final fullName = '${user.firstName ?? ''} ${user.lastName ?? ''}'.trim();
-
-    return DataRow.byIndex(
-      index: index,
-      cells: [
-        DataCell(
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.edit, color: Colors.blue),
-                tooltip: 'Detalji',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          ApplicantDetailsPage(applicant: applicants[index]),
-                    ),
-                  );
-                },
-              ),
-              IconButton(
-                icon: Icon(
-                  user.deleted! ? Icons.refresh : Icons.block,
-                  color: user.deleted! ? Colors.green : Colors.red,
-                ),
-                tooltip: user.deleted! ? 'Aktiviraj' : 'Blokiraj',
-                onPressed: () {
-                  if (user.deleted!) {
-                    _showActivateConfirmation(context, user);
-                  } else {
-                    _showDeleteConfirmation(context, user);
-                  }
-                },
-              ),
-            ],
-          ),
-        ),
-        DataCell(Text(fullName.isNotEmpty ? fullName : '-')),
-        DataCell(
-          Row(
-            children: [
-              Text(user.email ?? '-'),
-              const SizedBox(width: 2),
+  Widget _buildHeaderItem(String label, double width,
+      {bool sortable = false, String? sortField}) {
+    return GestureDetector(
+      onTap: sortable
+          ? () =>
+          _sort(sortField!, filter['sortBy'] != sortField || filter['sortOrder'] == 'desc')
+          : null,
+      child: Container(
+        width: width,
+        height: 56,
+        alignment: Alignment.centerLeft,
+        child: Row(
+          children: [
+            Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+            if (sortable)
               Icon(
-                user.accountConfirmed == true ? Icons.check_circle : Icons.cancel,
-                color: user.accountConfirmed == true ? Colors.green : Colors.red,
+                filter['sortBy'] == sortField
+                    ? (filter['sortOrder'] == 'asc' ? Icons.arrow_upward : Icons.arrow_downward)
+                    : Icons.unfold_more,
+                size: 16,
               ),
-            ],
-          ),
+          ],
         ),
-        DataCell(Text(user.phoneNumber ?? '-')),
-        DataCell(UserStatusBadge(isBlocked: user.deleted!))
+      ),
+    );
+  }
+
+
+  Widget _buildLeftColumn(BuildContext context, Applicant applicant) {
+    return Container(
+      width: 150,
+      height: 52,
+      alignment: Alignment.center,
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.edit, color: Colors.blue),
+            onPressed: () =>
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ApplicantDetailsPage(applicant: applicant),
+                  ),
+                ),
+          ),
+          IconButton(
+            icon: Icon(
+              applicant.deleted! ? Icons.refresh : Icons.block,
+              color: applicant.deleted! ? Colors.green : Colors.red,
+            ),
+            onPressed: () {
+              if (applicant.deleted!) {
+                activateUser(applicant.id!);
+              } else {
+                blockUser(applicant.id!);
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRightColumn(BuildContext context, Applicant applicant) {
+    return Row(
+      children: [
+        _buildCell(Text('${applicant.firstName} ${applicant.lastName}'), 200),
+        _buildCell(Text(applicant.email ?? '-'), 300),
+        _buildCell(Text(applicant.phoneNumber ?? '-'), 150),
+        _buildCell(UserStatusBadge(isBlocked: applicant.deleted!), 150),
+        // Pass the badge widget
       ],
     );
   }
 
-  @override
-  bool get isRowCountApproximate => false;
-
-  @override
-  int get rowCount => applicants.length;
-
-  @override
-  int get selectedRowCount => 0;
-
-  void _showDeleteConfirmation(BuildContext context, Applicant applicant) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Blokiraj'),
-        content: Text(
-            'Da li ste sigurni da želite blokirati ${applicant.firstName} ${applicant.lastName}?'),
-        actions: [
-          TextButton(
-            child: const Text('Odustani'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          TextButton(
-            child: const Text('Blokiraj'),
-            onPressed: () {
-              blockUser(applicant.id!); // Call blockUser
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showActivateConfirmation(BuildContext context, Applicant applicant) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Aktiviraj'),
-        content: Text(
-            'Da li ste sigurni da želite aktivirati ${applicant.firstName} ${applicant.lastName}?'),
-        actions: [
-          TextButton(
-            child: const Text('Odustani'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          TextButton(
-            child: const Text('Aktiviraj'),
-            onPressed: () {
-              activateUser(applicant.id!); // Call activateUser
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
+  Widget _buildCell(Widget content, double width) {
+    return Container(
+      width: width,
+      height: 52,
+      alignment: Alignment.centerLeft,
+      child: content, // Directly use the widget here
     );
   }
 }

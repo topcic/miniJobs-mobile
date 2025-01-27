@@ -5,11 +5,12 @@ import 'package:minijobs_admin/pages/home_page.dart';
 import 'package:minijobs_admin/pages/users.dart';
 
 import '../pages/employers/employers_view.dart';
+import '../pages/jobs/jobs_view.dart';
 
 class MasterScreenWidget extends StatefulWidget {
   final String title;
 
-  const MasterScreenWidget({required this.title, Key? key}) : super(key: key);
+  const MasterScreenWidget({required this.title, super.key});
 
   @override
   State<MasterScreenWidget> createState() => _MasterScreenWidgetState();
@@ -23,7 +24,7 @@ class _MasterScreenWidgetState extends State<MasterScreenWidget> {
     const UsersPage(),
     const ApplicantsView(), // Replace with Applicants Page
     const EmployersView(), // Replace with Employers Page
-    const UsersPage(), // Replace with Jobs Page
+    const JobsView(), // Replace with Jobs Page
   ];
 
   final List<String> _titles = [
@@ -53,26 +54,26 @@ class _MasterScreenWidgetState extends State<MasterScreenWidget> {
             selectedIndex: _selectedIndex,
             onDestinationSelected: _onItemTapped,
             labelType: NavigationRailLabelType.all,
-            destinations: [
+            destinations: const [
               NavigationRailDestination(
-                icon: const FaIcon(FontAwesomeIcons.home),
-                label: const Text('Kontrolna ploča'),
+                icon: FaIcon(FontAwesomeIcons.home),
+                label: Text('Kontrolna ploča'),
               ),
               NavigationRailDestination(
-                icon: const FaIcon(FontAwesomeIcons.users),
-                label: const Text('Korisnici'),
+                icon: FaIcon(FontAwesomeIcons.users),
+                label: Text('Korisnici'),
               ),
               NavigationRailDestination(
-                icon: const FaIcon(FontAwesomeIcons.usersCog),
-                label: const Text('Aplikanti'),
+                icon: FaIcon(FontAwesomeIcons.usersCog),
+                label: Text('Aplikanti'),
               ),
               NavigationRailDestination(
-                icon: const FaIcon(FontAwesomeIcons.building),
-                label: const Text('Poslodavci'),
+                icon: FaIcon(FontAwesomeIcons.building),
+                label: Text('Poslodavci'),
               ),
               NavigationRailDestination(
-                icon: const FaIcon(FontAwesomeIcons.suitcase),
-                label: const Text('Poslovi'),
+                icon: FaIcon(FontAwesomeIcons.suitcase),
+                label: Text('Poslovi'),
               ),
             ],
           ),

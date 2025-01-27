@@ -162,6 +162,9 @@ public class EmployerRepository(ApplicationDbContext _context, IMapper mapper) :
                 "PhoneNumber" => queryParameters.SortOrder == Domain.Enums.SortOrder.DESC
                     ? query.OrderByDescending(a => a.User.PhoneNumber)
                     : query.OrderBy(a => a.User.PhoneNumber),
+                "Deleted" => queryParameters.SortOrder == Domain.Enums.SortOrder.DESC
+                  ? query.OrderByDescending(a => a.User.Deleted)
+                  : query.OrderBy(a => a.User.Deleted),
                 _ => throw new ArgumentException($"Invalid SortBy value: {queryParameters.SortBy}")
             };
         }

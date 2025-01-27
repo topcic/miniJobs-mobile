@@ -28,8 +28,8 @@ public class JobsController(IMediator mediator, IJobRepository
     {
         var results = new SearchResponseBase<Job>();
 
-        results.Result = await jobRepository.FindPaginationAsync(parammeters);
-        results.Count = await jobRepository.CountAsync(parammeters);
+        results.Result = await jobRepository.PublicFindPaginationAsync(parammeters);
+        results.Count = await jobRepository.PublicCountAsync(parammeters);
         return Ok(results);
     }
     [HttpPost("")]

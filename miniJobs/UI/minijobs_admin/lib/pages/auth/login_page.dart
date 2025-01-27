@@ -52,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
     if (result) {
       // Navigate to Navbar if authentication is successful
       Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) =>  MasterScreenWidget(title: 'title'),
+        builder: (context) =>  const MasterScreenWidget(title: 'title'),
       ));
     } else {
       notificationService.error("Nevalidna lozinka ili email");
@@ -188,7 +188,7 @@ class _LoginPageState extends State<LoginPage> {
                                   if (result && mounted) {
                                     Navigator.of(context).pushReplacement(
                                       MaterialPageRoute(
-                                          builder: (context) =>  MasterScreenWidget(title: 'title')),
+                                          builder: (context) =>  const MasterScreenWidget(title: 'title')),
                                     );
                                   } else if (mounted) {
                                     ScaffoldMessenger.of(context)

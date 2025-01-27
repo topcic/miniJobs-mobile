@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:horizontal_data_table/horizontal_data_table.dart';
 import 'package:minijobs_admin/models/employer/employer.dart';
 import 'package:minijobs_admin/providers/user_provider.dart';
 import 'package:provider/provider.dart';
@@ -20,17 +21,18 @@ class _EmployersViewState extends State<EmployersView> {
   late UserProvider userProvider;
   List<Employer> data = [];
   bool isLoading = true;
-  // Pagination and filtering parameters
+
   Map<String, dynamic> filter = {
     'limit': 10,
     'offset': 0,
-    'sortBy': 'firstName', // Default sorting column
-    'sortOrder': 'asc',  // Default sorting order
-    'searchText': '',    // Default search text
+    'sortBy': 'firstName',
+    'sortOrder': 'asc',
+    'searchText': '',
   };
 
-  // Debouncing
   Timer? _debounce;
+  late ScrollController _verticalScrollController;
+  late ScrollController _horizontalScrollController;
 
   @override
   void didChangeDependencies() {
@@ -45,14 +47,14 @@ class _EmployersViewState extends State<EmployersView> {
       isLoading = true;
     });
 
-    // Fetch users with the filter object
-    final result = await employerProvider.searchPublic( filter);
+    final result = await employerProvider.searchPublic(filter);
 
     setState(() {
       data = result.result!;
       isLoading = false;
     });
   }
+
   Future<void> blockUser(int userId) async {
     await userProvider.delete(userId);
     final userIndex = data.indexWhere((user) => user.id == userId);
@@ -68,12 +70,13 @@ class _EmployersViewState extends State<EmployersView> {
       data[userIndex].deleted = false;
     });
   }
+
   void _debouncedSearch(String keyword) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
       setState(() {
         filter['searchText'] = keyword;
-        filter['offset'] = 0; // Reset pagination when searching
+        filter['offset'] = 0;
       });
       fetchUsers();
     });
@@ -83,7 +86,7 @@ class _EmployersViewState extends State<EmployersView> {
     setState(() {
       filter['sortBy'] = sortBy;
       filter['sortOrder'] = ascending ? 'asc' : 'desc';
-      filter['offset'] = 0; // Reset pagination on new sort
+      filter['offset'] = 0;
     });
     fetchUsers();
   }
@@ -103,7 +106,6 @@ class _EmployersViewState extends State<EmployersView> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
         children: [
-          // Search Bar
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
@@ -113,73 +115,51 @@ class _EmployersViewState extends State<EmployersView> {
                 border: OutlineInputBorder(),
               ),
               controller: TextEditingController(
-                text: filter['searchText'], // Retain search input value
+                text: filter['searchText'],
               ),
               onChanged: _debouncedSearch,
             ),
           ),
           Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal, // Enable horizontal scrolling
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width, // Make table occupy full width
-                child: PaginatedDataTable(
-                  rowsPerPage: filter['limit'],
-                  availableRowsPerPage: const [10, 20, 50],
-                  onRowsPerPageChanged: (rows) {
-                    setState(() {
-                      filter['limit'] = rows!;
-                      filter['offset'] = 0; // Reset pagination
-                    });
-                    fetchUsers();
-                  },
-                  onPageChanged: _changePage,
-                  sortColumnIndex: _getColumnIndex(filter['sortBy']),
-                  sortAscending: filter['sortOrder'] == 'asc',
-                  columns: [
-                    const DataColumn(
-                      label: Text(
-                        'Akcije',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    DataColumn(
-                      label: const Text(
-                        'Naziv',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    DataColumn(
-                      label: const Text(
-                        'Grad',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    DataColumn(
-                      label: const Text(
-                        'Email',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      onSort: (columnIndex, ascending) {
-                        _sort('email', ascending);
-                      },
-                    ),
-                    DataColumn(
-                      label: const Text(
-                        'Broj telefona',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    DataColumn(
-                      label: const Text(
-                        'Status',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                  source: DataSource(data, context, blockUser, activateUser),
+            child: HorizontalDataTable(
+              leftHandSideColumnWidth: 150,
+              rightHandSideColumnWidth: 1200,
+              isFixedHeader: true,
+              headerWidgets: _buildHeaders(),
+              leftSideItemBuilder: (context, index) =>
+                  _buildLeftColumn(context, data[index]),
+              rightSideItemBuilder: (context, index) =>
+                  _buildRightColumn(context, data[index]),
+              itemCount: data.length,
+              rowSeparatorWidget: Divider(color: Colors.grey[300], height: 1.0),
+              onScrollControllerReady: (vertical, horizontal) {
+                _verticalScrollController = vertical;
+                _horizontalScrollController = horizontal;
+              },
+              leftHandSideColBackgroundColor: Colors.white,
+              rightHandSideColBackgroundColor: Colors.white,
+              itemExtent: 56,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                  onPressed: filter['offset'] > 0
+                      ? () => _changePage((filter['offset'] / filter['limit']).floor() - 1)
+                      : null,
+                  child: const Text('Previous'),
                 ),
-              ),
+                Text('Page ${(filter['offset'] / filter['limit']).floor() + 1}'),
+                ElevatedButton(
+                  onPressed: (filter['offset'] + filter['limit']) < data.length
+                      ? () => _changePage((filter['offset'] / filter['limit']).floor() + 1)
+                      : null,
+                  child: const Text('Next'),
+                ),
+              ],
             ),
           ),
         ],
@@ -187,103 +167,104 @@ class _EmployersViewState extends State<EmployersView> {
     );
   }
 
-  int _getColumnIndex(String? sortBy) {
-    switch (sortBy) {
-      case 'firstName': // Sort by firstName or lastName combined
-      case 'lastName':
-        return 0;
-      case 'email':
-        return 1;
-      case 'role':
-        return 4;
-      default:
-        return -1;
-    }
+  List<Widget> _buildHeaders() {
+    return [
+      _buildHeaderItem('Akcije', 150),
+      _buildHeaderItem('Naziv', 200),
+      _buildHeaderItem('Grad', 200),
+      _buildHeaderItem('Email', 300, sortable: true, sortField: 'email'),
+      _buildHeaderItem('Broj Telefona', 250),
+      _buildHeaderItem('Status', 150, sortable: true, sortField: 'deleted'),
+    ];
   }
-}
-class DataSource extends DataTableSource {
-  final List<Employer> employers;
-  final BuildContext context;
-  final Function(int) blockUser;
-  final Function(int) activateUser;
 
-  DataSource(this.employers, this.context, this.blockUser, this.activateUser);
-
-  @override
-  DataRow getRow(int index) {
-    if (index >= employers.length) return null as DataRow;
-
-    final user = employers[index];
-    final fullName = user.name?.isNotEmpty == true
-        ? user.name
-        : '${user.firstName ?? ''} ${user.lastName ?? ''}'.trim();
-
-    return DataRow.byIndex(
-      index: index,
-      cells: [
-        DataCell(
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.edit, color: Colors.blue),
-                tooltip: 'Detalji',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          EmployerDetailsPage(employer: employers[index]),
-                    ),
-                  );
-                },
-              ),
-              IconButton(
-                icon: Icon(
-                  user.deleted! ? Icons.refresh : Icons.block,
-                  color: user.deleted! ? Colors.green : Colors.red,
-                ),
-                tooltip: user.deleted! ? 'Aktiviraj' : 'Blokiraj',
-                onPressed: () {
-                  if (user.deleted!) {
-                    _showActivateConfirmation(context, user);
-                  } else {
-                    _showDeleteConfirmation(context, user);
-                  }
-                },
-              ),
-            ],
-          ),
-        ),
-        DataCell(Text(fullName! )),
-        DataCell(Text(user.city!.name!)),
-        DataCell(
-          Row(
-            children: [
-              Text(user.email ?? '-'),
-              const SizedBox(width: 2),
+  Widget _buildHeaderItem(String label, double width,
+      {bool sortable = false, String? sortField}) {
+    return GestureDetector(
+      onTap: sortable
+          ? () => _sort(sortField!, filter['sortBy'] != sortField || filter['sortOrder'] == 'desc')
+          : null,
+      child: Container(
+        width: width,
+        height: 56,
+        alignment: Alignment.centerLeft,
+        child: Row(
+          children: [
+            Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+            if (sortable)
               Icon(
-                user.accountConfirmed == true ? Icons.check_circle : Icons.cancel,
-                color: user.accountConfirmed == true ? Colors.green : Colors.red,
+                filter['sortBy'] == sortField
+                    ? (filter['sortOrder'] == 'asc' ? Icons.arrow_upward : Icons.arrow_downward)
+                    : Icons.unfold_more,
+                size: 16,
               ),
-            ],
-          ),
+          ],
         ),
-        DataCell(Text(user.phoneNumber ?? '-')),
-        DataCell(UserStatusBadge(isBlocked: user.deleted!))
+      ),
+    );
+  }
+
+  Widget _buildLeftColumn(BuildContext context, Employer employer) {
+    return Container(
+      width: 150,
+      height: 52,
+      alignment: Alignment.center,
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.edit, color: Colors.blue),
+            onPressed: () =>
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        EmployerDetailsPage(employer: employer),
+                  ),
+                ),
+          ),
+          IconButton(
+            icon: Icon(
+              employer.deleted! ? Icons.refresh : Icons.block,
+              color: employer.deleted! ? Colors.green : Colors.red,
+            ),
+            onPressed: () {
+              if (employer.deleted!) {
+                _showActivateConfirmation(context, employer);
+              } else {
+                _showBlockConfirmation(context, employer);
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRightColumn(BuildContext context, Employer employer) {
+    final fullName = employer.name?.isNotEmpty == true
+        ? employer.name
+        : '${employer.firstName ?? ''} ${employer.lastName ?? ''}'.trim();
+    return Row(
+      children: [
+        _buildCell(Text('$fullName'), 200),
+        _buildCell(Text(employer.city?.name ?? ''), 200),
+        _buildCell(Text(employer.email ?? '-'), 300),
+        _buildCell(Text(employer.phoneNumber ?? '-'), 250),
+        _buildCell(UserStatusBadge(isBlocked: employer.deleted!), 150),
       ],
     );
   }
 
-  @override
-  bool get isRowCountApproximate => false;
+  Widget _buildCell(Widget content, double width) {
+    return Container(
+      width: width,
+      height: 52,
+      alignment: Alignment.centerLeft,
+      child: content,
+    );
+  }
 
-  @override
-  int get rowCount => employers.length;
-
-  @override
-  int get selectedRowCount => 0;
-
-  void _showDeleteConfirmation(BuildContext context, Employer employer) {
+  void _showBlockConfirmation(BuildContext context, Employer employer) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -298,7 +279,7 @@ class DataSource extends DataTableSource {
           TextButton(
             child: const Text('Blokiraj'),
             onPressed: () {
-              blockUser(employer.id!); // Call blockUser
+              blockUser(employer.id!);
               Navigator.of(context).pop();
             },
           ),
@@ -322,7 +303,7 @@ class DataSource extends DataTableSource {
           TextButton(
             child: const Text('Aktiviraj'),
             onPressed: () {
-              activateUser(employer.id!); // Call activateUser
+              activateUser(employer.id!);
               Navigator.of(context).pop();
             },
           ),

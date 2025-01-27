@@ -169,5 +169,52 @@ class JobProvider extends BaseProvider<Job> {
     } on DioException catch (err) {
       throw Exception(err.message);
     }
+
+  }
+  Future<SearchResult<Job>> searchPublic(Map<String, dynamic>? params) async {
+    try {
+      var url =
+          "${baseUrl}jobs/public-search";
+      final queryParameters = buildHttpParams(params ?? {});
+
+      // Make GET request
+      final response = await dio.get(url, queryParameters: queryParameters);
+      var data = response.data as Map<String, dynamic>;
+
+      var result = (data['result'] as List<dynamic>)
+          .map((item) => Job.fromJson(item as Map<String, dynamic>))
+          .toList();
+      var count = data['count'] as int;
+      return SearchResult<Job>(count, result);
+    } on DioException catch (err) {
+      throw Exception(err.message);
+    }
+  }
+  Future<Job?> deletedByAdmin(int jobId) async {
+    try {
+      var url = "${baseUrl}admin/jobs/$jobId/delete";
+
+      var response = await dio.delete(url);
+      Job responseData = Job.fromJson(response.data);
+      notificationService.success("Uspješno obrisan posao");
+      return responseData;
+    } catch (err) {
+      handleError(err);
+      return null;
+    }
+  }
+
+  Future<Job?> activateByAdmin(int jobId) async {
+    try {
+      var url = "${baseUrl}admin/jobs/$jobId/activate";
+
+      var response = await dio.put(url);
+      Job responseData = Job.fromJson(response.data);
+      notificationService.success("Uspješno aktiviran posao");
+      return responseData;
+    } catch (err) {
+      handleError(err);
+      return null;
+    }
   }
 }

@@ -32,11 +32,12 @@ class Job {
   bool isSaved = false;
   int? createdBy;
   DateTime? applicationsStart;
+  bool deletedByAdmin=false;
   Job();
   Job.withData(this.id, this.name, this.description, this.streetAddressAndNumber,
       this.city,this.applicationsDuration,this.status, this.requiredEmployees,
       this.wage,this.employer,this.state,this.cityId,
-      this.employerFullName,this.isApplied,this.isSaved,this.applicationsStart);
+      this.employerFullName,this.isApplied,this.isSaved,this.applicationsStart,this.deletedByAdmin);
 
   factory Job.fromJson(Map<String, dynamic> json) => _$JobFromJson(json);
 

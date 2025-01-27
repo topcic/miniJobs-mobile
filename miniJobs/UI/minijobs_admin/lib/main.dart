@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:horizontal_data_table/horizontal_data_table.dart';
 import 'package:minijobs_admin/pages/auth/login_page.dart';
 import 'package:minijobs_admin/providers/applicant_provider.dart';
 import 'package:minijobs_admin/providers/authentication_provider.dart';
@@ -52,7 +53,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
         useMaterial3: true,
       ),
-      home: MyMaterialApp(),
+      home: const MyMaterialApp(),
     );
   }
 }
@@ -69,7 +70,7 @@ class MyAppBar extends StatelessWidget {
 }
 
 class MyMaterialApp extends StatelessWidget {
-  const MyMaterialApp({Key? key}) : super(key: key);
+  const MyMaterialApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -80,8 +81,8 @@ class MyMaterialApp extends StatelessWidget {
           seedColor: Colors.blue,
         //  brightness: Brightness.light,
         ),
-        textTheme: TextTheme(
-          displayLarge: const TextStyle(
+        textTheme: const TextTheme(
+          displayLarge: TextStyle(
             fontSize: 72,
             fontWeight: FontWeight.bold,
           ),
@@ -91,4 +92,3 @@ class MyMaterialApp extends StatelessWidget {
     );
   }
 }
-

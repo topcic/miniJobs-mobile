@@ -34,11 +34,11 @@ class NotificationService {
         backgroundColor: backgroundColor,
         margin: const EdgeInsets.all(8.0),
         borderRadius: BorderRadius.circular(8.0),
-        icon: Icon(
+        icon: const Icon(
           Icons.info_outline,
           color: Colors.white,
         ),
-      )..show(context);
+      ).show(context);
     } else {
       debugPrint('Error: No context available for NotificationService.');
     }

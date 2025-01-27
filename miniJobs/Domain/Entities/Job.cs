@@ -41,6 +41,10 @@ public class Job : BaseAuditableEntity, IEntity<int>
     [Column("applications_start")]
     public DateTime? ApplicationsStart { get; set; }
 
+
+    [Column("deleted_by_admin")]
+    public bool DeletedByAdmin { get; set; }
+
     public virtual JobType JobType { get; set; }
     public virtual City City { get; set; }
     public virtual ICollection<ProposedAnswer> Schedules { get; set; }

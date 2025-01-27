@@ -47,7 +47,8 @@ Job _$JobFromJson(Map<String, dynamic> json) => Job()
   ..isSaved = (json['isSaved'] as bool?) ?? false // Default to false
   ..createdBy = (json['createdBy'] as num?)?.toInt()
   ..applicationsStart =
-  json['applicationsStart'] == null ? null : DateTime.parse(json['applicationsStart'] as String);
+  json['applicationsStart'] == null ? null : DateTime.parse(json['applicationsStart'] as String)
+  ..deletedByAdmin=(json['deletedByAdmin'] as bool?) ?? false ;
 
 Map<String, dynamic> _$JobToJson(Job instance) => <String, dynamic>{
       'id': instance.id,
@@ -73,6 +74,7 @@ Map<String, dynamic> _$JobToJson(Job instance) => <String, dynamic>{
       'isApplied': instance.isApplied,
       'isSaved': instance.isSaved,
       'createdBy': instance.createdBy,
+  'deletedByAdmin':instance.deletedByAdmin
     };
 
 JobStatus? jobStatusFromInt(int? status) {

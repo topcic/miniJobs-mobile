@@ -8,7 +8,7 @@ import '../../utils/photo_view.dart';
 class EmployerDetailsPage extends StatefulWidget {
   final Employer employer;
 
-  const EmployerDetailsPage({Key? key, required this.employer}) : super(key: key);
+  const EmployerDetailsPage({super.key, required this.employer});
 
   @override
   State<EmployerDetailsPage> createState() => _EmployerDetailsPageState();

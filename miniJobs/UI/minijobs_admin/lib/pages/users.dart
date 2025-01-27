@@ -141,14 +141,14 @@ class _UsersPageState extends State<UsersPage> {
                         _sort('email', ascending);
                       },
                     ),
-                    DataColumn(
-                      label: const Text(
+                    const DataColumn(
+                      label: Text(
                         'Phone Number',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
-                    DataColumn(
-                      label: const Text(
+                    const DataColumn(
+                      label: Text(
                         'Email Confirmed',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
