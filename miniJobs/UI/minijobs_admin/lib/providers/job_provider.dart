@@ -190,9 +190,9 @@ class JobProvider extends BaseProvider<Job> {
       throw Exception(err.message);
     }
   }
-  Future<Job?> deletedByAdmin(int jobId) async {
+  Future<Job?> deleteByAdmin(int jobId) async {
     try {
-      var url = "${baseUrl}admin/jobs/$jobId/delete";
+      var url = "${baseUrl}jobs/$jobId/admin";
 
       var response = await dio.delete(url);
       Job responseData = Job.fromJson(response.data);
@@ -206,7 +206,7 @@ class JobProvider extends BaseProvider<Job> {
 
   Future<Job?> activateByAdmin(int jobId) async {
     try {
-      var url = "${baseUrl}admin/jobs/$jobId/activate";
+      var url = "${baseUrl}jobs/$jobId/admin/activate";
 
       var response = await dio.put(url);
       Job responseData = Job.fromJson(response.data);

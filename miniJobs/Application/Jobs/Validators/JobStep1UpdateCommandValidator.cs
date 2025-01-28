@@ -28,6 +28,8 @@ public class JobStep1UpdateCommandValidator : AbstractValidator<JobStep1UpdateCo
     {
         var job = await jobRepository.TryFindAsync(command.Request.Id.Value);
         ExceptionExtension.Validate("JOB_NOT_EXIST", () => job == null);
+        ExceptionExtension.Validate("NO_ACTIONS_POSSIBLE_BECAUSE_HAS_BEEN_DELETED_BY_ADMIN", () => job.DeletedByAdmin);
+
         ExceptionExtension.Validate("CAN_NOT_UPDATE_JOB_IN_THIS_STATUS", () => job.Status == JobStatus.Inactive || job.Status == JobStatus.Completed || job.Status == JobStatus.ApplicationsCompleted);
 
         return true;

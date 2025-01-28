@@ -133,4 +133,25 @@ public class JobsController(IMediator mediator, IJobRepository
     {
         return Ok(await mediator.Send(new JobDeleteCommand(id)));
     }
+
+
+    [HttpDelete("{id}/admin")]
+    [Authorize(Roles = "Administrator")]
+    [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteByAdminAsync([FromRoute] int id)
+    {
+        return Ok(await mediator.Send(new JobDeleteByAdminCommand(id)));
+    }
+
+    [HttpPut("{id}/admin/activate")]
+    [Authorize(Roles = "Administrator")]
+    [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> ActivateByAdminAsync([FromRoute] int id)
+    {
+        return Ok(await mediator.Send(new JobActivateByAdminCommand(id)));
+    }
 }

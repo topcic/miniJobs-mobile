@@ -20,7 +20,9 @@ public class JobSaveCommandValidator : AbstractValidator<JobSaveCommand>
     private async Task<bool> ValidateEntity(JobSaveCommand command)
     {
         var job = await jobRepository.TryFindAsync(command.Id);
-        ExceptionExtension.Validate("JOB_NOT_EXIST", () => job == null); 
+        ExceptionExtension.Validate("JOB_NOT_EXIST", () => job == null);
+        ExceptionExtension.Validate("NO_ACTIONS_POSSIBLE_BECAUSE_HAS_BEEN_DELETED_BY_ADMIN", () => job.DeletedByAdmin);
+
         var isJobSaved = await savedJobRepository.FindOneAsync(x => x.CreatedBy == command.UserId.Value && x.JobId == command.Id && x.IsDeleted == false);
         ExceptionExtension.Validate("JOB_IS_ALREADY_SAVED", () => isJobSaved != null);
         ExceptionExtension.Validate("JOB_IS_COMPLETED", () => job.Status == Domain.Enums.JobStatus.Completed);

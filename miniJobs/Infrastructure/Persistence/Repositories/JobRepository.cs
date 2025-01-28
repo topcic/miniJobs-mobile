@@ -83,7 +83,7 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<IEnumerable<Job>> GetEmployerJobsAsync(int employerId)
         {
             var jobs = from j in context.Jobs
-                       where j.CreatedBy == employerId && j.Status != JobStatus.Inactive
+                       where j.CreatedBy == employerId && j.Status != JobStatus.Inactive && j.DeletedByAdmin==false
                        select new
                        {
                            Job = j,
@@ -119,7 +119,7 @@ namespace Infrastructure.Persistence.Repositories
                         where (string.IsNullOrEmpty(searchText) || j.Name.Contains(searchText))
                               && (!cityId.HasValue || j.CityId == cityId)
                               //  && (!jobTypeId.HasValue || j.JobTypeId == jobTypeId)
-                              && j.Status == JobStatus.Active
+                              && j.Status == JobStatus.Active && j.DeletedByAdmin == false
                         select new
                         {
                             Job = j,
@@ -199,7 +199,7 @@ namespace Infrastructure.Persistence.Repositories
             var query = from j in context.Jobs
                         join sj in context.SavedJobs on j.Id equals sj.JobId
                         join c in context.Cities on j.CityId equals c.Id
-                        where sj.CreatedBy == applicantId && sj.IsDeleted==false
+                        where sj.CreatedBy == applicantId && sj.IsDeleted==false && sj.DeletedByAdmin == false
                         select new Job
                         {
                             Id = j.Id,
@@ -229,7 +229,7 @@ namespace Infrastructure.Persistence.Repositories
                             equals new { Id = r.JobApplicationId, CreatedBy = r.CreatedBy }
                             into ratingsGroup
                         from r in ratingsGroup.DefaultIfEmpty() 
-                        where a.CreatedBy == applicantId && a.IsDeleted == false
+                        where a.CreatedBy == applicantId && a.IsDeleted == false && j.DeletedByAdmin == false
                         select new JobApplication
                         {
                             Id = a.Id,
@@ -268,7 +268,7 @@ namespace Infrastructure.Persistence.Repositories
                              join a in context.Applicants on ja.CreatedBy equals a.Id
                              join u in context.Users on a.Id equals u.Id
                              join c in context.Cities on u.CityId equals c.Id
-                             where j.Id == jobId
+                             where j.Id == jobId && j.DeletedByAdmin == false
                              select new
                              {
                                  Applicant = a,
@@ -332,7 +332,7 @@ namespace Infrastructure.Persistence.Repositories
             var twoDaysAgo = DateTime.UtcNow.AddDays(2);
 
             var query = from j in context.Jobs
-                        where j.Status == JobStatus.Active
+                        where j.Status == JobStatus.Active && j.DeletedByAdmin == false
                         && EF.Functions.DateDiffDay(DateTime.UtcNow, j.Created.AddDays(j.ApplicationsDuration.Value)) == 2
                         select j;
 
@@ -342,7 +342,7 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<IEnumerable<Job>> GetExpiredActiveJobsAsync()
         {
             var query = from j in context.Jobs
-                        where j.Status == JobStatus.Active
+                        where j.Status == JobStatus.Active && j.DeletedByAdmin == false
                               && DateTime.UtcNow > j.Created.AddDays(j.ApplicationsDuration.Value)
                         select j;
 

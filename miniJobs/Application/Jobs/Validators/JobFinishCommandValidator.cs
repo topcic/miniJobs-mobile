@@ -10,7 +10,7 @@ namespace Application.Jobs.Validators;
 public class JobFinishCommandValidator : AbstractValidator<JobFinishCommand>
 {
     private readonly IJobRepository jobRepository;
-    public JobFinishCommandValidator( IJobRepository jobRepository)
+    public JobFinishCommandValidator(IJobRepository jobRepository)
     {
         RuleFor(x => x).MustAsync(async (x, cancellation) => await ValidateEntity(x));
         this.jobRepository = jobRepository;
@@ -20,6 +20,9 @@ public class JobFinishCommandValidator : AbstractValidator<JobFinishCommand>
     {
         Job job = await jobRepository.TryFindAsync(command.JobId);
         ExceptionExtension.Validate("JOB_NOT_EXISTS", () => job == null);
+        ExceptionExtension.Validate("NO_ACTIONS_POSSIBLE_BECAUSE_HAS_BEEN_DELETED_BY_ADMIN", () => job.DeletedByAdmin);
+
+
         var acceptedApplicants = (await jobRepository.GetApplicants(command.JobId))
         .Where(x => x.ApplicationStatus == JobApplicationStatus.Accepted)
         .ToList();

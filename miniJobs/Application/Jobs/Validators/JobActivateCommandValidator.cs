@@ -19,6 +19,7 @@ public class JobActivateCommandValidator : AbstractValidator<JobActivateCommand>
     {
         Job job = await jobRepository.TryFindAsync(command.Id);
         ExceptionExtension.Validate("JOB_NOT_EXISTS", () => job == null);
+        ExceptionExtension.Validate("NO_ACTIONS_POSSIBLE_BECAUSE_HAS_BEEN_DELETED_BY_ADMIN", () => job.DeletedByAdmin);
         return true;
     }
 }

@@ -51,7 +51,7 @@ class _JobsViewState extends State<JobsView> {
   }
 
   Future<void> delete(int jobId) async {
-    await jobProvider.deletedByAdmin(jobId);
+    await jobProvider.deleteByAdmin(jobId);
     final jobIndex = data.indexWhere((job) => job.id == jobId);
     setState(() {
       data[jobIndex].deletedByAdmin = true;
@@ -152,7 +152,7 @@ class _JobsViewState extends State<JobsView> {
           ? const Center(child: CircularProgressIndicator())
           : HorizontalDataTable(
         leftHandSideColumnWidth: 100,
-        rightHandSideColumnWidth: 1200,
+        rightHandSideColumnWidth: 1300,
         isFixedHeader: true,
         headerWidgets: _getTitleWidgets(),
         leftSideItemBuilder: _generateFirstColumnRow,
@@ -174,6 +174,7 @@ class _JobsViewState extends State<JobsView> {
       _getTitleItemWidget('Grad', 150),
       _getTitleItemWidget('Broj radnika', 100),
       _getTitleItemWidget('Status', 200),
+      _getTitleItemWidget('Obrisan/Aktivan', 150),
     ];
   }
 
@@ -211,6 +212,7 @@ class _JobsViewState extends State<JobsView> {
           JobBadge(status: job.status!),
           200,
         ),
+        _buildTableCell(UserStatusBadge(isBlocked: job.deletedByAdmin), 150),
       ],
     );
   }
