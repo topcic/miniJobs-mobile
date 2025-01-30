@@ -3,6 +3,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
 import 'package:minijobs_admin/pages/auth/login_page.dart';
 import 'package:minijobs_admin/pages/main/constants.dart';
+import 'package:minijobs_admin/pages/main/screens/main/main_screen.dart';
 import 'package:minijobs_admin/providers/applicant_provider.dart';
 import 'package:minijobs_admin/providers/authentication_provider.dart';
 import 'package:minijobs_admin/providers/city_provider.dart';
@@ -19,6 +20,8 @@ import 'package:minijobs_admin/providers/user_provider.dart';
 import 'package:minijobs_admin/services/notification.service.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import 'controllers/menu_app_controller.dart';
 void main() async {
   await GetStorage.init();
   runApp(MultiProvider(
@@ -35,7 +38,8 @@ void main() async {
       ChangeNotifierProvider(create: (s) => RatingProvider()),
       ChangeNotifierProvider(create: (s) => JobApplicationProvider()),
       ChangeNotifierProvider(create: (s) => JobRecommendationProvider()),
-      ChangeNotifierProvider(create: (s) => RecommendationProvider())
+      ChangeNotifierProvider(create: (s) => RecommendationProvider()),
+      ChangeNotifierProvider(create: (s) => MenuAppController())
     ],
     child: const MyApp(),
   ));
@@ -83,7 +87,7 @@ class MyMaterialApp extends StatelessWidget {
             .apply(bodyColor: Colors.white),
         canvasColor: secondaryColor,
       ),
-      home: LoginPage(),
+      home: MainScreen(),
     );
   }
 }
