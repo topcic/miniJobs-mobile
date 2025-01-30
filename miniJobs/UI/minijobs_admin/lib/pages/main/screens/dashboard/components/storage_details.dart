@@ -1,21 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:minijobs_admin/pages/main/screens/dashboard/components/storage_info_card.dart';
+import 'package:provider/provider.dart';
 
+import '../../../../../models/overall_statistic.dart';
+import '../../../../../providers/statistic_provider.dart';
 import '../../../constants.dart';
 import 'chart.dart';
-import 'storage_info_card.dart';
 
-final testData = {
-  "totalApplicants": 1250, // Ukupan broj aplikanta
-  "totalEmployers": 340, // Ukupan broj poslodavaca
-  "jobsPosted": 870, // Broj objavljenih poslova
-  "activeApplications": 560, // Aktivne prijave
-  "averageRatingApplicants": 4.5, // Prosječna ocjena aplikanta
-  "averageRatingEmployers": 4.2, // Prosječna ocjena poslodavaca
-};
-
-class StorageDetails extends StatelessWidget {
+class StorageDetails extends StatefulWidget {
   const StorageDetails({Key? key}) : super(key: key);
+
+  @override
+  _StorageDetailsState createState() => _StorageDetailsState();
+}
+
+class _StorageDetailsState extends State<StorageDetails> {
+  late Future<OverallStatistic> _statisticsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    final statisticProvider = context.read<StatisticProvider>();
+    _statisticsFuture = statisticProvider.getOverall();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,67 +33,87 @@ class StorageDetails extends StatelessWidget {
         color: secondaryColor,
         borderRadius: const BorderRadius.all(Radius.circular(10)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Pregled Statistike",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          SizedBox(height: defaultPadding),
-          Chart(),
+      child: FutureBuilder<OverallStatistic>(
+        future: _statisticsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                "Error loading statistics",
+                style: TextStyle(color: Colors.red),
+              ),
+            );
+          } else if (!snapshot.hasData) {
+            return Center(child: Text("No data available"));
+          }
 
-          // Ukupan broj aplikanta
-          StorageInfoCard(
-            icon: FontAwesomeIcons.userGraduate,
-            title: "Ukupan broj aplikanta",
-            amountOfFiles: "${testData["totalApplicants"]}",
-            numOfFiles: testData["totalApplicants"] as int,
-          ),
+          final stats = snapshot.data!;
 
-          // Ukupan broj poslodavaca
-          StorageInfoCard(
-            icon: FontAwesomeIcons.briefcase,
-            title: "Ukupan broj poslodavaca",
-            amountOfFiles: "${testData["totalEmployers"]}",
-            numOfFiles: testData["totalEmployers"] as int,
-          ),
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Pregled Statistike",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(height: defaultPadding),
+              Chart(),
 
-          // Broj objavljenih poslova
-          StorageInfoCard(
-            icon: FontAwesomeIcons.clipboardList,
-            title: "Broj objavljenih poslova",
-            amountOfFiles: "${testData["jobsPosted"]}",
-            numOfFiles: testData["jobsPosted"] as int,
-          ),
+              // Ukupan broj aplikanta
+              StorageInfoCard(
+                icon: FontAwesomeIcons.userGraduate,
+                title: "Ukupan broj aplikanta",
+                amountOfFiles: "${stats.totalApplicants}",
+                numOfFiles: stats.totalApplicants,
+              ),
 
-          // Aktivne prijave
-          StorageInfoCard(
-            icon: FontAwesomeIcons.paperPlane,
-            title: "Aktivne prijave",
-            amountOfFiles: "${testData["activeApplications"]}",
-            numOfFiles: testData["activeApplications"] as int,
-          ),
+              // Ukupan broj poslodavaca
+              StorageInfoCard(
+                icon: FontAwesomeIcons.briefcase,
+                title: "Ukupan broj poslodavaca",
+                amountOfFiles: "${stats.totalEmployers}",
+                numOfFiles: stats.totalEmployers,
+              ),
 
-          // Prosječna ocjena aplikanta
-          StorageInfoCard(
-            icon: FontAwesomeIcons.star,
-            title: "Prosječna ocjena aplikanta",
-            amountOfFiles: "${testData["averageRatingApplicants"]}",
-            numOfFiles: testData["averageRatingApplicants"]!.toInt(),
-          ),
+              // Broj objavljenih poslova
+              StorageInfoCard(
+                icon: FontAwesomeIcons.clipboardList,
+                title: "Broj objavljenih poslova",
+                amountOfFiles: "${stats.totalJobs}",
+                numOfFiles: stats.totalJobs,
+              ),
 
-          // Prosječna ocjena poslodavaca
-          StorageInfoCard(
-            icon: FontAwesomeIcons.starHalfAlt,
-            title: "Prosječna ocjena poslodavaca",
-            amountOfFiles: "${testData["averageRatingEmployers"]}",
-            numOfFiles: testData["averageRatingEmployers"]!.toInt(),
-          ),
-        ],
+              // Aktivne prijave
+              StorageInfoCard(
+                icon: FontAwesomeIcons.paperPlane,
+                title: "Aktivne prijave",
+                amountOfFiles: "${stats.totalActiveJobs}",
+                numOfFiles: stats.totalActiveJobs,
+              ),
+
+              // Prosječna ocjena aplikanta
+              StorageInfoCard(
+                icon: FontAwesomeIcons.star,
+                title: "Prosječna ocjena aplikanta",
+                amountOfFiles: "${stats.averageApplicantRating.toStringAsFixed(1)}",
+                numOfFiles: stats.averageApplicantRating.toInt(),
+              ),
+
+              // Prosječna ocjena poslodavaca
+              StorageInfoCard(
+                icon: FontAwesomeIcons.starHalfAlt,
+                title: "Prosječna ocjena poslodavaca",
+                amountOfFiles: "${stats.averageEmployerRating.toStringAsFixed(1)}",
+                numOfFiles: stats.averageEmployerRating.toInt(),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

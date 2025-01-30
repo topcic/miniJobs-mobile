@@ -101,7 +101,9 @@ public static class ConfigureServices
         services.AddScoped<IJobQuestionAnswerRepository, JobQuestionAnswerRepository>();
         services.AddScoped<IJobRecommendationRepository, JobRecommendationRepository>();
         services.AddScoped<IJobRecommendationJobTypeRepository, JobRecommendationJobTypeRepository>();
-        services.AddScoped<IJobRecommendationCityRepository, JobRecommendationCityRepository>(); ;
+        services.AddScoped<IJobRecommendationCityRepository, JobRecommendationCityRepository>();
+        services.AddScoped<IStatisticRepository, StatisticRepository>();
+
     }
 
     private static void AddMailSenders(IServiceCollection services)

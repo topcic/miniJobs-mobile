@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import '../../../../../models/overall_statistic.dart';
+import '../../../../../providers/statistic_provider.dart';
 import '../../../constants.dart';
 import '../../../responsve.dart';
 import 'info_card.dart';
-
 class MyData extends StatelessWidget {
-  const MyData({
-    Key? key,
-  }) : super(key: key);
+  const MyData({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,15 +24,31 @@ class MyData extends StatelessWidget {
           ],
         ),
         SizedBox(height: defaultPadding),
-        Responsive(
-          mobile: FileInfoCardGridView(
-            crossAxisCount: _size.width < 650 ? 2 : 4,
-            childAspectRatio: _size.width < 650 ? 1.3 : 1,
-          ),
-          tablet: FileInfoCardGridView(),
-          desktop: FileInfoCardGridView(
-            childAspectRatio: _size.width < 1400 ? 1.1 : 1.4,
-          ),
+        FutureBuilder<OverallStatistic>(
+          future: context.read<StatisticProvider>().getOverall(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text("Error loading statistics", style: TextStyle(color: Colors.red)));
+            } else if (!snapshot.hasData) {
+              return Center(child: Text("No data available"));
+            }
+
+            final stats = snapshot.data!;
+            return Responsive(
+              mobile: FileInfoCardGridView(
+                crossAxisCount: _size.width < 650 ? 2 : 3,
+                childAspectRatio: _size.width < 650 ? 1.3 : 1,
+                stats: stats,
+              ),
+              tablet: FileInfoCardGridView(stats: stats),
+              desktop: FileInfoCardGridView(
+                childAspectRatio: _size.width < 1400 ? 1.1 : 1.4,
+                stats: stats,
+              ),
+            );
+          },
         ),
       ],
     );
@@ -41,22 +58,24 @@ class MyData extends StatelessWidget {
 class FileInfoCardGridView extends StatelessWidget {
   const FileInfoCardGridView({
     Key? key,
-    this.crossAxisCount = 4,
+    this.crossAxisCount = 3,
     this.childAspectRatio = 1,
+    required this.stats,
   }) : super(key: key);
 
   final int crossAxisCount;
   final double childAspectRatio;
+  final OverallStatistic stats;
 
   @override
   Widget build(BuildContext context) {
     final List<DemoData> demoData = [
-      DemoData(title: "Aplikanti", total: 1250, icon: Icons.person),
-      DemoData(title: "Poslodavci", total: 340, icon: Icons.business),
-      DemoData(title: "Objavljeni poslovi", total: 870, icon: Icons.work),
-      DemoData(title: "Aktivne prijave", total: 560, icon: Icons.check_circle),
-      DemoData(title: "Prosj. ocjena aplikanta", total: 4, icon: Icons.star),
-      DemoData(title: "Prosj. ocjena poslodavca", total: 4, icon: Icons.star_half),
+      DemoData(title: "Poslodavci", total: stats.totalEmployers, icon: FontAwesomeIcons.building),
+      DemoData(title: "Aplikanti", total: stats.totalApplicants, icon: FontAwesomeIcons.users),
+      DemoData(title: "Objavljeni poslovi", total: stats.totalJobs, icon: FontAwesomeIcons.briefcase),
+      DemoData(title: "Aktivne prijave", total: stats.totalActiveJobs, icon: Icons.check_circle),
+      DemoData(title: "Prosj. ocjena aplikanta", total: stats.averageApplicantRating.toInt(), icon: Icons.star),
+      DemoData(title: "Prosj. ocjena poslodavca", total: stats.averageEmployerRating.toInt(), icon: Icons.star),
     ];
 
     return GridView.builder(

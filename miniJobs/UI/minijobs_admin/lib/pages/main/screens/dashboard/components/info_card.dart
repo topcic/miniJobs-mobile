@@ -32,13 +32,13 @@ class InfoCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: EdgeInsets.all(defaultPadding * 0.75),
                 height: 40,
                 width: 40,
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.1),
-                  borderRadius: const BorderRadius.all(Radius.circular(10)),
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
+                alignment: Alignment.center, // Ensures the icon is centered
                 child: Icon(icon, color: color, size: 24),
               ),
               Icon(Icons.more_vert, color: Colors.white54),

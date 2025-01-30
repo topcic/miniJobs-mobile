@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:minijobs_admin/models/auth_code_request.dart';
 import 'package:minijobs_admin/providers/authentication_provider.dart';
-import 'package:minijobs_admin/widgets/master_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/notification.service.dart';
+import '../main/screens/main/main_screen.dart';
 import 'forgot_password_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -52,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
     if (result) {
       // Navigate to Navbar if authentication is successful
       Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) =>  const MasterScreenWidget(title: 'title'),
+        builder: (context) =>  MainScreen(),
       ));
     } else {
       notificationService.error("Nevalidna lozinka ili email");
@@ -188,7 +188,7 @@ class _LoginPageState extends State<LoginPage> {
                                   if (result && mounted) {
                                     Navigator.of(context).pushReplacement(
                                       MaterialPageRoute(
-                                          builder: (context) =>  const MasterScreenWidget(title: 'title')),
+                                          builder: (context) =>   MainScreen()),
                                     );
                                   } else if (mounted) {
                                     ScaffoldMessenger.of(context)

@@ -15,6 +15,7 @@ import 'package:minijobs_admin/providers/job_type_provider.dart';
 import 'package:minijobs_admin/providers/proposed_answer_provider.dart';
 import 'package:minijobs_admin/providers/rating_provider.dart';
 import 'package:minijobs_admin/providers/recommendation_provider.dart';
+import 'package:minijobs_admin/providers/statistic_provider.dart';
 import 'package:minijobs_admin/providers/user_registration_provider.dart';
 import 'package:minijobs_admin/providers/user_provider.dart';
 import 'package:minijobs_admin/services/notification.service.dart';
@@ -39,7 +40,8 @@ void main() async {
       ChangeNotifierProvider(create: (s) => JobApplicationProvider()),
       ChangeNotifierProvider(create: (s) => JobRecommendationProvider()),
       ChangeNotifierProvider(create: (s) => RecommendationProvider()),
-      ChangeNotifierProvider(create: (s) => MenuAppController())
+      ChangeNotifierProvider(create: (s) => MenuAppController()),
+      ChangeNotifierProvider(create: (s) => StatisticProvider())
     ],
     child: const MyApp(),
   ));
@@ -87,7 +89,7 @@ class MyMaterialApp extends StatelessWidget {
             .apply(bodyColor: Colors.white),
         canvasColor: secondaryColor,
       ),
-      home: MainScreen(),
+      home: LoginPage(),
     );
   }
 }
