@@ -7,6 +7,7 @@ import 'package:horizontal_data_table/horizontal_data_table.dart';
 
 import '../../enumerations/job_statuses.dart';
 import '../../widgets/badges.dart';
+import '../main/constants.dart';
 import 'job_applications_view.dart';
 import 'job_details.dart';
 
@@ -180,8 +181,8 @@ class _JobsViewState extends State<JobsView> {
               rightSideItemBuilder: _generateRightHandSideColumnRow,
               itemCount: data.length,
               rowSeparatorWidget: const Divider(color: Colors.black54, height: 1.0),
-              leftHandSideColBackgroundColor: Colors.white,
-              rightHandSideColBackgroundColor: Colors.white,
+              leftHandSideColBackgroundColor:secondaryColor,
+              rightHandSideColBackgroundColor: secondaryColor,
               onScrollControllerReady: (vertical, horizontal) {
                 _verticalScrollController = vertical;
                 _horizontalScrollController = horizontal;

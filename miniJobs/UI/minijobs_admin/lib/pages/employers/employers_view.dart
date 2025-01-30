@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../../providers/employer_provider.dart';
 import '../../widgets/badges.dart';
+import '../main/constants.dart';
 import 'employer_details_page.dart';
 
 class EmployersView extends StatefulWidget {
@@ -136,8 +137,8 @@ class _EmployersViewState extends State<EmployersView> {
                 _verticalScrollController = vertical;
                 _horizontalScrollController = horizontal;
               },
-              leftHandSideColBackgroundColor: Colors.white,
-              rightHandSideColBackgroundColor: Colors.white,
+              leftHandSideColBackgroundColor: secondaryColor,
+              rightHandSideColBackgroundColor:secondaryColor,
               itemExtent: 56,
             ),
           ),

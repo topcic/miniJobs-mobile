@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
 import 'package:minijobs_admin/models/applicant/applicant.dart';
+import 'package:minijobs_admin/pages/main/constants.dart';
 import 'package:minijobs_admin/providers/applicant_provider.dart';
 import 'package:minijobs_admin/providers/user_provider.dart';
 import 'package:provider/provider.dart';
@@ -140,8 +141,8 @@ class _ApplicantsViewState extends State<ApplicantsView> {
                 _verticalScrollController = vertical;
                 _horizontalScrollController = horizontal;
               },
-              leftHandSideColBackgroundColor: Colors.white,
-              rightHandSideColBackgroundColor: Colors.white,
+              leftHandSideColBackgroundColor:secondaryColor,
+              rightHandSideColBackgroundColor: secondaryColor,
               itemExtent: 56,
             ),
           ),
@@ -254,7 +255,13 @@ class _ApplicantsViewState extends State<ApplicantsView> {
   Widget _buildRightColumn(BuildContext context, Applicant applicant) {
     return Row(
       children: [
-        _buildCell(Text('${applicant.firstName} ${applicant.lastName}'), 200),
+        _buildCell(
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text('${applicant.firstName} ${applicant.lastName}'),
+          ),
+          200,
+        ),
         _buildCell(Text(applicant.email ?? '-'), 300),
         _buildCell(Text(applicant.phoneNumber ?? '-'), 150),
         _buildCell(UserStatusBadge(isBlocked: applicant.deleted!), 150),

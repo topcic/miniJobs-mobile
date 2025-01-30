@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../applicants/applicants_view.dart';
 import '../../../employers/employers_view.dart';
 import '../../../jobs/jobs_view.dart';
+import '../../constants.dart';
 import '../dashboard/dashboard_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -32,7 +33,10 @@ class _MainScreenState extends State<MainScreen> {
             Expanded(child: SideMenu(onMenuItemSelected: _setSelectedScreen)),
             Expanded(
               flex: 5,
-              child:  _selectedScreen
+              child: Padding(
+                padding: const EdgeInsets.all(defaultPadding), // Apply default padding
+                child: _selectedScreen,
+              ),
             ),
           ],
         ),
