@@ -12,7 +12,7 @@ public interface IJobRepository : IGenericRepository<Job, int>
     Task<int> SearchCountAsync(string searchText, int? cityId);
     Task<IEnumerable<Job>> GetApplicantSavedJobsAsync(int applicantId);
     Task<IEnumerable<JobApplication>> GetApplicantAppliedJobsAsync(int applicantId);
-    Task<IEnumerable<ApplicantDTO>> GetApplicants(int jobId);
+    Task<IEnumerable<ApplicantDTO>> GetApplicants(int jobId,string role);
     Task<IEnumerable<Job>> GetJobsExpiringInTwoDaysAsync();
     Task<IEnumerable<Job>> GetExpiredActiveJobsAsync();
 

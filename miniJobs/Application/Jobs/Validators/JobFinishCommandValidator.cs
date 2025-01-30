@@ -23,7 +23,7 @@ public class JobFinishCommandValidator : AbstractValidator<JobFinishCommand>
         ExceptionExtension.Validate("NO_ACTIONS_POSSIBLE_BECAUSE_HAS_BEEN_DELETED_BY_ADMIN", () => job.DeletedByAdmin);
 
 
-        var acceptedApplicants = (await jobRepository.GetApplicants(command.JobId))
+        var acceptedApplicants = (await jobRepository.GetApplicants(command.JobId,command.RoleId))
         .Where(x => x.ApplicationStatus == JobApplicationStatus.Accepted)
         .ToList();
         ExceptionExtension.Validate("JOB_NEED_ACCEPTED_APPLICANTS", () => acceptedApplicants.Count() == 0);

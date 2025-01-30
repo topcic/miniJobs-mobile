@@ -199,7 +199,7 @@ namespace Infrastructure.Persistence.Repositories
             var query = from j in context.Jobs
                         join sj in context.SavedJobs on j.Id equals sj.JobId
                         join c in context.Cities on j.CityId equals c.Id
-                        where sj.CreatedBy == applicantId && sj.IsDeleted==false && sj.DeletedByAdmin == false
+                        where sj.CreatedBy == applicantId && sj.IsDeleted==false && j.DeletedByAdmin == false
                         select new Job
                         {
                             Id = j.Id,
@@ -261,14 +261,15 @@ namespace Infrastructure.Persistence.Repositories
             return await query.ToListAsync();
         }
 
-        public async Task<IEnumerable<ApplicantDTO>> GetApplicants(int jobId)
+        public async Task<IEnumerable<ApplicantDTO>> GetApplicants(int jobId, string role)
         {
+            var isAdmin = role=="Administrator";
             var applicants = from j in context.Jobs
                              join ja in context.JobApplications on j.Id equals ja.JobId
                              join a in context.Applicants on ja.CreatedBy equals a.Id
                              join u in context.Users on a.Id equals u.Id
                              join c in context.Cities on u.CityId equals c.Id
-                             where j.Id == jobId && j.DeletedByAdmin == false
+                             where j.Id == jobId && (isAdmin || !j.DeletedByAdmin)
                              select new
                              {
                                  Applicant = a,

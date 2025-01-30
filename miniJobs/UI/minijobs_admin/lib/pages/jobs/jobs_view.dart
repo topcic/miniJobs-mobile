@@ -5,7 +5,10 @@ import 'package:minijobs_admin/providers/job_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
 
+import '../../enumerations/job_statuses.dart';
 import '../../widgets/badges.dart';
+import 'job_applications_view.dart';
+import 'job_details.dart';
 
 class JobsView extends StatefulWidget {
   const JobsView({super.key});
@@ -18,7 +21,8 @@ class _JobsViewState extends State<JobsView> {
   late JobProvider jobProvider;
   List<Job> data = [];
   bool isLoading = true;
-
+  late ScrollController _verticalScrollController;
+  late ScrollController _horizontalScrollController;
   // Pagination and filtering parameters
   Map<String, dynamic> filter = {
     'limit': 10,
@@ -127,7 +131,12 @@ class _JobsViewState extends State<JobsView> {
     _debounce?.cancel();
     super.dispose();
   }
-
+  void _changePage(int newPage) {
+    setState(() {
+      filter['offset'] = newPage * filter['limit'];
+    });
+    search();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -143,31 +152,71 @@ class _JobsViewState extends State<JobsView> {
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(),
               ),
-              onChanged: _debouncedSearch,
+              onChanged: (text) {
+                if (_debounce?.isActive ?? false) _debounce!.cancel();
+                _debounce = Timer(const Duration(milliseconds: 500), () {
+                  setState(() {
+                    filter['searchText'] = text;
+                    filter['offset'] = 0;
+                  });
+                  search();
+                });
+              },
             ),
           ),
         ),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : HorizontalDataTable(
-        leftHandSideColumnWidth: 100,
-        rightHandSideColumnWidth: 1300,
-        isFixedHeader: true,
-        headerWidgets: _getTitleWidgets(),
-        leftSideItemBuilder: _generateFirstColumnRow,
-        rightSideItemBuilder: _generateRightHandSideColumnRow,
-        itemCount: data.length,
-        rowSeparatorWidget: const Divider(color: Colors.black54, height: 1.0),
-        leftHandSideColBackgroundColor: Colors.white,
-        rightHandSideColBackgroundColor: Colors.white,
+          : Column(
+        children: [
+          Expanded(
+            child: HorizontalDataTable(
+              leftHandSideColumnWidth: 50,
+              rightHandSideColumnWidth: 1300,
+              isFixedHeader: true,
+              headerWidgets: _getTitleWidgets(),
+              leftSideItemBuilder: _generateFirstColumnRow,
+              rightSideItemBuilder: _generateRightHandSideColumnRow,
+              itemCount: data.length,
+              rowSeparatorWidget: const Divider(color: Colors.black54, height: 1.0),
+              leftHandSideColBackgroundColor: Colors.white,
+              rightHandSideColBackgroundColor: Colors.white,
+              onScrollControllerReady: (vertical, horizontal) {
+                _verticalScrollController = vertical;
+                _horizontalScrollController = horizontal;
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                  onPressed: filter['offset'] > 0
+                      ? () => _changePage((filter['offset'] / filter['limit']).floor() - 1)
+                      : null,
+                  child: const Text('Previous'),
+                ),
+                Text('Page ${(filter['offset'] / filter['limit']).floor() + 1}'),
+                ElevatedButton(
+                  onPressed: data.length == filter['limit']
+                      ? () => _changePage((filter['offset'] / filter['limit']).floor() + 1)
+                      : null,
+                  child: const Text('Next'),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
   List<Widget> _getTitleWidgets() {
     return [
-      _getTitleItemWidget('Akcije', 100),
+      _getTitleItemWidget('Akcije', 50),
       _getTitleItemWidget('Naziv', 200),
       _getTitleItemWidget('Opis', 300),
       _getTitleItemWidget('Tip posla', 150),
@@ -195,7 +244,7 @@ class _JobsViewState extends State<JobsView> {
       width: 100,
       height: 52,
       alignment: Alignment.center,
-      child:   _buildActionsCell(context, data[index], 100),
+      child:   _buildActionsCell(context, data[index], 50),
     );
   }
 
@@ -231,19 +280,73 @@ class _JobsViewState extends State<JobsView> {
       width: width,
       height: 52,
       alignment: Alignment.center,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.delete, color: Colors.red),
-            onPressed: () => _showDeleteConfirmation(context, job),
+      child: PopupMenuButton<String>(
+        icon: const Icon(Icons.more_vert, color: Colors.black), // Three-dot menu icon
+        onSelected: (String value) {
+          switch (value) {
+            case 'edit':
+            Navigator.push(
+            context,
+          MaterialPageRoute(
+          builder: (context) =>
+          JobDetailsPage(job: job),
+          ));
+              break;
+            case 'delete':
+              _showDeleteConfirmation(context, job);
+              break;
+            case 'activate':
+              _showActivateConfirmation(context, job);
+              break;
+            case 'applicants':
+          Navigator.push(
+             context,
+            MaterialPageRoute(
+             builder: (context) =>
+          JobApplicationsView(jobId: job.id!),
+          ));
+
+              break;
+          }
+        },
+        itemBuilder: (BuildContext context) => [
+          const PopupMenuItem(
+            value: 'edit',
+            child: ListTile(
+              leading: Icon(Icons.edit, color: Colors.blue),
+              title: Text('Detalji'),
+            ),
           ),
-          IconButton(
-            icon: const Icon(Icons.check, color: Colors.green),
-            onPressed: () => _showActivateConfirmation(context, job),
-          ),
+          if (job.deletedByAdmin!)
+            const PopupMenuItem(
+              value: 'activate',
+              child: ListTile(
+                leading: Icon(Icons.refresh, color: Colors.green),
+                title: Text('Aktiviraj'),
+              ),
+            )
+          else
+            const PopupMenuItem(
+              value: 'delete',
+              child: ListTile(
+                leading: Icon(Icons.block, color: Colors.red),
+                title: Text('Obriši'),
+              ),
+            ),
+          if (job.status == JobStatus.Aktivan ||
+              job.status == JobStatus.AplikacijeZavrsene ||
+              job.status == JobStatus.Zavrsen)
+            const PopupMenuItem(
+              value: 'applicants',
+              child: ListTile(
+                leading: Icon(Icons.group, color: Colors.purple),
+                title: Text('Aplikanti'),
+              ),
+            ),
         ],
       ),
     );
   }
+
+
 }

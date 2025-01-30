@@ -11,10 +11,14 @@ JobApplication _$JobApplicationFromJson(Map<String, dynamic> json) => JobApplica
   ..created =
   json['created'] == null ? null : DateTime.parse(json['created'] as String)
   ..createdBy = (json['createdBy'] as num?)?.toInt()
-  ..hasRated = json['hasRated'] as bool
+  ..hasRated = json['hasRated'] as bool? ?? false
   ..job = json['job'] == null
       ? null
-      : Job.fromJson(json['job'] as Map<String, dynamic>);
+      : Job.fromJson(json['job'] as Map<String, dynamic>)
+  ..rating = json['rating'] == null
+      ? null
+      : Rating.fromJson(json['rating'] as Map<String, dynamic>)
+..createdByName= json['createdByName'] as String? ?? null;
 
 
 Map<String, dynamic> _$JobApplicationToJson(JobApplication instance) => <String, dynamic>{

@@ -11,6 +11,6 @@ sealed class JobGetApplicantsQueryHandler(IJobRepository jobRepository, IMapper 
     public async Task<IEnumerable<ApplicantDTO>> Handle(JobGetApplicantsQuery request, CancellationToken cancellationToken)
     {
         var job = await jobRepository.TryFindAsync(request.JobId);
-        return await jobRepository.GetApplicants(request.JobId);
+        return await jobRepository.GetApplicants(request.JobId,request.RoleId);
     }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
 import 'package:minijobs_admin/pages/auth/login_page.dart';
+import 'package:minijobs_admin/pages/main/constants.dart';
 import 'package:minijobs_admin/providers/applicant_provider.dart';
 import 'package:minijobs_admin/providers/authentication_provider.dart';
 import 'package:minijobs_admin/providers/city_provider.dart';
@@ -17,7 +18,7 @@ import 'package:minijobs_admin/providers/user_registration_provider.dart';
 import 'package:minijobs_admin/providers/user_provider.dart';
 import 'package:minijobs_admin/services/notification.service.dart';
 import 'package:provider/provider.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 void main() async {
   await GetStorage.init();
   runApp(MultiProvider(
@@ -75,18 +76,12 @@ class MyMaterialApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "My app",
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue,
-        //  brightness: Brightness.light,
-        ),
-        textTheme: const TextTheme(
-          displayLarge: TextStyle(
-            fontSize: 72,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      title: "Minijobs",
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: bgColor,
+        textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme)
+            .apply(bodyColor: Colors.white),
+        canvasColor: secondaryColor,
       ),
       home: LoginPage(),
     );

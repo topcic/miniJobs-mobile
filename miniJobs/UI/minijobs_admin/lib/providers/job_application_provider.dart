@@ -57,4 +57,17 @@ class JobApplicationProvider extends BaseProvider<JobApplication> {
       return null;
     }
   }
+
+  Future<List<JobApplication>> getApplicationsWithDetails(int jobId) async {
+    try {
+      var url = "${baseUrl}jobs/$jobId/applications/withdetails";
+      var response = await dio.get(url);
+
+      List<JobApplication> responseData = List<JobApplication>.from(
+          response.data.map((item) => JobApplication.fromJson(item)));
+      return responseData;
+    } catch (err) {
+      throw Exception(err.toString());
+    }
+  }
 }
