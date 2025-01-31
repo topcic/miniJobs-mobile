@@ -14,18 +14,7 @@ class Header extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        if (!Responsive.isDesktop(context))
-          IconButton(
-            icon: Icon(Icons.menu),
-            onPressed: context.read<MenuAppController>().controlMenu,
-          ),
-        if (!Responsive.isMobile(context))
-          Text(
-            "Dashboard",
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-        if (!Responsive.isMobile(context))
-          Spacer(flex: Responsive.isDesktop(context) ? 2 : 1),
+          Spacer(flex: 2),
         ProfileCard()
       ],
     );

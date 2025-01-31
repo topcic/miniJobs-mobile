@@ -17,28 +17,43 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   Widget _selectedScreen = DashboardScreen(); // Default screen
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>(); // Key to control drawer
 
   void _setSelectedScreen(Widget screen) {
     setState(() {
-      _selectedScreen = screen; // Update selected screen
+      _selectedScreen = screen;
     });
+
+    // Close the drawer if on mobile after selecting a menu item
+    if (MediaQuery.of(context).size.width < 850) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    bool isMobile = MediaQuery.of(context).size.width < 850; // Define breakpoint for mobile
+
     return Scaffold(
-      drawer: SideMenu(onMenuItemSelected: _setSelectedScreen),
+      key: _scaffoldKey,
+      drawer: isMobile ? _buildSideMenu() : null, // Use drawer on mobile
       body: SafeArea(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(child: SideMenu(onMenuItemSelected: _setSelectedScreen)),
+            if (!isMobile) _buildSideMenu(), // Show Side Menu on larger screens
             Expanded(
               flex: 5,
-              child: Padding(
-                padding: const EdgeInsets.all(defaultPadding),
-                // Apply default padding
-                child: _selectedScreen,
+              child: Column(
+                children: [
+                  _buildHeader(isMobile),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(defaultPadding),
+                      child: _selectedScreen,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -46,87 +61,62 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
   }
-}
 
-class SideMenu extends StatelessWidget {
-  final Function(Widget)
-      onMenuItemSelected; // Function callback to update screen
+  // Header with menu button for mobile
+  Widget _buildHeader(bool isMobile) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
+      color: secondaryColor,
+      child: Row(
+        children: [
+          if (isMobile)
+            IconButton(
+              icon: Icon(Icons.menu, color: Colors.white),
+              onPressed: () {
+                _scaffoldKey.currentState?.openDrawer(); // Open drawer on mobile
+              },
+            ),
+          Text(
+            "Dashboard",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+        ],
+      ),
+    );
+  }
 
-  const SideMenu({Key? key, required this.onMenuItemSelected})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Drawer(
+  // Sidebar menu (Drawer for mobile, Expanded container for desktop)
+  Widget _buildSideMenu() {
+    return Container(
+      width: 250,
+      decoration: BoxDecoration(color: secondaryColor),
       child: ListView(
         children: [
           DrawerHeader(
             child: Image.asset("assets/images/logo.png"),
           ),
-          DrawerListTile(
-            title: "Dashboard",
-            icon: FontAwesomeIcons.tachometerAlt,
-            press: () => onMenuItemSelected(DashboardScreen()),
-          ),
-          DrawerListTile(
-            title: "Poslodavci",
-            icon: FontAwesomeIcons.building,
-            press: () => onMenuItemSelected(const EmployersView()),
-          ),
-          DrawerListTile(
-            title: "Aplikanti",
-            icon: FontAwesomeIcons.users,
-            press: () => onMenuItemSelected(const ApplicantsView()),
-          ),
-          DrawerListTile(
-            title: "Poslovi",
-            icon: FontAwesomeIcons.briefcase,
-            press: () => onMenuItemSelected(JobsView()),
-          ),
+          _buildMenuItem("Dashboard", FontAwesomeIcons.tachometerAlt, DashboardScreen()),
+          _buildMenuItem("Poslodavci", FontAwesomeIcons.building, const EmployersView()),
+          _buildMenuItem("Aplikanti", FontAwesomeIcons.users, const ApplicantsView()),
+          _buildMenuItem("Poslovi", FontAwesomeIcons.briefcase, JobsView()),
           ExpansionTile(
-            leading: Icon(FontAwesomeIcons.chartBar),
-            title: Text("Izvještaji"),
+            leading: Icon(FontAwesomeIcons.chartBar, color: Colors.white54),
+            title: Text("Izvještaji", style: TextStyle(color: Colors.white54)),
             children: [
-              DrawerListTile(
-                title: "Izvještaj o ocjenama",
-                icon: FontAwesomeIcons.star,
-                press: () => onMenuItemSelected(RatingReportsPage()),
-              ),
-              DrawerListTile(
-                title: "Izvještaj o aplikacijama",
-                icon: FontAwesomeIcons.fileAlt,
-                press: () => onMenuItemSelected(JobApplicationReportsPage()),
-              ),
-              DrawerListTile(
-                title: "Izvještaj o poslovima",
-                icon: FontAwesomeIcons.suitcase,
-                press: () => onMenuItemSelected(JobReportsPage()),
-              ),
+              _buildMenuItem("Izvještaj o ocjenama", FontAwesomeIcons.star, RatingReportsPage()),
+              _buildMenuItem("Izvještaj o aplikacijama", FontAwesomeIcons.fileAlt, JobApplicationReportsPage()),
+              _buildMenuItem("Izvještaj o poslovima", FontAwesomeIcons.suitcase, JobReportsPage()),
             ],
           ),
         ],
       ),
     );
   }
-}
 
-class DrawerListTile extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final VoidCallback press;
-
-  const DrawerListTile({
-    Key? key,
-    required this.title,
-    required this.icon,
-    required this.press,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
+  // Helper method to build menu items
+  Widget _buildMenuItem(String title, IconData icon, Widget screen) {
     return ListTile(
-      onTap: press,
-      horizontalTitleGap: 0.0,
+      onTap: () => _setSelectedScreen(screen),
       leading: FaIcon(icon, color: Colors.white54, size: 16),
       title: Text(title, style: TextStyle(color: Colors.white54)),
     );
