@@ -1,13 +1,9 @@
 ﻿using Application.Common.Exceptions;
 using AutoMapper;
 using Domain.Dtos;
-using Domain.Entities;
 using Domain.Enums;
-using Domain.Interfaces;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Data.SqlClient;
 using System.Data;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Infrastructure.Persistence.Repositories
 {
@@ -83,7 +79,7 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<IEnumerable<Job>> GetEmployerJobsAsync(int employerId)
         {
             var jobs = from j in context.Jobs
-                       where j.CreatedBy == employerId && j.Status != JobStatus.Inactive && j.DeletedByAdmin==false
+                       where j.CreatedBy == employerId && j.Status != JobStatus.Inactive && j.DeletedByAdmin == false
                        select new
                        {
                            Job = j,
@@ -199,7 +195,7 @@ namespace Infrastructure.Persistence.Repositories
             var query = from j in context.Jobs
                         join sj in context.SavedJobs on j.Id equals sj.JobId
                         join c in context.Cities on j.CityId equals c.Id
-                        where sj.CreatedBy == applicantId && sj.IsDeleted==false && j.DeletedByAdmin == false
+                        where sj.CreatedBy == applicantId && sj.IsDeleted == false && j.DeletedByAdmin == false
                         select new Job
                         {
                             Id = j.Id,
@@ -228,7 +224,7 @@ namespace Infrastructure.Persistence.Repositories
                             on new { a.Id, a.CreatedBy }
                             equals new { Id = r.JobApplicationId, CreatedBy = r.CreatedBy }
                             into ratingsGroup
-                        from r in ratingsGroup.DefaultIfEmpty() 
+                        from r in ratingsGroup.DefaultIfEmpty()
                         where a.CreatedBy == applicantId && a.IsDeleted == false && j.DeletedByAdmin == false
                         select new JobApplication
                         {
@@ -237,7 +233,7 @@ namespace Infrastructure.Persistence.Repositories
                             Status = a.Status,
                             IsDeleted = a.IsDeleted,
                             Created = a.Created,
-                            HasRated = r != null, 
+                            HasRated = r != null,
                             Job = new Job
                             {
                                 Id = j.Id,
@@ -250,7 +246,7 @@ namespace Infrastructure.Persistence.Repositories
                                 Wage = j.Wage,
                                 CityId = j.CityId,
                                 JobTypeId = j.JobTypeId,
-                                CreatedBy= j.CreatedBy,
+                                CreatedBy = j.CreatedBy,
                                 City = c // Include City information
                             }
                         };
@@ -263,7 +259,7 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<IEnumerable<ApplicantDTO>> GetApplicants(int jobId, string role)
         {
-            var isAdmin = role=="Administrator";
+            var isAdmin = role == "Administrator";
             var applicants = from j in context.Jobs
                              join ja in context.JobApplications on j.Id equals ja.JobId
                              join a in context.Applicants on ja.CreatedBy equals a.Id
@@ -321,7 +317,7 @@ namespace Infrastructure.Persistence.Repositories
                                        NumberOfFinishedJobs = finishedJobsCount,
                                        JobApplicationId = app.JobApplicationId,
                                        IsRated = isRated,
-                                       ApplicationStatus= app.ApplicationStatus
+                                       ApplicationStatus = app.ApplicationStatus
                                    };
 
             var result = await applicantDetails.ToListAsync();
@@ -433,5 +429,36 @@ namespace Infrastructure.Persistence.Repositories
             return result;
         }
 
+        public async Task<IEnumerable<Job>> GetJobsForReportsAsync()
+        {
+            var jobs = await (from j in context.Jobs
+                              join jt in context.JobTypes on j.JobTypeId equals jt.Id into jobTypeJoin
+                              from jt in jobTypeJoin.DefaultIfEmpty()
+                              join c in context.Cities on j.CityId equals c.Id into cityJoin
+                              from c in cityJoin.DefaultIfEmpty()
+                              join u in context.Users on j.CreatedBy equals u.Id into userJoin
+                              from u in userJoin.DefaultIfEmpty()
+                              select new Job
+                              {
+                                  Id = j.Id,
+                                  Name = j.Name,
+                                  Description = j.Description,
+                                  StreetAddressAndNumber = j.StreetAddressAndNumber,
+                                  ApplicationsDuration = j.ApplicationsDuration,
+                                  Status = j.Status,
+                                  RequiredEmployees = j.RequiredEmployees,
+                                  Wage = j.Wage,
+                                  CityId = j.CityId,
+                                  JobTypeId = j.JobTypeId,
+                                  Created = j.Created,
+                                  CreatedBy = j.CreatedBy,
+                                  JobType = jt, // Use jt (joined job type)
+                                  City = c,     // Use c (joined city)
+                                  EmployerFullName = u != null ? u.FirstName + " " + u.LastName : null
+                              }).ToListAsync();
+
+            return jobs;
+        }
     }
+
 }

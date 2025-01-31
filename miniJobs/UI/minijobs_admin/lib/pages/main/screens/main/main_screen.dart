@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../applicants/applicants_view.dart';
 import '../../../employers/employers_view.dart';
 import '../../../jobs/jobs_view.dart';
+import '../../../reports/job_reports_page.dart';
 import '../../constants.dart';
 import '../dashboard/dashboard_screen.dart';
 
@@ -77,6 +78,11 @@ class SideMenu extends StatelessWidget {
             title: "Poslovi",
             icon: FontAwesomeIcons.briefcase,
             press: () => onMenuItemSelected(JobsView()),
+          ),
+          DrawerListTile(
+            title: "Izvještaji",
+            icon: FontAwesomeIcons.chartBar,
+            press:() => onMenuItemSelected(JobReportsPage()),
           ),
         ],
       ),

@@ -18,4 +18,7 @@ public interface IJobRepository : IGenericRepository<Job, int>
 
     Task<int> PublicCountAsync(Dictionary<string, string> parameters = null);
     Task<IEnumerable<Job>> PublicFindPaginationAsync(Dictionary<string, string> parameters = null);
+
+    Task<IEnumerable<Job>> GetJobsForReportsAsync();
+
 }
