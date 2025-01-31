@@ -29,6 +29,15 @@ public class Rating : BaseAuditableEntity, IEntity<int>
     public string CreatedByFullName { get; set; }
 
     [NotMapped]
+    public string RatedUserFullName { get; set; }
+
+    [NotMapped]
+    public string CreatedByRole{ get; set; }
+
+    [NotMapped]
+    public string RatedUserRole { get; set; }
+
+    [NotMapped]
     public byte[]? Photo { get; set; }
 
 }

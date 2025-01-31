@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-
 import '../../../applicants/applicants_view.dart';
 import '../../../employers/employers_view.dart';
 import '../../../jobs/jobs_view.dart';
+import '../../../reports/job_application_reports_page.dart';
 import '../../../reports/job_reports_page.dart';
+import '../../../reports/rating_reports_page.dart';
 import '../../constants.dart';
 import '../dashboard/dashboard_screen.dart';
 
@@ -35,7 +36,8 @@ class _MainScreenState extends State<MainScreen> {
             Expanded(
               flex: 5,
               child: Padding(
-                padding: const EdgeInsets.all(defaultPadding), // Apply default padding
+                padding: const EdgeInsets.all(defaultPadding),
+                // Apply default padding
                 child: _selectedScreen,
               ),
             ),
@@ -47,9 +49,11 @@ class _MainScreenState extends State<MainScreen> {
 }
 
 class SideMenu extends StatelessWidget {
-  final Function(Widget) onMenuItemSelected; // Function callback to update screen
+  final Function(Widget)
+      onMenuItemSelected; // Function callback to update screen
 
-  const SideMenu({Key? key, required this.onMenuItemSelected}) : super(key: key);
+  const SideMenu({Key? key, required this.onMenuItemSelected})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -79,10 +83,26 @@ class SideMenu extends StatelessWidget {
             icon: FontAwesomeIcons.briefcase,
             press: () => onMenuItemSelected(JobsView()),
           ),
-          DrawerListTile(
-            title: "Izvještaji",
-            icon: FontAwesomeIcons.chartBar,
-            press:() => onMenuItemSelected(JobReportsPage()),
+          ExpansionTile(
+            leading: Icon(FontAwesomeIcons.chartBar),
+            title: Text("Izvještaji"),
+            children: [
+              DrawerListTile(
+                title: "Izvještaj o ocjenama",
+                icon: FontAwesomeIcons.star,
+                press: () => onMenuItemSelected(RatingReportsPage()),
+              ),
+              DrawerListTile(
+                title: "Izvještaj o aplikacijama",
+                icon: FontAwesomeIcons.fileAlt,
+                press: () => onMenuItemSelected(JobApplicationReportsPage()),
+              ),
+              DrawerListTile(
+                title: "Izvještaj o poslovima",
+                icon: FontAwesomeIcons.suitcase,
+                press: () => onMenuItemSelected(JobReportsPage()),
+              ),
+            ],
           ),
         ],
       ),

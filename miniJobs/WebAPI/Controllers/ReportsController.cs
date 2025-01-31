@@ -8,14 +8,32 @@ namespace WebAPI.Controllers;
 [Route("api/reports")]
 [Authorize]
 
-public class ReportsController(IJobRepository jobRepository) : ControllerBase
+public class ReportsController(IJobRepository jobRepository, IJobApplicationRepository jobApplicationRepository, IRatingRepository ratingRepository) : ControllerBase
 {
     [HttpGet("jobs")]
     [ProducesResponseType(typeof(IEnumerable<Job>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetOverallStatisticAsync()
+    public async Task<IActionResult> GetJobsAsync()
     {
         return Ok(await jobRepository.GetJobsForReportsAsync());
+    }
+
+    [HttpGet("job-applications")]
+    [ProducesResponseType(typeof(IEnumerable<JobApplication>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetJobApplicationsAsync()
+    {
+        return Ok(await jobApplicationRepository.GetJobApplicationForReportsAsync());
+    }
+
+    [HttpGet("ratings")]
+    [ProducesResponseType(typeof(IEnumerable<Rating>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetRatingsAsync()
+    {
+        return Ok(await ratingRepository.GetRatingsForReportsAsync());
     }
 }

@@ -16,6 +16,10 @@ class Rating {
    DateTime created;
    Uint8List? photo;
    int createdBy;
+   String createdByRole;
+   String ratedUserFullName;
+   String ratedUserRole;
+   bool isActive;
 
   Rating(
      this.id,
@@ -26,7 +30,11 @@ class Rating {
      this.createdByFullName,
      this.created,
       this.photo,
-      this.createdBy
+      this.createdBy,
+      this.createdByRole,
+      this.ratedUserFullName,
+      this.ratedUserRole,
+      this.isActive
   );
 
   factory Rating.fromJson(Map<String, dynamic> json) => _$RatingFromJson(json);

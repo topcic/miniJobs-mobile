@@ -1,48 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import '../../enumerations/job_statuses.dart';
-import '../../models/job/job.dart';
+import 'package:minijobs_admin/enumerations/job_application_status.dart';
+
+import '../../models/job/job_application.dart';
 import '../../providers/report_provider.dart';
 
-class JobReportsPage extends StatefulWidget {
+class JobApplicationReportsPage extends StatefulWidget {
+  const JobApplicationReportsPage({Key? key}) : super(key: key);
+
   @override
-  _JobReportsPageState createState() => _JobReportsPageState();
+  _JobApplicationReportsPageState createState() =>
+      _JobApplicationReportsPageState();
 }
 
-class _JobReportsPageState extends State<JobReportsPage> {
+class _JobApplicationReportsPageState extends State<JobApplicationReportsPage> {
   final ReportProvider reportProvider = ReportProvider();
-  Map<JobStatus, int> jobStatusCount = {};
+  Map<JobApplicationStatus, int> jobStatusCount = {};
   Map<String, int> jobCategoryCount = {};
   Map<String, int> cityJobCount = {};
-  Map<String, int> monthlyJobCount = {};
-  List<Job> jobs = [];
+  Map<String, int> monthlyApplicationCount = {};
+  List<JobApplication> jobApplications = [];
   bool isLoading = true;
   String? errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _fetchJobReports();
+    _fetchJobApplicationReports();
   }
 
-  Future<void> _fetchJobReports() async {
+  Future<void> _fetchJobApplicationReports() async {
     try {
-      jobs = await reportProvider.getJobs();
-      Map<JobStatus, int> statusCount = {};
+      jobApplications = await reportProvider.getJobApplications();
+      Map<JobApplicationStatus, int> statusCount = {};
       Map<String, int> categoryCount = {};
       Map<String, int> cityCount = {};
       Map<String, int> monthlyCount = {};
 
-      for (var job in jobs) {
-        statusCount[job.status!] = (statusCount[job.status] ?? 0) + 1;
-        if (job.jobType != null) {
-          categoryCount[job.jobType!.name!] =
-              (categoryCount[job.jobType!.name] ?? 0) + 1;
+      for (var application in jobApplications) {
+        statusCount[application.status!] =
+            (statusCount[application.status] ?? 0) + 1;
+
+        if (application.job!.jobType != null) {
+          categoryCount[application.job!.jobType!.name!] =
+              (categoryCount[application.job!.jobType!.name] ?? 0) + 1;
         }
-        if (job.city != null) {
-          cityCount[job.city!.name!] = (cityCount[job.city!.name] ?? 0) + 1;
+        if (application.job!.city != null) {
+          cityCount[application.job!.city!.name!] =
+              (cityCount[application.job!.city!.name] ?? 0) + 1;
         }
-        String monthKey = "${job.created!.year}-${job.created!.month}";
+        String monthKey =
+            "${application.created!.year}-${application.created!.month}";
         monthlyCount[monthKey] = (monthlyCount[monthKey] ?? 0) + 1;
       }
 
@@ -50,7 +58,7 @@ class _JobReportsPageState extends State<JobReportsPage> {
         jobStatusCount = statusCount;
         jobCategoryCount = _getTopEntries(categoryCount, 5);
         cityJobCount = _getTopEntries(cityCount, 5);
-        monthlyJobCount = monthlyCount;
+        monthlyApplicationCount = monthlyCount;
         isLoading = false;
       });
     } catch (error) {
@@ -67,34 +75,26 @@ class _JobReportsPageState extends State<JobReportsPage> {
     return Map.fromEntries(sortedEntries.take(topN));
   }
 
-  String _statusToString(JobStatus status) {
+  String _statusToString(JobApplicationStatus status) {
     switch (status) {
-      case JobStatus.Kreiran:
-        return "Kreiran";
-      case JobStatus.Aktivan:
-        return "Aktivan";
-      case JobStatus.AplikacijeZavrsene:
-        return "Aplikacije završene";
-      case JobStatus.Zavrsen:
-        return "Završen";
-      case JobStatus.Izbrisan:
-        return "Izbrisan";
+      case JobApplicationStatus.Poslano:
+        return "Poslano";
+      case JobApplicationStatus.Prihvaceno:
+        return "Prihvaćeno";
+      case JobApplicationStatus.Odbijeno:
+        return "Odbijeno";
       default:
         return "Unknown";
     }
   }
 
-  Color _getStatusColor(JobStatus status) {
+  Color _getStatusColor(JobApplicationStatus status) {
     switch (status) {
-      case JobStatus.Kreiran:
+      case JobApplicationStatus.Poslano:
         return Colors.blue;
-      case JobStatus.Aktivan:
+      case JobApplicationStatus.Prihvaceno:
         return Colors.green;
-      case JobStatus.AplikacijeZavrsene:
-        return Colors.orange;
-      case JobStatus.Zavrsen:
-        return Colors.purple;
-      case JobStatus.Izbrisan:
+      case JobApplicationStatus.Odbijeno:
         return Colors.red;
       default:
         return Colors.grey;
@@ -104,24 +104,24 @@ class _JobReportsPageState extends State<JobReportsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Izvještaji o poslovima')),
+      appBar: AppBar(title: const Text('Izvještaji o aplikacijama za poslove')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: isLoading
-            ? Center(child: CircularProgressIndicator())
+            ? Center(child: const CircularProgressIndicator())
             : errorMessage != null
                 ? Center(
                     child: Text(errorMessage!,
-                        style: TextStyle(color: Colors.red)))
+                        style: const TextStyle(color: Colors.red)))
                 : SingleChildScrollView(
                     child: Column(
                       children: [
-                        Text("Poslovi pregled",
+                        const Text("Aplikacije pregled",
                             style: TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.bold)),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
-                        // Pie Chart for Job Status
+                        // Pie Chart for Job Application Status
                         SizedBox(
                           height: 250,
                           child: PieChart(
@@ -133,7 +133,7 @@ class _JobReportsPageState extends State<JobReportsPage> {
                                   value: entry.value.toDouble(),
                                   color: _getStatusColor(entry.key),
                                   radius: 60,
-                                  titleStyle: TextStyle(
+                                  titleStyle: const TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -144,17 +144,15 @@ class _JobReportsPageState extends State<JobReportsPage> {
                           ),
                         ),
 
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         Padding(
                           padding: const EdgeInsets.only(bottom: 8.0),
-                          child: Text('Gradovi sa najviše poslova',
+                          child: Text('Gradovi sa najviše aplikacija',
                               style: const TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold)),
                         ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        // Bar Chart for Top 5 Cities with Most Jobs
+                        SizedBox(height: 20),
+                        // Bar Chart for Top 5 Cities with Most Applications
                         SizedBox(
                           height: 300,
                           child: BarChart(
@@ -165,13 +163,12 @@ class _JobReportsPageState extends State<JobReportsPage> {
                                   x: cityJobCount.keys
                                       .toList()
                                       .indexOf(entry.key),
-                                  // Index as X value
                                   barRods: [
                                     BarChartRodData(
                                       toY: entry.value.toDouble(),
                                       color: Colors.blue,
                                       width: 20,
-                                    )
+                                    ),
                                   ],
                                 );
                               }).toList(),
@@ -192,39 +189,34 @@ class _JobReportsPageState extends State<JobReportsPage> {
                                           axisSide: meta.axisSide,
                                           child: Text(
                                             cityJobCount.keys.elementAt(index),
-                                            style: TextStyle(fontSize: 12),
+                                            style:
+                                                const TextStyle(fontSize: 12),
                                           ),
                                         );
                                       }
                                       return Container();
                                     },
-                                    reservedSize: 40, // Space for city names
+                                    reservedSize: 40,
                                   ),
                                 ),
                                 topTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                      showTitles: false), // Hide top labels
-                                ),
+                                    sideTitles: SideTitles(showTitles: false)),
                                 rightTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                      showTitles: false), // Hide right labels
-                                ),
+                                    sideTitles: SideTitles(showTitles: false)),
                               ),
                             ),
                           ),
                         ),
 
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         Padding(
                           padding: const EdgeInsets.only(bottom: 8.0),
-                          child: Text('Tipovi poslova koji dominiraju',
+                          child: Text('Najtraženiji tipovi posla za aplikante',
                               style: const TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold)),
                         ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        // Bar Chart for Top 5 Job Types with Most Jobs
+                        SizedBox(height: 20),
+                        // Bar Chart for Top 5 Job Types with Most Applications
                         SizedBox(
                           height: 300,
                           child: BarChart(
@@ -235,13 +227,12 @@ class _JobReportsPageState extends State<JobReportsPage> {
                                   x: jobCategoryCount.keys
                                       .toList()
                                       .indexOf(entry.key),
-                                  // Index as X value
                                   barRods: [
                                     BarChartRodData(
                                       toY: entry.value.toDouble(),
                                       color: Colors.green,
                                       width: 20,
-                                    )
+                                    ),
                                   ],
                                 );
                               }).toList(),
@@ -264,55 +255,52 @@ class _JobReportsPageState extends State<JobReportsPage> {
                                           child: Text(
                                             jobCategoryCount.keys
                                                 .elementAt(index),
-                                            style: TextStyle(fontSize: 12),
+                                            style:
+                                                const TextStyle(fontSize: 12),
                                           ),
                                         );
                                       }
                                       return Container();
                                     },
-                                    reservedSize:
-                                        40, // Space for job type labels
+                                    reservedSize: 40,
                                   ),
                                 ),
                                 topTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                      showTitles: false), // Hide top labels
-                                ),
+                                    sideTitles: SideTitles(showTitles: false)),
                                 rightTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                      showTitles: false), // Hide right labels
-                                ),
+                                    sideTitles: SideTitles(showTitles: false)),
                               ),
                             ),
                           ),
                         ),
 
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         Padding(
                           padding: const EdgeInsets.only(bottom: 8.0),
-                          child: Text('Broj poslova u zadnjih 12 mjeseca',
+                          child: Text(
+                              'Broj aplikacija na poslove u zadnjih 12 mjeseca',
                               style: const TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold)),
                         ),
                         SizedBox(height: 20),
-                        // Line Chart for Jobs Created Per Month
+                        // Bar Chart for Applications Created Per Month
                         SizedBox(
                           height: 300,
                           child: BarChart(
                             BarChartData(
                               alignment: BarChartAlignment.spaceAround,
-                              barGroups: monthlyJobCount.entries.map((entry) {
+                              barGroups:
+                                  monthlyApplicationCount.entries.map((entry) {
                                 return BarChartGroupData(
-                                  x: monthlyJobCount.keys
+                                  x: monthlyApplicationCount.keys
                                       .toList()
                                       .indexOf(entry.key),
-                                  // Index as X value
                                   barRods: [
                                     BarChartRodData(
                                       toY: entry.value.toDouble(),
                                       color: Colors.orange,
                                       width: 20,
-                                    )
+                                    ),
                                   ],
                                 );
                               }).toList(),
@@ -328,30 +316,28 @@ class _JobReportsPageState extends State<JobReportsPage> {
                                         (double value, TitleMeta meta) {
                                       int index = value.toInt();
                                       if (index >= 0 &&
-                                          index < monthlyJobCount.keys.length) {
+                                          index <
+                                              monthlyApplicationCount
+                                                  .keys.length) {
                                         return SideTitleWidget(
                                           axisSide: meta.axisSide,
                                           child: Text(
-                                            monthlyJobCount.keys
+                                            monthlyApplicationCount.keys
                                                 .elementAt(index),
-                                            // Display "YYYY-MM"
-                                            style: TextStyle(fontSize: 10),
+                                            style:
+                                                const TextStyle(fontSize: 12),
                                           ),
                                         );
                                       }
                                       return Container();
                                     },
-                                    reservedSize: 40, // Space for labels
+                                    reservedSize: 40,
                                   ),
                                 ),
                                 topTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                      showTitles: false), // Hide top labels
-                                ),
+                                    sideTitles: SideTitles(showTitles: false)),
                                 rightTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                      showTitles: false), // Hide right labels
-                                ),
+                                    sideTitles: SideTitles(showTitles: false)),
                               ),
                             ),
                           ),

@@ -5,4 +5,6 @@ namespace Domain.Interfaces;
 public interface IJobApplicationRepository : IGenericRepository<JobApplication, int>
 {
     Task<IEnumerable<JobApplication>> FindJobApplicationsWithDetailsAsync(int jobId);
+    Task<IEnumerable<JobApplication>> GetJobApplicationForReportsAsync();
+
 }
