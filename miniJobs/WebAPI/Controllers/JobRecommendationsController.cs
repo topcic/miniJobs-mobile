@@ -1,6 +1,10 @@
-﻿using Application.JobRecommendations.Commands;
+﻿using Application.Common.Models;
+using Application.JobRecommendations.Commands;
 using Application.JobRecommendations.Models;
+using Domain.Dtos;
 using Domain.Entities;
+using Domain.Interfaces;
+using Infrastructure.Persistence.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +13,7 @@ namespace WebAPI.Controllers;
 
 [Route("api/job-recommendations")]
 [Authorize]
-public class JobRecommendationsController(IMediator mediator) : ControllerBase
+public class JobRecommendationsController(IMediator mediator,IJobRecommendationRepository jobRecommendationRepository) : ControllerBase
 {
     private readonly IMediator mediator = mediator;
 
@@ -41,5 +45,19 @@ public class JobRecommendationsController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> DeleteAsync([FromRoute] int id)
     {
         return Ok(await mediator.Send(new JobRecommendationDeleteCommand(id)));
+    }
+
+    [HttpGet("search")]
+    [Authorize(Roles = "Administrator")]
+    [ProducesResponseType(typeof(SearchResponseBase<JobRecommendationDTO>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> SearchAsync([FromQuery] Dictionary<string, string> parammeters)
+    {
+        var results = new SearchResponseBase<JobRecommendationDTO>();
+
+        results.Result = await jobRecommendationRepository.PublicFindPaginationAsync(parammeters);
+        results.Count = await jobRecommendationRepository.PublicCountAsync(parammeters);
+        return Ok(results);
     }
 }

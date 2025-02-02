@@ -16,6 +16,7 @@ import 'package:minijobs_admin/providers/proposed_answer_provider.dart';
 import 'package:minijobs_admin/providers/rating_provider.dart';
 import 'package:minijobs_admin/providers/recommendation_provider.dart';
 import 'package:minijobs_admin/providers/report_provider.dart';
+import 'package:minijobs_admin/providers/saved_job_provider.dart';
 import 'package:minijobs_admin/providers/statistic_provider.dart';
 import 'package:minijobs_admin/providers/user_registration_provider.dart';
 import 'package:minijobs_admin/providers/user_provider.dart';
@@ -43,7 +44,8 @@ void main() async {
       ChangeNotifierProvider(create: (s) => RecommendationProvider()),
       ChangeNotifierProvider(create: (s) => MenuAppController()),
       ChangeNotifierProvider(create: (s) => StatisticProvider()),
-      ChangeNotifierProvider(create: (s) => ReportProvider())
+      ChangeNotifierProvider(create: (s) => ReportProvider()),
+      ChangeNotifierProvider(create: (s) => SavedJobProvider()),
     ],
     child: const MyApp(),
   ));

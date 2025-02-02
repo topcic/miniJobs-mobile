@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:minijobs_admin/pages/ratings/rating_view.dart';
+import 'package:minijobs_admin/pages/saved_jobs/saved_jobs_view.dart';
 
 import '../../../applicants/applicants_view.dart';
 import '../../../employers/employers_view.dart';
+import '../../../job-recommendations/job-recommendations_view.dart';
 import '../../../jobs/jobs_view.dart';
 import '../../../reports/job_application_reports_page.dart';
 import '../../../reports/job_reports_page.dart';
@@ -101,6 +103,8 @@ class _MainScreenState extends State<MainScreen> {
           _buildMenuItem("Aplikanti", FontAwesomeIcons.users, const ApplicantsView()),
           _buildMenuItem("Poslovi", FontAwesomeIcons.briefcase, JobsView()),
           _buildMenuItem("Ocjene", FontAwesomeIcons.star, RatingsView()),
+          _buildMenuItem("Preporuke", FontAwesomeIcons.thumbsUp, JobRecommendationsView()),
+          _buildMenuItem("Spašeni poslovi", FontAwesomeIcons.bookmark, SavedJobsView()),
           ExpansionTile(
             leading: Icon(FontAwesomeIcons.chartBar, color: Colors.white54),
             title: Text("Izvještaji", style: TextStyle(color: Colors.white54)),

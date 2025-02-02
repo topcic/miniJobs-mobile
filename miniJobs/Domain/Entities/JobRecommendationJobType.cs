@@ -7,4 +7,6 @@ public class JobRecommendationJobType
     public int JobRecommendationId { get; set; }
     [Column("job_type_id")]
     public int JobTypeId { get; set; }
+    public virtual JobType JobType { get; set; }
+
 }

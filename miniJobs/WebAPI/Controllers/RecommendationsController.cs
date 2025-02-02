@@ -19,5 +19,4 @@ public class RecommendationsController(IMediator mediator) : ControllerBase
     {
         return Ok(await mediator.Send(new RecommendationJobsQuery()));
     }
-
 }

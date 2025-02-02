@@ -7,4 +7,7 @@ public class JobRecommendationCity
     public int JobRecommendationId { get; set; }
     [Column("city_id")]
     public int CityId { get; set; }
+
+    public virtual City City { get; set; }
+
 }

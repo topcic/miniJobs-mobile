@@ -263,3 +263,26 @@ class RatingBadge extends StatelessWidget {
     );
   }
 }
+
+class SavedJobBadge extends StatelessWidget {
+  final bool IsDeleted;
+
+  const SavedJobBadge({
+    required this.IsDeleted,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Determine text and colors based on the user's blocked status
+    final statusText = IsDeleted ? 'Obrisan' : 'Aktivan';
+    final backgroundColor = IsDeleted ? Colors.red[100]! : Colors.green[100]!;
+    final textColor = IsDeleted ? Colors.red[800]! : Colors.green[800]!;
+
+    return Badge(
+      text: statusText,
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+    );
+  }
+}

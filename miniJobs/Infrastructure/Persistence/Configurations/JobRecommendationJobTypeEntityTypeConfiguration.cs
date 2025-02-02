@@ -8,6 +8,9 @@ public class JobRecommendationJobTypeEntityTypeConfiguration : IEntityTypeConfig
     {
         builder.HasKey(x => new { x.JobRecommendationId, x.JobTypeId });
         builder.HasOne<JobRecommendation>().WithMany().HasForeignKey(x => x.JobRecommendationId);
-        builder.HasOne<JobType>().WithMany().HasForeignKey(x => x.JobTypeId);
+        builder.HasOne(x => x.JobType) 
+                .WithMany() 
+                .HasForeignKey(x => x.JobTypeId) 
+                .OnDelete(DeleteBehavior.Restrict);
     }
 }

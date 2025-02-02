@@ -1,6 +1,10 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
+
 import '../models/job_recommendation/job_recommendation.dart';
+import '../models/job_recommendation/job_recommendation_dto.dart';
+import '../models/search_result.dart';
 import '../services/notification.service.dart';
 import 'base_provider.dart';
 
@@ -28,6 +32,26 @@ class JobRecommendationProvider extends BaseProvider<JobRecommendation> {
     } catch (err) {
       handleError(err);
       return null;
+    }
+  }
+
+  Future<SearchResult<JobRecommendationDto>> search(Map<String, dynamic>? params) async {
+    try {
+      var url =
+          "${baseUrl}job-recommendations/search";
+      final queryParameters = buildHttpParams(params ?? {});
+
+      // Make GET request
+      final response = await dio.get(url, queryParameters: queryParameters);
+      var data = response.data as Map<String, dynamic>;
+
+      var result = (data['result'] as List<dynamic>)
+          .map((item) => JobRecommendationDto.fromJson(item as Map<String, dynamic>))
+          .toList();
+      var count = data['count'] as int;
+      return SearchResult<JobRecommendationDto>(count, result);
+    } on DioException catch (err) {
+      throw Exception(err.message);
     }
   }
 }

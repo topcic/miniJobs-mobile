@@ -14,4 +14,10 @@ public class SavedJob : BaseAuditableEntity, IEntity<int>
 
     [Column("is_deleted")]
     public bool IsDeleted { get; set; }
+
+    [NotMapped]
+    public string JobName { get; set; }
+
+    [NotMapped]
+    public string ApplicantFullName { get; set; }
 }
