@@ -26,6 +26,7 @@ Rating _$RatingFromJson(Map<String, dynamic> json) => Rating(
       json['ratedUserFullName'] as String? ?? '',
       json['ratedUserRole'] as String? ?? '',
       json['isActive'] as bool,
+      json['jobName']as String?
     );
 
 Map<String, dynamic> _$RatingToJson(Rating instance) => <String, dynamic>{

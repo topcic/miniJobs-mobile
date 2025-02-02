@@ -38,6 +38,9 @@ public class Rating : BaseAuditableEntity, IEntity<int>
     public string RatedUserRole { get; set; }
 
     [NotMapped]
+    public string JobName { get; set; }
+
+    [NotMapped]
     public byte[]? Photo { get; set; }
 
 }

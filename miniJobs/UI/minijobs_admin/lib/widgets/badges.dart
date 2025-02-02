@@ -240,3 +240,26 @@ class UserStatusBadge extends StatelessWidget {
     );
   }
 }
+
+class RatingBadge extends StatelessWidget {
+  final bool isActive;
+
+  const RatingBadge({
+    required this.isActive,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Determine text and colors based on the user's blocked status
+    final statusText = isActive ? 'Neaktivna' : 'Aktivna';
+    final backgroundColor = isActive ? Colors.red[100]! : Colors.green[100]!;
+    final textColor = isActive ? Colors.red[800]! : Colors.green[800]!;
+
+    return Badge(
+      text: statusText,
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+    );
+  }
+}

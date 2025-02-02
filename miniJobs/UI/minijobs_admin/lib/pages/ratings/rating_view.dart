@@ -1,26 +1,23 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:minijobs_admin/models/job/job.dart';
-import 'package:minijobs_admin/providers/job_provider.dart';
+import 'package:intl/intl.dart';
+import 'package:minijobs_admin/models/rating.dart';
+import 'package:minijobs_admin/providers/rating_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
-
-import '../../enumerations/job_statuses.dart';
 import '../../widgets/badges.dart';
 import '../main/constants.dart';
-import 'job_applications_view.dart';
-import 'job_details.dart';
 
-class JobsView extends StatefulWidget {
-  const JobsView({super.key});
+class RatingsView extends StatefulWidget {
+  const RatingsView({super.key});
 
   @override
-  _JobsViewState createState() => _JobsViewState();
+  _RatingsViewState createState() => _RatingsViewState();
 }
 
-class _JobsViewState extends State<JobsView> {
-  late JobProvider jobProvider;
-  List<Job> data = [];
+class _RatingsViewState extends State<RatingsView> {
+  late RatingProvider ratingProvider;
+  List<Rating> data = [];
   bool isLoading = true;
   late ScrollController _verticalScrollController;
   late ScrollController _horizontalScrollController;
@@ -28,7 +25,7 @@ class _JobsViewState extends State<JobsView> {
   Map<String, dynamic> filter = {
     'limit': 10,
     'offset': 0,
-    'sortBy': 'name',
+    'sortBy': 'created',
     'sortOrder': 'asc',
     'searchText': '',
   };
@@ -38,7 +35,7 @@ class _JobsViewState extends State<JobsView> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    jobProvider = context.read<JobProvider>();
+    ratingProvider = context.read<RatingProvider>();
     search();
   }
 
@@ -47,7 +44,7 @@ class _JobsViewState extends State<JobsView> {
       isLoading = true;
     });
 
-    final result = await jobProvider.searchPublic(filter);
+    final result = await ratingProvider.search(filter);
 
     setState(() {
       data = result.result ?? [];
@@ -55,21 +52,11 @@ class _JobsViewState extends State<JobsView> {
     });
   }
 
-  Future<void> delete(int jobId) async {
-    await jobProvider.deleteByAdmin(jobId);
-    final jobIndex = data.indexWhere((job) => job.id == jobId);
-    setState(() {
-      data[jobIndex].deletedByAdmin = true;
-    });
+  Future<void> delete(int id) async {
+    await ratingProvider.delete(id);
+   search();
   }
 
-  Future<void> activateJob(int jobId) async {
-    await jobProvider.activateByAdmin(jobId);
-    final jobIndex = data.indexWhere((job) => job.id == jobId);
-    setState(() {
-      data[jobIndex].deletedByAdmin = false;
-    });
-  }
 
   void _debouncedSearch(String keyword) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
@@ -81,12 +68,12 @@ class _JobsViewState extends State<JobsView> {
     });
   }
 
-  void _showDeleteConfirmation(BuildContext context, Job job) {
+  void _showDeleteConfirmation(BuildContext context, Rating rating) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Obriši'),
-        content: const Text('Da li ste sigurni da želite obrisati ovaj posao?'),
+        content: const Text('Da li ste sigurni da želite obrisati ovu ocjenu?'),
         actions: [
           TextButton(
             child: const Text('Odustani'),
@@ -95,30 +82,7 @@ class _JobsViewState extends State<JobsView> {
           TextButton(
             child: const Text('Obriši'),
             onPressed: () {
-              delete(job.id!);
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showActivateConfirmation(BuildContext context, Job job) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Aktiviraj'),
-        content: const Text('Da li ste sigurni da želite aktivirati ovaj posao?'),
-        actions: [
-          TextButton(
-            child: const Text('Odustani'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          TextButton(
-            child: const Text('Aktiviraj'),
-            onPressed: () {
-              activateJob(job.id!);
+              delete(rating.id!);
               Navigator.of(context).pop();
             },
           ),
@@ -142,14 +106,14 @@ class _JobsViewState extends State<JobsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pregled poslova'),
+        title: const Text('Pregled ocjena'),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(50),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               decoration: const InputDecoration(
-                hintText: 'Pretraži po nazivu...',
+                hintText: 'Pretraži po ocjeni ili komentaru',
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(),
               ),
@@ -174,7 +138,7 @@ class _JobsViewState extends State<JobsView> {
           Expanded(
             child: HorizontalDataTable(
               leftHandSideColumnWidth: 50,
-              rightHandSideColumnWidth: 1300,
+              rightHandSideColumnWidth: 1400,
               isFixedHeader: true,
               headerWidgets: _getTitleWidgets(),
               leftSideItemBuilder: _generateFirstColumnRow,
@@ -218,13 +182,13 @@ class _JobsViewState extends State<JobsView> {
   List<Widget> _getTitleWidgets() {
     return [
       _getTitleItemWidget('Akcije', 50),
-      _getTitleItemWidget('Naziv', 200),
-      _getTitleItemWidget('Opis', 300),
-      _getTitleItemWidget('Tip posla', 150),
-      _getTitleItemWidget('Grad', 150),
-      _getTitleItemWidget('Broj radnika', 100),
+      _getTitleItemWidget('Ocjenio', 150),
+      _getTitleItemWidget('Ocjenjeni', 150),
+      _getTitleItemWidget('Ocjena', 100),
+      _getTitleItemWidget('Komentar', 400),
+      _getTitleItemWidget('Posao', 250),
+      _getTitleItemWidget('Kreirano', 150),
       _getTitleItemWidget('Status', 200),
-      _getTitleItemWidget('Obrisan/Aktivan', 150),
     ];
   }
 
@@ -245,24 +209,24 @@ class _JobsViewState extends State<JobsView> {
       width: 100,
       height: 52,
       alignment: Alignment.center,
-      child:   _buildActionsCell(context, data[index], 50),
+      child:   _buildActionsCell(context, data[index], 150),
     );
   }
 
   Widget _generateRightHandSideColumnRow(BuildContext context, int index) {
-    final job = data[index];
+    final rating = data[index];
     return Row(
       children: [
-        _buildTableCell(job.name ?? '-', 200),
-        _buildTableCell(job.description ?? '-', 300),
-        _buildTableCell(job.jobType?.name ?? '-', 150),
-        _buildTableCell(job.city?.name ?? '-', 150),
-        _buildTableCell(job.requiredEmployees?.toString() ?? '-', 100),
+        _buildTableCell(rating.createdByFullName , 150),
+        _buildTableCell(rating.ratedUserFullName, 150),
+        _buildTableCell(rating.value.toString(), 100),
+        _buildTableCell(rating.comment , 400),
+        _buildTableCell(rating.jobName ?? '-', 250),
+        _buildTableCell(DateFormat('dd.MM.yyyy HH:mm').format(rating.created), 150),
         _buildTableCell(
-          JobBadge(status: job.status!),
+          RatingBadge(isActive: rating.isActive),
           200,
         ),
-        _buildTableCell(UserStatusBadge(isBlocked: job.deletedByAdmin), 150),
       ],
     );
   }
@@ -275,83 +239,20 @@ class _JobsViewState extends State<JobsView> {
       child: content is Widget ? content : Text(content.toString()),
     );
   }
-
-  Widget _buildActionsCell(BuildContext context, Job job, double width) {
+  Widget _buildActionsCell(BuildContext context, Rating rating, double width) {
     return Container(
       width: width,
       height: 52,
       alignment: Alignment.center,
-      child: PopupMenuButton<String>(
-        icon: const Icon(Icons.more_vert, color: Colors.black), // Three-dot menu icon
-        onSelected: (String value) {
-          switch (value) {
-            case 'edit':
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => JobDetailsPage(jobId: job.id!),
-                ),
-              ).then((value) {
-                if (value == true) {
-                  search(); // ✅ Refresh jobs after returning
-                }
-              });
-              break;
-            case 'delete':
-              _showDeleteConfirmation(context, job);
-              break;
-            case 'activate':
-              _showActivateConfirmation(context, job);
-              break;
-            case 'applicants':
-          Navigator.push(
-             context,
-            MaterialPageRoute(
-             builder: (context) =>
-          JobApplicationsView(jobId: job.id!),
-          ));
-
-              break;
-          }
-        },
-        itemBuilder: (BuildContext context) => [
-          const PopupMenuItem(
-            value: 'edit',
-            child: ListTile(
-              leading: Icon(Icons.edit, color: Colors.blue),
-              title: Text('Detalji'),
-            ),
-          ),
-          if (job.deletedByAdmin!)
-            const PopupMenuItem(
-              value: 'activate',
-              child: ListTile(
-                leading: Icon(Icons.refresh, color: Colors.green),
-                title: Text('Aktiviraj'),
-              ),
-            )
-          else
-            const PopupMenuItem(
-              value: 'delete',
-              child: ListTile(
-                leading: Icon(Icons.block, color: Colors.red),
-                title: Text('Obriši'),
-              ),
-            ),
-          if (job.status == JobStatus.Aktivan ||
-              job.status == JobStatus.AplikacijeZavrsene ||
-              job.status == JobStatus.Zavrsen)
-            const PopupMenuItem(
-              value: 'applicants',
-              child: ListTile(
-                leading: Icon(Icons.group, color: Colors.purple),
-                title: Text('Aplikanti'),
-              ),
-            ),
-        ],
+      child: Tooltip(
+        message: 'Obriši',
+        preferBelow: false, // Ensures the tooltip appears above
+        child: IconButton(
+          icon: const Icon(Icons.block, color: Colors.red),
+          onPressed: () => _showDeleteConfirmation(context, rating),
+          tooltip: '', // Ensures Flutter doesn't show the default label behavior
+        ),
       ),
     );
   }
-
-
 }

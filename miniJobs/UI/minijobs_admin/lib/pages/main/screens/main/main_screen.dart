@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:minijobs_admin/pages/ratings/rating_view.dart';
 
 import '../../../applicants/applicants_view.dart';
 import '../../../employers/employers_view.dart';
@@ -99,6 +100,7 @@ class _MainScreenState extends State<MainScreen> {
           _buildMenuItem("Poslodavci", FontAwesomeIcons.building, const EmployersView()),
           _buildMenuItem("Aplikanti", FontAwesomeIcons.users, const ApplicantsView()),
           _buildMenuItem("Poslovi", FontAwesomeIcons.briefcase, JobsView()),
+          _buildMenuItem("Ocjene", FontAwesomeIcons.star, RatingsView()),
           ExpansionTile(
             leading: Icon(FontAwesomeIcons.chartBar, color: Colors.white54),
             title: Text("Izvještaji", style: TextStyle(color: Colors.white54)),

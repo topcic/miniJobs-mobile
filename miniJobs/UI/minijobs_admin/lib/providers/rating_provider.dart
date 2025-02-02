@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:minijobs_admin/providers/base_provider.dart';
 import '../models/rating.dart';
+import '../models/search_result.dart';
 import '../services/notification.service.dart';
 
 class RatingProvider extends BaseProvider<Rating> {
@@ -24,6 +26,25 @@ class RatingProvider extends BaseProvider<Rating> {
     } catch (err) {
       handleError(err);
       return null;
+    }
+  }
+  Future<SearchResult<Rating>> search(Map<String, dynamic>? params) async {
+    try {
+      var url =
+          "${baseUrl}ratings/search";
+      final queryParameters = buildHttpParams(params ?? {});
+
+      // Make GET request
+      final response = await dio.get(url, queryParameters: queryParameters);
+      var data = response.data as Map<String, dynamic>;
+
+      var result = (data['result'] as List<dynamic>)
+          .map((item) => Rating.fromJson(item as Map<String, dynamic>))
+          .toList();
+      var count = data['count'] as int;
+      return SearchResult<Rating>(count, result);
+    } on DioException catch (err) {
+      throw Exception(err.message);
     }
   }
 }

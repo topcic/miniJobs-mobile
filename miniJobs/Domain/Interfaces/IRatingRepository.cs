@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Domain.Dtos;
+using Domain.Entities;
 
 namespace Domain.Interfaces;
 public interface IRatingRepository : IGenericRepository<Rating, int>

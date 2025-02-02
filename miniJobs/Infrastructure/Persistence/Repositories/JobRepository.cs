@@ -386,7 +386,16 @@ namespace Infrastructure.Persistence.Repositories
                                                         where jq.JobId == j.Id && jq.QuestionId == 3
                                                         select qa.ProposedAnswer).ToList(),
                             JobType = context.JobTypes.FirstOrDefault(jt => jt.Id == j.JobTypeId),
-                            City = context.Cities.FirstOrDefault(c => c.Id == j.CityId)
+                            City = context.Cities.FirstOrDefault(c => c.Id == j.CityId),
+                             EmployerFullName = (
+                    from e in context.Employers
+                    where e.Id == j.CreatedBy
+                    select e.Name
+                ).FirstOrDefault() ?? (
+                    from u in context.Users
+                    where u.Id == j.CreatedBy
+                    select u.FirstName + " " + u.LastName
+                ).FirstOrDefault()
                         };
 
             // Sorting
@@ -423,7 +432,9 @@ namespace Infrastructure.Persistence.Repositories
                 PaymentQuestion = job.PaymentQuestion,
                 AdditionalPaymentOptions = job.AdditionalPaymentOptions,
                 JobType = job.JobType,
-                City = job.City
+                City = job.City,
+                EmployerFullName= job.EmployerFullName,
+                DeletedByAdmin=job.Job.DeletedByAdmin
             }).ToList();
 
             return result;

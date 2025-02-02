@@ -43,7 +43,7 @@ public class JobsController(IMediator mediator, IJobRepository
     }
 
     [HttpGet("{jobId}")]
-    [Authorize(Roles = "Applicant,Employer")]
+    [Authorize]
     [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]

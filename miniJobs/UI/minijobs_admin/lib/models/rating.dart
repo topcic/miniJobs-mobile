@@ -20,6 +20,8 @@ class Rating {
    String ratedUserFullName;
    String ratedUserRole;
    bool isActive;
+   String? jobName;
+
 
   Rating(
      this.id,
@@ -34,7 +36,8 @@ class Rating {
       this.createdByRole,
       this.ratedUserFullName,
       this.ratedUserRole,
-      this.isActive
+      this.isActive,
+      this.jobName
   );
 
   factory Rating.fromJson(Map<String, dynamic> json) => _$RatingFromJson(json);
