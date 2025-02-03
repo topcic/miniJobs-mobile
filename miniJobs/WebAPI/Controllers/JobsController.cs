@@ -15,7 +15,7 @@ namespace WebAPI.Controllers;
 [Route("api/jobs")]
 [Authorize]
 public class JobsController(IMediator mediator, IJobRepository
-     jobRepository) : ControllerBase
+     jobRepository, IJobApplicationRepository jobApplicationRepository) : ControllerBase
 {
     private readonly IMediator mediator = mediator;
 
@@ -153,5 +153,19 @@ public class JobsController(IMediator mediator, IJobRepository
     public async Task<IActionResult> ActivateByAdminAsync([FromRoute] int id)
     {
         return Ok(await mediator.Send(new JobActivateByAdminCommand(id)));
+    }
+
+    [HttpGet("applications/search")]
+    [Authorize(Roles = "Administrator")]
+    [ProducesResponseType(typeof(SearchResponseBase<JobApplication>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> SearchApplicationsAsync([FromQuery] Dictionary<string, string> parammeters)
+    {
+        var results = new SearchResponseBase<JobApplication>();
+
+        results.Result = await jobApplicationRepository.FindPaginationAsync(parammeters);
+        results.Count = await jobApplicationRepository.CountAsync(parammeters);
+        return Ok(results);
     }
 }

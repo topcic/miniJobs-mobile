@@ -17,6 +17,7 @@ class JobApplication {
   bool hasRated = false;
   Rating? rating;
   String? createdByName;
+  String? jobName;
   JobApplication();
   JobApplication.withData(this.id, this.status, this.jobId,
       this.created,this.createdBy);

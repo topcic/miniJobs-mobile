@@ -7,6 +7,7 @@ import 'package:minijobs_admin/models/job/job.dart';
 import 'package:minijobs_admin/providers/base_provider.dart';
 
 import '../enumerations/sort_order.dart';
+import '../models/job/job_application.dart';
 import '../models/job/job_step1_request.dart';
 import '../models/job/job_step2.request.dart';
 import '../models/job/job_step3_request.dart';
@@ -215,6 +216,26 @@ class JobProvider extends BaseProvider<Job> {
     } catch (err) {
       handleError(err);
       return null;
+    }
+  }
+
+  Future<SearchResult<JobApplication>> searchApplications(Map<String, dynamic>? params) async {
+    try {
+      var url =
+          "${baseUrl}jobs/applications/search";
+      final queryParameters = buildHttpParams(params ?? {});
+
+      // Make GET request
+      final response = await dio.get(url, queryParameters: queryParameters);
+      var data = response.data as Map<String, dynamic>;
+
+      var result = (data['result'] as List<dynamic>)
+          .map((item) => JobApplication.fromJson(item as Map<String, dynamic>))
+          .toList();
+      var count = data['count'] as int;
+      return SearchResult<JobApplication>(count, result);
+    } on DioException catch (err) {
+      throw Exception(err.message);
     }
   }
 }

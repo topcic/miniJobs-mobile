@@ -28,7 +28,14 @@ public class JobApplication : BaseAuditableEntity, IEntity<int>
 
     [NotMapped]
     public string CreatedByName { get; set; }
+    [NotMapped]
+    public string JobName { get; set; }
 
     [NotMapped]
     public Rating Rating { get; set; }
+
+    public virtual Job JobReference { get; set; }
+    public virtual User User { get; set; }
+
+
 }

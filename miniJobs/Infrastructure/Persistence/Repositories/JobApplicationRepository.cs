@@ -98,4 +98,54 @@ public class JobApplicationRepository(ApplicationDbContext context, IMapper mapp
 
         return await jobApplications.ToListAsync();
     }
+
+    public async override Task<int> CountAsync(Dictionary<string, string> parameters = null)
+    {
+        var query = context.JobApplications.AsQueryable();
+
+        if (parameters != null && parameters.TryGetValue("searchText", out string searchText) && !string.IsNullOrWhiteSpace(searchText))
+        {
+            query = query.Where(ja =>
+               ja.JobReference.Name.ToString().Contains(searchText) ||
+               ja.User.FirstName.Contains(searchText) ||
+               ja.User.LastName.Contains(searchText)
+           );
+        }
+
+
+        var count = await query.CountAsync();
+        return count;
+    }
+    public async override Task<IEnumerable<JobApplication>> FindPaginationAsync(Dictionary<string, string> parameters = null)
+    {
+        var queryParameters = mapper.Map<QueryParametersDto>(parameters);
+
+        var query = from ja in context.JobApplications
+                    join u in context.Users on ja.CreatedBy equals u.Id into userGroup
+                    from u in userGroup.DefaultIfEmpty()
+                    join j in context.Jobs on ja.JobId equals j.Id into jobGroup
+                    from j in jobGroup.DefaultIfEmpty()
+                    where !ja.IsDeleted 
+                    select new JobApplication
+                    {
+                        Id = ja.Id,
+                        JobId = ja.JobId,
+                        Status = ja.Status,
+                        Created = ja.Created,
+                        CreatedBy=ja.CreatedBy,
+                        IsDeleted = ja.IsDeleted,
+                        CreatedByName = u != null ? (u.FirstName + " " + u.LastName) : null,
+                        JobName = j != null ? j.Name : null
+                    };
+
+        if (!string.IsNullOrEmpty(queryParameters.SearchText))
+        {
+            query = query.Where(ja => ja.JobName.Contains(queryParameters.SearchText) ||
+                                      ja.CreatedByName.Contains(queryParameters.SearchText));
+        }
+
+        query = query.Skip(queryParameters.Offset).Take(queryParameters.Limit);
+
+        return await query.ToListAsync();
+    }
 }

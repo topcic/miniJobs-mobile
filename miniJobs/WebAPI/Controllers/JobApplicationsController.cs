@@ -1,8 +1,10 @@
-﻿using Application.JobApplicationa.Commands;
+﻿using Application.Common.Models;
+using Application.JobApplicationa.Commands;
 using Application.JobApplications.Commands;
 using Application.Jobs.Queries;
 using Domain.Entities;
 using Domain.Interfaces;
+using Infrastructure.Persistence.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

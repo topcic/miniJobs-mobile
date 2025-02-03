@@ -18,7 +18,8 @@ JobApplication _$JobApplicationFromJson(Map<String, dynamic> json) => JobApplica
   ..rating = json['rating'] == null
       ? null
       : Rating.fromJson(json['rating'] as Map<String, dynamic>)
-..createdByName= json['createdByName'] as String? ?? null;
+..createdByName= json['createdByName'] as String? ?? null
+  ..jobName= json['jobName'] as String? ?? null;
 
 
 Map<String, dynamic> _$JobApplicationToJson(JobApplication instance) => <String, dynamic>{

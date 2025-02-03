@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:minijobs_admin/pages/job-applications/job_applications_view.dart';
 import 'package:minijobs_admin/pages/ratings/rating_view.dart';
 import 'package:minijobs_admin/pages/saved_jobs/saved_jobs_view.dart';
 
@@ -102,6 +103,7 @@ class _MainScreenState extends State<MainScreen> {
           _buildMenuItem("Poslodavci", FontAwesomeIcons.building, const EmployersView()),
           _buildMenuItem("Aplikanti", FontAwesomeIcons.users, const ApplicantsView()),
           _buildMenuItem("Poslovi", FontAwesomeIcons.briefcase, JobsView()),
+          _buildMenuItem("Aplikacije", FontAwesomeIcons.fileAlt, JobApplicationsView()),
           _buildMenuItem("Ocjene", FontAwesomeIcons.star, RatingsView()),
           _buildMenuItem("Preporuke", FontAwesomeIcons.thumbsUp, JobRecommendationsView()),
           _buildMenuItem("Spašeni poslovi", FontAwesomeIcons.bookmark, SavedJobsView()),

@@ -70,4 +70,5 @@ class JobApplicationProvider extends BaseProvider<JobApplication> {
       throw Exception(err.toString());
     }
   }
+
 }
