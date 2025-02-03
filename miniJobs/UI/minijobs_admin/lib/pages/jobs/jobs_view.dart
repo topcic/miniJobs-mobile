@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
 
 import '../../enumerations/job_statuses.dart';
+import '../../models/job/job_dto.dart';
 import '../../widgets/badges.dart';
 import '../main/constants.dart';
 import 'job_applications_view.dart';
@@ -20,7 +21,7 @@ class JobsView extends StatefulWidget {
 
 class _JobsViewState extends State<JobsView> {
   late JobProvider jobProvider;
-  List<Job> data = [];
+  List<JobDTO> data = [];
   bool isLoading = true;
   late ScrollController _verticalScrollController;
   late ScrollController _horizontalScrollController;
@@ -81,7 +82,7 @@ class _JobsViewState extends State<JobsView> {
     });
   }
 
-  void _showDeleteConfirmation(BuildContext context, Job job) {
+  void _showDeleteConfirmation(BuildContext context, JobDTO job) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -104,7 +105,7 @@ class _JobsViewState extends State<JobsView> {
     );
   }
 
-  void _showActivateConfirmation(BuildContext context, Job job) {
+  void _showActivateConfirmation(BuildContext context, JobDTO job) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -255,8 +256,8 @@ class _JobsViewState extends State<JobsView> {
       children: [
         _buildTableCell(job.name ?? '-', 200),
         _buildTableCell(job.description ?? '-', 300),
-        _buildTableCell(job.jobType?.name ?? '-', 150),
-        _buildTableCell(job.city?.name ?? '-', 150),
+        _buildTableCell(job.jobTypeName ?? '-', 150),
+        _buildTableCell(job.cityName ?? '-', 150),
         _buildTableCell(job.requiredEmployees?.toString() ?? '-', 100),
         _buildTableCell(
           JobBadge(status: job.status!),
@@ -276,7 +277,7 @@ class _JobsViewState extends State<JobsView> {
     );
   }
 
-  Widget _buildActionsCell(BuildContext context, Job job, double width) {
+  Widget _buildActionsCell(BuildContext context, JobDTO job, double width) {
     return Container(
       width: width,
       height: 52,

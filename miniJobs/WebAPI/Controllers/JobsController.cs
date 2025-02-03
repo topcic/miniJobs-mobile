@@ -3,6 +3,7 @@ using Application.Jobs.Commands;
 using Application.Jobs.Models;
 using Application.Jobs.Queries;
 using Application.Users.Models;
+using Domain.Dtos;
 using Domain.Entities;
 using Domain.Interfaces;
 using Infrastructure.Persistence.Repositories;
@@ -26,7 +27,7 @@ public class JobsController(IMediator mediator, IJobRepository
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> SearchAsync([FromQuery] Dictionary<string, string> parammeters)
     {
-        var results = new SearchResponseBase<Job>();
+        var results = new SearchResponseBase<JobDTO>();
 
         results.Result = await jobRepository.PublicFindPaginationAsync(parammeters);
         results.Count = await jobRepository.PublicCountAsync(parammeters);

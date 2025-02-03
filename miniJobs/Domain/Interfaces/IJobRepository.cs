@@ -17,7 +17,7 @@ public interface IJobRepository : IGenericRepository<Job, int>
     Task<IEnumerable<Job>> GetExpiredActiveJobsAsync();
 
     Task<int> PublicCountAsync(Dictionary<string, string> parameters = null);
-    Task<IEnumerable<Job>> PublicFindPaginationAsync(Dictionary<string, string> parameters = null);
+    Task<IEnumerable<JobDTO>> PublicFindPaginationAsync(Dictionary<string, string> parameters = null);
 
     Task<IEnumerable<Job>> GetJobsForReportsAsync();
 

@@ -363,83 +363,91 @@ namespace Infrastructure.Persistence.Repositories
             return count;
         }
 
-        public async Task<IEnumerable<Job>> PublicFindPaginationAsync(Dictionary<string, string> parameters = null)
+        public async Task<IEnumerable<JobDTO>> PublicFindPaginationAsync(Dictionary<string, string> parameters = null)
         {
             var queryParameters = mapper.Map<QueryParametersDto>(parameters);
 
-            // Base query
+            // Base query selecting only necessary fields
             var query = from j in context.Jobs
-                        where (string.IsNullOrEmpty(queryParameters.SearchText) || j.Name.Contains(queryParameters.SearchText) || j.Description.Contains(queryParameters.SearchText))
+                        where string.IsNullOrEmpty(queryParameters.SearchText) ||
+                              j.Name.Contains(queryParameters.SearchText) ||
+                              j.Description.Contains(queryParameters.SearchText)
                         select new
                         {
-                            Job = j,
-                            Schedules = (from jq in context.JobQuestions
-                                         join qa in context.JobQuestionAnswers on jq.Id equals qa.JobQuestionId
-                                         where jq.JobId == j.Id && jq.QuestionId == 1
-                                         select qa.ProposedAnswer).ToList(),
-                            PaymentQuestion = (from jq in context.JobQuestions
-                                               join qa in context.JobQuestionAnswers on jq.Id equals qa.JobQuestionId
-                                               where jq.JobId == j.Id && jq.QuestionId == 2
-                                               select qa.ProposedAnswer).FirstOrDefault(),
-                            AdditionalPaymentOptions = (from jq in context.JobQuestions
-                                                        join qa in context.JobQuestionAnswers on jq.Id equals qa.JobQuestionId
-                                                        where jq.JobId == j.Id && jq.QuestionId == 3
-                                                        select qa.ProposedAnswer).ToList(),
-                            JobType = context.JobTypes.FirstOrDefault(jt => jt.Id == j.JobTypeId),
-                            City = context.Cities.FirstOrDefault(c => c.Id == j.CityId),
-                             EmployerFullName = (
-                    from e in context.Employers
-                    where e.Id == j.CreatedBy
-                    select e.Name
-                ).FirstOrDefault() ?? (
-                    from u in context.Users
-                    where u.Id == j.CreatedBy
-                    select u.FirstName + " " + u.LastName
-                ).FirstOrDefault()
+                            j.Id,
+                            j.Name,
+                            j.Description,
+                            j.ApplicationsDuration,
+                            j.Status,
+                            j.RequiredEmployees,
+                            j.Wage,
+                            j.Created,
+                            j.CreatedBy,
+                            j.DeletedByAdmin,
+
+                            // Related data
+                            CityName = context.Cities.Where(c => c.Id == j.CityId)
+                                                     .Select(c => c.Name)
+                                                     .FirstOrDefault(),
+                            JobTypeName = context.JobTypes.Where(jt => jt.Id == j.JobTypeId)
+                                                          .Select(jt => jt.Name)
+                                                          .FirstOrDefault(),
+
+                            EmployerFullName = context.Employers.Where(e => e.Id == j.CreatedBy)
+                                                                .Select(e => e.Name)
+                                                                .FirstOrDefault() ??
+                                               context.Users.Where(u => u.Id == j.CreatedBy)
+                                                            .Select(u => u.FirstName + " " + u.LastName)
+                                                            .FirstOrDefault()
                         };
 
-            // Sorting
             if (!string.IsNullOrEmpty(queryParameters.SortBy))
             {
-                string columnName = QueryParameterExtension.GetMappedColumnName(queryParameters.SortBy, typeof(Job));
-                query = queryParameters.SortOrder == Domain.Enums.SortOrder.DESC
-                    ? query.OrderByDescending(job => EF.Property<object>(job.Job, columnName))
-                    : query.OrderBy(job => EF.Property<object>(job.Job, columnName));
+                switch (queryParameters.SortBy.ToLower())
+                {
+                    case "name":
+                        query = queryParameters.SortOrder == Domain.Enums.SortOrder.DESC
+                            ? query.OrderByDescending(j => j.Name)
+                            : query.OrderBy(j => j.Name);
+                        break;
+                    case "status":
+                        query = queryParameters.SortOrder == Domain.Enums.SortOrder.DESC
+                            ? query.OrderByDescending(j => j.Status)
+                            : query.OrderBy(j => j.Status);
+                        break;
+                    case "created":
+                        query = queryParameters.SortOrder == Domain.Enums.SortOrder.DESC
+                            ? query.OrderByDescending(j => j.Created)
+                            : query.OrderBy(j => j.Created);
+                        break;
+                    default:
+                        query = query.OrderBy(j => j.Id); 
+                        break;
+                }
             }
 
-            // Pagination
             query = query.Skip(queryParameters.Offset).Take(queryParameters.Limit);
 
-            // Fetch data
             var jobList = await query.ToListAsync();
 
-            // Map to Job objects
-            var result = jobList.Select(job => new Job
+            var result = jobList.Select(job => new JobDTO
             {
-                Id = job.Job.Id,
-                Name = job.Job.Name,
-                Description = job.Job.Description,
-                StreetAddressAndNumber = job.Job.StreetAddressAndNumber,
-                ApplicationsDuration = job.Job.ApplicationsDuration,
-                Status = job.Job.Status,
-                RequiredEmployees = job.Job.RequiredEmployees,
-                Wage = job.Job.Wage,
-                CityId = job.Job.CityId,
-                JobTypeId = job.Job.JobTypeId,
-                Created = job.Job.Created,
-                CreatedBy = job.Job.CreatedBy,
-                Schedules = job.Schedules,
-                PaymentQuestion = job.PaymentQuestion,
-                AdditionalPaymentOptions = job.AdditionalPaymentOptions,
-                JobType = job.JobType,
-                City = job.City,
-                EmployerFullName= job.EmployerFullName,
-                DeletedByAdmin=job.Job.DeletedByAdmin
+                Id = job.Id,
+                Name = job.Name,
+                Description = job.Description,
+                ApplicationsDuration = job.ApplicationsDuration,
+                Status = job.Status,
+                RequiredEmployees = job.RequiredEmployees,
+                CreatedBy = job.CreatedBy.Value,
+                EmployerFullName = job.EmployerFullName,
+                CityName = job.CityName,
+                JobTypeName = job.JobTypeName,
+                Created = job.Created,
+                DeletedByAdmin = job.DeletedByAdmin
             }).ToList();
 
             return result;
         }
-
         public async Task<IEnumerable<Job>> GetJobsForReportsAsync()
         {
             var jobs = await (from j in context.Jobs

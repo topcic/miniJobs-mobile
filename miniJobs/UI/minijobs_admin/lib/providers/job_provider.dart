@@ -8,6 +8,7 @@ import 'package:minijobs_admin/providers/base_provider.dart';
 
 import '../enumerations/sort_order.dart';
 import '../models/job/job_application.dart';
+import '../models/job/job_dto.dart';
 import '../models/job/job_step1_request.dart';
 import '../models/job/job_step2.request.dart';
 import '../models/job/job_step3_request.dart';
@@ -172,7 +173,7 @@ class JobProvider extends BaseProvider<Job> {
     }
 
   }
-  Future<SearchResult<Job>> searchPublic(Map<String, dynamic>? params) async {
+  Future<SearchResult<JobDTO>> searchPublic(Map<String, dynamic>? params) async {
     try {
       var url =
           "${baseUrl}jobs/public-search";
@@ -183,10 +184,10 @@ class JobProvider extends BaseProvider<Job> {
       var data = response.data as Map<String, dynamic>;
 
       var result = (data['result'] as List<dynamic>)
-          .map((item) => Job.fromJson(item as Map<String, dynamic>))
+          .map((item) => JobDTO.fromJson(item as Map<String, dynamic>))
           .toList();
       var count = data['count'] as int;
-      return SearchResult<Job>(count, result);
+      return SearchResult<JobDTO>(count, result);
     } on DioException catch (err) {
       throw Exception(err.message);
     }
