@@ -21,10 +21,10 @@ public class JobApplicationRepository(ApplicationDbContext context, IMapper mapp
                               {
                                   Id = ja.Id,
                                   JobId = ja.JobId,
+                                  Created=ja.Created,
+                                  CreatedBy=ja.CreatedBy,
                                   Status = ja.Status,
-                                  IsDeleted = ja.IsDeleted,
                                   CreatedByName = u.FirstName + " " + u.LastName,
-                                  HasRated = context.Ratings.Any(r => r.RatedUserId == u.Id && r.JobApplicationId == ja.Id),
                                   Rating = r 
                               };
 

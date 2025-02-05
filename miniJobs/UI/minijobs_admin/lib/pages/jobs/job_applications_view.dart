@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
 import 'package:intl/intl.dart';
+import 'package:minijobs_admin/pages/applicants/applicant_details.page.dart';
 import 'package:provider/provider.dart';
 import '../../models/job/job_application.dart';
 import '../../providers/job_application_provider.dart';
 import '../../widgets/badges.dart';
+import '../main/constants.dart';
 
 class JobApplicationsView extends StatefulWidget {
   final int jobId;
@@ -70,15 +72,17 @@ class _JobApplicationsViewState extends State<JobApplicationsView> {
           rightSideItemBuilder: _generateRightHandSideColumnRow,
           itemCount: data.length,
           rowSeparatorWidget: const Divider(color: Colors.black54, height: 1.0),
-          leftHandSideColBackgroundColor: Colors.white,
-          rightHandSideColBackgroundColor: Colors.white,
+          leftHandSideColBackgroundColor:secondaryColor,
+          rightHandSideColBackgroundColor: secondaryColor,
         ),
+
       ),
     );
   }
 
   List<Widget> _getTitleWidgets() {
     return [
+      _getTitleItemWidget('Akcije', 120),
       _getTitleItemWidget('Ime i prezime', 120),
       _getTitleItemWidget('Status', 150),
       _getTitleItemWidget('Kreirano', 200),
@@ -96,15 +100,20 @@ class _JobApplicationsViewState extends State<JobApplicationsView> {
       child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
     );
   }
-
   Widget _generateFirstColumnRow(BuildContext context, int index) {
-    return _buildTableCell(data[index].createdByName, 120);
+    return Container(
+      width: 100,
+      height: 52,
+      alignment: Alignment.center,
+      child:   _buildActionsCell(context, data[index], 150),
+    );
   }
 
   Widget _generateRightHandSideColumnRow(BuildContext context, int index) {
     final application = data[index];
     return Row(
       children: [
+        _buildTableCell(data[index].createdByName, 120),
         _buildTableCell(JobApplicationBadge(status: application.status!), 150),
         _buildTableCell(_formatDate(application.created), 200),
         _buildTableCell(application.rating?.value ?? '-', 100),
@@ -120,6 +129,27 @@ class _JobApplicationsViewState extends State<JobApplicationsView> {
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: content is Widget ? content : Text(content.toString()),
+    );
+  }
+  Widget _buildActionsCell(BuildContext context, JobApplication data, double width) {
+    return Container(
+      width: width,
+      height: 52,
+      alignment: Alignment.center,
+      child: Tooltip(
+        message: 'Detalji aplikanta',
+        preferBelow: false, // Ensures the tooltip appears above
+        child: IconButton(
+          icon: const Icon(Icons.info_outline, color: Colors.blue),
+          onPressed: () =>Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ApplicantDetailsPage(id: data.createdBy!),
+            ),
+          ),
+          tooltip: '', // Ensures Flutter doesn't show the default label behavior
+        ),
+      ),
     );
   }
 }

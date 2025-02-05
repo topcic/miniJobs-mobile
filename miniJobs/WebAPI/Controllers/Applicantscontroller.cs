@@ -62,7 +62,6 @@ public class Applicantscontroller(IMediator mediator,IApplicantRepository applic
     }
 
     [HttpGet("{applicantId}")]
-    [Authorize(Roles = "Applicant,Employer")]
     [ProducesResponseType(typeof(ApplicantDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]

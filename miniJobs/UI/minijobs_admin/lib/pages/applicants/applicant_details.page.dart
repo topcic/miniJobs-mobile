@@ -4,11 +4,14 @@ import '../../models/applicant/applicant.dart';
 import '../../providers/applicant_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../utils/photo_view.dart';
+import '../user-profile/active_jobs_view.dart';
+import '../user-profile/finished_job_view.dart';
+import '../user-profile/user_ratings_view.dart';
 
 class ApplicantDetailsPage extends StatefulWidget {
-  final Applicant applicant;
+  final int id;
 
-  const ApplicantDetailsPage({super.key, required this.applicant});
+  const ApplicantDetailsPage({super.key, required this.id});
 
   @override
   State<ApplicantDetailsPage> createState() => _ApplicantDetailsPageState();
@@ -17,30 +20,44 @@ class ApplicantDetailsPage extends StatefulWidget {
 class _ApplicantDetailsPageState extends State<ApplicantDetailsPage> {
   late ApplicantProvider _applicantProvider;
   late UserProvider _userProvider;
+  Applicant? applicant;
+  bool isLoading = true;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _applicantProvider = context.read<ApplicantProvider>();
     _userProvider = context.read<UserProvider>();
-    fetchUsers();
+    fetchUser();
   }
 
-  Future<void> fetchUsers() async {
-    // Add logic to fetch user-specific data if required
+  Future<void> fetchUser() async {
+    try {
+      final fetchedApplicant = await _applicantProvider.get(widget.id);
+      setState(() {
+        applicant = fetchedApplicant;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() => isLoading = false);
+    }
   }
 
   Future<void> blockUser() async {
-    await _userProvider.delete(widget.applicant.id!);
+    setState(() => isLoading = true);
+    await _userProvider.delete(applicant!.id!);
     setState(() {
-      widget.applicant.deleted = true;
+      applicant!.deleted = true;
+      isLoading = false;
     });
   }
 
   Future<void> activateUser() async {
-    await _userProvider.activate(widget.applicant.id!);
+    setState(() => isLoading = true);
+    await _userProvider.activate(applicant!.id!);
     setState(() {
-      widget.applicant.deleted = false;
+      applicant!.deleted = false;
+      isLoading = false;
     });
   }
 
@@ -63,8 +80,8 @@ class _ApplicantDetailsPageState extends State<ApplicantDetailsPage> {
           TextButton(
             child: const Text('Potvrdi'),
             onPressed: () {
-              onConfirm();
               Navigator.of(context).pop();
+              onConfirm();
             },
           ),
         ],
@@ -74,13 +91,14 @@ class _ApplicantDetailsPageState extends State<ApplicantDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final applicant = widget.applicant;
     return Scaffold(
       appBar: AppBar(
-        title: Text('${applicant.firstName} ${applicant.lastName}'),
+        title: Text(applicant != null ? '${applicant!.firstName} ${applicant!.lastName}' : 'Korisnik'),
         centerTitle: true,
       ),
-      body: LayoutBuilder(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : LayoutBuilder(
         builder: (context, constraints) {
           final isSmallScreen = constraints.maxWidth < 800;
           return Padding(
@@ -108,8 +126,6 @@ class _ApplicantDetailsPageState extends State<ApplicantDetailsPage> {
   }
 
   Widget _buildApplicantDetailsCard(BuildContext parentContext) {
-    final applicant = widget.applicant;
-
     return Card(
       elevation: 6,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -123,55 +139,53 @@ class _ApplicantDetailsPageState extends State<ApplicantDetailsPage> {
                 radius: 50,
                 child: ClipOval(
                   child: PhotoView(
-                    photo: applicant.photo,
+                    photo: applicant!.photo,
                     editable: false,
-                    userId: applicant.id!,
+                    userId: applicant!.id!,
                   ),
                 ),
               ),
             ),
             const SizedBox(height: 16),
-            _detailRow('Ime i prezime:', '${applicant.firstName} ${applicant.lastName}'),
-            _detailRow('Email:', applicant.email ?? '-'),
-            _detailRow('Broj telefona:', applicant.phoneNumber ?? '-'),
-            _detailRow('Grad:', applicant.city?.name ?? '-'),
-            _detailRow('Račun potvrđen:', applicant.accountConfirmed == true ? 'Da' : 'Ne'),
-            _detailRow('Broj završenih poslova:', applicant.numberOfFinishedJobs?.toString() ?? '0'),
-            _detailRow('Prosječna ocjena:', applicant.averageRating?.toString() ?? '-'),
+            _detailRow('Ime i prezime:', '${applicant!.firstName} ${applicant!.lastName}'),
+            _detailRow('Email:', applicant!.email ?? '-'),
+            _detailRow('Broj telefona:', applicant!.phoneNumber ?? '-'),
+            _detailRow('Grad:', applicant!.city?.name ?? '-'),
+            _detailRow('Račun potvrđen:', applicant!.accountConfirmed == true ? 'Da' : 'Ne'),
+            _detailRow('Broj završenih poslova:', applicant!.numberOfFinishedJobs?.toString() ?? '0'),
+            _detailRow('Prosječna ocjena:', applicant!.averageRating?.toString() ?? '-'),
             const SizedBox(height: 16),
             Center(
               child: ElevatedButton.icon(
-                onPressed: () {
-                  if (applicant.deleted!) {
+                onPressed: isLoading
+                    ? null
+                    : () {
+                  if (applicant!.deleted!) {
                     _showConfirmationDialog(
                       context: context,
                       title: 'Aktiviraj',
-                      content:
-                      'Da li ste sigurni da želite aktivirati ${applicant.firstName} ${applicant.lastName}?',
+                      content: 'Da li ste sigurni da želite aktivirati ${applicant!.firstName} ${applicant!.lastName}?',
                       onConfirm: activateUser,
                     );
                   } else {
                     _showConfirmationDialog(
                       context: context,
                       title: 'Blokiraj',
-                      content:
-                      'Da li ste sigurni da želite blokirati ${applicant.firstName} ${applicant.lastName}?',
+                      content: 'Da li ste sigurni da želite blokirati ${applicant!.firstName} ${applicant!.lastName}?',
                       onConfirm: blockUser,
                     );
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: applicant.deleted!
-                      ? Colors.greenAccent[700]
-                      : Colors.redAccent[700],
+                  backgroundColor: applicant!.deleted! ? Colors.greenAccent[700] : Colors.redAccent[700],
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
                 icon: Icon(
-                  applicant.deleted! ? Icons.refresh : Icons.block,
+                  applicant!.deleted! ? Icons.refresh : Icons.block,
                   color: Colors.white,
                 ),
                 label: Text(
-                  applicant.deleted! ? 'Aktiviraj korisnika' : 'Blokiraj korisnika',
+                  applicant!.deleted! ? 'Aktiviraj korisnika' : 'Blokiraj korisnika',
                   style: const TextStyle(color: Colors.white),
                 ),
               ),
@@ -183,8 +197,6 @@ class _ApplicantDetailsPageState extends State<ApplicantDetailsPage> {
   }
 
   Widget _buildAdditionalDetailsCard() {
-    final applicant = widget.applicant;
-
     return Card(
       elevation: 6,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -198,29 +210,38 @@ class _ApplicantDetailsPageState extends State<ApplicantDetailsPage> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const Divider(),
-            _detailRow('Opis:', applicant.description ?? '-'),
-            _detailRow('Iskustvo:', applicant.experience ?? '-'),
+            _detailRow('Opis:', applicant!.description ?? '-'),
+            _detailRow('Iskustvo:', applicant!.experience ?? '-'),
             _detailRow(
               'Predložena plata:',
-              applicant.wageProposal != null
-                  ? '${applicant.wageProposal.toString()} KM'
+              applicant!.wageProposal != null
+                  ? '${applicant!.wageProposal.toString()} KM'
                   : '-',
             ),
             const Divider(),
-            SizedBox(
-              height: 200,
-              child: ListView.builder(
-                itemCount: applicant.jobTypes?.length ?? 0,
-                itemBuilder: (context, index) {
-                  final jobType = applicant.jobTypes![index];
-                  return ListTile(
-                    title: Text(jobType.name ?? '-'),
-                    leading: const Icon(Icons.work_outline),
-                  );
-                },
+            DefaultTabController(
+              length: 3,
+              child: Column(
+                children: [
+                  const TabBar(
+                    tabs: [
+                      Tab(text: 'Završeni'),
+                      Tab(text: 'Utisci'),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 300,
+                    child: TabBarView(
+                      children: [
+                        FinishedJobsView(userId: applicant!.id!),
+                        UserRatingsView(userId: applicant!.id!),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
-            if (applicant.cv != null)
+            if (applicant!.cv != null)
               Center(
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.download),
@@ -235,6 +256,7 @@ class _ApplicantDetailsPageState extends State<ApplicantDetailsPage> {
       ),
     );
   }
+
 
   Widget _detailRow(String label, String value) {
     return Padding(

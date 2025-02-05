@@ -230,7 +230,7 @@ class _ApplicantsViewState extends State<ApplicantsView> {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        ApplicantDetailsPage(applicant: applicant),
+                        ApplicantDetailsPage(id: applicant.id!),
                   ),
                 ),
           ),
