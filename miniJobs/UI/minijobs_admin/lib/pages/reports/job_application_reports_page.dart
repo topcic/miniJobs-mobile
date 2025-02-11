@@ -6,7 +6,7 @@ import '../../models/job/job_application.dart';
 import '../../providers/report_provider.dart';
 
 class JobApplicationReportsPage extends StatefulWidget {
-  const JobApplicationReportsPage({Key? key}) : super(key: key);
+  const JobApplicationReportsPage({super.key});
 
   @override
   _JobApplicationReportsPageState createState() =>
@@ -108,7 +108,7 @@ class _JobApplicationReportsPageState extends State<JobApplicationReportsPage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: isLoading
-            ? Center(child: const CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator())
             : errorMessage != null
                 ? Center(
                     child: Text(errorMessage!,
@@ -145,13 +145,13 @@ class _JobApplicationReportsPageState extends State<JobApplicationReportsPage> {
                         ),
 
                         const SizedBox(height: 20),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
+                        const Padding(
+                          padding: EdgeInsets.only(bottom: 8.0),
                           child: Text('Gradovi sa najviše aplikacija',
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold)),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         // Bar Chart for Top 5 Cities with Most Applications
                         SizedBox(
                           height: 300,
@@ -173,7 +173,7 @@ class _JobApplicationReportsPageState extends State<JobApplicationReportsPage> {
                                 );
                               }).toList(),
                               titlesData: FlTitlesData(
-                                leftTitles: AxisTitles(
+                                leftTitles: const AxisTitles(
                                   sideTitles: SideTitles(
                                       showTitles: true, reservedSize: 40),
                                 ),
@@ -199,9 +199,9 @@ class _JobApplicationReportsPageState extends State<JobApplicationReportsPage> {
                                     reservedSize: 40,
                                   ),
                                 ),
-                                topTitles: AxisTitles(
+                                topTitles: const AxisTitles(
                                     sideTitles: SideTitles(showTitles: false)),
-                                rightTitles: AxisTitles(
+                                rightTitles: const AxisTitles(
                                     sideTitles: SideTitles(showTitles: false)),
                               ),
                             ),
@@ -209,13 +209,13 @@ class _JobApplicationReportsPageState extends State<JobApplicationReportsPage> {
                         ),
 
                         const SizedBox(height: 20),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
+                        const Padding(
+                          padding: EdgeInsets.only(bottom: 8.0),
                           child: Text('Najtraženiji tipovi posla za aplikante',
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold)),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         // Bar Chart for Top 5 Job Types with Most Applications
                         SizedBox(
                           height: 300,
@@ -237,7 +237,7 @@ class _JobApplicationReportsPageState extends State<JobApplicationReportsPage> {
                                 );
                               }).toList(),
                               titlesData: FlTitlesData(
-                                leftTitles: AxisTitles(
+                                leftTitles: const AxisTitles(
                                   sideTitles: SideTitles(
                                       showTitles: true, reservedSize: 40),
                                 ),
@@ -265,9 +265,9 @@ class _JobApplicationReportsPageState extends State<JobApplicationReportsPage> {
                                     reservedSize: 40,
                                   ),
                                 ),
-                                topTitles: AxisTitles(
+                                topTitles: const AxisTitles(
                                     sideTitles: SideTitles(showTitles: false)),
-                                rightTitles: AxisTitles(
+                                rightTitles: const AxisTitles(
                                     sideTitles: SideTitles(showTitles: false)),
                               ),
                             ),
@@ -275,14 +275,14 @@ class _JobApplicationReportsPageState extends State<JobApplicationReportsPage> {
                         ),
 
                         const SizedBox(height: 20),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
+                        const Padding(
+                          padding: EdgeInsets.only(bottom: 8.0),
                           child: Text(
                               'Broj aplikacija na poslove u zadnjih 12 mjeseca',
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold)),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         // Bar Chart for Applications Created Per Month
                         SizedBox(
                           height: 300,
@@ -305,7 +305,7 @@ class _JobApplicationReportsPageState extends State<JobApplicationReportsPage> {
                                 );
                               }).toList(),
                               titlesData: FlTitlesData(
-                                leftTitles: AxisTitles(
+                                leftTitles: const AxisTitles(
                                   sideTitles: SideTitles(
                                       showTitles: true, reservedSize: 40),
                                 ),
@@ -334,9 +334,9 @@ class _JobApplicationReportsPageState extends State<JobApplicationReportsPage> {
                                     reservedSize: 40,
                                   ),
                                 ),
-                                topTitles: AxisTitles(
+                                topTitles: const AxisTitles(
                                     sideTitles: SideTitles(showTitles: false)),
-                                rightTitles: AxisTitles(
+                                rightTitles: const AxisTitles(
                                     sideTitles: SideTitles(showTitles: false)),
                               ),
                             ),

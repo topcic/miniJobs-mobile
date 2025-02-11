@@ -5,7 +5,7 @@ import '../../models/rating.dart';
 import '../../providers/report_provider.dart';
 
 class RatingReportsPage extends StatefulWidget {
-  const RatingReportsPage({Key? key}) : super(key: key);
+  const RatingReportsPage({super.key});
 
   @override
   _RatingReportsPageState createState() => _RatingReportsPageState();
@@ -126,23 +126,23 @@ class _RatingReportsPageState extends State<RatingReportsPage> {
                                 fontSize: 20, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 20),
                         _buildAverageRating(context),
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
                         ),
                         const Text("Ocjene pregled",
                             style: TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.bold)),
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
                         ),
                         _buildBarChart(),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
+                        const Padding(
+                          padding: EdgeInsets.only(bottom: 8.0),
                           child: Text("Omjer aktivnih i nekativnih ocjena",
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold)),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
                         ),
                         _buildPieChart(),
@@ -176,7 +176,7 @@ class _RatingReportsPageState extends State<RatingReportsPage> {
                 rating: averageEmployerRating,
                 icon: Icons.star,
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               RatingInfoCard(
                 title: "Prosječna ocjena aplikanata",
                 rating: averageApplicantRating,
@@ -191,7 +191,7 @@ class _RatingReportsPageState extends State<RatingReportsPage> {
                 rating: averageEmployerRating,
                 icon: Icons.star,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               RatingInfoCard(
                 title: "Prosj. ocjena aplikanata",
                 rating: averageApplicantRating,
@@ -248,7 +248,7 @@ class _RatingReportsPageState extends State<RatingReportsPage> {
               style:
                   const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         ),
-        SizedBox(
+        const SizedBox(
           height: 30,
         ),
         SizedBox(
@@ -256,7 +256,7 @@ class _RatingReportsPageState extends State<RatingReportsPage> {
           child: BarChart(
             BarChartData(
               titlesData: FlTitlesData(
-                leftTitles: AxisTitles(
+                leftTitles: const AxisTitles(
                     sideTitles: SideTitles(showTitles: true, reservedSize: 40)),
                 bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
@@ -278,9 +278,9 @@ class _RatingReportsPageState extends State<RatingReportsPage> {
                   ),
                 ),
                 topTitles:
-                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 rightTitles:
-                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               ),
               barGroups: users.asMap().entries.map((entry) {
                 return BarChartGroupData(

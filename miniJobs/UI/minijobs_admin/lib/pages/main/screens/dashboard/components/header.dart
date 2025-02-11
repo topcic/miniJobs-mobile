@@ -3,16 +3,15 @@ import 'package:get_storage/get_storage.dart';
 import 'package:minijobs_admin/providers/authentication_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../../controllers/menu_app_controller.dart';
 import '../../../constants.dart';
 import '../../../responsve.dart';
 
 class Header extends StatelessWidget {
-  const Header({Key? key}) : super(key: key);
+  const Header({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return const Row(
       children: [
           Spacer(flex: 2),
         ProfileCard()
@@ -22,7 +21,7 @@ class Header extends StatelessWidget {
 }
 
 class ProfileCard extends StatefulWidget {
-  const ProfileCard({Key? key}) : super(key: key);
+  const ProfileCard({super.key});
 
   @override
   _ProfileCardState createState() => _ProfileCardState();
@@ -45,7 +44,7 @@ class _ProfileCardState extends State<ProfileCard> {
         }
       },
       itemBuilder: (context) => [
-        PopupMenuItem<int>(
+        const PopupMenuItem<int>(
           value: 1,
           child: Row(
             children: [
@@ -57,8 +56,8 @@ class _ProfileCardState extends State<ProfileCard> {
         ),
       ],
       child: Container(
-        margin: EdgeInsets.only(left: defaultPadding),
-        padding: EdgeInsets.symmetric(
+        margin: const EdgeInsets.only(left: defaultPadding),
+        padding: const EdgeInsets.symmetric(
           horizontal: defaultPadding,
           vertical: defaultPadding / 2,
         ),
@@ -79,7 +78,7 @@ class _ProfileCardState extends State<ProfileCard> {
                 const EdgeInsets.symmetric(horizontal: defaultPadding / 2),
                 child: Text(userName),
               ),
-            Icon(Icons.keyboard_arrow_down),
+            const Icon(Icons.keyboard_arrow_down),
           ],
         ),
       ),

@@ -7,11 +7,11 @@ import '../../../constants.dart';
 import '../../../responsve.dart';
 import 'info_card.dart';
 class MyData extends StatelessWidget {
-  const MyData({Key? key}) : super(key: key);
+  const MyData({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final Size _size = MediaQuery.of(context).size;
+    final Size size = MediaQuery.of(context).size;
     return Column(
       children: [
         Row(
@@ -23,28 +23,28 @@ class MyData extends StatelessWidget {
             )
           ],
         ),
-        SizedBox(height: defaultPadding),
+        const SizedBox(height: defaultPadding),
         FutureBuilder<OverallStatistic>(
           future: context.read<StatisticProvider>().getOverall(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
-              return Center(child: Text("Error loading statistics", style: TextStyle(color: Colors.red)));
+              return const Center(child: Text("Error loading statistics", style: TextStyle(color: Colors.red)));
             } else if (!snapshot.hasData) {
-              return Center(child: Text("No data available"));
+              return const Center(child: Text("No data available"));
             }
 
             final stats = snapshot.data!;
             return Responsive(
               mobile: FileInfoCardGridView(
-                crossAxisCount: _size.width < 650 ? 2 : 3,
-                childAspectRatio: _size.width < 650 ? 1.3 : 1,
+                crossAxisCount: size.width < 650 ? 2 : 3,
+                childAspectRatio: size.width < 650 ? 1.3 : 1,
                 stats: stats,
               ),
               tablet: FileInfoCardGridView(stats: stats),
               desktop: FileInfoCardGridView(
-                childAspectRatio: _size.width < 1400 ? 1.1 : 1.4,
+                childAspectRatio: size.width < 1400 ? 1.1 : 1.4,
                 stats: stats,
               ),
             );
@@ -57,11 +57,11 @@ class MyData extends StatelessWidget {
 
 class FileInfoCardGridView extends StatelessWidget {
   const FileInfoCardGridView({
-    Key? key,
+    super.key,
     this.crossAxisCount = 3,
     this.childAspectRatio = 1,
     required this.stats,
-  }) : super(key: key);
+  });
 
   final int crossAxisCount;
   final double childAspectRatio;
@@ -79,7 +79,7 @@ class FileInfoCardGridView extends StatelessWidget {
     ];
 
     return GridView.builder(
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemCount: demoData.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

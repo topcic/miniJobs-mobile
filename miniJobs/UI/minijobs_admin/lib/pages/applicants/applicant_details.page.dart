@@ -4,7 +4,6 @@ import '../../models/applicant/applicant.dart';
 import '../../providers/applicant_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../utils/photo_view.dart';
-import '../user-profile/active_jobs_view.dart';
 import '../user-profile/finished_job_view.dart';
 import '../user-profile/user_ratings_view.dart';
 

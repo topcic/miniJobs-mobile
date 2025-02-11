@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:horizontal_data_table/horizontal_data_table.dart';
 import 'package:minijobs_admin/pages/auth/login_page.dart';
 import 'package:minijobs_admin/pages/main/constants.dart';
-import 'package:minijobs_admin/pages/main/screens/main/main_screen.dart';
 import 'package:minijobs_admin/providers/applicant_provider.dart';
 import 'package:minijobs_admin/providers/authentication_provider.dart';
 import 'package:minijobs_admin/providers/city_provider.dart';
@@ -93,7 +91,7 @@ class MyMaterialApp extends StatelessWidget {
             .apply(bodyColor: Colors.white),
         canvasColor: secondaryColor,
       ),
-      home: LoginPage(),
+      home: const LoginPage(),
     );
   }
 }

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -9,7 +8,7 @@ import 'job_details.dart';
 class JobDetailsContent extends StatelessWidget {
   final Job job;
 
-  const JobDetailsContent({Key? key, required this.job}) : super(key: key);
+  const JobDetailsContent({super.key, required this.job});
 
   @override
   Widget build(BuildContext context) {
@@ -26,11 +25,11 @@ class JobDetailsContent extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(job.name ?? 'Nema naziva',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: primaryColor)),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: primaryColor)),
           const SizedBox(height: defaultPadding),
           Text('${job.employerFullName} - ${job.city?.name ?? ''}',
-              style: TextStyle(fontSize: 16, color: Colors.white70)),
-          Divider(color: Colors.white24, height: defaultPadding),
+              style: const TextStyle(fontSize: 16, color: Colors.white70)),
+          const Divider(color: Colors.white24, height: defaultPadding),
 
           _buildDetailSection('Opis posla:', job.description),
           _buildDetailSection('Tip posla:', job.jobType?.name),
@@ -54,7 +53,7 @@ class JobDetailsContent extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          Text('$title ', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: primaryColor)),
+          Text('$title ', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: primaryColor)),
           Expanded(
             child: Text(value ?? 'Nepoznato', style: const TextStyle(fontSize: 15, color: Colors.white70)),
           ),
@@ -68,7 +67,7 @@ class JobDetailsContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: defaultPadding),
-        Text('Raspored posla:', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: primaryColor)),
+        const Text('Raspored posla:', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: primaryColor)),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
@@ -86,7 +85,7 @@ class JobDetailsContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: defaultPadding),
-        Text('Dodatno plaća:', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: primaryColor)),
+        const Text('Dodatno plaća:', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: primaryColor)),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,

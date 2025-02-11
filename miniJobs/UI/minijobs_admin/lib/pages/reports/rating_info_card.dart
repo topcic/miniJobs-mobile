@@ -1,16 +1,15 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../main/constants.dart';
 
 class RatingInfoCard extends StatelessWidget {
   const RatingInfoCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.rating,
     required this.icon,
     this.color = primaryColor,
-  }) : super(key: key);
+  });
 
   final String title;
   final double rating;
@@ -21,10 +20,10 @@ class RatingInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 250, // Adjust width as needed
-      padding: EdgeInsets.all(defaultPadding),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.all(defaultPadding),
+      decoration: const BoxDecoration(
         color: secondaryColor,
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
+        borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

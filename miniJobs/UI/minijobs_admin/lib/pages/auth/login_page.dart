@@ -39,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> authenticateUser() async {
     var autCodeRequest = AuthCodeRequest(
       "admin@minijobs.ba",
-      "Arni1234",
+      "Minijobs1234!",
       "password",
       "",
       "",
@@ -52,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
     if (result) {
       // Navigate to Navbar if authentication is successful
       Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) =>  MainScreen(),
+        builder: (context) =>  const MainScreen(),
       ));
     } else {
       notificationService.error("Nevalidna lozinka ili email");
@@ -188,7 +188,7 @@ class _LoginPageState extends State<LoginPage> {
                                   if (result && mounted) {
                                     Navigator.of(context).pushReplacement(
                                       MaterialPageRoute(
-                                          builder: (context) =>   MainScreen()),
+                                          builder: (context) =>   const MainScreen()),
                                     );
                                   } else if (mounted) {
                                     ScaffoldMessenger.of(context)

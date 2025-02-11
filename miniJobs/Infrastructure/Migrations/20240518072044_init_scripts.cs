@@ -34,7 +34,9 @@ namespace Infrastructure.Migrations
             sqlFile = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "Infrastructure/Persistence/Migrations/InitialDataScripts/add_proposed_answers.sql");
             migrationBuilder.Sql(File.ReadAllText(sqlFile));
 
+
         }
+
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)

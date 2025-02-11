@@ -27,5 +27,5 @@ public class UserAuthCode : IEntity<int>
     public bool Used { get; set; }
 
     [Column("type")]
-    public UserAuthCodeType Type { get; set; }
+    public int Type { get; set; }
 }

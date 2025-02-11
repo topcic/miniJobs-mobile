@@ -11,7 +11,7 @@ import 'job_details_content.dart';
 class JobDetailsPage extends StatefulWidget {
   final int jobId;
 
-  const JobDetailsPage({Key? key, required this.jobId}) : super(key: key);
+  const JobDetailsPage({super.key, required this.jobId});
 
   @override
   _JobDetailsPageState createState() => _JobDetailsPageState();
@@ -82,7 +82,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
 class JobActions extends StatefulWidget {
   final Job job;
 
-  const JobActions({Key? key, required this.job}) : super(key: key);
+  const JobActions({super.key, required this.job});
 
   @override
   _JobActionsState createState() => _JobActionsState();

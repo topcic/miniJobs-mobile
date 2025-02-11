@@ -11,7 +11,7 @@ import '../../widgets/badges.dart';
 import 'applicant_details.page.dart';
 
 class ApplicantsView extends StatefulWidget {
-  const ApplicantsView({Key? key}) : super(key: key);
+  const ApplicantsView({super.key});
 
   @override
   _ApplicantsViewState createState() => _ApplicantsViewState();

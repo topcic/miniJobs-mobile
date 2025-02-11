@@ -15,12 +15,14 @@ import '../../constants.dart';
 import '../dashboard/dashboard_screen.dart';
 
 class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
   @override
   _MainScreenState createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
-  Widget _selectedScreen = DashboardScreen(); // Default screen
+  Widget _selectedScreen = const DashboardScreen(); // Default screen
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>(); // Key to control drawer
 
   void _setSelectedScreen(Widget screen) {
@@ -75,12 +77,12 @@ class _MainScreenState extends State<MainScreen> {
         children: [
           if (isMobile)
             IconButton(
-              icon: Icon(Icons.menu, color: Colors.white),
+              icon: const Icon(Icons.menu, color: Colors.white),
               onPressed: () {
                 _scaffoldKey.currentState?.openDrawer(); // Open drawer on mobile
               },
             ),
-          Text(
+          const Text(
             "Dashboard",
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
           ),
@@ -93,27 +95,27 @@ class _MainScreenState extends State<MainScreen> {
   Widget _buildSideMenu() {
     return Container(
       width: 250,
-      decoration: BoxDecoration(color: secondaryColor),
+      decoration: const BoxDecoration(color: secondaryColor),
       child: ListView(
         children: [
           DrawerHeader(
             child: Image.asset("assets/images/logo.png"),
           ),
-          _buildMenuItem("Dashboard", FontAwesomeIcons.tachometerAlt, DashboardScreen()),
+          _buildMenuItem("Dashboard", FontAwesomeIcons.tachometerAlt, const DashboardScreen()),
           _buildMenuItem("Poslodavci", FontAwesomeIcons.building, const EmployersView()),
           _buildMenuItem("Aplikanti", FontAwesomeIcons.users, const ApplicantsView()),
-          _buildMenuItem("Poslovi", FontAwesomeIcons.briefcase, JobsView()),
-          _buildMenuItem("Aplikacije", FontAwesomeIcons.fileAlt, JobApplicationsView()),
-          _buildMenuItem("Ocjene", FontAwesomeIcons.star, RatingsView()),
-          _buildMenuItem("Preporuke", FontAwesomeIcons.thumbsUp, JobRecommendationsView()),
-          _buildMenuItem("Spašeni poslovi", FontAwesomeIcons.bookmark, SavedJobsView()),
+          _buildMenuItem("Poslovi", FontAwesomeIcons.briefcase, const JobsView()),
+          _buildMenuItem("Aplikacije", FontAwesomeIcons.fileAlt, const JobApplicationsView()),
+          _buildMenuItem("Ocjene", FontAwesomeIcons.star, const RatingsView()),
+          _buildMenuItem("Preporuke", FontAwesomeIcons.thumbsUp, const JobRecommendationsView()),
+          _buildMenuItem("Spašeni poslovi", FontAwesomeIcons.bookmark, const SavedJobsView()),
           ExpansionTile(
-            leading: Icon(FontAwesomeIcons.chartBar, color: Colors.white54),
-            title: Text("Izvještaji", style: TextStyle(color: Colors.white54)),
+            leading: const Icon(FontAwesomeIcons.chartBar, color: Colors.white54),
+            title: const Text("Izvještaji", style: TextStyle(color: Colors.white54)),
             children: [
-              _buildMenuItem("Izvještaj o ocjenama", FontAwesomeIcons.star, RatingReportsPage()),
-              _buildMenuItem("Izvještaj o aplikacijama", FontAwesomeIcons.fileAlt, JobApplicationReportsPage()),
-              _buildMenuItem("Izvještaj o poslovima", FontAwesomeIcons.suitcase, JobReportsPage()),
+              _buildMenuItem("Izvještaj o ocjenama", FontAwesomeIcons.star, const RatingReportsPage()),
+              _buildMenuItem("Izvještaj o aplikacijama", FontAwesomeIcons.fileAlt, const JobApplicationReportsPage()),
+              _buildMenuItem("Izvještaj o poslovima", FontAwesomeIcons.suitcase, const JobReportsPage()),
             ],
           ),
         ],
@@ -126,7 +128,7 @@ class _MainScreenState extends State<MainScreen> {
     return ListTile(
       onTap: () => _setSelectedScreen(screen),
       leading: FaIcon(icon, color: Colors.white54, size: 16),
-      title: Text(title, style: TextStyle(color: Colors.white54)),
+      title: Text(title, style: const TextStyle(color: Colors.white54)),
     );
   }
 }

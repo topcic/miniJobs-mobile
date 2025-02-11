@@ -9,7 +9,7 @@ import '../../../constants.dart';
 import 'chart.dart';
 
 class StorageDetails extends StatefulWidget {
-  const StorageDetails({Key? key}) : super(key: key);
+  const StorageDetails({super.key});
 
   @override
   _StorageDetailsState createState() => _StorageDetailsState();
@@ -28,25 +28,25 @@ class _StorageDetailsState extends State<StorageDetails> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(defaultPadding),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.all(defaultPadding),
+      decoration: const BoxDecoration(
         color: secondaryColor,
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
+        borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
       child: FutureBuilder<OverallStatistic>(
         future: _statisticsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(
+            return const Center(
               child: Text(
                 "Error loading statistics",
                 style: TextStyle(color: Colors.red),
               ),
             );
           } else if (!snapshot.hasData) {
-            return Center(child: Text("No data available"));
+            return const Center(child: Text("No data available"));
           }
 
           final stats = snapshot.data!;
@@ -54,15 +54,15 @@ class _StorageDetailsState extends State<StorageDetails> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 "Pregled Statistike",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              SizedBox(height: defaultPadding),
-              Chart(),
+              const SizedBox(height: defaultPadding),
+              const Chart(),
 
               // Ukupan broj aplikanta
               StorageInfoCard(
@@ -100,7 +100,7 @@ class _StorageDetailsState extends State<StorageDetails> {
               StorageInfoCard(
                 icon: FontAwesomeIcons.star,
                 title: "Prosječna ocjena aplikanta",
-                amountOfFiles: "${stats.averageApplicantRating.toStringAsFixed(1)}",
+                amountOfFiles: stats.averageApplicantRating.toStringAsFixed(1),
                 numOfFiles: stats.averageApplicantRating.toInt(),
               ),
 
@@ -108,7 +108,7 @@ class _StorageDetailsState extends State<StorageDetails> {
               StorageInfoCard(
                 icon: FontAwesomeIcons.starHalfAlt,
                 title: "Prosječna ocjena poslodavaca",
-                amountOfFiles: "${stats.averageEmployerRating.toStringAsFixed(1)}",
+                amountOfFiles: stats.averageEmployerRating.toStringAsFixed(1),
                 numOfFiles: stats.averageEmployerRating.toInt(),
               ),
             ],

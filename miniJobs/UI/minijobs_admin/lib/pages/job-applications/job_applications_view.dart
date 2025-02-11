@@ -4,9 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
 import '../../models/job/job_application.dart';
-import '../../models/saved_job.dart';
 import '../../providers/job_provider.dart';
-import '../../providers/saved_job_provider.dart';
 import '../../widgets/badges.dart';
 import '../main/constants.dart';
 

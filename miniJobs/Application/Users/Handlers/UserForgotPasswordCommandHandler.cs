@@ -31,7 +31,7 @@ public class UserForgotPasswordCommandHandler(IUserManagerRepository userManager
             var code = GenerateCode.Generate();
             var userAuthCode = new UserAuthCode()
             {
-                Type= UserAuthCodeType.SetPassword,
+                Type= (int)UserAuthCodeType.SetPassword,
                 GeneratedAt = DateTime.UtcNow,
                 Code = code,
                 UserId = user.Id,

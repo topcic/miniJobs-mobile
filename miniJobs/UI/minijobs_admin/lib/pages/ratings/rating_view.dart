@@ -82,7 +82,7 @@ class _RatingsViewState extends State<RatingsView> {
           TextButton(
             child: const Text('Obriši'),
             onPressed: () {
-              delete(rating.id!);
+              delete(rating.id);
               Navigator.of(context).pop();
             },
           ),

@@ -87,7 +87,7 @@ class MyMaterialApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const Navbar() ,
+      home: const LoginSignupPage() ,
     );
   }
 }

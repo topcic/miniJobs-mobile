@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:minijobs_admin/models/job/job.dart';
 import 'package:minijobs_admin/providers/job_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
@@ -96,7 +95,7 @@ class _JobsViewState extends State<JobsView> {
           TextButton(
             child: const Text('Obriši'),
             onPressed: () {
-              delete(job.id!);
+              delete(job.id);
               Navigator.of(context).pop();
             },
           ),
@@ -119,7 +118,7 @@ class _JobsViewState extends State<JobsView> {
           TextButton(
             child: const Text('Aktiviraj'),
             onPressed: () {
-              activateJob(job.id!);
+              activateJob(job.id);
               Navigator.of(context).pop();
             },
           ),
@@ -290,7 +289,7 @@ class _JobsViewState extends State<JobsView> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => JobDetailsPage(jobId: job.id!),
+                  builder: (context) => JobDetailsPage(jobId: job.id),
                 ),
               ).then((value) {
                 if (value == true) {
@@ -309,7 +308,7 @@ class _JobsViewState extends State<JobsView> {
              context,
             MaterialPageRoute(
              builder: (context) =>
-          JobApplicationsView(jobId: job.id!),
+          JobApplicationsView(jobId: job.id),
           ));
 
               break;
@@ -323,7 +322,7 @@ class _JobsViewState extends State<JobsView> {
               title: Text('Detalji'),
             ),
           ),
-          if (job.deletedByAdmin!)
+          if (job.deletedByAdmin)
             const PopupMenuItem(
               value: 'activate',
               child: ListTile(

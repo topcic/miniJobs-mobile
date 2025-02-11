@@ -33,7 +33,7 @@ public class UserChangePasswordCommandValidator : AbstractValidator<UserChangePa
         ExceptionExtension.Validate("AUTH_CODE_NOT_VALID", () => authCode == null);
 
         ExceptionExtension.Validate("AUTH_CODE_NOT_VALID", () => authCode.Used);
-        ExceptionExtension.Validate("AUTH_CODE_NOT_VALID", () => authCode.Type != UserAuthCodeType.SetPassword);
+        ExceptionExtension.Validate("AUTH_CODE_NOT_VALID", () => authCode.Type != (int)UserAuthCodeType.SetPassword);
         string expirationMinutes = configuration["AuthCodeOptions:ForgotPasswordCodeExpirationMinutes"];
         int authCodeExpirationTimeInMinutes = int.Parse(expirationMinutes);
         ExceptionExtension.Validate("AUTH_CODE_NOT_VALID", () => authCode.GeneratedAt.AddMinutes(authCodeExpirationTimeInMinutes) < DateTime.UtcNow);

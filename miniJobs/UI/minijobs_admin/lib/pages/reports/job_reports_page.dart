@@ -5,6 +5,8 @@ import '../../models/job/job.dart';
 import '../../providers/report_provider.dart';
 
 class JobReportsPage extends StatefulWidget {
+  const JobReportsPage({super.key});
+
   @override
   _JobReportsPageState createState() => _JobReportsPageState();
 }
@@ -104,22 +106,22 @@ class _JobReportsPageState extends State<JobReportsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Izvještaji o poslovima')),
+      appBar: AppBar(title: const Text('Izvještaji o poslovima')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: isLoading
-            ? Center(child: CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator())
             : errorMessage != null
                 ? Center(
                     child: Text(errorMessage!,
-                        style: TextStyle(color: Colors.red)))
+                        style: const TextStyle(color: Colors.red)))
                 : SingleChildScrollView(
                     child: Column(
                       children: [
-                        Text("Poslovi pregled",
+                        const Text("Poslovi pregled",
                             style: TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.bold)),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
                         // Pie Chart for Job Status
                         SizedBox(
@@ -133,7 +135,7 @@ class _JobReportsPageState extends State<JobReportsPage> {
                                   value: entry.value.toDouble(),
                                   color: _getStatusColor(entry.key),
                                   radius: 60,
-                                  titleStyle: TextStyle(
+                                  titleStyle: const TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -144,14 +146,14 @@ class _JobReportsPageState extends State<JobReportsPage> {
                           ),
                         ),
 
-                        SizedBox(height: 20),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
+                        const SizedBox(height: 20),
+                        const Padding(
+                          padding: EdgeInsets.only(bottom: 8.0),
                           child: Text('Gradovi sa najviše poslova',
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold)),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
                         ),
                         // Bar Chart for Top 5 Cities with Most Jobs
@@ -176,7 +178,7 @@ class _JobReportsPageState extends State<JobReportsPage> {
                                 );
                               }).toList(),
                               titlesData: FlTitlesData(
-                                leftTitles: AxisTitles(
+                                leftTitles: const AxisTitles(
                                   sideTitles: SideTitles(
                                       showTitles: true, reservedSize: 40),
                                 ),
@@ -192,7 +194,7 @@ class _JobReportsPageState extends State<JobReportsPage> {
                                           axisSide: meta.axisSide,
                                           child: Text(
                                             cityJobCount.keys.elementAt(index),
-                                            style: TextStyle(fontSize: 12),
+                                            style: const TextStyle(fontSize: 12),
                                           ),
                                         );
                                       }
@@ -201,11 +203,11 @@ class _JobReportsPageState extends State<JobReportsPage> {
                                     reservedSize: 40, // Space for city names
                                   ),
                                 ),
-                                topTitles: AxisTitles(
+                                topTitles: const AxisTitles(
                                   sideTitles: SideTitles(
                                       showTitles: false), // Hide top labels
                                 ),
-                                rightTitles: AxisTitles(
+                                rightTitles: const AxisTitles(
                                   sideTitles: SideTitles(
                                       showTitles: false), // Hide right labels
                                 ),
@@ -214,14 +216,14 @@ class _JobReportsPageState extends State<JobReportsPage> {
                           ),
                         ),
 
-                        SizedBox(height: 20),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
+                        const SizedBox(height: 20),
+                        const Padding(
+                          padding: EdgeInsets.only(bottom: 8.0),
                           child: Text('Tipovi poslova koji dominiraju',
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold)),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
                         ),
                         // Bar Chart for Top 5 Job Types with Most Jobs
@@ -246,7 +248,7 @@ class _JobReportsPageState extends State<JobReportsPage> {
                                 );
                               }).toList(),
                               titlesData: FlTitlesData(
-                                leftTitles: AxisTitles(
+                                leftTitles: const AxisTitles(
                                   sideTitles: SideTitles(
                                       showTitles: true, reservedSize: 40),
                                 ),
@@ -264,7 +266,7 @@ class _JobReportsPageState extends State<JobReportsPage> {
                                           child: Text(
                                             jobCategoryCount.keys
                                                 .elementAt(index),
-                                            style: TextStyle(fontSize: 12),
+                                            style: const TextStyle(fontSize: 12),
                                           ),
                                         );
                                       }
@@ -274,11 +276,11 @@ class _JobReportsPageState extends State<JobReportsPage> {
                                         40, // Space for job type labels
                                   ),
                                 ),
-                                topTitles: AxisTitles(
+                                topTitles: const AxisTitles(
                                   sideTitles: SideTitles(
                                       showTitles: false), // Hide top labels
                                 ),
-                                rightTitles: AxisTitles(
+                                rightTitles: const AxisTitles(
                                   sideTitles: SideTitles(
                                       showTitles: false), // Hide right labels
                                 ),
@@ -287,14 +289,14 @@ class _JobReportsPageState extends State<JobReportsPage> {
                           ),
                         ),
 
-                        SizedBox(height: 20),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
+                        const SizedBox(height: 20),
+                        const Padding(
+                          padding: EdgeInsets.only(bottom: 8.0),
                           child: Text('Broj poslova u zadnjih 12 mjeseca',
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold)),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         // Line Chart for Jobs Created Per Month
                         SizedBox(
                           height: 300,
@@ -317,7 +319,7 @@ class _JobReportsPageState extends State<JobReportsPage> {
                                 );
                               }).toList(),
                               titlesData: FlTitlesData(
-                                leftTitles: AxisTitles(
+                                leftTitles: const AxisTitles(
                                   sideTitles: SideTitles(
                                       showTitles: true, reservedSize: 40),
                                 ),
@@ -335,7 +337,7 @@ class _JobReportsPageState extends State<JobReportsPage> {
                                             monthlyJobCount.keys
                                                 .elementAt(index),
                                             // Display "YYYY-MM"
-                                            style: TextStyle(fontSize: 10),
+                                            style: const TextStyle(fontSize: 10),
                                           ),
                                         );
                                       }
@@ -344,11 +346,11 @@ class _JobReportsPageState extends State<JobReportsPage> {
                                     reservedSize: 40, // Space for labels
                                   ),
                                 ),
-                                topTitles: AxisTitles(
+                                topTitles: const AxisTitles(
                                   sideTitles: SideTitles(
                                       showTitles: false), // Hide top labels
                                 ),
-                                rightTitles: AxisTitles(
+                                rightTitles: const AxisTitles(
                                   sideTitles: SideTitles(
                                       showTitles: false), // Hide right labels
                                 ),

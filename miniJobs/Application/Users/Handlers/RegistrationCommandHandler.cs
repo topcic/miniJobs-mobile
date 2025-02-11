@@ -50,13 +50,25 @@ public class RegistrationCommandHandler(IUserManagerRepository userManager,
             var code = GenerateCode.Generate();
             var userAuthCode = new UserAuthCode()
             {
-                Type = UserAuthCodeType.TwoFactorAuthCode,
+                Type = (int)UserAuthCodeType.TwoFactorAuthCode,
                 GeneratedAt = DateTime.UtcNow,
                 Code = code,
                 UserId = user.Id,
                 Used = false
             };
-            await userAuthCodeRepository.InsertAsync(userAuthCode);
+            try
+            {
+                await userAuthCodeRepository.InsertAsync(userAuthCode);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+                }
+            }
 
             await emailSender.SendActivationEmailAsync(fullName, user.Email,code);
 
