@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:minijobs_mobile/models/applicant/applicant.dart';
@@ -5,7 +7,7 @@ import 'package:minijobs_mobile/providers/applicant_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:minijobs_mobile/pages/user-profile/finished_job_view.dart';
 import 'package:minijobs_mobile/pages/user-profile/user_ratings_view.dart';
-
+import 'dart:typed_data';
 import '../../providers/authentication_provider.dart';
 import '../../utils/photo_view.dart';
 import '../user-profile/user_change_password.dart';
@@ -45,6 +47,7 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
     try {
       final applicantProvider = context.read<ApplicantProvider>();
       final fetchedUser = await applicantProvider.get(userId);
+      _updatePhoto(fetchedUser.photo);
       setState(() {
         applicant = fetchedUser;
         isLoading = false;
@@ -64,6 +67,11 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
       context,
       MaterialPageRoute(builder: (context) => const UserChangePassword()),
     );
+  }
+  void _updatePhoto(Uint8List? newPhoto) {
+    setState(() {
+      applicant?.photo = Uint8List.fromList(newPhoto!); // Ensure new reference
+    });
   }
   @override
   Widget build(BuildContext context) {
@@ -125,17 +133,21 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
                         const SizedBox(width: 35),
 
                         PhotoView(
+                          key: ValueKey(applicant?.photo?.hashCode),
                           photo: applicant?.photo,
                           editable: false,
                           userId: userId,
                         ),
                         if (isAbleTodoEdit)
                           GestureDetector(
-                            onTap: () {
-                              Navigator.push(
+                            onTap: () async {
+                              await Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => ApplicantInfo(applicantId: userId),
+                                  builder: (context) => ApplicantInfo(
+                                    applicantId: userId,
+                                    onBack: () => fetchUserData(), // Pass the callback to call fetchUserData
+                                  ),
                                 ),
                               );
                             },

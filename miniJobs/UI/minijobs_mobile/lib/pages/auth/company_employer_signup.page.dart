@@ -20,7 +20,8 @@ class CompanyEmployerSignupPage extends StatefulWidget {
 }
 
 class _CompanyEmployerSignupPageState extends State<CompanyEmployerSignupPage> {
-F  final _formKey = GlobalKey<FormBuilderState>();
+  final notificationService=NotificationService();
+  final _formKey = GlobalKey<FormBuilderState>();
   List<City>? cities;
   bool isLoading = true;
   final phoneNumberMask = MaskTextInputFormatter(

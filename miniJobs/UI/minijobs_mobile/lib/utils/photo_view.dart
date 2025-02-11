@@ -62,30 +62,31 @@ class _PhotoViewState extends State<PhotoView> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Select Image Source'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.camera),
-              title: const Text('Take a Photo'),
-              onTap: () {
-                Navigator.of(context).pop();
-                _pickImage(ImageSource.camera);
-              },
+      builder: (context) =>
+          AlertDialog(
+            title: const Text('Select Image Source'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.camera),
+                  title: const Text('Take a Photo'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _pickImage(ImageSource.camera);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.image),
+                  title: const Text('Choose from Gallery'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _pickImage(ImageSource.gallery);
+                  },
+                ),
+              ],
             ),
-            ListTile(
-              leading: const Icon(Icons.image),
-              title: const Text('Choose from Gallery'),
-              onTap: () {
-                Navigator.of(context).pop();
-                _pickImage(ImageSource.gallery);
-              },
-            ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -95,12 +96,17 @@ class _PhotoViewState extends State<PhotoView> {
       child: Stack(
         alignment: Alignment.bottomRight,
         children: [
-          CircleAvatar(
-            radius: 50,
-            backgroundImage: _currentPhoto != null
-                ? MemoryImage(_currentPhoto!)
-                : const AssetImage('assets/images/user-icon.png') as ImageProvider,
-            backgroundColor: Colors.grey.shade200,
+          GestureDetector(
+            onTap: widget.editable ? _showImageSourceDialog : null,
+            // Enable tap anywhere if editable
+            child: CircleAvatar(
+              radius: 50,
+              backgroundImage: _currentPhoto != null
+                  ? MemoryImage(_currentPhoto!)
+                  : const AssetImage(
+                  'assets/images/user-icon.png') as ImageProvider,
+              backgroundColor: Colors.grey.shade200,
+            ),
           ),
           if (widget.editable)
             IconButton(
@@ -111,4 +117,5 @@ class _PhotoViewState extends State<PhotoView> {
       ),
     );
   }
+
 }

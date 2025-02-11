@@ -191,7 +191,7 @@ class _LoginPageState extends State<LoginPage> {
                                           builder: (context) => const Navbar()),
                                     );
                                   } else if (mounted) {
-                                    notificationService.error('Nevalidan email ili lozinka');F
+                                    notificationService.error('Nevalidan email ili lozinka');
                                     _formKey.currentState?.reset();
                                   }
                                 }
