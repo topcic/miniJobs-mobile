@@ -26,7 +26,7 @@ public class RegistrationCommandHandler(IUserManagerRepository userManager,
             var user = mapper.Map<User>(command.Request);
             var generatedPassword = securityProvider.EncodePassword(command.Request.Password);
             user.PasswordHash = generatedPassword;
-            
+
             await userManager.InsertAsync(user);
             if (command.Request.RoleId == "Applicant")
             {
@@ -56,21 +56,11 @@ public class RegistrationCommandHandler(IUserManagerRepository userManager,
                 UserId = user.Id,
                 Used = false
             };
-            try
-            {
-                await userAuthCodeRepository.InsertAsync(userAuthCode);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
 
-                if (ex.InnerException != null)
-                {
-                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
-                }
-            }
+            await userAuthCodeRepository.InsertAsync(userAuthCode);
 
-            await emailSender.SendActivationEmailAsync(fullName, user.Email,code);
+
+            await emailSender.SendActivationEmailAsync(fullName, user.Email, code);
 
             ts.Complete();
         }

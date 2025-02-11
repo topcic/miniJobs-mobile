@@ -14,7 +14,6 @@ import 'package:minijobs_mobile/providers/rating_provider.dart';
 import 'package:minijobs_mobile/providers/recommendation_provider.dart';
 import 'package:minijobs_mobile/providers/user_registration_provider.dart';
 import 'package:minijobs_mobile/providers/user_provider.dart';
-import 'package:minijobs_mobile/widgets/navbar.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
