@@ -10,6 +10,7 @@ import 'package:minijobs_mobile/providers/city_provider.dart';
 import 'package:minijobs_mobile/providers/applicant_provider.dart';
 
 import '../../models/applicant/applicant_save_request.dart';
+import '../../services/notification.service.dart';
 
 class ApplicantBasicInfo extends StatefulWidget {
   final int applicantId;
@@ -20,6 +21,7 @@ class ApplicantBasicInfo extends StatefulWidget {
 }
 
 class _ApplicantBasicInfoState extends State<ApplicantBasicInfo> {
+  final notificationService = NotificationService();
   final _formKey = GlobalKey<FormBuilderState>();
   late ApplicantProvider applicantProvider;
   late CityProvider cityProvider;
@@ -74,18 +76,11 @@ class _ApplicantBasicInfoState extends State<ApplicantBasicInfo> {
           null,
           jobTypeIds );
 
-      try {
+
         await applicantProvider.update(widget.applicantId, request);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Changes saved successfully')),
-        );
-      } catch (error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save changes: $error')),
-        );
+       notificationService.success('Promjene uspješno spremljene');
       }
     }
-  }
 
   @override
   Widget build(BuildContext context) {

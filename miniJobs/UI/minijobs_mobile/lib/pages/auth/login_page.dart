@@ -191,11 +191,7 @@ class _LoginPageState extends State<LoginPage> {
                                           builder: (context) => const Navbar()),
                                     );
                                   } else if (mounted) {
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(const SnackBar(
-                                      content: Text(
-                                          'Nevalidan email ili lozinka.'),
-                                    ));
+                                    notificationService.error('Nevalidan email ili lozinka');F
                                     _formKey.currentState?.reset();
                                   }
                                 }

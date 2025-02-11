@@ -5,6 +5,8 @@ import 'package:minijobs_mobile/pages/employer/job/job_modal.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../../../services/notification.service.dart';
+
 class JobCard extends StatefulWidget {
   final Job job;
   final bool isInSavedJobs;
@@ -15,6 +17,7 @@ class JobCard extends StatefulWidget {
 }
 
 class _JobCardState extends State<JobCard> {
+  final notificationService = NotificationService();
   late JobProvider jobProvider;
   late Job job;
 
@@ -102,10 +105,7 @@ class _JobCardState extends State<JobCard> {
                     },
                   );
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Detalji posla nisu dostupni')),
-                  );
+                  notificationService.success('Detalji posla nisu dostupni');
                 }
               },
               child: const Text('Pogledaj', style: TextStyle(fontSize: 14)),

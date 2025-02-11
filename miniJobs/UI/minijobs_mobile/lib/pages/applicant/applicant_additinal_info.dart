@@ -15,6 +15,7 @@ import 'package:multi_select_flutter/multi_select_flutter.dart';
 import '../../models/applicant/applicant_save_request.dart';
 import '../../models/job_type.dart';
 import '../../providers/job_type_provider.dart';
+import '../../services/notification.service.dart';
 
 class ApplicantAdditionalInfo extends StatefulWidget {
   final int applicantId;
@@ -25,6 +26,7 @@ class ApplicantAdditionalInfo extends StatefulWidget {
 }
 
 class _ApplicantAdditionalInfoState extends State<ApplicantAdditionalInfo> {
+  final notificationService = NotificationService();
   final _formKey = GlobalKey<FormBuilderState>();
   late ApplicantProvider applicantProvider;
   late JobTypeProvider jobTypeProvider = JobTypeProvider();
@@ -129,13 +131,9 @@ class _ApplicantAdditionalInfoState extends State<ApplicantAdditionalInfo> {
 
       try {
         await applicantProvider.update(widget.applicantId, request);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Changes saved successfully')),
-        );
+        notificationService.success('Promjene uspješno spašene');
       } catch (error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save changes: $error')),
-        );
+       notificationService.error('Došlo je do greške');
       }
     }
   }
@@ -212,7 +210,7 @@ class _ApplicantAdditionalInfoState extends State<ApplicantAdditionalInfo> {
                 title: const Text("Tipovi posla"),
                 initialValue: selectedJobTypeIds ?? [], // Use initialValue instead of selectedItems
                   buttonText: const Text(
-                    "Izaberite tip posla jim se bavite", // Your placeholder text here
+                    "Izaberite tip posla kojim se bavite", // Your placeholder text here
                     style: TextStyle(
                       color: Colors.grey, // Placeholder text color
                     ),

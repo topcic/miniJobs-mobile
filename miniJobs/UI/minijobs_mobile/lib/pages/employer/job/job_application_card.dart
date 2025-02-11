@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import '../../../enumerations/job_statuses.dart';
 import '../../../models/job/job_application.dart';
 import '../../../models/rating/rating_save_request.dart';
+import '../../../services/notification.service.dart';
 import '../../rate_user_card.dart';
 
 class JobApplicationCard extends StatefulWidget {
@@ -22,6 +23,7 @@ class JobApplicationCard extends StatefulWidget {
 }
 
 class _JobApplicationCardState extends State<JobApplicationCard> {
+  final notificationService = NotificationService();
   late JobProvider jobProvider;
   late JobApplication jobApplication;
 
@@ -191,11 +193,7 @@ class _JobApplicationCardState extends State<JobApplicationCard> {
                     },
                   );
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Detalji posla nisu dostupni'),
-                    ),
-                  );
+                  notificationService.success('Detalji posla nisu dostupni');
                 }
               },
               child: const Text('Pogledaj', style: TextStyle(fontSize: 14)),

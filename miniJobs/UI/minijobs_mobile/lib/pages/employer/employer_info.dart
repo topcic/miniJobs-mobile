@@ -10,6 +10,7 @@ import 'package:minijobs_mobile/models/employer/employer_save_request.dart';
 import 'package:minijobs_mobile/providers/city_provider.dart';
 import 'package:minijobs_mobile/providers/employer_provider.dart';
 
+import '../../services/notification.service.dart';
 import '../../utils/photo_view.dart';
 
 class EmployerInfo extends StatefulWidget {
@@ -21,6 +22,8 @@ class EmployerInfo extends StatefulWidget {
 }
 
 class _EmployerInfoState extends State<EmployerInfo> {
+  final notificationService = NotificationService();
+
   final _formKey = GlobalKey<FormBuilderState>();
   late EmployerProvider employerProvider;
   late CityProvider cityProvider;
@@ -77,16 +80,8 @@ class _EmployerInfoState extends State<EmployerInfo> {
         int.tryParse(formData['cityId'])
       );
 
-      try {
         await employerProvider.update(widget.employerId, request);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Changes saved successfully')),
-        );
-      } catch (error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save changes: $error')),
-        );
-      }
+        notificationService.success('Uspješno spašene promjene');
     }
   }
 

@@ -193,7 +193,6 @@ class _JobDetailsState extends State<JobDetails> {
                         },
                   controlsBuilder: (context, details) {
                     final isLastStep = _currentStep == getSteps().length - 1;
-
                     return Container(
                       margin: const EdgeInsets.only(top: 50),
                       child: Row(

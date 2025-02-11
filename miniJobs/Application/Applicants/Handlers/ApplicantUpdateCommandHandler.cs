@@ -32,49 +32,50 @@ public class ApplicantUpdateCommandHandler(IMapper mapper, IApplicantRepository 
 
         // Ensure addedJobTypeIds is not null and convert it to a list of JobTypeIds
         var addedJobTypeIds = addedJobTypes?.Select(jt => jt.Id).ToList() ?? new List<int>();
-
-        if (!addedJobTypeIds.Any())
+        if ((requestJobTypes != null && requestJobTypes.Any()))
         {
-            // Add all job types from the request if there are no added job types
-            foreach (var jobTypeId in requestJobTypes)
+            if (!addedJobTypeIds.Any())
             {
-                await applicantJobTypeRepository.InsertAsync(new ApplicantJobType
+                // Add all job types from the request if there are no added job types
+                foreach (var jobTypeId in requestJobTypes)
                 {
-                    ApplicantId = applicant.Id,
-                    JobTypeId = jobTypeId
-                });
-            }
-        }
-        else
-        {
-            // Find job types to be added
-            var jobTypesToAdd = requestJobTypes.Except(addedJobTypeIds).ToList();
-
-            // Find job types to be removed
-            var jobTypesToRemove = addedJobTypeIds.Except(requestJobTypes).ToList();
-
-            // Delete removed job types
-            foreach (var jobTypeId in jobTypesToRemove)
-            {
-                var jobTypeToRemove = addedJobTypes.FirstOrDefault(jt => jt.Id == jobTypeId);
-                if (jobTypeToRemove != null)
-                {
-
-                    applicantJobTypeRepository.DeleteAsync(applicant.Id, jobTypeToRemove.Id);
+                    await applicantJobTypeRepository.InsertAsync(new ApplicantJobType
+                    {
+                        ApplicantId = applicant.Id,
+                        JobTypeId = jobTypeId
+                    });
                 }
             }
-
-            // Add new job types
-            foreach (var jobTypeId in jobTypesToAdd)
+            else
             {
-                await applicantJobTypeRepository.InsertAsync(new ApplicantJobType
+                // Find job types to be added
+                var jobTypesToAdd = requestJobTypes.Except(addedJobTypeIds).ToList();
+
+                // Find job types to be removed
+                var jobTypesToRemove = addedJobTypeIds.Except(requestJobTypes).ToList();
+
+                // Delete removed job types
+                foreach (var jobTypeId in jobTypesToRemove)
                 {
-                    ApplicantId = applicant.Id,
-                    JobTypeId = jobTypeId
-                });
+                    var jobTypeToRemove = addedJobTypes.FirstOrDefault(jt => jt.Id == jobTypeId);
+                    if (jobTypeToRemove != null)
+                    {
+
+                        applicantJobTypeRepository.DeleteAsync(applicant.Id, jobTypeToRemove.Id);
+                    }
+                }
+
+                // Add new job types
+                foreach (var jobTypeId in jobTypesToAdd)
+                {
+                    await applicantJobTypeRepository.InsertAsync(new ApplicantJobType
+                    {
+                        ApplicantId = applicant.Id,
+                        JobTypeId = jobTypeId
+                    });
+                }
             }
         }
-
 
 
         await applicantRepository.UpdateAsync(applicant);

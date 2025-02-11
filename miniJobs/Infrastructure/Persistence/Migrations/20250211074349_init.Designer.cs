@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Infrastructure.Migrations
+namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240526185854_updated_jobss")]
-    partial class updated_jobss
+    [Migration("20250211074349_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -42,6 +42,10 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("GeneratedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("generated_at");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int")
+                        .HasColumnName("type");
 
                     b.Property<bool>("Used")
                         .HasColumnType("bit")
@@ -88,8 +92,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("experience");
 
-                    b.Property<string>("WageProposal")
-                        .HasColumnType("nvarchar(max)")
+                    b.Property<decimal?>("WageProposal")
+                        .HasColumnType("decimal(18,2)")
                         .HasColumnName("wage_proposal");
 
                     b.HasKey("Id");
@@ -211,6 +215,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("name");
 
+                    b.Property<string>("StreetAddressAndNumber")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("street_address_and_number");
+
                     b.HasKey("Id");
 
                     b.ToTable("employers");
@@ -225,9 +233,13 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("ApplicationsEndTo")
+                    b.Property<int?>("ApplicationsDuration")
+                        .HasColumnType("int")
+                        .HasColumnName("applications_duration");
+
+                    b.Property<DateTime?>("ApplicationsStart")
                         .HasColumnType("datetime2")
-                        .HasColumnName("applications_end_to");
+                        .HasColumnName("applications_start");
 
                     b.Property<int>("CityId")
                         .HasColumnType("int")
@@ -241,12 +253,16 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("created_by");
 
+                    b.Property<bool>("DeletedByAdmin")
+                        .HasColumnType("bit")
+                        .HasColumnName("deleted_by_admin");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("description");
 
-                    b.Property<int>("JobTypeId")
+                    b.Property<int?>("JobTypeId")
                         .HasColumnType("int")
                         .HasColumnName("job_type_id");
 
@@ -267,10 +283,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("required_employees");
 
-                    b.Property<int>("State")
-                        .HasColumnType("int")
-                        .HasColumnName("state");
-
                     b.Property<int>("Status")
                         .HasColumnType("int")
                         .HasColumnName("status");
@@ -285,6 +297,8 @@ namespace Infrastructure.Migrations
                         .HasColumnName("wage");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CityId");
 
                     b.HasIndex("CreatedBy");
 
@@ -309,9 +323,12 @@ namespace Infrastructure.Migrations
                         .HasColumnName("created");
 
                     b.Property<int?>("CreatedBy")
-                        .IsRequired()
                         .HasColumnType("int")
                         .HasColumnName("created_by");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_deleted");
 
                     b.Property<int>("JobId")
                         .HasColumnType("int")
@@ -331,9 +348,11 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("JobId", "CreatedBy");
-
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("JobId");
+
+                    b.HasIndex("LastModifiedBy");
 
                     b.ToTable("job_applications");
                 });
@@ -388,6 +407,77 @@ namespace Infrastructure.Migrations
                     b.HasIndex("ProposedAnswerId");
 
                     b.ToTable("job_question_answers");
+                });
+
+            modelBuilder.Entity("Domain.Entities.JobRecommendation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("last_modified");
+
+                    b.Property<int?>("LastModifiedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("last_modified_by");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy")
+                        .IsUnique()
+                        .HasDatabaseName("IX_JobRecommendation_Unique_User")
+                        .HasFilter("[created_by] IS NOT NULL");
+
+                    b.HasIndex("LastModifiedBy");
+
+                    b.ToTable("job_recommendations");
+                });
+
+            modelBuilder.Entity("Domain.Entities.JobRecommendationCity", b =>
+                {
+                    b.Property<int>("JobRecommendationId")
+                        .HasColumnType("int")
+                        .HasColumnName("job_recommendation_id");
+
+                    b.Property<int>("CityId")
+                        .HasColumnType("int")
+                        .HasColumnName("city_id");
+
+                    b.HasKey("JobRecommendationId", "CityId");
+
+                    b.HasIndex("CityId");
+
+                    b.ToTable("job_recommendation_cites");
+                });
+
+            modelBuilder.Entity("Domain.Entities.JobRecommendationJobType", b =>
+                {
+                    b.Property<int>("JobRecommendationId")
+                        .HasColumnType("int")
+                        .HasColumnName("job_recommendation_id");
+
+                    b.Property<int>("JobTypeId")
+                        .HasColumnType("int")
+                        .HasColumnName("job_type_id");
+
+                    b.HasKey("JobRecommendationId", "JobTypeId");
+
+                    b.HasIndex("JobTypeId");
+
+                    b.ToTable("job_recommendation_job_types");
                 });
 
             modelBuilder.Entity("Domain.Entities.JobType", b =>
@@ -562,6 +652,10 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("CreatedBy")
                         .HasColumnType("int")
                         .HasColumnName("created_by");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_active");
 
                     b.Property<int>("JobApplicationId")
                         .HasColumnType("int")
@@ -752,6 +846,8 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CityId");
+
                     b.ToTable("users");
                 });
 
@@ -785,26 +881,32 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Applicant", b =>
                 {
-                    b.HasOne("Domain.Entities.User", null)
+                    b.HasOne("Domain.Entities.User", "User")
                         .WithOne()
                         .HasForeignKey("Domain.Entities.Applicant", "Id")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.Entities.ApplicantJobType", b =>
                 {
-                    b.HasOne("Domain.Entities.Applicant", null)
-                        .WithMany()
+                    b.HasOne("Domain.Entities.Applicant", "Applicant")
+                        .WithMany("ApplicantJobTypes")
                         .HasForeignKey("ApplicantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.JobType", null)
+                    b.HasOne("Domain.Entities.JobType", "JobType")
                         .WithMany()
                         .HasForeignKey("JobTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Applicant");
+
+                    b.Navigation("JobType");
                 });
 
             modelBuilder.Entity("Domain.Entities.City", b =>
@@ -822,15 +924,23 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Employer", b =>
                 {
-                    b.HasOne("Domain.Entities.User", null)
+                    b.HasOne("Domain.Entities.User", "User")
                         .WithOne()
                         .HasForeignKey("Domain.Entities.Employer", "Id")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.Entities.Job", b =>
                 {
+                    b.HasOne("Domain.Entities.City", null)
+                        .WithMany()
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy");
@@ -838,8 +948,7 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.JobType", null)
                         .WithMany()
                         .HasForeignKey("JobTypeId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Domain.Entities.User", null)
                         .WithMany()
@@ -848,17 +957,23 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.JobApplication", b =>
                 {
-                    b.HasOne("Domain.Entities.User", null)
+                    b.HasOne("Domain.Entities.User", "User")
                         .WithMany()
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .HasForeignKey("CreatedBy");
 
-                    b.HasOne("Domain.Entities.Job", null)
+                    b.HasOne("Domain.Entities.Job", "JobReference")
                         .WithMany()
                         .HasForeignKey("JobId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("LastModifiedBy");
+
+                    b.Navigation("JobReference");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.Entities.JobQuestion", b =>
@@ -889,6 +1004,51 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("ProposedAnswerId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.JobRecommendation", b =>
+                {
+                    b.HasOne("Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedBy");
+
+                    b.HasOne("Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("LastModifiedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.JobRecommendationCity", b =>
+                {
+                    b.HasOne("Domain.Entities.City", "City")
+                        .WithMany()
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.JobRecommendation", null)
+                        .WithMany()
+                        .HasForeignKey("JobRecommendationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("City");
+                });
+
+            modelBuilder.Entity("Domain.Entities.JobRecommendationJobType", b =>
+                {
+                    b.HasOne("Domain.Entities.JobRecommendation", null)
+                        .WithMany()
+                        .HasForeignKey("JobRecommendationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.JobType", "JobType")
+                        .WithMany()
+                        .HasForeignKey("JobTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("JobType");
                 });
 
             modelBuilder.Entity("Domain.Entities.Message", b =>
@@ -969,6 +1129,15 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("LastModifiedBy");
                 });
 
+            modelBuilder.Entity("Domain.Entities.User", b =>
+                {
+                    b.HasOne("Domain.Entities.City", "City")
+                        .WithMany()
+                        .HasForeignKey("CityId");
+
+                    b.Navigation("City");
+                });
+
             modelBuilder.Entity("Domain.Entities.UserRole", b =>
                 {
                     b.HasOne("Domain.Entities.Role", null)
@@ -982,6 +1151,11 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.Applicant", b =>
+                {
+                    b.Navigation("ApplicantJobTypes");
                 });
 #pragma warning restore 612, 618
         }

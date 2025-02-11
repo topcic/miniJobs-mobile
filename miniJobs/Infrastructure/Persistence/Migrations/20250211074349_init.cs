@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Infrastructure.Migrations
+namespace Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
     public partial class init : Migration
@@ -76,32 +76,6 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "users",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    first_name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    last_name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    phone_number = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    gender = table.Column<int>(type: "int", nullable: true),
-                    date_of_birth = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    city_id = table.Column<int>(type: "int", nullable: true),
-                    deleted = table.Column<bool>(type: "bit", nullable: false),
-                    account_confirmed = table.Column<bool>(type: "bit", nullable: false),
-                    password_hash = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    access_failed_count = table.Column<int>(type: "int", nullable: false),
-                    created = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    created_by = table.Column<int>(type: "int", nullable: true),
-                    photo = table.Column<byte[]>(type: "varbinary(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_users", x => x.id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "cities",
                 columns: table => new
                 {
@@ -148,6 +122,37 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "users",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    first_name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    last_name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    phone_number = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    gender = table.Column<int>(type: "int", nullable: true),
+                    date_of_birth = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    city_id = table.Column<int>(type: "int", nullable: true),
+                    deleted = table.Column<bool>(type: "bit", nullable: false),
+                    account_confirmed = table.Column<bool>(type: "bit", nullable: false),
+                    password_hash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    access_failed_count = table.Column<int>(type: "int", nullable: false),
+                    created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    created_by = table.Column<int>(type: "int", nullable: true),
+                    photo = table.Column<byte[]>(type: "varbinary(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_users", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_users_cities_city_id",
+                        column: x => x.city_id,
+                        principalTable: "cities",
+                        principalColumn: "id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "applicants",
                 columns: table => new
                 {
@@ -155,7 +160,7 @@ namespace Infrastructure.Migrations
                     cv = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     experience = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    wage_proposal = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    wage_proposal = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     confirmation_code = table.Column<int>(type: "int", nullable: true),
                     access_failed_count = table.Column<int>(type: "int", nullable: false),
                     created = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -177,7 +182,8 @@ namespace Infrastructure.Migrations
                     id = table.Column<int>(type: "int", nullable: false),
                     name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     id_number = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    company_phone_number = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    company_phone_number = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    street_address_and_number = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -185,6 +191,32 @@ namespace Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_employers_users_id",
                         column: x => x.id,
+                        principalTable: "users",
+                        principalColumn: "id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "job_recommendations",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    created_by = table.Column<int>(type: "int", nullable: true),
+                    last_modified = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    last_modified_by = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_job_recommendations", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_job_recommendations_users_created_by",
+                        column: x => x.created_by,
+                        principalTable: "users",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "FK_job_recommendations_users_last_modified_by",
+                        column: x => x.last_modified_by,
                         principalTable: "users",
                         principalColumn: "id");
                 });
@@ -198,21 +230,32 @@ namespace Infrastructure.Migrations
                     name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     street_address_and_number = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    applications_end_to = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    applications_duration = table.Column<int>(type: "int", nullable: true),
                     status = table.Column<int>(type: "int", nullable: false),
                     required_employees = table.Column<int>(type: "int", nullable: true),
                     wage = table.Column<int>(type: "int", nullable: true),
-                    employer_id = table.Column<int>(type: "int", nullable: false),
                     city_id = table.Column<int>(type: "int", nullable: false),
-                    state = table.Column<int>(type: "int", nullable: false),
+                    job_type_id = table.Column<int>(type: "int", nullable: true),
+                    applications_start = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    deleted_by_admin = table.Column<bool>(type: "bit", nullable: false),
                     created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     created_by = table.Column<int>(type: "int", nullable: true),
-                    last_modified = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    last_modified = table.Column<DateTime>(type: "datetime2", nullable: true),
                     last_modified_by = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_jobs", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_jobs_cities_city_id",
+                        column: x => x.city_id,
+                        principalTable: "cities",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "FK_jobs_job_types_job_type_id",
+                        column: x => x.job_type_id,
+                        principalTable: "job_types",
+                        principalColumn: "id");
                     table.ForeignKey(
                         name: "FK_jobs_users_created_by",
                         column: x => x.created_by,
@@ -235,7 +278,7 @@ namespace Infrastructure.Migrations
                     question_thread_id = table.Column<int>(type: "int", nullable: false),
                     created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     created_by = table.Column<int>(type: "int", nullable: true),
-                    last_modified = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    last_modified = table.Column<DateTime>(type: "datetime2", nullable: true),
                     last_modified_by = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -282,7 +325,8 @@ namespace Infrastructure.Migrations
                     user_id = table.Column<int>(type: "int", nullable: false),
                     code = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     generated_at = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    used = table.Column<bool>(type: "bit", nullable: false)
+                    used = table.Column<bool>(type: "bit", nullable: false),
+                    type = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -318,30 +362,6 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "question_answers",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    question_id = table.Column<int>(type: "int", nullable: false),
-                    proposed_answer_id = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_question_answers", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_question_answers_proposed_answers_proposed_answer_id",
-                        column: x => x.proposed_answer_id,
-                        principalTable: "proposed_answers",
-                        principalColumn: "id");
-                    table.ForeignKey(
-                        name: "FK_question_answers_questions_question_id",
-                        column: x => x.question_id,
-                        principalTable: "questions",
-                        principalColumn: "id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "applicant_job_types",
                 columns: table => new
                 {
@@ -366,6 +386,54 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "job_recommendation_cites",
+                columns: table => new
+                {
+                    job_recommendation_id = table.Column<int>(type: "int", nullable: false),
+                    city_id = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_job_recommendation_cites", x => new { x.job_recommendation_id, x.city_id });
+                    table.ForeignKey(
+                        name: "FK_job_recommendation_cites_cities_city_id",
+                        column: x => x.city_id,
+                        principalTable: "cities",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_job_recommendation_cites_job_recommendations_job_recommendation_id",
+                        column: x => x.job_recommendation_id,
+                        principalTable: "job_recommendations",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "job_recommendation_job_types",
+                columns: table => new
+                {
+                    job_recommendation_id = table.Column<int>(type: "int", nullable: false),
+                    job_type_id = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_job_recommendation_job_types", x => new { x.job_recommendation_id, x.job_type_id });
+                    table.ForeignKey(
+                        name: "FK_job_recommendation_job_types_job_recommendations_job_recommendation_id",
+                        column: x => x.job_recommendation_id,
+                        principalTable: "job_recommendations",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_job_recommendation_job_types_job_types_job_type_id",
+                        column: x => x.job_type_id,
+                        principalTable: "job_types",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "job_applications",
                 columns: table => new
                 {
@@ -373,15 +441,15 @@ namespace Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     job_id = table.Column<int>(type: "int", nullable: false),
                     status = table.Column<int>(type: "int", nullable: false),
+                    is_deleted = table.Column<bool>(type: "bit", nullable: false),
                     created = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    created_by = table.Column<int>(type: "int", nullable: false),
-                    last_modified = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    created_by = table.Column<int>(type: "int", nullable: true),
+                    last_modified = table.Column<DateTime>(type: "datetime2", nullable: true),
                     last_modified_by = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_job_applications", x => x.id);
-                    table.UniqueConstraint("AK_job_applications_job_id_created_by", x => new { x.job_id, x.created_by });
                     table.ForeignKey(
                         name: "FK_job_applications_jobs_job_id",
                         column: x => x.job_id,
@@ -390,6 +458,11 @@ namespace Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_job_applications_users_created_by",
                         column: x => x.created_by,
+                        principalTable: "users",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "FK_job_applications_users_last_modified_by",
+                        column: x => x.last_modified_by,
                         principalTable: "users",
                         principalColumn: "id");
                 });
@@ -419,28 +492,6 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "job_type_assignments",
-                columns: table => new
-                {
-                    job_id = table.Column<int>(type: "int", nullable: false),
-                    job_type_id = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_job_type_assignments", x => new { x.job_id, x.job_type_id });
-                    table.ForeignKey(
-                        name: "FK_job_type_assignments_job_types_job_type_id",
-                        column: x => x.job_type_id,
-                        principalTable: "job_types",
-                        principalColumn: "id");
-                    table.ForeignKey(
-                        name: "FK_job_type_assignments_jobs_job_id",
-                        column: x => x.job_id,
-                        principalTable: "jobs",
-                        principalColumn: "id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "question_threads",
                 columns: table => new
                 {
@@ -450,7 +501,7 @@ namespace Infrastructure.Migrations
                     job_id = table.Column<int>(type: "int", nullable: false),
                     created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     created_by = table.Column<int>(type: "int", nullable: true),
-                    last_modified = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    last_modified = table.Column<DateTime>(type: "datetime2", nullable: true),
                     last_modified_by = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -483,7 +534,7 @@ namespace Infrastructure.Migrations
                     is_deleted = table.Column<bool>(type: "bit", nullable: false),
                     created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     created_by = table.Column<int>(type: "int", nullable: true),
-                    last_modified = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    last_modified = table.Column<DateTime>(type: "datetime2", nullable: true),
                     last_modified_by = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -516,9 +567,10 @@ namespace Infrastructure.Migrations
                     comment = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     job_application_id = table.Column<int>(type: "int", nullable: false),
                     rated_user_id = table.Column<int>(type: "int", nullable: false),
+                    is_active = table.Column<bool>(type: "bit", nullable: false),
                     created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     created_by = table.Column<int>(type: "int", nullable: true),
-                    last_modified = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    last_modified = table.Column<DateTime>(type: "datetime2", nullable: true),
                     last_modified_by = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -538,6 +590,30 @@ namespace Infrastructure.Migrations
                         name: "FK_ratings_users_last_modified_by",
                         column: x => x.last_modified_by,
                         principalTable: "users",
+                        principalColumn: "id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "job_question_answers",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    job_question_id = table.Column<int>(type: "int", nullable: false),
+                    proposed_answer_id = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_job_question_answers", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_job_question_answers_job_questions_job_question_id",
+                        column: x => x.job_question_id,
+                        principalTable: "job_questions",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "FK_job_question_answers_proposed_answers_proposed_answer_id",
+                        column: x => x.proposed_answer_id,
+                        principalTable: "proposed_answers",
                         principalColumn: "id");
                 });
 
@@ -562,26 +638,71 @@ namespace Infrastructure.Migrations
                 column: "created_by");
 
             migrationBuilder.CreateIndex(
+                name: "IX_job_applications_job_id",
+                table: "job_applications",
+                column: "job_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_job_applications_last_modified_by",
+                table: "job_applications",
+                column: "last_modified_by");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_job_question_answers_job_question_id",
+                table: "job_question_answers",
+                column: "job_question_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_job_question_answers_proposed_answer_id",
+                table: "job_question_answers",
+                column: "proposed_answer_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_job_questions_job_id",
                 table: "job_questions",
-                column: "job_id",
-                unique: true);
+                column: "job_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_job_questions_question_id",
                 table: "job_questions",
-                column: "question_id",
-                unique: true);
+                column: "question_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_job_type_assignments_job_type_id",
-                table: "job_type_assignments",
+                name: "IX_job_recommendation_cites_city_id",
+                table: "job_recommendation_cites",
+                column: "city_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_job_recommendation_job_types_job_type_id",
+                table: "job_recommendation_job_types",
                 column: "job_type_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_job_recommendations_last_modified_by",
+                table: "job_recommendations",
+                column: "last_modified_by");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_JobRecommendation_Unique_User",
+                table: "job_recommendations",
+                column: "created_by",
+                unique: true,
+                filter: "[created_by] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_jobs_city_id",
+                table: "jobs",
+                column: "city_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_jobs_created_by",
                 table: "jobs",
                 column: "created_by");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_jobs_job_type_id",
+                table: "jobs",
+                column: "job_type_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_jobs_last_modified_by",
@@ -602,18 +723,6 @@ namespace Infrastructure.Migrations
                 name: "IX_proposed_answers_question_id",
                 table: "proposed_answers",
                 column: "question_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_question_answers_proposed_answer_id",
-                table: "question_answers",
-                column: "proposed_answer_id",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_question_answers_question_id",
-                table: "question_answers",
-                column: "question_id",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_question_threads_created_by",
@@ -674,6 +783,36 @@ namespace Infrastructure.Migrations
                 name: "IX_user_roles_role_id",
                 table: "user_roles",
                 column: "role_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_users_city_id",
+                table: "users",
+                column: "city_id");
+
+            var sqlFile = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "Infrastructure/Persistence/Migrations/InitialDataScripts/add_roles.sql");
+            migrationBuilder.Sql(File.ReadAllText(sqlFile));
+
+            sqlFile = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "Infrastructure/Persistence/Migrations/InitialDataScripts/add_default_user.sql");
+            migrationBuilder.Sql(File.ReadAllText(sqlFile));
+
+            sqlFile = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "Infrastructure/Persistence/Migrations/InitialDataScripts/add_cantons.sql");
+            migrationBuilder.Sql(File.ReadAllText(sqlFile));
+
+            sqlFile = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "Infrastructure/Persistence/Migrations/InitialDataScripts/add_default_country.sql");
+            migrationBuilder.Sql(File.ReadAllText(sqlFile));
+
+            sqlFile = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "Infrastructure/Persistence/Migrations/InitialDataScripts/add_cities.sql");
+            migrationBuilder.Sql(File.ReadAllText(sqlFile));
+
+            sqlFile = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "Infrastructure/Persistence/Migrations/InitialDataScripts/add_job_types.sql");
+            migrationBuilder.Sql(File.ReadAllText(sqlFile));
+
+            sqlFile = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "Infrastructure/Persistence/Migrations/InitialDataScripts/add_questions.sql");
+            migrationBuilder.Sql(File.ReadAllText(sqlFile));
+
+            sqlFile = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "Infrastructure/Persistence/Migrations/InitialDataScripts/add_proposed_answers.sql");
+            migrationBuilder.Sql(File.ReadAllText(sqlFile));
+
         }
 
         /// <inheritdoc />
@@ -683,22 +822,19 @@ namespace Infrastructure.Migrations
                 name: "applicant_job_types");
 
             migrationBuilder.DropTable(
-                name: "cities");
-
-            migrationBuilder.DropTable(
                 name: "employers");
 
             migrationBuilder.DropTable(
-                name: "job_questions");
+                name: "job_question_answers");
 
             migrationBuilder.DropTable(
-                name: "job_type_assignments");
+                name: "job_recommendation_cites");
+
+            migrationBuilder.DropTable(
+                name: "job_recommendation_job_types");
 
             migrationBuilder.DropTable(
                 name: "messages");
-
-            migrationBuilder.DropTable(
-                name: "question_answers");
 
             migrationBuilder.DropTable(
                 name: "question_threads");
@@ -722,16 +858,13 @@ namespace Infrastructure.Migrations
                 name: "applicants");
 
             migrationBuilder.DropTable(
-                name: "cantons");
-
-            migrationBuilder.DropTable(
-                name: "countries");
-
-            migrationBuilder.DropTable(
-                name: "job_types");
+                name: "job_questions");
 
             migrationBuilder.DropTable(
                 name: "proposed_answers");
+
+            migrationBuilder.DropTable(
+                name: "job_recommendations");
 
             migrationBuilder.DropTable(
                 name: "job_applications");
@@ -746,7 +879,19 @@ namespace Infrastructure.Migrations
                 name: "jobs");
 
             migrationBuilder.DropTable(
+                name: "job_types");
+
+            migrationBuilder.DropTable(
                 name: "users");
+
+            migrationBuilder.DropTable(
+                name: "cities");
+
+            migrationBuilder.DropTable(
+                name: "cantons");
+
+            migrationBuilder.DropTable(
+                name: "countries");
         }
     }
 }

@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/user_provider.dart';
+import '../services/notification.service.dart';
 
 class PhotoView extends StatefulWidget {
   final Uint8List? photo;
@@ -23,6 +24,7 @@ class PhotoView extends StatefulWidget {
 }
 
 class _PhotoViewState extends State<PhotoView> {
+  final notificationService = NotificationService();
   final ImagePicker _picker = ImagePicker();
   Uint8List? _currentPhoto;
 
@@ -49,13 +51,9 @@ class _PhotoViewState extends State<PhotoView> {
       final userProvider = context.read<UserProvider>();
       final photo = MultipartFile.fromBytes(newPhoto, filename: 'photo.jpg');
       await userProvider.uploadUserPhoto(widget.userId, photo);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Photo updated successfully')),
-      );
+      notificationService.success('Uspješno ste dodali sliku.');
     } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update photo: $error')),
-      );
+      notificationService.error('Greška prilikom spremanja slike.');
     }
   }
 

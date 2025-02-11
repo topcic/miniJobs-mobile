@@ -8,6 +8,7 @@ import 'package:minijobs_mobile/providers/city_provider.dart';
 import 'package:minijobs_mobile/providers/employer_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../../services/notification.service.dart';
 import '../../utils/util_widgets.dart';
 
 class CompanyEmployerSignupPage extends StatefulWidget {
@@ -19,7 +20,7 @@ class CompanyEmployerSignupPage extends StatefulWidget {
 }
 
 class _CompanyEmployerSignupPageState extends State<CompanyEmployerSignupPage> {
-  final _formKey = GlobalKey<FormBuilderState>();
+F  final _formKey = GlobalKey<FormBuilderState>();
   List<City>? cities;
   bool isLoading = true;
   final phoneNumberMask = MaskTextInputFormatter(
@@ -323,10 +324,8 @@ class _CompanyEmployerSignupPageState extends State<CompanyEmployerSignupPage> {
                                             var result =
                                                 await _userCompanyProvider
                                                     .insert(request);
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(const SnackBar(
-                                                    content: Text(
-                                                        "Uspješno ste se registrovali. Molimo Vas provjerite Vaš email")));
+                                            notificationService.success('Uspješno ste se registrovali. Molimo Vas provjerite Vaš email');
+
 
                                             Navigator.of(context).push(
                                                 MaterialPageRoute(
@@ -334,10 +333,7 @@ class _CompanyEmployerSignupPageState extends State<CompanyEmployerSignupPage> {
                                                         const VerificationPage()));
                                           } else {}
                                         } catch (e) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(const SnackBar(
-                                                  content: Text(
-                                                      " Email adresa se već koristi. Molimo izaberite drugu email adresu.")));
+                                          notificationService.error('Email adresa se već koristi. Molimo izaberite drugu email adresu.');
                                         }
                                       },
                                       child: const Text("Registruj se"),
