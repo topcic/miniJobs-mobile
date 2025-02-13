@@ -299,7 +299,6 @@ namespace Infrastructure.Persistence.Repositories
                                        Experience = app.Applicant.Experience,
                                        Description = app.Applicant.Description,
                                        WageProposal = app.Applicant.WageProposal,
-                                       Created = app.Applicant.Created,
                                        FirstName = app.User.FirstName,
                                        LastName = app.User.LastName,
                                        Email = app.User.Email,

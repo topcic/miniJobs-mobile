@@ -12,8 +12,8 @@ import 'package:provider/provider.dart';
 import '../../../../models/job/job_step3_request.dart';
 
 class JobStep3 extends StatefulWidget {
-  final Function(bool,int, JobStep3Request) onNextButton;
-  final Function(Function()) setValidateAndSaveCallback;
+  final Function(bool,int,int, JobStep3Request?) onNextButton;
+  final void Function(bool Function()) setValidateAndSaveCallback;
 
   const JobStep3({
     super.key,
@@ -241,7 +241,7 @@ class _JobStep3State extends State<JobStep3> {
     );
   }
 
-  validateAndSave() {
+  bool validateAndSave() {
     _formKey.currentState?.save();
     bool isFormValid = _formKey.currentState!.validate();
 
@@ -261,18 +261,23 @@ class _JobStep3State extends State<JobStep3> {
       final Map<String, dynamic> formValues = _formKey.currentState!.value;
       saveAnswersToPaymentQuestions();
       var saveRequest = JobStep3Request(
-        answersToPaymentQuestions,
-        formValues['wage'] != null ? int.tryParse(formValues['wage']) : 0
+          answersToPaymentQuestions,
+          formValues['wage'] != null ? int.tryParse(formValues['wage']) : 0
       );
 
       setState(() {
         _jobStep3Request = saveRequest;
       });
-      widget.onNextButton(true,_job!.id!, _jobStep3Request!);
+
+      // Ensure valid request is passed to onNextButton
+      widget.onNextButton(true, _job!.id!,2, _jobStep3Request); // Pass the valid _jobStep3Request
+      return true;
     } else {
-      widget.onNextButton(false,_job!.id!, _jobStep3Request!);
+      widget.onNextButton(false, _job!.id!,2, null); // Pass null only if it's invalid
+      return false;
     }
   }
+
 
 }
 

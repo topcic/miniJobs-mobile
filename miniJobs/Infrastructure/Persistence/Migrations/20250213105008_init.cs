@@ -160,10 +160,7 @@ namespace Infrastructure.Persistence.Migrations
                     cv = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     experience = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    wage_proposal = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    confirmation_code = table.Column<int>(type: "int", nullable: true),
-                    access_failed_count = table.Column<int>(type: "int", nullable: false),
-                    created = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    wage_proposal = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -492,39 +489,6 @@ namespace Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "question_threads",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    job_id = table.Column<int>(type: "int", nullable: false),
-                    created = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    created_by = table.Column<int>(type: "int", nullable: true),
-                    last_modified = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    last_modified_by = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_question_threads", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_question_threads_jobs_job_id",
-                        column: x => x.job_id,
-                        principalTable: "jobs",
-                        principalColumn: "id");
-                    table.ForeignKey(
-                        name: "FK_question_threads_users_created_by",
-                        column: x => x.created_by,
-                        principalTable: "users",
-                        principalColumn: "id");
-                    table.ForeignKey(
-                        name: "FK_question_threads_users_last_modified_by",
-                        column: x => x.last_modified_by,
-                        principalTable: "users",
-                        principalColumn: "id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "saved_jobs",
                 columns: table => new
                 {
@@ -725,21 +689,6 @@ namespace Infrastructure.Persistence.Migrations
                 column: "question_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_question_threads_created_by",
-                table: "question_threads",
-                column: "created_by");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_question_threads_job_id",
-                table: "question_threads",
-                column: "job_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_question_threads_last_modified_by",
-                table: "question_threads",
-                column: "last_modified_by");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ratings_created_by",
                 table: "ratings",
                 column: "created_by");
@@ -788,13 +737,12 @@ namespace Infrastructure.Persistence.Migrations
                 name: "IX_users_city_id",
                 table: "users",
                 column: "city_id");
-            string basePath = "/app/Infrastructure/Persistence/Migrations/InitialDataScripts";
+
+            // string basePath = "/app/Infrastructure/Persistence/Migrations/InitialDataScripts";
+            string basePath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "Infrastructure/Persistence/Migrations/InitialDataScripts");
 
 
             var sqlFile = Path.Combine(basePath, "add_roles.sql");
-            migrationBuilder.Sql(File.ReadAllText(sqlFile));
-
-            sqlFile = Path.Combine(basePath, "add_default_user.sql");
             migrationBuilder.Sql(File.ReadAllText(sqlFile));
 
             sqlFile = Path.Combine(basePath, "add_cantons.sql");
@@ -815,6 +763,11 @@ namespace Infrastructure.Persistence.Migrations
             sqlFile = Path.Combine(basePath, "add_proposed_answers.sql");
             migrationBuilder.Sql(File.ReadAllText(sqlFile));
 
+            sqlFile = Path.Combine(basePath, "add_default_user.sql");
+            migrationBuilder.Sql(File.ReadAllText(sqlFile));
+
+            sqlFile = Path.Combine(basePath, "init.sql");
+            migrationBuilder.Sql(File.ReadAllText(sqlFile), suppressTransaction: true);
         }
 
         /// <inheritdoc />
@@ -837,9 +790,6 @@ namespace Infrastructure.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "messages");
-
-            migrationBuilder.DropTable(
-                name: "question_threads");
 
             migrationBuilder.DropTable(
                 name: "ratings");

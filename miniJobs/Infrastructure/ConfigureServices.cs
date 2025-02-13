@@ -1,10 +1,8 @@
 ﻿using Application.Common.Interfaces;
 using Hangfire;
 using Infrastructure.Authentication;
-using Infrastructure.BackgroundServices;
 using Infrastructure.Common.Interfaces;
 using Infrastructure.Consumers;
-using Infrastructure.Mails;
 using Infrastructure.MailSenders;
 using Infrastructure.OptionsSetup;
 using Infrastructure.Persistence;
@@ -13,7 +11,6 @@ using Infrastructure.Services;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.CodeAnalysis.FlowAnalysis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -92,7 +89,6 @@ public static class ConfigureServices
         services.AddScoped<ICityRepository, CityRepository>();
         services.AddScoped<ICountryRepository, CountryRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
-        services.AddScoped<IQuestionThreadRepository, QuestionThreadRepository>(); 
         services.AddScoped<IApplicantJobTypeRepository, ApplicantJobTypeRepository>();
         services.AddScoped<IUserAuthCodeRepository, UserAuthCodeRepository>();
         services.AddScoped<ITokenRepository, TokenRepository>();

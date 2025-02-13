@@ -20,14 +20,6 @@ public class Applicant : IEntity<int>
     [Column("wage_proposal")]
     public decimal? WageProposal { get; set; }
 
-    [Column("confirmation_code")]
-    public int? ConfirmationCode { get; set; }
-
-    [Column("access_failed_count")]
-    public int AccessFailedCount { get; set; }
-
-    [Column("created")]
-    public DateTime Created { get; set; }
     public User User { get; set; }
     public ICollection<ApplicantJobType> ApplicantJobTypes { get; set; }
     [NotMapped]

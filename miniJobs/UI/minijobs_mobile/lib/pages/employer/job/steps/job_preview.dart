@@ -98,7 +98,7 @@ class _JobPreviewState extends State<JobPreview> {
             ),
             const SizedBox(height: 12),
             Text(
-              '$userName - ${job.city!.name}',
+              '$userName - ${job.city?.name??''}',
               style: TextStyle(fontSize: 16, color: Colors.deepPurple[300]),
             ),
             Divider(color: Colors.grey[400], height: 20),
@@ -127,7 +127,7 @@ class _JobPreviewState extends State<JobPreview> {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  job.jobType!.name!,
+                  job.jobType?.name??'',
                   style: TextStyle(fontSize: 15, color: Colors.grey[700]),
                 ),
               ],
@@ -144,7 +144,7 @@ class _JobPreviewState extends State<JobPreview> {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  job.requiredEmployees!.toString(),
+                  job.requiredEmployees?.toString()??'0',
                   style: TextStyle(fontSize: 15, color: Colors.grey[700]),
                 ),
               ],
@@ -161,7 +161,7 @@ class _JobPreviewState extends State<JobPreview> {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  job.paymentQuestion!.answer!,
+                    job.paymentQuestion?.answer ?? '',
                   style: TextStyle(fontSize: 15, color: Colors.grey[700]),
                 ),
                 if (job.wage != null && job.wage! > 0)
@@ -184,12 +184,12 @@ class _JobPreviewState extends State<JobPreview> {
             Wrap(
               spacing: 8.0,
               runSpacing: 4.0,
-              children: job.schedules!.map((schedule) {
+              children: job.schedules?.map((schedule) {
                 return Text(
-                  schedule.answer!,
+                  schedule.answer ?? '', // Provide a default value in case 'answer' is null
                   style: TextStyle(fontSize: 15, color: Colors.grey[700]),
                 );
-              }).toList(),
+              }).toList() ?? [],
             ),
             if (job.additionalPaymentOptions != null &&
                 job.additionalPaymentOptions!.isNotEmpty) ...[

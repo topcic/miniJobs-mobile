@@ -16,7 +16,7 @@ import '../../../../enumerations/job_statuses.dart';
 import '../../../../models/job/job_step2.request.dart';
 
 class JobStep2 extends StatefulWidget {
-  final Function(bool,int, JobStep2Request) onNextButton;
+  final Function(bool,int,int, JobStep2Request) onNextButton;
   final Function(Function()) setValidateAndSaveCallback;
 
   const JobStep2({
@@ -132,11 +132,10 @@ class JobStep2State extends State<JobStep2> {
                       if (textEditingValue.text.isEmpty) {
                         return const Iterable<String>.empty();
                       }
-                      return _jobTypes!
-                          .where((element) => element.name!
-                          .toLowerCase()
-                          .contains(textEditingValue.text.toLowerCase()))
-                          .map((e) => e.name!);
+                      return _jobTypes
+                          ?.where((element) => element.name != null && element.name!.toLowerCase().contains(textEditingValue.text.toLowerCase()))
+                          .map((e) => e.name!)
+                          .toList() ?? [];
                     },
                     onSelected: (String selection) {
                       final selectedJobType = _jobTypes!
@@ -396,9 +395,9 @@ class JobStep2State extends State<JobStep2> {
       setState(() {
         _jobStep2Request = saveRequest;
       });
-      widget.onNextButton(true,_job!.id!, _jobStep2Request!);
+      widget.onNextButton(true,_job!.id!,1, _jobStep2Request!);
     } else {
-      widget.onNextButton(false,_job!.id!, _jobStep2Request!);
+      widget.onNextButton(false,_job!.id!,1, _jobStep2Request!);
     }
   }
 

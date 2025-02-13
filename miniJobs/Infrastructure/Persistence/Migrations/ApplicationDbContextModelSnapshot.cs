@@ -65,18 +65,6 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int")
-                        .HasColumnName("access_failed_count");
-
-                    b.Property<int?>("ConfirmationCode")
-                        .HasColumnType("int")
-                        .HasColumnName("confirmation_code");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("created");
-
                     b.Property<byte[]>("Cv")
                         .HasColumnType("varbinary(max)")
                         .HasColumnName("cv");
@@ -583,51 +571,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("questions");
                 });
 
-            modelBuilder.Entity("Domain.Entities.QuestionThread", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("created");
-
-                    b.Property<int?>("CreatedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("created_by");
-
-                    b.Property<int>("JobId")
-                        .HasColumnType("int")
-                        .HasColumnName("job_id");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("last_modified");
-
-                    b.Property<int?>("LastModifiedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("last_modified_by");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("name");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("JobId");
-
-                    b.HasIndex("LastModifiedBy");
-
-                    b.ToTable("question_threads");
-                });
-
             modelBuilder.Entity("Domain.Entities.Rating", b =>
                 {
                     b.Property<int>("Id")
@@ -1066,23 +1009,6 @@ namespace Infrastructure.Persistence.Migrations
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Domain.Entities.QuestionThread", b =>
-                {
-                    b.HasOne("Domain.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("CreatedBy");
-
-                    b.HasOne("Domain.Entities.Job", null)
-                        .WithMany()
-                        .HasForeignKey("JobId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("LastModifiedBy");
                 });
 
             modelBuilder.Entity("Domain.Entities.Rating", b =>

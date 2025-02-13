@@ -27,7 +27,7 @@ class _JobDetailsState extends State<JobDetails> {
   late JobProvider _jobProvider;
   final GlobalKey<JobStep1State> _jobStep1Key = GlobalKey<JobStep1State>();
   late Function() _validateAndSaveStep2Callback;
-  late Function() _validateAndSaveStep3Callback;
+  late bool Function() _validateAndSaveStep3Callback;
   bool isCalledCanAccessStep = false;
   int requestedStep = 0;
 
@@ -93,21 +93,21 @@ class _JobDetailsState extends State<JobDetails> {
     } else if (step == 2) {
       var jobStep1State = _jobStep1Key.currentState;
       if (jobStep1State != null && jobStep1State.validateAndSave()) {
-        _job = jobStep1State.getUpdatedJob();
+        updateJobForStep1(jobStep1State.getUpdatedJob());
         return _validateAndSaveStep2Callback();
       }
       return false;
     } else if (step == 3) {
       var jobStep1State = _jobStep1Key.currentState;
       if (jobStep1State != null && jobStep1State.validateAndSave()) {
-        _job = jobStep1State.getUpdatedJob();
+        updateJobForStep1(jobStep1State.getUpdatedJob());
 
         _validateAndSaveStep2Callback();
         setState(() {
           isCalledCanAccessStep = true;
         });
-        _validateAndSaveStep3Callback();
-        return true;
+        var x=_validateAndSaveStep3Callback();
+        return x;
       }
       return false;
     }
@@ -121,7 +121,7 @@ class _JobDetailsState extends State<JobDetails> {
     _initializeJob(widget.jobId);
   }
 
-  void _onNextButton(bool isValid,int id,[dynamic request]) async {
+  void _onNextButton(bool isValid,int id,int step, [dynamic? request]) async {
     if (isValid) {
       if (!isCalledCanAccessStep) {
         Job? job;
@@ -132,9 +132,10 @@ class _JobDetailsState extends State<JobDetails> {
         }
         _jobProvider.setCurrentJob(job!);
         setState(() {
+          if(_currentStep<3)
           _currentStep += 1;
         });
-      } else {
+      } else if(requestedStep-1==step){
         setState(() {
           isCalledCanAccessStep = false;
           _currentStep = requestedStep;
@@ -177,7 +178,8 @@ class _JobDetailsState extends State<JobDetails> {
                       requestedStep = step;
                       isCalledCanAccessStep = true;
                     });
-                    if (await canAccessStep(step)) {
+                    var canAccess=await canAccessStep(step);
+                    if (canAccess) {
                       setState(() {
                         isCalledCanAccessStep = false;
                         _currentStep = requestedStep;
@@ -260,7 +262,7 @@ class _JobDetailsState extends State<JobDetails> {
           title: const Text(''),
           content: JobStep3(
               onNextButton: _onNextButton,
-              setValidateAndSaveCallback: (Function() validateAndSave) {
+              setValidateAndSaveCallback: (bool Function() validateAndSave) {
                 _validateAndSaveStep3Callback = validateAndSave;
               }),
           isActive: _currentStep >= 2,
@@ -317,7 +319,11 @@ class _JobDetailsState extends State<JobDetails> {
     } else if (_currentStep == 1 && !isCalledCanAccessStep) {
       _validateAndSaveStep2Callback();
     } else if (_currentStep == 2 && !isCalledCanAccessStep) {
-      _validateAndSaveStep3Callback();
+      if (_validateAndSaveStep3Callback() && _currentStep==2) {
+        setState(() {
+          _currentStep += 1;
+        });
+      }
     } else if (_currentStep == 3 && !isCalledCanAccessStep) {
       var job = await _jobProvider.activate(_job.id!, JobStatus.Aktivan);
       _jobProvider.setCurrentJob(job);
