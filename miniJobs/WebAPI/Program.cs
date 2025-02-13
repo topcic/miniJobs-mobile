@@ -1,5 +1,6 @@
 using Application.Common.Middlewares;
 using Hangfire;
+using Microsoft.AspNetCore.HttpOverrides;
 using NLog.Web;
 using WebAPI.Extensions;
 
@@ -31,10 +32,6 @@ if (app.Environment.IsDevelopment())
     //    Authorization = []
     //});
 }
-if (!app.Environment.IsDevelopment()) // Only use HTTPS redirection outside Docker
-{
-    app.UseHttpsRedirection();
-}
 
 app.StartRecurringJobs();
 
@@ -44,8 +41,10 @@ app.UseRequestLocalization();
 app.UseMiddleware<UserMiddleware>();
 app.UseMiddleware<UnhandledExceptionMiddleware>();
 app.UseCors("CorsPolicy");
-app.UseHttpsRedirection();
-
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.All
+});
 app.MapControllers();
 
 app.ExecuteMigrations();

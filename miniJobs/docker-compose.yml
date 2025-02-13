@@ -55,12 +55,10 @@ services:
       - RABBITMQ_USERNAME=guest
       - RABBITMQ_PASSWORD=guest
       - RABBITMQ_VIRTUALHOST=/  
-      - DOTNET_USE_POLLING_FILE_WATCHER=1
+      - DOTNET_USE_POLLING_FILE_WATCHER=1 
+      - ASPNETCORE_URLS=http://+:7126;https://+:7127
     ports:
      - 7126:7126
-    
-    extra_hosts:
-      - "localhost:10.0.2.2"
 
     networks:
       - miniJobs_network

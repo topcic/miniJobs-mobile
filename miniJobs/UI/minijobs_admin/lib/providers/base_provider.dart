@@ -17,7 +17,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
     _endpoint = endpoint;
     _baseUrl = const String.fromEnvironment(//10.0.2.2 //http://localhost:5020/
       "baseUrl",
-      defaultValue: "http://localhost:5020/api/",
+      defaultValue: "http://localhost:7126/api/",
     );
 
     _dio = Dio(BaseOptions(
