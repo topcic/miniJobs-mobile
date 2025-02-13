@@ -55,13 +55,13 @@ services:
       - RABBITMQ_USERNAME=guest
       - RABBITMQ_PASSWORD=guest
       - RABBITMQ_VIRTUALHOST=/  
-      - ASPNETCORE_URLS=http://0.0.0.0:5000
       - DOTNET_USE_POLLING_FILE_WATCHER=1
     ports:
-       - "5000:5000"   # HTTP
-       - "5001:5001"   # HTTPS
+     - 7126:7126
+    
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - "localhost:10.0.2.2"
+
     networks:
       - miniJobs_network
     depends_on:

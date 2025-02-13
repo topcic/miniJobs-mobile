@@ -2,8 +2,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app
 WORKDIR /app
-EXPOSE 5000
-EXPOSE 5081
+EXPOSE 7126
 
 # Build image with SDK
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build

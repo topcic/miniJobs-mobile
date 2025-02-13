@@ -12,8 +12,12 @@ builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddWebAPIServices(builder.Configuration);
 builder.Services.AddJobManagerAndServices();
-var app = builder.Build();
 
+builder.Services.AddCors(options => options.AddPolicy(
+    name: "CorsPolicy",
+    builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
+));
+var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) 
 {
@@ -39,7 +43,8 @@ app.UseAuthorization();
 app.UseRequestLocalization();
 app.UseMiddleware<UserMiddleware>();
 app.UseMiddleware<UnhandledExceptionMiddleware>();
-app.UseCors("miniJobsCors");
+app.UseCors("CorsPolicy");
+app.UseHttpsRedirection();
 
 app.MapControllers();
 
