@@ -12,23 +12,27 @@ builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddWebAPIServices(builder.Configuration);
 builder.Services.AddJobManagerAndServices();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment()) 
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    app.ApplyMigrations();
 
     //app.UseHangfireDashboard(string.Empty, new DashboardOptions()
     //{
     //    Authorization = []
     //});
 }
-app.StartRecurringJobs();
+if (!app.Environment.IsDevelopment()) // Only use HTTPS redirection outside Docker
+{
+    app.UseHttpsRedirection();
+}
 
-app.UseHttpsRedirection();
+app.StartRecurringJobs();
 
 app.UseAuthentication();
 app.UseAuthorization();

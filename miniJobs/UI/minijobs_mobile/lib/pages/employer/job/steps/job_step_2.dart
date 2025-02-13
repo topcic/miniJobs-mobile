@@ -267,7 +267,7 @@ class JobStep2State extends State<JobStep2> {
                 rowMethod(Text("Raspored posla je obavezno polje",
                     style: TextStyle(color: Colors.red[800], fontSize: 12))),
               const SizedBox(height: 20),
-              if (_job!.status == JobStatus.Aktivan) ...[
+              if (_job?.status == JobStatus.Aktivan) ...[
                 Text(
                   'Aplikacije traju do: ${DateFormat('dd.MM.yyyy').format(_job!.applicationsStart!.add(Duration(days: _job!.applicationsDuration!)))}',
                   style: const TextStyle(fontSize: 14),

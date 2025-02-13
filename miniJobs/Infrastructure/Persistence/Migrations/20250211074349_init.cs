@@ -788,29 +788,31 @@ namespace Infrastructure.Persistence.Migrations
                 name: "IX_users_city_id",
                 table: "users",
                 column: "city_id");
+            string basePath = "/app/Infrastructure/Persistence/Migrations/InitialDataScripts";
 
-            var sqlFile = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "Infrastructure/Persistence/Migrations/InitialDataScripts/add_roles.sql");
+
+            var sqlFile = Path.Combine(basePath, "add_roles.sql");
             migrationBuilder.Sql(File.ReadAllText(sqlFile));
 
-            sqlFile = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "Infrastructure/Persistence/Migrations/InitialDataScripts/add_default_user.sql");
+            sqlFile = Path.Combine(basePath, "add_default_user.sql");
             migrationBuilder.Sql(File.ReadAllText(sqlFile));
 
-            sqlFile = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "Infrastructure/Persistence/Migrations/InitialDataScripts/add_cantons.sql");
+            sqlFile = Path.Combine(basePath, "add_cantons.sql");
             migrationBuilder.Sql(File.ReadAllText(sqlFile));
 
-            sqlFile = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "Infrastructure/Persistence/Migrations/InitialDataScripts/add_default_country.sql");
+            sqlFile = Path.Combine(basePath, "add_default_country.sql");
             migrationBuilder.Sql(File.ReadAllText(sqlFile));
 
-            sqlFile = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "Infrastructure/Persistence/Migrations/InitialDataScripts/add_cities.sql");
+            sqlFile = Path.Combine(basePath, "add_cities.sql");
             migrationBuilder.Sql(File.ReadAllText(sqlFile));
 
-            sqlFile = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "Infrastructure/Persistence/Migrations/InitialDataScripts/add_job_types.sql");
+            sqlFile = Path.Combine(basePath, "add_job_types.sql");
             migrationBuilder.Sql(File.ReadAllText(sqlFile));
 
-            sqlFile = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "Infrastructure/Persistence/Migrations/InitialDataScripts/add_questions.sql");
+            sqlFile = Path.Combine(basePath, "add_questions.sql");
             migrationBuilder.Sql(File.ReadAllText(sqlFile));
 
-            sqlFile = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "Infrastructure/Persistence/Migrations/InitialDataScripts/add_proposed_answers.sql");
+            sqlFile = Path.Combine(basePath, "add_proposed_answers.sql");
             migrationBuilder.Sql(File.ReadAllText(sqlFile));
 
         }

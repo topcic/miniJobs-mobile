@@ -45,6 +45,7 @@ public static class ConfigureServices
 
         AddBackgroundJobs(services,configuration);
         AddMassTransitAndRabbitMq(services, configuration);
+
         //AddConsumers(services);
         return services;
     }

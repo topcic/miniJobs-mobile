@@ -349,3 +349,4 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 /miniJobs/Infrastructure/Migrations/20240518071446_init.Designer.cs
+/miniJobs/Infrastructure/Persistence/Migrations/InitialDataScripts/init-db.sh
