@@ -15,7 +15,8 @@ import '../../utils/photo_view.dart';
 
 class EmployerInfo extends StatefulWidget {
   final int employerId;
-  const EmployerInfo({super.key, required this.employerId});
+  final VoidCallback onBack;
+  const EmployerInfo({super.key, required this.employerId,required this.onBack});
 
   @override
   State<EmployerInfo> createState() => _EmployerInfoState();
@@ -91,6 +92,13 @@ class _EmployerInfoState extends State<EmployerInfo> {
       appBar: AppBar(
         title: const Text('Korisničke informacije'),
         centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            widget.onBack(); // Call the callback when back button is pressed
+            Navigator.pop(context, true); // Pass 'true' to indicate data should be fetched
+          },
+        ),
       ),
       body: isLoading
           ?  const SpinKitRing(color: Colors.brown)

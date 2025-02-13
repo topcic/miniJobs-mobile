@@ -112,6 +112,7 @@ class _EmployerProfilePageState extends State<EmployerProfilePage> {
                         const SizedBox(width: 35),
 
                         PhotoView(
+                          key: ValueKey(employer?.photo?.hashCode),
                           photo: employer?.photo,
                           editable: false,
                           userId: userId,
@@ -122,7 +123,7 @@ class _EmployerProfilePageState extends State<EmployerProfilePage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => EmployerInfo(employerId: userId),
+                                  builder: (context) => EmployerInfo(employerId: userId,onBack: () => fetchUserData(),),
                                 ),
                               );
                             },
