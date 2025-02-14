@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
@@ -72,8 +71,9 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
   }
   void _updatePhoto(Uint8List? newPhoto) {
     setState(() {
-      if(newPhoto!=null)
-      applicant?.photo = Uint8List.fromList(newPhoto); // Ensure new reference
+      if(newPhoto!=null) {
+        applicant?.photo = Uint8List.fromList(newPhoto); // Ensure new reference
+      }
     });
   }
   @override

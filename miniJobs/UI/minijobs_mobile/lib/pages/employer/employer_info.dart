@@ -93,7 +93,7 @@ class _EmployerInfoState extends State<EmployerInfo> {
         title: const Text('Korisničke informacije'),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             widget.onBack(); // Call the callback when back button is pressed
             Navigator.pop(context, true); // Pass 'true' to indicate data should be fetched

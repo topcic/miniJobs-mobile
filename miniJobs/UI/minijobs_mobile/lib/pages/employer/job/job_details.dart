@@ -121,7 +121,7 @@ class _JobDetailsState extends State<JobDetails> {
     _initializeJob(widget.jobId);
   }
 
-  void _onNextButton(bool isValid,int id,int step, [dynamic? request]) async {
+  void _onNextButton(bool isValid,int id,int step, [dynamic request]) async {
     if (isValid) {
       if (!isCalledCanAccessStep) {
         Job? job;
@@ -132,8 +132,9 @@ class _JobDetailsState extends State<JobDetails> {
         }
         _jobProvider.setCurrentJob(job!);
         setState(() {
-          if(_currentStep<3)
-          _currentStep += 1;
+          if(_currentStep<3) {
+            _currentStep += 1;
+          }
         });
       } else if(requestedStep-1==step){
         setState(() {

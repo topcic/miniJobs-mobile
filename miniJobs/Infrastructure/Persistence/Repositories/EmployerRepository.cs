@@ -14,7 +14,7 @@ public class EmployerRepository(ApplicationDbContext _context, IMapper mapper) :
         if(requestedBy == userId) 
             query = from j in _context.Jobs
                     join c in _context.Cities on j.CityId equals c.Id
-                    where j.Status == JobStatus.Active
+                    where j.Status == JobStatus.Active && j.CreatedBy==userId
                     select new Job
                     {
                         Id = j.Id,

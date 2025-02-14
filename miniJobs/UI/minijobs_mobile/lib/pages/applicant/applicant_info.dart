@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:minijobs_mobile/models/applicant/applicant.dart';
 import 'package:minijobs_mobile/providers/applicant_provider.dart';
@@ -49,7 +48,7 @@ class _ApplicantInfoState extends State<ApplicantInfo> with SingleTickerProvider
         title: const Text('Korisničke informacije'),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             widget.onBack(); // Call the callback when back button is pressed
             Navigator.pop(context, true); // Pass 'true' to indicate data should be fetched

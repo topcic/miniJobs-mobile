@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:minijobs_mobile/pages/auth/signup.page.dart';
 import '../../enumerations/role.dart';
 import '../../helpers/auth_helper.dart';
-import '../../widgets/navbar.dart';
 import 'company_employer_signup.page.dart';
 import 'login_page.dart';
 class LoginSignupPage extends StatefulWidget {
