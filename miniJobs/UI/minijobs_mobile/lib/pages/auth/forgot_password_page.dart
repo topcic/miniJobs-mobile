@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:minijobs_mobile/models/user/user_change_password_request.dart';
 import 'package:minijobs_mobile/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../../helpers/auth_helper.dart';
 import '../../services/notification.service.dart';
+import '../../widgets/navbar.dart';
 import 'login_sign_up_page.dart';
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -23,6 +26,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   void initState() {
     super.initState();
     _userProvider = context.read<UserProvider>();
+    AuthHelper.checkIsAuthenticated(context);
   }
 
   Future<void> sendEmail(String email) async {

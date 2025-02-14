@@ -10,6 +10,7 @@ import 'package:minijobs_mobile/providers/city_provider.dart';
 import 'package:minijobs_mobile/providers/user_registration_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../../helpers/auth_helper.dart';
 import '../../services/notification.service.dart';
 import '../../utils/util_widgets.dart';
 
@@ -44,6 +45,7 @@ class _SignupPageState extends State<SignupPage> {
     super.didChangeDependencies();
     _cityProvider = context.read<CityProvider>();
     _userRegistrationProvider = context.read<UserRegistrationProvider>();
+    AuthHelper.checkIsAuthenticated(context);
   }
 
   @override

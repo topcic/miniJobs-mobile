@@ -122,6 +122,7 @@ class _LoginPageState extends State<LoginPage> {
                           children: [
                             // Email Input
                             FormBuilderTextField(
+                              style: TextStyle(color: Colors.black),
                               name: 'email',
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
@@ -146,6 +147,7 @@ class _LoginPageState extends State<LoginPage> {
                             // Password Input
                             FormBuilderTextField(
                               name: 'password',
+                              style: TextStyle(color: Colors.black),
                               obscureText: true,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {

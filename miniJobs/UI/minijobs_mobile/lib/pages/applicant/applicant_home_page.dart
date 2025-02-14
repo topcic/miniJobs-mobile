@@ -88,6 +88,7 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mini Jobs - Poslovi'),
+        automaticallyImplyLeading: false,
       ),
       body: Stack(
         children: [

@@ -5,6 +5,7 @@ import 'package:minijobs_mobile/models/auth_code_request.dart';
 import 'package:minijobs_mobile/providers/authentication_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../../helpers/auth_helper.dart';
 import '../../services/notification.service.dart';
 import 'login_page.dart';
 
@@ -28,6 +29,7 @@ class _VerificationPageState extends State<VerificationPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _authenticationProvider = context.read<AuthenticationProvider>();
+    AuthHelper.checkIsAuthenticated(context);
   }
 
   @override

@@ -82,10 +82,7 @@ class _MainScreenState extends State<MainScreen> {
                 _scaffoldKey.currentState?.openDrawer(); // Open drawer on mobile
               },
             ),
-          const Text(
-            "Dashboard",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
-          ),
+
         ],
       ),
     );
