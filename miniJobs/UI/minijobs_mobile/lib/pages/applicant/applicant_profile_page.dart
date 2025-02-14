@@ -34,6 +34,7 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
   bool isLoading = true;
   bool isAbleTodoEdit = false;
   late AuthenticationProvider _authenticationProvider;
+  final GlobalKey<ApplicantInfoViewState> _applicantInfoViewKey = GlobalKey();
   @override
   void initState() {
     super.initState();
@@ -52,6 +53,7 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
         applicant = fetchedUser;
         isLoading = false;
       });
+      _applicantInfoViewKey.currentState?.refresh();
     } catch (error) {
       // Handle error
       setState(() {
@@ -70,7 +72,8 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
   }
   void _updatePhoto(Uint8List? newPhoto) {
     setState(() {
-      applicant?.photo = Uint8List.fromList(newPhoto!); // Ensure new reference
+      if(newPhoto!=null)
+      applicant?.photo = Uint8List.fromList(newPhoto); // Ensure new reference
     });
   }
   @override
@@ -200,12 +203,18 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
               ),
               // Expanded tab bar view
               Expanded(
-                child: TabBarView(
-                  children: [
-                    ApplicantInfoView(applicantId: userId),
-                    FinishedJobsView(userId: userId),
-                    UserRatingsView(userId: userId),
-                  ],
+                child: KeyedSubtree(
+                  key: ValueKey(applicant?.hashCode), // Forces rebuild when applicant changes
+                  child: TabBarView(
+                    children: [
+                      ApplicantInfoView(
+                        key: _applicantInfoViewKey,
+                        applicantId: userId,
+                      ),
+                      FinishedJobsView(userId: userId),
+                      UserRatingsView(userId: userId),
+                    ],
+                  ),
                 ),
               ),
             ],

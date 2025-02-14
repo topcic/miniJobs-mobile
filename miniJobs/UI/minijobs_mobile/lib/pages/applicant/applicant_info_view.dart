@@ -14,10 +14,10 @@ class ApplicantInfoView extends StatefulWidget {
   const ApplicantInfoView({super.key, required this.applicantId});
 
   @override
-  State<ApplicantInfoView> createState() => _ApplicantInfoViewState();
+  State<ApplicantInfoView> createState() => ApplicantInfoViewState();
 }
 
-class _ApplicantInfoViewState extends State<ApplicantInfoView> {
+class ApplicantInfoViewState extends State<ApplicantInfoView> {
   late ApplicantProvider applicantProvider;
   Applicant? applicant;
   bool isLoading = true;
@@ -30,7 +30,9 @@ class _ApplicantInfoViewState extends State<ApplicantInfoView> {
     applicantProvider = context.read<ApplicantProvider>();
     getApplicant();
   }
-
+  void refresh() {
+    getApplicant(); // Refresh the data
+  }
   Future<void> getApplicant() async {
     applicant = await applicantProvider.get(widget.applicantId);
     setState(() {
