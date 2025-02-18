@@ -10,7 +10,7 @@ public class JobRecommendationRepository(ApplicationDbContext context, IMapper m
     public async Task<IEnumerable<User>> GetUsersByMatchingJobRecommendationsAsync(int jobId)
     {
         var job = await _context.Jobs.FirstOrDefaultAsync(j => j.Id == jobId);
-
+        if (job == null) return Enumerable.Empty<User>(); // Return an empty collection if the job doesn't exist
 
         var matchingUsers = await (from user in _context.Users
                                    join recommendation in _context.JobRecommendations on user.Id equals recommendation.CreatedBy
@@ -18,14 +18,25 @@ public class JobRecommendationRepository(ApplicationDbContext context, IMapper m
                                    from recJobType in jobTypeMatches.DefaultIfEmpty()
                                    join recCity in _context.JobRecommendationCities on recommendation.Id equals recCity.JobRecommendationId into cityMatches
                                    from recCity in cityMatches.DefaultIfEmpty()
-                                   where (recJobType != null && recJobType.JobTypeId == job.JobTypeId)
-                                      || (recCity != null && recCity.CityId == job.CityId)
-                                   select user)
+                                   select new
+                                   {
+                                       User = user,
+                                       RecJobType = recJobType,
+                                       RecCity = recCity,
+                                       HasJobTypeMatch = (recJobType != null && recJobType.JobTypeId == job.JobTypeId),
+                                       HasCityMatch = (recCity != null && recCity.CityId == job.CityId)
+                                   })
+                                   .GroupBy(x => x.User)
+                                   .Where(g => (g.All(u => u.RecJobType == null) && g.Any(u => u.HasCityMatch)) // If user has no job types, check for city match
+                                            || (g.All(u => u.RecCity == null) && g.Any(u => u.HasJobTypeMatch)) // If user has no cities, check for job type match
+                                            || (g.Any(u => u.HasJobTypeMatch) && g.Any(u => u.HasCityMatch))) // If user has both, check for matches on both
+                                   .Select(g => g.Key) // Select the user from the grouping
                                    .Distinct()
                                    .ToListAsync();
 
         return matchingUsers;
     }
+
 
     public async Task<int> PublicCountAsync(Dictionary<string, string> parameters = null)
     {
