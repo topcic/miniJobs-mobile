@@ -13,6 +13,7 @@ services:
     ports:
       - "8050:15672"
       - "5672:5672"
+    hostname: minijobs-queue
     volumes:
       - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
     networks:
@@ -54,7 +55,7 @@ services:
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_USERNAME=guest
       - RABBITMQ_PASSWORD=guest
-      - RABBITMQ_VIRTUALHOST=/  
+      - RABBITMQ_HOST=amqp://minijobs-queue:5672  
       - DOTNET_USE_POLLING_FILE_WATCHER=1 
       - ASPNETCORE_URLS=http://+:7126;https://+:7127
     ports:

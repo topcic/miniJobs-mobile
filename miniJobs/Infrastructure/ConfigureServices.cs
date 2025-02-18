@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces;
+using Application.JobRecommendations.Models;
 using Hangfire;
 using Infrastructure.Authentication;
 using Infrastructure.Common.Interfaces;
