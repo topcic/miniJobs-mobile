@@ -8,51 +8,21 @@ namespace Infrastructure.Persistence.Repositories;
 
 public class EmployerRepository(ApplicationDbContext _context, IMapper mapper) : GenericRepository<Employer, int, ApplicationDbContext>(_context, mapper), IEmployerRepository
 {
-    public async  Task<IEnumerable<Job>> GetActiveJobs(int userId, int requestedBy)
+    public async Task<IEnumerable<JobCardDTO>> GetActiveJobs(int userId, int requestedBy)
     {
-        IQueryable<Job> query;
-        if(requestedBy == userId) 
-            query = from j in _context.Jobs
+        var query = from j in _context.Jobs
                     join c in _context.Cities on j.CityId equals c.Id
-                    where j.Status == JobStatus.Active && j.CreatedBy==userId
-                    select new Job
+                    where j.Status == JobStatus.Active &&
+                          (requestedBy == userId ? j.CreatedBy == userId : true)
+                    select new JobCardDTO
                     {
                         Id = j.Id,
                         Name = j.Name,
-                        Description = j.Description,
-                        StreetAddressAndNumber = j.StreetAddressAndNumber,
-                        ApplicationsDuration = j.ApplicationsDuration,
-                        Status = j.Status,
-                        RequiredEmployees = j.RequiredEmployees,
                         Wage = j.Wage,
-                        CityId = j.CityId,
-                        JobTypeId = j.JobTypeId,
-                        City = c 
+                        Created = j.Created,
+                        CityName = c.Name // Assuming City has a Name property
                     };
-        else
-            query = from j in _context.Jobs
-                    join c in _context.Cities on j.CityId equals c.Id
-                    join a in _context.JobApplications on j.Id equals a.JobId into jobApplications
-                    from ja in jobApplications.DefaultIfEmpty()
-                    join s in _context.SavedJobs on j.Id equals s.JobId into savedJobs
-                    from sj in savedJobs.DefaultIfEmpty()
-                    where j.Status == JobStatus.Active
-                    select new Job
-                    {
-                        Id = j.Id,
-                        Name = j.Name,
-                        Description = j.Description,
-                        StreetAddressAndNumber = j.StreetAddressAndNumber,
-                        ApplicationsDuration = j.ApplicationsDuration,
-                        Status = j.Status,
-                        RequiredEmployees = j.RequiredEmployees,
-                        Wage = j.Wage,
-                        CityId = j.CityId,
-                        JobTypeId = j.JobTypeId,
-                        City = c,
-                        IsSaved = sj != null && sj.CreatedBy == userId,
-                        IsApplied = ja != null && ja.CreatedBy == userId
-                    };
+
         return await query.ToListAsync();
     }
 

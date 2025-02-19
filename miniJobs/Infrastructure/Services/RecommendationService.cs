@@ -11,7 +11,7 @@ public class RecommendationService(ApplicationDbContext context) : IRecommendati
     public async Task<IEnumerable<JobCardDTO>> GetRecommendationJobsAsync(int userId)
     {
         // 1. Fetch user's job preferences
-        var jobPreferences = context.JobRecommendations
+        var jobPreferences = await context.JobRecommendations
             .Where(jr => jr.CreatedBy == userId)
             .Select(jr => new
             {
@@ -25,25 +25,22 @@ public class RecommendationService(ApplicationDbContext context) : IRecommendati
                     .Select(jrt => jrt.JobTypeId)
                     .ToList()
             })
-            .FirstOrDefault();
+            .FirstOrDefaultAsync(); // ✅ Use `FirstOrDefaultAsync()`
 
         // 2. Fetch all active jobs
         var activeJobs = await context.Jobs
             .Where(job => job.Status == JobStatus.Active)
             .ToListAsync();
 
-        // 3. Filter jobs based on content-based preferences
-        var filteredJobs = activeJobs;
-        if (jobPreferences != null)
-        {
-            filteredJobs = activeJobs
-                .Where(job =>
-                    (jobPreferences.Cities.Contains(job.CityId) || jobPreferences.Cities.Count == 0) &&
-                    (jobPreferences.JobTypes.Contains(job.JobTypeId ?? 0) || jobPreferences.JobTypes.Count == 0))
-                .ToList();
-        }
+        // 3. Filter jobs based on preferences
+        var filteredJobs = jobPreferences != null
+            ? activeJobs.Where(job =>
+                (jobPreferences.Cities.Contains(job.CityId) || !jobPreferences.Cities.Any()) &&
+                (jobPreferences.JobTypes.Contains(job.JobTypeId ?? 0) || !jobPreferences.JobTypes.Any()))
+                .ToList()
+            : activeJobs;
 
-        // 4. Exclude jobs the user has already interacted with
+        // 4. Exclude jobs the user has interacted with
         var excludedJobIds = await context.JobApplications
             .Where(app => !app.IsDeleted && app.CreatedBy == userId)
             .Select(app => app.JobId)
@@ -53,66 +50,61 @@ public class RecommendationService(ApplicationDbContext context) : IRecommendati
                     .Select(saved => saved.JobId))
             .ToListAsync();
 
-        // 5. Collaborative filtering: Find similar users and their jobs
+        // 5. Find similar users and their jobs
+        var userJobIds = await context.JobApplications
+            .Where(ua => !ua.IsDeleted && ua.CreatedBy == userId)
+            .Select(ua => ua.JobId)
+            .ToListAsync();
+
         var similarUserJobIds = await context.JobApplications
             .Where(app => !app.IsDeleted && app.CreatedBy != userId)
-            .GroupBy(app => app.CreatedBy) // Group by user ID
+            .GroupBy(app => app.CreatedBy)
             .Select(g => new
             {
                 UserId = g.Key,
-                SharedJobs = g.Select(app => app.JobId).Intersect(
-                    context.JobApplications
-                        .Where(ua => !ua.IsDeleted && ua.CreatedBy == userId)
-                        .Select(ua => ua.JobId)
-                ).Count() // Count of shared jobs to determine similarity
+                SharedJobs = g.Select(app => app.JobId).Intersect(userJobIds).Count()
             })
-            .Where(user => user.SharedJobs > 0) // Filter users with shared interests
-            .OrderByDescending(user => user.SharedJobs) // Rank by similarity
-            .Take(10) // Limit to top 10 similar users
+            .Where(user => user.SharedJobs > 0)
+            .OrderByDescending(user => user.SharedJobs)
+            .Take(10)
             .SelectMany(user =>
                 context.JobApplications
                     .Where(app => app.CreatedBy == user.UserId && !app.IsDeleted)
-                    .Select(app => app.JobId)
-            )
+                    .Select(app => app.JobId))
             .Distinct()
             .ToListAsync();
 
-        // 6. Fetch job ratings for filtered jobs
+        // 6. Fetch job ratings
         var jobRatings = await context.Ratings
-            .Where(r => filteredJobs.Select(job => job.Id).Contains(r.RatedUserId) && r.IsActive)
+            .Where(r => filteredJobs.Select(job => job.CreatedBy).Contains(r.RatedUserId) && r.IsActive)
             .GroupBy(r => r.RatedUserId)
             .Select(g => new { UserId = g.Key, AverageRating = g.Average(r => r.Value) })
             .ToListAsync();
 
-        // 7. Combine content-based and collaborative scores
+        // 7. Compute job scores and rank them
         var jobScores = filteredJobs
-            .Where(job => !excludedJobIds.Contains(job.Id)) // Exclude previously interacted jobs
+            .Where(job => !excludedJobIds.Contains(job.Id)) 
             .Select(job => new
             {
                 Job = job,
                 ContentScore = (jobPreferences?.Cities.Contains(job.CityId) == true ? 1 : 0) +
                                (jobPreferences?.JobTypes.Contains(job.JobTypeId ?? 0) == true ? 1 : 0),
                 CollaborativeScore = similarUserJobIds.Contains(job.Id) ? 1 : 0,
-                AverageRating = jobRatings
-                    .Where(r => r.UserId == job.CreatedBy)
-                    .Select(r => r.AverageRating)
-                    .DefaultIfEmpty(0)
-                    .First()
+                AverageRating = jobRatings.FirstOrDefault(r => r.UserId == job.CreatedBy)?.AverageRating ?? 0
             })
-            .OrderByDescending(job => job.ContentScore * 0.5 + job.CollaborativeScore * 0.3 + job.AverageRating * 0.2) // Weighted ranking
-            .Take(6) // Limit to top 6 recommendations
+            .OrderByDescending(job => job.ContentScore * 0.5 + job.CollaborativeScore * 0.3 + job.AverageRating * 0.2)
+            .Take(6)
             .Select(j => j.Job)
             .ToList();
 
-        // 8. Fetch related data and project into JobCardDTO format
+        // 8. Map jobs to DTOs
         var result = jobScores
             .Select(job => new JobCardDTO
             {
                 Id = job.Id,
                 Name = job.Name,
-                CityName =job.City.Name, 
+                CityName = context.Cities.FirstOrDefault(c => c.Id == job.CityId)?.Name,
                 Wage = job.Wage
-
             })
             .ToList();
 
@@ -121,8 +113,8 @@ public class RecommendationService(ApplicationDbContext context) : IRecommendati
         {
             Id = job.Id,
             Name = job.Name,
-            CityName = job.City.Name,
-            Wage = job.Wage,
+            CityName = context.Cities.FirstOrDefault(c => c.Id == job.CityId)?.Name,
+            Wage = job.Wage
         }).ToList();
     }
 
