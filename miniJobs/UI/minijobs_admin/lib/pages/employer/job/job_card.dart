@@ -5,10 +5,13 @@ import 'package:minijobs_admin/pages/employer/job/job_modal.dart';
 import 'package:minijobs_admin/providers/job_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../../../models/job/job_card_dto.dart';
+import '../../jobs/job_details.dart';
+
 class JobCard extends StatefulWidget {
-  final Job job;
+  final JobCardDTO job;
   final bool isInSavedJobs;
-  const JobCard({super.key, required this.job,this.isInSavedJobs = false});
+  const JobCard({super.key, required this.job, this.isInSavedJobs = false});
 
   @override
   State<JobCard> createState() => _JobCardState();
@@ -16,7 +19,7 @@ class JobCard extends StatefulWidget {
 
 class _JobCardState extends State<JobCard> {
   late JobProvider jobProvider;
-  late Job job;
+  late JobCardDTO job;
 
   @override
   void didChangeDependencies() {
@@ -25,14 +28,8 @@ class _JobCardState extends State<JobCard> {
     job = widget.job;
   }
 
-  Future<void> getJob(int id) async {
-    job = await jobProvider.get(id);
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
     return Card(
       margin: const EdgeInsets.all(10.0),
       color: Colors.blue[50],
@@ -47,10 +44,10 @@ class _JobCardState extends State<JobCard> {
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: screenWidth * 0.045,
+              style: const TextStyle(
+                fontSize: 18, // Normal font size
                 fontWeight: FontWeight.bold,
-                color: Colors.blueGrey[900],
+                color: Colors.blueGrey,
               ),
             ),
             const SizedBox(height: 8),
@@ -61,10 +58,10 @@ class _JobCardState extends State<JobCard> {
               children: [
                 const Icon(Icons.location_on, size: 16),
                 Text(
-                  job.city!.name!,
-                  style: TextStyle(
-                    fontSize: screenWidth * 0.035,
-                    color: Colors.grey[700],
+                  job.cityName!,
+                  style: const TextStyle(
+                    fontSize: 14, // Normal font size
+                    color: Colors.grey,
                   ),
                 ),
               ],
@@ -80,9 +77,9 @@ class _JobCardState extends State<JobCard> {
                   job.wage != null && job.wage! > 0
                       ? '${job.wage} KM'
                       : 'po dogovoru',
-                  style: TextStyle(
-                    fontSize: screenWidth * 0.035,
-                    color: Colors.green[800],
+                  style: const TextStyle(
+                    fontSize: 14, // Normal font size
+                    color: Colors.green,
                   ),
                 ),
               ],
@@ -94,11 +91,8 @@ class _JobCardState extends State<JobCard> {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
-                      return JobModal(
-                        jobId: job.id!,
-                        role: GetStorage().read('role'),
-                          isInSavedJobs: widget.isInSavedJobs
-                      );
+                      return JobDetailsPage(
+                        jobId: job.id);
                     },
                   );
                 } else {

@@ -4,6 +4,8 @@ import 'package:minijobs_admin/pages/employer/job/job_card.dart';
 import 'package:minijobs_admin/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/job/job_card_dto.dart';
+
 class FinishedJobsView extends StatefulWidget {
   final int userId;
   const FinishedJobsView({super.key,required this.userId});
@@ -14,7 +16,7 @@ class FinishedJobsView extends StatefulWidget {
 
 class _FinishedJobsViewState extends State<FinishedJobsView> {
   late UserProvider userProvider;
-List<Job> jobs=[];
+List<JobCardDTO> jobs=[];
 @override
   void initState() {
     // TODO: implement initState

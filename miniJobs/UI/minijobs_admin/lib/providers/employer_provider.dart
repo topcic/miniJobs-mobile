@@ -4,6 +4,7 @@ import 'package:minijobs_admin/models/employer/employer.dart';
 import 'package:minijobs_admin/models/job/job.dart';
 import 'package:minijobs_admin/providers/base_provider.dart';
 import '../models/employer/employer_save_request.dart';
+import '../models/job/job_card_dto.dart';
 import '../models/search_result.dart';
 
 class EmployerProvider extends BaseProvider<Employer> {
@@ -14,11 +15,11 @@ class EmployerProvider extends BaseProvider<Employer> {
     return Employer.fromJson(data);
   }
 
-  Future<List<Job>> getActiveJobs(int userId) async {
+  Future<List<JobCardDTO>> getActiveJobs(int userId) async {
     try {
       var url = "${baseUrl}employers/$userId/activejobs";
       var response = await dio.get(url); // Use the dio getter here
-      List<Job> responseData = List<Job>.from(response.data.map((item) => Job.fromJson(item)));
+      List<JobCardDTO> responseData = List<JobCardDTO>.from(response.data.map((item) => JobCardDTO.fromJson(item)));
       return responseData;
     } catch (err) {
       throw Exception(err.toString());

@@ -6,12 +6,13 @@ import 'package:minijobs_admin/providers/base_provider.dart';
 
 import '../enumerations/sort_order.dart';
 import '../models/job/job_application.dart';
+import '../models/job/job_card_dto.dart';
 import '../services/notification.service.dart';
 
 class ApplicantProvider extends BaseProvider<Applicant> {
   @override
   final notificationService = NotificationService();
-  List<Job>? _savedJobs;
+  List<JobCardDTO>? _savedJobs;
   List<JobApplication>? _appliedJobs;
 
   ApplicantProvider() : super("applicants");
@@ -19,7 +20,7 @@ class ApplicantProvider extends BaseProvider<Applicant> {
   Applicant fromJson(data) {
     return Applicant.fromJson(data);
   }
-  List<Job>? get savedJobs => _savedJobs;
+  List<JobCardDTO>? get savedJobs => _savedJobs;
   List<JobApplication>? get appliedJobs => _appliedJobs;
 
 
@@ -57,12 +58,12 @@ class ApplicantProvider extends BaseProvider<Applicant> {
     }
   }
 
-  Future<List<Job>> getSavedJobs() async {
+  Future<List<JobCardDTO>> getSavedJobs() async {
     try {
       var url = "${baseUrl}applicants/saved-jobs";
       var response = await dio.get(url); // Use the dio getter here
-      List<Job> responseData =
-          List<Job>.from(response.data.map((item) => Job.fromJson(item)));
+      List<JobCardDTO> responseData =
+          List<JobCardDTO>.from(response.data.map((item) => JobCardDTO.fromJson(item)));
       _savedJobs = responseData;
       notifyListeners();
       return responseData;

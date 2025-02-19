@@ -8,6 +8,7 @@ import 'package:minijobs_admin/models/rating.dart';
 import 'package:minijobs_admin/models/user/user.dart';
 import 'package:minijobs_admin/providers/base_provider.dart';
 
+import '../models/job/job_card_dto.dart';
 import '../models/search_result.dart';
 import '../models/user/user_change_password_request.dart';
 
@@ -31,12 +32,12 @@ class UserProvider extends BaseProvider<User> {
     }
   }
 
-  Future<List<Job>> getUserFinishedJobs(int userId) async {
+  Future<List<JobCardDTO>> getUserFinishedJobs(int userId) async {
     try {
       var url = "${baseUrl}users/$userId/finishedjobs";
       var response = await dio.get(url);
-      List<Job> responseData =
-          List<Job>.from(response.data.map((item) => Job.fromJson(item)));
+      List<JobCardDTO> responseData =
+          List<JobCardDTO>.from(response.data.map((item) => JobCardDTO.fromJson(item)));
       return responseData;
     } catch (err) {
       throw Exception(err.toString());
