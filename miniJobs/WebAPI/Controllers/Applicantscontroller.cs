@@ -53,7 +53,7 @@ public class Applicantscontroller(IMediator mediator,IApplicantRepository applic
 
     [HttpGet("saved-jobs")]
     [Authorize(Roles = "Applicant")]
-    [ProducesResponseType(typeof(IEnumerable<Job>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<JobCardDTO>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetSavedJobs()

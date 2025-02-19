@@ -3,12 +3,7 @@
 using Application.Common.Exceptions;
 using AutoMapper;
 using Domain.Dtos;
-using Domain.Entities;
 using Domain.Enums;
-using Domain.Interfaces;
-using Microsoft.Data.SqlClient;
-using Microsoft.IdentityModel.Tokens;
-using System.Linq;
 
 namespace Infrastructure.Persistence.Repositories;
 

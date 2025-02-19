@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
+import 'package:minijobs_mobile/models/job/job_card_dto.dart';
 import 'package:minijobs_mobile/pages/employer/job/job_card.dart';
 import 'package:minijobs_mobile/providers/user_provider.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +15,7 @@ class FinishedJobsView extends StatefulWidget {
 
 class _FinishedJobsViewState extends State<FinishedJobsView> {
   late UserProvider userProvider;
-List<Job> jobs=[];
+List<JobCardDTO> jobs=[];
 @override
   void initState() {
     // TODO: implement initState

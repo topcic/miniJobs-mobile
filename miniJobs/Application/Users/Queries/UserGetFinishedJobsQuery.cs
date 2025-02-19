@@ -1,14 +1,9 @@
 ﻿using Application.Common.Queries;
-using Domain.Entities;
+using Domain.Dtos;
 
 namespace Application.Users.Queries;
 
-public class UserGetFinishedJobsQuery : QueryBase<IEnumerable<Job>>
+public class UserGetFinishedJobsQuery(int id) : QueryBase<IEnumerable<JobCardDTO>>
 {
-    public int Id { get; set; }
-
-    public UserGetFinishedJobsQuery(int id)
-    {
-        Id = id;
-    }
+    public int Id { get; set; } = id;
 }

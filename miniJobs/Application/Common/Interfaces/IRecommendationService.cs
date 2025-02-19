@@ -1,8 +1,9 @@
-﻿using Domain.Entities;
+﻿using Domain.Dtos;
+using Domain.Entities;
 
 namespace Application.Common.Interfaces;
 
 public interface IRecommendationService
 {
-    Task<IEnumerable<Job>> GetRecommendationJobsAsync(int userId);
+    Task<IEnumerable<JobCardDTO>> GetRecommendationJobsAsync(int userId);
 }

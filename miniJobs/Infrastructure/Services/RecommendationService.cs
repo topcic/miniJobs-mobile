@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces;
+using Domain.Dtos;
 using Domain.Enums;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +8,7 @@ namespace Infrastructure.Services;
 
 public class RecommendationService(ApplicationDbContext context) : IRecommendationService
 {
-    public async Task<IEnumerable<Job>> GetRecommendationJobsAsync(int userId)
+    public async Task<IEnumerable<JobCardDTO>> GetRecommendationJobsAsync(int userId)
     {
         // 1. Fetch user's job preferences
         var jobPreferences = context.JobRecommendations
@@ -103,51 +104,28 @@ public class RecommendationService(ApplicationDbContext context) : IRecommendati
             .Select(j => j.Job)
             .ToList();
 
-        // 8. Fetch related data and project into the desired format
+        // 8. Fetch related data and project into JobCardDTO format
         var result = jobScores
-            .Select(job => new
+            .Select(job => new JobCardDTO
             {
-                Job = job,
-                Schedules = context.JobQuestions
-                    .Where(jq => jq.JobId == job.Id && jq.QuestionId == 1)
-                    .Join(context.JobQuestionAnswers, jq => jq.Id, qa => qa.JobQuestionId, (jq, qa) => qa.ProposedAnswer)
-                    .ToList(),
-                PaymentQuestion = context.JobQuestions
-                    .Where(jq => jq.JobId == job.Id && jq.QuestionId == 2)
-                    .Join(context.JobQuestionAnswers, jq => jq.Id, qa => qa.JobQuestionId, (jq, qa) => qa.ProposedAnswer)
-                    .FirstOrDefault(),
-                AdditionalPaymentOptions = context.JobQuestions
-                    .Where(jq => jq.JobId == job.Id && jq.QuestionId == 3)
-                    .Join(context.JobQuestionAnswers, jq => jq.Id, qa => qa.JobQuestionId, (jq, qa) => qa.ProposedAnswer)
-                    .ToList(),
-                JobType = context.JobTypes.FirstOrDefault(jt => jt.Id == job.JobTypeId),
-                City = context.Cities.FirstOrDefault(c => c.Id == job.CityId)
-            })
-            .Select(job => new Job
-            {
-                Id = job.Job.Id,
-                Name = job.Job.Name,
-                Description = job.Job.Description,
-                StreetAddressAndNumber = job.Job.StreetAddressAndNumber,
-                ApplicationsDuration = job.Job.ApplicationsDuration,
-                Status = job.Job.Status,
-                RequiredEmployees = job.Job.RequiredEmployees,
-                Wage = job.Job.Wage,
-                CityId = job.Job.CityId,
-                JobTypeId = job.Job.JobTypeId,
-                Created = job.Job.Created,
-                CreatedBy = job.Job.CreatedBy,
-                Schedules = job.Schedules,
-                PaymentQuestion = job.PaymentQuestion,
-                AdditionalPaymentOptions = job.AdditionalPaymentOptions,
-                JobType = job.JobType,
-                City = job.City
+                Id = job.Id,
+                Name = job.Name,
+                CityName =job.City.Name, 
+                Wage = job.Wage
+
             })
             .ToList();
 
         // 9. Fallback to active jobs if no recommendations
-        return result.Any() ? result : activeJobs.Take(6);
+        return result.Any() ? result : activeJobs.Take(6).Select(job => new JobCardDTO
+        {
+            Id = job.Id,
+            Name = job.Name,
+            CityName = job.City.Name,
+            Wage = job.Wage,
+        }).ToList();
     }
+
 
 
 }

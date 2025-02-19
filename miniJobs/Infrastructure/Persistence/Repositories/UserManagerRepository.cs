@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Domain.Dtos;
 using Domain.Enums;
 
 namespace Infrastructure.Persistence.Repositories;
@@ -60,54 +61,42 @@ public class UserManagerRepository(ApplicationDbContext context, IMapper mapper)
         return ratings;
     }
 
-    public async Task<IEnumerable<Job>> GetFinishedJobs(int userId, bool isApplicant)
+    public async Task<IEnumerable<JobCardDTO>> GetFinishedJobs(int userId, bool isApplicant)
     {
-        IQueryable<Job> query;
+        IQueryable<JobCardDTO> query;
+
         if (isApplicant)
         {
             query = from j in context.Jobs
                     join a in context.JobApplications on j.Id equals a.JobId
-                    join c in context.Cities on j.CityId equals c.Id
                     where a.Status == JobApplicationStatus.Accepted
                           && a.CreatedBy == userId
                           && j.Status == JobStatus.Completed
-                    select new Job
+                    select new JobCardDTO
                     {
                         Id = j.Id,
                         Name = j.Name,
-                        Description = j.Description,
-                        StreetAddressAndNumber = j.StreetAddressAndNumber,
-                        ApplicationsDuration = j.ApplicationsDuration,
-                        Status = j.Status,
-                        RequiredEmployees = j.RequiredEmployees,
+                        CityName = j.City.Name,
                         Wage = j.Wage,
-                        CityId = j.CityId,
-                        JobTypeId = j.JobTypeId,
-                        City = c
                     };
         }
         else
         {
             query = from j in context.Jobs
-                    join c in context.Cities on j.CityId equals c.Id
-                    where j.Status == JobStatus.Completed
-                    select new Job
+                    where j.Status == JobStatus.Completed && j.CreatedBy == userId
+                    select new JobCardDTO
                     {
                         Id = j.Id,
                         Name = j.Name,
-                        Description = j.Description,
-                        StreetAddressAndNumber = j.StreetAddressAndNumber,
-                        ApplicationsDuration = j.ApplicationsDuration,
-                        Status = j.Status,
-                        RequiredEmployees = j.RequiredEmployees,
+                        CityName = j.City.Name,
                         Wage = j.Wage,
-                        CityId = j.CityId,
-                        JobTypeId = j.JobTypeId,
-                        City = c // Include City information
                     };
         }
+
         return await query.ToListAsync();
     }
+
+
     public override async Task<User> TryFindAsync(int id)
     {
         var user = await (from u in DbSet

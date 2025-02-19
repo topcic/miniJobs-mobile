@@ -5,9 +5,9 @@ import 'package:minijobs_mobile/models/search_result.dart';
 import 'package:minijobs_mobile/providers/city_provider.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
 import 'package:provider/provider.dart';
+import '../../models/job/job_card_dto.dart';
 import '../../providers/recommendation_provider.dart';
 import '../employer/job/job_card.dart';
-import '../../models/job/job.dart';
 
 class ApplicantHomePage extends StatefulWidget {
   const ApplicantHomePage({super.key});
@@ -22,8 +22,8 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
   late JobProvider _jobProvider;
   late RecommendationProvider _recommendationProvider;
   late CityProvider _cityProvider;
-  SearchResult<Job> jobs = SearchResult(0, []); // Initialize jobs directly here
-  List<Job> recommendedJobs=[];
+  SearchResult<JobCardDTO> jobs = SearchResult(0, []); // Initialize jobs directly here
+  List<JobCardDTO> recommendedJobs=[];
   List<City> cities = [];
   String? selectedCity;
   String sort="Najnovije";
@@ -139,7 +139,7 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
             itemCount: jobs.result!.length,
             itemBuilder: (context, index) {
               final job = jobs.result![index];
-              return JobCard(job: job);
+             return JobCard(job:job);
             },
           ),
         ),
@@ -179,7 +179,7 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
                   padding: const EdgeInsets.only(right: 8.0),
                   child: SizedBox(
                     width: 250,
-                    child: JobCard(job: job),
+                    child: JobCard(job:job)
                   ),
                 );
               },

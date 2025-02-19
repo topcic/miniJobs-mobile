@@ -1,7 +1,6 @@
-﻿using Application.Common.Exceptions;
+﻿using Domain.Enums;
 using AutoMapper;
 using Domain.Dtos;
-using Domain.Enums;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
@@ -109,64 +108,34 @@ namespace Infrastructure.Persistence.Repositories
             return result;
         }
 
-        public async Task<IEnumerable<Job>> SearchAsync(string searchText, int limit, int offset, int? cityId, Domain.Enums.SortOrder sort)
+        public async Task<IEnumerable<JobCardDTO>> SearchAsync(string searchText, int limit, int offset, int? cityId, Domain.Enums.SortOrder sort)
         {
-            var query = from j in context.Jobs
-                        where (string.IsNullOrEmpty(searchText) || j.Name.Contains(searchText))
-                              && (!cityId.HasValue || j.CityId == cityId)
-                              //  && (!jobTypeId.HasValue || j.JobTypeId == jobTypeId)
-                              && j.Status == JobStatus.Active && j.DeletedByAdmin == false
-                        select new
-                        {
-                            Job = j,
-                            Schedules = (from jq in context.JobQuestions
-                                         join qa in context.JobQuestionAnswers on jq.Id equals qa.JobQuestionId
-                                         where jq.JobId == j.Id && jq.QuestionId == 1
-                                         select qa.ProposedAnswer).ToList(),
-                            PaymentQuestion = (from jq in context.JobQuestions
-                                               join qa in context.JobQuestionAnswers on jq.Id equals qa.JobQuestionId
-                                               where jq.JobId == j.Id && jq.QuestionId == 2
-                                               select qa.ProposedAnswer).FirstOrDefault(),
-                            AdditionalPaymentOptions = (from jq in context.JobQuestions
-                                                        join qa in context.JobQuestionAnswers on jq.Id equals qa.JobQuestionId
-                                                        where jq.JobId == j.Id && jq.QuestionId == 3
-                                                        select qa.ProposedAnswer).ToList(),
-                            JobType = context.JobTypes.FirstOrDefault(jt => jt.Id == j.JobTypeId),
-                            City = context.Cities.FirstOrDefault(c => c.Id == j.CityId)
-                        };
+            var query = context.Jobs
+                .Where(j => (string.IsNullOrEmpty(searchText) || j.Name.Contains(searchText))
+                             && (!cityId.HasValue || j.CityId == cityId)
+                             && j.Status == JobStatus.Active
+                             && !j.DeletedByAdmin)
+                .Select(j => new JobCardDTO
+                {
+                    Id = j.Id,
+                    Name = j.Name,
+                    CityName = j.City.Name,
+                    Wage = j.Wage,
+                    Created = j.Created
+                });
 
             var jobList = sort == Domain.Enums.SortOrder.DESC
-    ? await query.OrderByDescending(job => job.Job.Created)
-                 .Skip(offset)
-                 .Take(limit)
-                 .ToListAsync()
-    : await query.OrderBy(job => job.Job.Created)
-                 .Skip(offset)
-                 .Take(limit)
-                 .ToListAsync();
+                ? await query.OrderByDescending(j => j.Created)
+                             .Skip(offset)
+                             .Take(limit)
+                             .ToListAsync()
+                : await query.OrderBy(j => j.Created)
+                             .Skip(offset)
+                             .Take(limit)
+                             .ToListAsync();
 
-            var result = jobList.Select(job => new Job
-            {
-                Id = job.Job.Id,
-                Name = job.Job.Name,
-                Description = job.Job.Description,
-                StreetAddressAndNumber = job.Job.StreetAddressAndNumber,
-                ApplicationsDuration = job.Job.ApplicationsDuration,
-                Status = job.Job.Status,
-                RequiredEmployees = job.Job.RequiredEmployees,
-                Wage = job.Job.Wage,
-                CityId = job.Job.CityId,
-                JobTypeId = job.Job.JobTypeId,
-                Created = job.Job.Created,
-                CreatedBy = job.Job.CreatedBy,
-                Schedules = job.Schedules,
-                PaymentQuestion = job.PaymentQuestion,
-                AdditionalPaymentOptions = job.AdditionalPaymentOptions,
-                JobType = job.JobType,
-                City = job.City
-            }).ToList();
-
-            return result;
+            return jobList;
+        
         }
 
 
@@ -190,27 +159,18 @@ namespace Infrastructure.Persistence.Repositories
             return count;
         }
 
-        public async Task<IEnumerable<Job>> GetApplicantSavedJobsAsync(int applicantId)
+        public async Task<IEnumerable<JobCardDTO>> GetApplicantSavedJobsAsync(int applicantId)
         {
             var query = from j in context.Jobs
                         join sj in context.SavedJobs on j.Id equals sj.JobId
-                        join c in context.Cities on j.CityId equals c.Id
                         where sj.CreatedBy == applicantId && sj.IsDeleted == false && j.DeletedByAdmin == false
-                        select new Job
+                        select new JobCardDTO
                         {
                             Id = j.Id,
                             Name = j.Name,
-                            Description = j.Description,
-                            StreetAddressAndNumber = j.StreetAddressAndNumber,
-                            ApplicationsDuration = j.ApplicationsDuration,
-                            Status = j.Status,
-                            RequiredEmployees = j.RequiredEmployees,
-                            Wage = j.Wage,
-                            CityId = j.CityId,
-                            JobTypeId = j.JobTypeId,
-                            City = c // Include City information
+                            CityName =j.City.Name,
+                            Wage = j.Wage
                         };
-
 
             return await query.ToListAsync();
         }

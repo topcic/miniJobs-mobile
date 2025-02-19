@@ -1,17 +1,12 @@
 ﻿using Application.Common.Models;
 using Application.Common.Queries;
 using Application.Jobs.Models;
-using Domain.Entities;
+using Domain.Dtos;
 
 namespace Application.Jobs.Queries;
 
-public class JobSearchQuery : QueryBase<SearchResponseBase<Job>>
+public class JobSearchQuery(JobSearchRequest searchRequest) : QueryBase<SearchResponseBase<JobCardDTO>>
 {
 
-    public JobSearchRequest SearchRequest { get; set; }
-
-    public JobSearchQuery(JobSearchRequest searchRequest)
-    {
-        SearchRequest = searchRequest;
-    }
+    public JobSearchRequest SearchRequest { get; set; } = searchRequest;
 }

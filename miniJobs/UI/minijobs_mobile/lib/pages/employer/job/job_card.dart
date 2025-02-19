@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
+import 'package:minijobs_mobile/models/job/job_card_dto.dart';
 import 'package:minijobs_mobile/pages/employer/job/job_modal.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
 import 'package:provider/provider.dart';
@@ -8,7 +9,7 @@ import 'package:provider/provider.dart';
 import '../../../services/notification.service.dart';
 
 class JobCard extends StatefulWidget {
-  final Job job;
+  final JobCardDTO job;
   final bool isInSavedJobs;
   const JobCard({super.key, required this.job,this.isInSavedJobs = false});
 
@@ -19,18 +20,13 @@ class JobCard extends StatefulWidget {
 class _JobCardState extends State<JobCard> {
   final notificationService = NotificationService();
   late JobProvider jobProvider;
-  late Job job;
+  late JobCardDTO job;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     jobProvider = context.read<JobProvider>();
-    job = widget.job;
-  }
-
-  Future<void> getJob(int id) async {
-    job = await jobProvider.get(id);
-    setState(() {});
+    job=widget.job;
   }
 
   @override
@@ -64,7 +60,7 @@ class _JobCardState extends State<JobCard> {
               children: [
                 const Icon(Icons.location_on, size: 16),
                 Text(
-                  job.city!.name!,
+                  job.cityName,
                   style: TextStyle(
                     fontSize: screenWidth * 0.035,
                     color: Colors.grey[700],

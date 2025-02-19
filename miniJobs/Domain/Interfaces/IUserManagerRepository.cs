@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Domain.Dtos;
+using Domain.Entities;
 
 namespace Domain.Interfaces;
 
@@ -9,5 +10,5 @@ public interface IUserManagerRepository : IGenericRepository<User, int>
     Task<Role> TryFindRoleAsync(string roleId);
     Task<UserRole> AssignUserRoleAsync(User user, Role role);
     Task<IEnumerable<Rating>> GetRatings(int userId);
-    Task<IEnumerable<Job>> GetFinishedJobs(int userId, bool isApplicant);
+    Task<IEnumerable<JobCardDTO>> GetFinishedJobs(int userId, bool isApplicant);
 }

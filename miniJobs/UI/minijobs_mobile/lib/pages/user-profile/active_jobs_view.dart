@@ -45,7 +45,7 @@ List<Job> jobs=[];
     itemCount: jobs.length, // Zamijenite ovu vrijednost s vašim brojem poslova
     itemBuilder: (BuildContext context, int index) {
        final job= jobs[index];
-     return JobCard(job:job);
+    // return JobCard(job:job.id!);
     }
     );
   }

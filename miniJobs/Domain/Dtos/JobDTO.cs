@@ -2,7 +2,7 @@
 
 namespace Domain.Dtos;
 
-public class JobDTO
+public record JobDTO
 {
     public int Id { get; set; }
 
