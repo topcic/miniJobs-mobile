@@ -73,7 +73,7 @@ class FileInfoCardGridView extends StatelessWidget {
       DemoData(title: "Poslodavci", total: stats.totalEmployers, icon: FontAwesomeIcons.building),
       DemoData(title: "Aplikanti", total: stats.totalApplicants, icon: FontAwesomeIcons.users),
       DemoData(title: "Objavljeni poslovi", total: stats.totalJobs, icon: FontAwesomeIcons.briefcase),
-      DemoData(title: "Aktivne prijave", total: stats.totalActiveJobs, icon: Icons.check_circle),
+      DemoData(title: "Aktivni poslovi", total: stats.totalActiveJobs, icon: Icons.check_circle),
       DemoData(title: "Prosj. ocjena aplikanta", total: stats.averageApplicantRating.toInt(), icon: Icons.star),
       DemoData(title: "Prosj. ocjena poslodavca", total: stats.averageEmployerRating.toInt(), icon: Icons.star),
     ];

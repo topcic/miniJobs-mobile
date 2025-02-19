@@ -9,6 +9,7 @@ class SavedJob {
   int? createdBy;
   String? applicantFullName;
   String? jobName;
+  int? jobId;
   bool? isDeleted;
 
 
@@ -18,6 +19,7 @@ class SavedJob {
     this.createdBy,
     this.applicantFullName,
     this.jobName,
+    this.jobId,
     this.isDeleted
   });
 

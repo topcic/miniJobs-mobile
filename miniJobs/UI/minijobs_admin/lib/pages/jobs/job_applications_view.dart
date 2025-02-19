@@ -7,6 +7,7 @@ import '../../models/job/job_application.dart';
 import '../../providers/job_application_provider.dart';
 import '../../widgets/badges.dart';
 import '../main/constants.dart';
+import 'job_details.dart';
 
 class JobApplicationsView extends StatefulWidget {
   final int jobId;
@@ -57,7 +58,7 @@ class _JobApplicationsViewState extends State<JobApplicationsView> {
           padding: EdgeInsets.all(16.0),
           child: Text(
             'Posao nema aplikacija.',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
           ),
         ),
       )
@@ -72,10 +73,9 @@ class _JobApplicationsViewState extends State<JobApplicationsView> {
           rightSideItemBuilder: _generateRightHandSideColumnRow,
           itemCount: data.length,
           rowSeparatorWidget: const Divider(color: Colors.black54, height: 1.0),
-          leftHandSideColBackgroundColor:secondaryColor,
+          leftHandSideColBackgroundColor: secondaryColor,
           rightHandSideColBackgroundColor: secondaryColor,
         ),
-
       ),
     );
   }
@@ -97,15 +97,22 @@ class _JobApplicationsViewState extends State<JobApplicationsView> {
       height: 56,
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Colors.white, // Set text color to white
+        ),
+      ),
     );
   }
+
   Widget _generateFirstColumnRow(BuildContext context, int index) {
     return Container(
       width: 100,
       height: 52,
       alignment: Alignment.center,
-      child:   _buildActionsCell(context, data[index], 150),
+      child: _buildActionsCell(context, data[index], 150),
     );
   }
 
@@ -128,28 +135,58 @@ class _JobApplicationsViewState extends State<JobApplicationsView> {
       height: 52,
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: content is Widget ? content : Text(content.toString()),
+      child: content is Widget
+          ? content
+          : Text(
+        content.toString(),
+        style: const TextStyle(color: Colors.white), // Set text color to white
+      ),
     );
   }
+
   Widget _buildActionsCell(BuildContext context, JobApplication data, double width) {
     return Container(
       width: width,
       height: 52,
       alignment: Alignment.center,
-      child: Tooltip(
-        message: 'Detalji aplikanta',
-        preferBelow: false, // Ensures the tooltip appears above
-        child: IconButton(
-          icon: const Icon(Icons.info_outline, color: Colors.blue),
-          onPressed: () =>Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ApplicantDetailsPage(id: data.createdBy!),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Existing 'Detalji aplikanta' button
+          Tooltip(
+            message: 'Detalji aplikanta',
+            preferBelow: false,
+            child: IconButton(
+              icon: const Icon(Icons.info_outline, color: Colors.blue),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ApplicantDetailsPage(id: data.createdBy!),
+                ),
+              ),
+              tooltip: '',
             ),
           ),
-          tooltip: '', // Ensures Flutter doesn't show the default label behavior
-        ),
+          const SizedBox(width: 8), // Space between buttons
+          // New 'Detalji posla' button
+          Tooltip(
+            message: 'Detalji posla',
+            preferBelow: false,
+            child: IconButton(
+              icon: const Icon(Icons.work_outline, color: Colors.blue),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => JobDetailsPage(jobId: data.jobId!),
+                ),
+              ),
+              tooltip: '',
+            ),
+          ),
+        ],
       ),
     );
   }
+
+
 }

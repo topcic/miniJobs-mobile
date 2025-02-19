@@ -64,6 +64,7 @@ public class JobRecommendationRepository(ApplicationDbContext context, IMapper m
                         ApplicantFullName = createdByEmployer != null && !string.IsNullOrEmpty(createdByEmployer.Name)
                             ? createdByEmployer.Name
                             : (createdByUser != null ? createdByUser.FirstName + " " + createdByUser.LastName : null),
+                        CreatedBy= jr.CreatedBy.Value,
                         Cities = context.JobRecommendationCities.Where(jc => jc.JobRecommendationId == jr.Id).Select(jc => jc.City.Name).ToList(),
                         JobTypes = context.JobRecommendationJobTypes.Where(jt => jt.JobRecommendationId == jr.Id).Select(jt => jt.JobType.Name).ToList()
                     };

@@ -15,4 +15,5 @@ SavedJob _$SavedJobFromJson(Map<String, dynamic> json) => SavedJob(
     applicantFullName: json['applicantFullName'] as String?,
     // Fixed type
     jobName: json['jobName'] as String?,
+    jobId: (json['jobId'] as num?)?.toInt(),
     isDeleted: json['isDeleted'] as bool?);

@@ -6,6 +6,8 @@ import 'package:horizontal_data_table/horizontal_data_table.dart';
 import '../../models/saved_job.dart';
 import '../../providers/saved_job_provider.dart';
 import '../../widgets/badges.dart';
+import '../applicants/applicant_details.page.dart';
+import '../jobs/job_details.dart';
 import '../main/constants.dart';
 
 class SavedJobsView extends StatefulWidget {
@@ -108,8 +110,8 @@ class _SavedJobsViewState extends State<SavedJobsView> {
         children: [
           Expanded(
             child: HorizontalDataTable(
-              leftHandSideColumnWidth: 200,
-              rightHandSideColumnWidth: 600,
+              leftHandSideColumnWidth: 150,
+              rightHandSideColumnWidth: 800,
               isFixedHeader: true,
               headerWidgets: _getTitleWidgets(),
               leftSideItemBuilder: _generateFirstColumnRow,
@@ -152,6 +154,7 @@ class _SavedJobsViewState extends State<SavedJobsView> {
 
   List<Widget> _getTitleWidgets() {
     return [
+      _getTitleItemWidget('Akcije', 150),
       _getTitleItemWidget('Aplikant', 200),
       _getTitleItemWidget('Posao', 200),
       _getTitleItemWidget('Spašen', 200),
@@ -176,7 +179,7 @@ class _SavedJobsViewState extends State<SavedJobsView> {
       width: 100,
       height: 52,
       alignment: Alignment.center,
-      child:   _buildTableCell(data[index].applicantFullName , 200),
+      child: _buildActionsCell(context, data[index], 150),
     );
   }
 
@@ -184,6 +187,7 @@ class _SavedJobsViewState extends State<SavedJobsView> {
     final x = data[index];
     return Row(
       children: [
+        _buildTableCell(data[index].applicantFullName , 200),
         _buildTableCell(x.jobName, 200),
         _buildTableCell(DateFormat('dd.MM.yyyy HH:mm').format(x.created!), 200),
         _buildTableCell(
@@ -200,6 +204,49 @@ class _SavedJobsViewState extends State<SavedJobsView> {
       height: 52,
       alignment: Alignment.center,
       child: content is Widget ? content : Text(content.toString()),
+    );
+  }
+  Widget _buildActionsCell(BuildContext context, SavedJob data, double width) {
+    return Container(
+      width: width,
+      height: 52,
+      alignment: Alignment.center,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Existing 'Detalji aplikanta' button
+          Tooltip(
+            message: 'Detalji aplikanta',
+            preferBelow: false,
+            child: IconButton(
+              icon: const Icon(Icons.info_outline, color: Colors.blue),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ApplicantDetailsPage(id: data.createdBy!),
+                ),
+              ),
+              tooltip: '',
+            ),
+          ),
+          const SizedBox(width: 8), // Space between buttons
+          // New 'Detalji posla' button
+          Tooltip(
+            message: 'Detalji posla',
+            preferBelow: false,
+            child: IconButton(
+              icon: const Icon(Icons.work_outline, color: Colors.blue),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => JobDetailsPage(jobId: data.jobId!),
+                ),
+              ),
+              tooltip: '',
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

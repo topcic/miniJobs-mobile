@@ -41,7 +41,6 @@ class InfoCard extends StatelessWidget {
                 alignment: Alignment.center, // Ensures the icon is centered
                 child: Icon(icon, color: color, size: 24),
               ),
-              const Icon(Icons.more_vert, color: Colors.white54),
             ],
           ),
           Text(

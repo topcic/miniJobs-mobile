@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
 import '../../models/job_recommendation/job_recommendation_dto.dart';
 import '../../providers/job_recommendation_provider.dart';
+import '../applicants/applicant_details.page.dart';
 import '../main/constants.dart';
 
 class JobRecommendationsView extends StatefulWidget {
@@ -106,8 +107,8 @@ class _JobRecommendationsViewState extends State<JobRecommendationsView> {
         children: [
           Expanded(
             child: HorizontalDataTable(
-              leftHandSideColumnWidth: 200,
-              rightHandSideColumnWidth: 1400,
+              leftHandSideColumnWidth: 100,
+              rightHandSideColumnWidth: 1200,
               isFixedHeader: true,
               headerWidgets: _getTitleWidgets(),
               leftSideItemBuilder: _generateFirstColumnRow,
@@ -150,6 +151,7 @@ class _JobRecommendationsViewState extends State<JobRecommendationsView> {
 
   List<Widget> _getTitleWidgets() {
     return [
+      _getTitleItemWidget('Akcije', 100),
       _getTitleItemWidget('Aplikant', 200),
       _getTitleItemWidget('Gradovi', 500),
       _getTitleItemWidget('Tipovi poslova', 500)
@@ -173,7 +175,7 @@ class _JobRecommendationsViewState extends State<JobRecommendationsView> {
       width: 100,
       height: 52,
       alignment: Alignment.center,
-      child:   _buildTableCell(data[index].applicantFullName , 200),
+      child: _buildActionsCell(context, data[index], 100),
     );
   }
 
@@ -181,6 +183,7 @@ class _JobRecommendationsViewState extends State<JobRecommendationsView> {
     final x = data[index];
     return Row(
       children: [
+        _buildTableCell(data[index].applicantFullName , 200),
         _buildTableCell(x.cities?.join(', ') ?? '', 500),
         _buildTableCell(x.jobTypes?.join(', ') ?? '', 500),
       ],
@@ -193,6 +196,34 @@ class _JobRecommendationsViewState extends State<JobRecommendationsView> {
       height: 52,
       alignment: Alignment.center,
       child: content is Widget ? content : Text(content.toString()),
+    );
+  }
+  Widget _buildActionsCell(BuildContext context, JobRecommendationDto data, double width) {
+    return Container(
+      width: width,
+      height: 52,
+      alignment: Alignment.center,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Existing 'Detalji aplikanta' button
+          Tooltip(
+            message: 'Detalji aplikanta',
+            preferBelow: false,
+            child: IconButton(
+              icon: const Icon(Icons.info_outline, color: Colors.blue),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ApplicantDetailsPage(id: data.createdBy!),
+                ),
+              ),
+              tooltip: '',
+            ),
+          ),
+
+        ],
+      ),
     );
   }
 }

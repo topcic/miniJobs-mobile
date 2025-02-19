@@ -68,10 +68,6 @@ class _ProfileCardState extends State<ProfileCard> {
         ),
         child: Row(
           children: [
-            Image.asset(
-              "assets/images/user-icon.png",
-              height: 38,
-            ),
             if (!Responsive.isMobile(context))
               Padding(
                 padding:

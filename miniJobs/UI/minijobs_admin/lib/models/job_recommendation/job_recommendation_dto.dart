@@ -5,6 +5,7 @@ part 'job_recommendation_dto.g.dart';
 @JsonSerializable()
 class JobRecommendationDto {
   String? applicantFullName;
+  int? createdBy;
   List<String>? cities;
   List<String>? jobTypes;
 
