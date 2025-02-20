@@ -40,18 +40,17 @@ class _UserRatingsViewState extends State<UserRatingsView> {
         ),
       );
     }
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: ListView.builder(
-          itemCount: ratings.length,
-          itemBuilder: (context, index) {
-            final rating = ratings[index];
-            return ImpressionCard(
-                rating: rating,
-            );
-          },
-        ),
+    return SingleChildScrollView( // Wrapping the ListView.builder inside SingleChildScrollView
+      child: ListView.builder(
+        shrinkWrap: true, // Makes the ListView only take necessary space
+        physics: NeverScrollableScrollPhysics(), // Prevents inner scrolling of ListView
+        itemCount: ratings.length,
+        itemBuilder: (context, index) {
+          final rating = ratings[index];
+          return ImpressionCard(
+            rating: rating,
+          );
+        },
       ),
     );
   }
@@ -62,23 +61,22 @@ class ImpressionCard extends StatelessWidget {
 
   const ImpressionCard({
     super.key,
-    required this.rating
+    required this.rating,
   });
 
   @override
   Widget build(BuildContext context) {
-
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: ListTile(
         leading: CircleAvatar(
           radius: 25,
           child: PhotoView(
-              photo: rating.photo,
-              editable: false,
-              userId: rating.createdBy
-            ),
+            photo: rating.photo,
+            editable: false,
+            userId: rating.createdBy,
           ),
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -93,7 +91,7 @@ class ImpressionCard extends StatelessWidget {
               children: [
                 const Icon(Icons.star, color: Colors.yellow),
                 const SizedBox(width: 5),
-                Text(rating.value .toString()),
+                Text(rating.value.toString()),
               ],
             ),
             const SizedBox(height: 5),

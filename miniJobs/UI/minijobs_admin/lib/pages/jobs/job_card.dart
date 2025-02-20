@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:minijobs_admin/models/job/job.dart';
-import 'package:minijobs_admin/pages/employer/job/job_modal.dart';
 import 'package:minijobs_admin/providers/job_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../../../models/job/job_card_dto.dart';
-import '../../jobs/job_details.dart';
+import '../../models/job/job_card_dto.dart';
+import 'job_details.dart';
 
 class JobCard extends StatefulWidget {
   final JobCardDTO job;

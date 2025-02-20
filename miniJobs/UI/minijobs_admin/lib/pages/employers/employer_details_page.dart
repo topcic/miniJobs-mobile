@@ -274,8 +274,7 @@ class _EmployerDetailsPageState extends State<EmployerDetailsPage> {
                 ],
               ),
               // SizedBox for responsiveness, adjusting the TabBarView's height
-              SizedBox(
-                height:600, // Adjust height based on screen size
+              Expanded(
                 child: TabBarView(
                   children: [
                     // Aktivni poslovi tab

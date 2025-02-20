@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:minijobs_admin/models/job/job.dart';
-import 'package:minijobs_admin/pages/employer/job/job_card.dart';
+import 'package:minijobs_admin/pages/jobs/job_card.dart';
 import 'package:minijobs_admin/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -46,17 +46,24 @@ List<JobCardDTO> jobs=[];
         ),
       );
     }
-    return   GridView.builder(
-    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 2, // Broj kartica u redu
-      crossAxisSpacing: 10.0, // Razmak između kartica u redu
-      mainAxisSpacing: 10.0, // Razmak između redova kartica
-    ),
-    itemCount: jobs.length, // Zamijenite ovu vrijednost s vašim brojem poslova
-    itemBuilder: (BuildContext context, int index) {
-       final job= jobs[index];
-     return JobCard(job:job);
-    }
+
+    return SingleChildScrollView( // Make the GridView scrollable
+      child: GridView.builder(
+        shrinkWrap: true, // Prevents the GridView from taking more space than necessary
+        physics: NeverScrollableScrollPhysics(), // Prevents inner scroll of GridView
+        padding: const EdgeInsets.all(16.0),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2, // Number of cards in a row
+          crossAxisSpacing: 10.0, // Space between cards horizontally
+          mainAxisSpacing: 10.0, // Space between cards vertically
+        ),
+        itemCount: jobs.length, // Number of jobs
+        itemBuilder: (BuildContext context, int index) {
+          final job = jobs[index];
+          return JobCard(job: job);
+        },
+      ),
     );
   }
+
 }

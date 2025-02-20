@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:minijobs_admin/models/job/job.dart';
-import 'package:minijobs_admin/pages/employer/job/job_card.dart';
+import 'package:minijobs_admin/pages/jobs/job_card.dart';
 import 'package:minijobs_admin/providers/employer_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -50,20 +50,23 @@ List<JobCardDTO> jobs=[];
           );
         },
       ),
-      desktop: Container(
-        child: GridView.builder(
-          padding: const EdgeInsets.all(16.0),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 16.0,
-            mainAxisSpacing: 16.0,
-            childAspectRatio: 2, // Height is double the width
+      desktop: SingleChildScrollView( // Make the content scrollable on desktop
+        child: Container(
+          child: GridView.builder(
+            shrinkWrap: true, // Prevents the GridView from taking more space than necessary
+            padding: const EdgeInsets.all(16.0),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16.0,
+              mainAxisSpacing: 16.0,
+              childAspectRatio: 2, // Height is double the width
+            ),
+            itemCount: jobs.length,
+            itemBuilder: (context, index) {
+              final job = jobs[index];
+              return JobCard(job: job);
+            },
           ),
-          itemCount: jobs.length,
-          itemBuilder: (context, index) {
-            final job = jobs[index];
-            return JobCard(job: job);
-          },
         ),
       ),
     );

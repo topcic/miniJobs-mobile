@@ -1,4 +1,9 @@
+import 'dart:typed_data';
+
+import 'package:file_saver/file_saver.dart';
 import 'package:flutter/material.dart';
+import 'package:mime/mime.dart';
+import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
 import '../../models/applicant/applicant.dart';
 import '../../providers/applicant_provider.dart';
@@ -21,7 +26,8 @@ class _ApplicantDetailsPageState extends State<ApplicantDetailsPage> {
   late UserProvider _userProvider;
   Applicant? applicant;
   bool isLoading = true;
-
+  Uint8List? cvBytes;
+  String? cvFileName;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -36,12 +42,42 @@ class _ApplicantDetailsPageState extends State<ApplicantDetailsPage> {
       setState(() {
         applicant = fetchedApplicant;
         isLoading = false;
+        if (applicant?.cv != null) {
+          cvBytes = applicant!.cv;
+          cvFileName = "CV.${_getFileExtension(applicant!.cv!)}";
+        }
       });
     } catch (e) {
       setState(() => isLoading = false);
     }
   }
+String _getFileExtension(Uint8List bytes) {
+  final mimeType = lookupMimeType('', headerBytes: bytes);
 
+  if (mimeType != null) {
+    final extension = mimeType.split('/').last;
+    return extension;
+  }
+
+  final signatures = {
+    '25504446': 'pdf',
+    '504B0304': 'docx',
+    'D0CF11E0': 'doc',
+  };
+
+  final headerBytes = bytes
+      .take(4)
+      .map((byte) => byte.toRadixString(16).padLeft(2, '0'))
+      .join()
+      .toUpperCase();
+  final extension = signatures[headerBytes];
+
+  if (extension != null) {
+    return extension;
+  }
+
+  return '';
+}
   Future<void> blockUser() async {
     setState(() => isLoading = true);
     await _userProvider.delete(applicant!.id!);
@@ -49,6 +85,12 @@ class _ApplicantDetailsPageState extends State<ApplicantDetailsPage> {
       applicant!.deleted = true;
       isLoading = false;
     });
+  }
+  Future<void> _downloadCVFile() async {
+    if (cvBytes != null && cvFileName != null) {
+      String? path = await FileSaver.instance.saveFile(name: cvFileName!, bytes: cvBytes!, ext: "");
+      OpenFile.open(path);
+    }
   }
 
   Future<void> activateUser() async {
@@ -201,56 +243,60 @@ class _ApplicantDetailsPageState extends State<ApplicantDetailsPage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Dodatni detalji',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const Divider(),
-            _detailRow('Opis:', applicant!.description ?? '-'),
-            _detailRow('Iskustvo:', applicant!.experience ?? '-'),
-            _detailRow(
-              'Predložena plata:',
-              applicant!.wageProposal != null
-                  ? '${applicant!.wageProposal.toString()} KM'
-                  : '-',
-            ),
-            const Divider(),
-            DefaultTabController(
-              length: 3,
-              child: Column(
-                children: [
-                  const TabBar(
-                    tabs: [
-                      Tab(text: 'Završeni'),
-                      Tab(text: 'Utisci'),
-                    ],
+        child: SingleChildScrollView( // Wrap the entire content in a SingleChildScrollView
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Dodatni detalji',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const Divider(),
+              _detailRow('Opis:', applicant!.description ?? '-'),
+              _detailRow('Iskustvo:', applicant!.experience ?? '-'),
+              _detailRow(
+                'Predložena plata:',
+                applicant!.wageProposal != null
+                    ? '${applicant!.wageProposal.toString()} KM'
+                    : '-',
+              ),
+              if (applicant!.cv != null)
+                Container(
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.download),
+                    label: const Text('Preuzmi CV'),
+                    onPressed: () {
+                      _downloadCVFile();
+                    },
                   ),
-                  SizedBox(
-                    height: 300,
-                    child: TabBarView(
-                      children: [
-                        FinishedJobsView(userId: applicant!.id!),
-                        UserRatingsView(userId: applicant!.id!),
+                ),
+              const Divider(),
+              DefaultTabController(
+                length: 3,
+                child: Column(
+                  children: [
+                    const TabBar(
+                      tabs: [
+                        Tab(text: 'Završeni'),
+                        Tab(text: 'Utisci'),
                       ],
                     ),
-                  ),
-                ],
-              ),
-            ),
-            if (applicant!.cv != null)
-              Center(
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.download),
-                  label: const Text('Preuzmi CV'),
-                  onPressed: () {
-                    // Add CV download functionality
-                  },
+                    // SizedBox for responsiveness, adjusting the TabBarView's height
+                    SizedBox(
+                      height: 300,
+                      child: TabBarView(
+                        children: [
+                          FinishedJobsView(userId: applicant!.id!),
+                          UserRatingsView(userId: applicant!.id!),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-          ],
+
+            ],
+          ),
         ),
       ),
     );
