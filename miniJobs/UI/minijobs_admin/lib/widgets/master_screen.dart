@@ -22,9 +22,9 @@ class _MasterScreenWidgetState extends State<MasterScreenWidget> {
   final List<Widget> _pages = [
     const HomePage(),
     const UsersPage(),
-    const ApplicantsView(), // Replace with Applicants Page
-    const EmployersView(), // Replace with Employers Page
-    const JobsView(), // Replace with Jobs Page
+    const ApplicantsView(), // Replace with Applicants Stranica
+    const EmployersView(), // Replace with Employers Stranica
+    const JobsView(), // Replace with Jobs Stranica
   ];
 
   final List<String> _titles = [

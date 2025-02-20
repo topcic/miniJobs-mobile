@@ -158,17 +158,17 @@ class _ApplicantsViewState extends State<ApplicantsView> {
                       _changePage(
                           (filter['offset'] / filter['limit']).floor() - 1)
                       : null,
-                  child: const Text('Previous'),
+                  child: const Text('Prethodna'),
                 ),
                 Text(
-                    'Page ${(filter['offset'] / filter['limit']).floor() + 1}'),
+                    'Stranica ${(filter['offset'] / filter['limit']).floor() + 1}'),
                 ElevatedButton(
                   onPressed: (filter['offset'] + filter['limit']) < data.length
                       ? () =>
                       _changePage(
                           (filter['offset'] / filter['limit']).floor() + 1)
                       : null,
-                  child: const Text('Next'),
+                  child: const Text('Sljedeća'),
                 ),
               ],
             ),

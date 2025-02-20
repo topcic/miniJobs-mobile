@@ -198,14 +198,14 @@ class _JobsViewState extends State<JobsView> {
                   onPressed: filter['offset'] > 0
                       ? () => _changePage((filter['offset'] / filter['limit']).floor() - 1)
                       : null,
-                  child: const Text('Previous'),
+                  child: const Text('Prethodna'),
                 ),
-                Text('Page ${(filter['offset'] / filter['limit']).floor() + 1}'),
+                Text('Stranica ${(filter['offset'] / filter['limit']).floor() + 1}'),
                 ElevatedButton(
                   onPressed: data.length == filter['limit']
                       ? () => _changePage((filter['offset'] / filter['limit']).floor() + 1)
                       : null,
-                  child: const Text('Next'),
+                  child: const Text('Sljedeća'),
                 ),
               ],
             ),
