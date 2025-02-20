@@ -79,6 +79,7 @@ namespace Infrastructure.Persistence.Repositories
         {
             var jobs = from j in context.Jobs
                        where j.CreatedBy == employerId && j.Status != JobStatus.Inactive && j.DeletedByAdmin == false
+                       orderby j.Created descending
                        select new
                        {
                            Job = j,

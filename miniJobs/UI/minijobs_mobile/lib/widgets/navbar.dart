@@ -82,19 +82,38 @@ class _NavbarState extends State<Navbar> {
   }
 
   IconData _getFabIcon(int index) {
-    switch (index) {
-      case 0:
-        return Icons.home;
-      case 1:
-        return Icons.add;
-      case 2:
-        return Icons.view_list;
-      case 3:
-        return Icons.person;
-      default:
-        return Icons.home;
+    String role = GetStorage().read('role') ?? '';
+
+    // FAB icon logic based on role and index
+    if (role == 'Applicant') {
+      switch (index) {
+        case 0:
+          return Icons.home; // Home
+        case 1:
+          return Icons.view_list; // Jobs search
+        case 2:
+          return Icons.mail; // Recommendations
+        case 3:
+          return Icons.person; // Profile
+        default:
+          return Icons.home; // Default case
+      }
+    } else { // Employer
+      switch (index) {
+        case 0:
+          return Icons.home; // Home
+        case 1:
+          return Icons.add; // Create job
+        case 2:
+          return Icons.view_list; // View job list
+        case 3:
+          return Icons.person; // Profile
+        default:
+          return Icons.home; // Default case
+      }
     }
   }
+
 
   List<IconData> _getIconsForRole() {
     String role = GetStorage().read('role') ?? '';
