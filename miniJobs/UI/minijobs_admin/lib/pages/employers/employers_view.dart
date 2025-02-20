@@ -219,7 +219,7 @@ class _EmployersViewState extends State<EmployersView> {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        EmployerDetailsPage(employer: employer),
+                        EmployerDetailsPage(id: employer.id!),
                   ),
                 ),
           ),

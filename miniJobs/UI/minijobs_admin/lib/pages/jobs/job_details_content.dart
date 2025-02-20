@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../models/job/job.dart';
+import '../employers/employer_details_page.dart';
 import '../main/constants.dart';
 import 'job_details.dart';
 
@@ -27,8 +28,59 @@ class JobDetailsContent extends StatelessWidget {
           Text(job.name ?? 'Nema naziva',
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: primaryColor)),
           const SizedBox(height: defaultPadding),
-          Text('${job.employerFullName} - ${job.city?.name ?? ''}',
-              style: const TextStyle(fontSize: 16, color: Colors.white70)),
+          RichText(
+            text: TextSpan(
+              children: [
+                WidgetSpan(
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EmployerDetailsPage(id: job.createdBy!),
+                        ),
+                      );
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            job.employerFullName!,
+                            style: const TextStyle(
+                              color: Colors.blue,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Tooltip(
+                          message: 'Detalji poslodavca',
+                          child: Icon(
+                            Icons.info_outline,
+                            color: Colors.blue.shade400,
+                            size: 18,
+                          ),
+                        ),
+                      ],
+                    )
+
+
+                  ),
+                ),
+                TextSpan(
+                  text: ' - ${job.city?.name ?? ''}',
+                  style: const TextStyle(color: Colors.blue, fontSize: 16),
+                ),
+              ],
+            ),
+          ),
           const Divider(color: Colors.white24, height: defaultPadding),
 
           _buildDetailSection('Opis posla:', job.description),

@@ -52,7 +52,6 @@ public class EmployersController(IMediator mediator,IEmployerRepository employer
     }
 
     [HttpGet("{employerId}")]
-    [Authorize(Roles = "Applicant,Employer")]
     [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
