@@ -17,7 +17,6 @@ public class ApplicationDbContext : DbContext
     public DbSet<Canton> Cantons => Set<Canton>();
     public DbSet<JobApplication> JobApplications => Set<JobApplication>();
     public DbSet<JobType> JobTypes => Set<JobType>();
-    public DbSet<Message> Messages => Set<Message>();
     public DbSet<Rating> Ratings => Set<Rating>();
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<SavedJob> SavedJobs => Set<SavedJob>();

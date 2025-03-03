@@ -89,7 +89,6 @@ public static class ConfigureServices
         services.AddScoped<IRatingRepository, RatingRepository>();
         services.AddScoped<ICityRepository, CityRepository>();
         services.AddScoped<ICountryRepository, CountryRepository>();
-        services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddScoped<IApplicantJobTypeRepository, ApplicantJobTypeRepository>();
         services.AddScoped<IUserAuthCodeRepository, UserAuthCodeRepository>();
         services.AddScoped<ITokenRepository, TokenRepository>();

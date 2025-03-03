@@ -738,7 +738,7 @@ namespace Infrastructure.Persistence.Migrations
                 table: "users",
                 column: "city_id");
 
-             string basePath = "/app/Infrastructure/Persistence/Migrations/InitialDataScripts";
+            string basePath = "/app/Infrastructure/Persistence/Migrations/InitialDataScripts";
             //string basePath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "Infrastructure/Persistence/Migrations/InitialDataScripts");
 
 
