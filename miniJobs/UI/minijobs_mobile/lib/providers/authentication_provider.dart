@@ -42,7 +42,6 @@ class AuthenticationProvider extends BaseProvider<AuthTokenResponse> {
 
       // Ensure result.accessToken is not null
       if (result.accessToken == null) {
-        print('Error: Access token is null');
         return false;
       }
 
@@ -67,8 +66,6 @@ class AuthenticationProvider extends BaseProvider<AuthTokenResponse> {
 
       return true;
     } catch (e) {
-      // Log the error for debugging
-      print('Error: $e');
       return false;
     }
   }

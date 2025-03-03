@@ -19,44 +19,17 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormBuilderState>();
   final notificationService = NotificationService();
   late AuthenticationProvider _authenticationProvider;
+  bool _obscureText = true; // Added to toggle password visibility
 
- @override
+  @override
   void initState() {
     super.initState();
-    authenticateUserOnInit();
   }
 
-  // Run authentication process on init
   void authenticateUserOnInit() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Ensure provider is available after initial build
       _authenticationProvider = context.read<AuthenticationProvider>();
-      authenticateUser();
     });
-  }
-
-  // Method to authenticate user
-  Future<void> authenticateUser() async {
-    var autCodeRequest = AuthCodeRequest(
-      "admin@minijobs.ba",
-      "Minijobs1234!",
-      "password",
-      "",
-      "",
-    );
-
-    var result = await _authenticationProvider.tokens(autCodeRequest);
-
-    if (!mounted) return; // Ensure the widget is still in the widget tree
-
-    if (result) {
-      // Navigate to Navbar if authentication is successful
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) =>  const MainScreen(),
-      ));
-    } else {
-      notificationService.error("Nevalidna lozinka ili email");
-    }
   }
 
   @override
@@ -101,14 +74,13 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Logo inside the card
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Column(
                           children: [
                             Image.asset(
                               "assets/images/logo.png",
-                              height: screenHeight * 0.2, // 20% of screen height
+                              height: screenHeight * 0.2,
                               fit: BoxFit.contain,
                             ),
                           ],
@@ -120,9 +92,8 @@ class _LoginPageState extends State<LoginPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            // Email Input
                             FormBuilderTextField(
-                              style: TextStyle(color: Colors.black),
+                              style: const TextStyle(color: Colors.black),
                               name: 'email',
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
@@ -139,16 +110,14 @@ class _LoginPageState extends State<LoginPage> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
-                                prefixIcon:
-                                const Icon(Icons.email, color: Colors.blue),
+                                prefixIcon: const Icon(Icons.email, color: Colors.blue),
                               ),
                             ),
                             const SizedBox(height: 20),
-                            // Password Input
                             FormBuilderTextField(
                               name: 'password',
-                              style: TextStyle(color: Colors.black),
-                              obscureText: true,
+                              style: const TextStyle(color: Colors.black),
+                              obscureText: _obscureText,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return "Lozinka je obavezno polje";
@@ -160,12 +129,21 @@ class _LoginPageState extends State<LoginPage> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12.0),
                                 ),
-                                prefixIcon:
-                                const Icon(Icons.lock, color: Colors.blue),
+                                prefixIcon: const Icon(Icons.lock, color: Colors.blue),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscureText ? Icons.visibility : Icons.visibility_off,
+                                    color: Colors.blue,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureText = !_obscureText;
+                                    });
+                                  },
+                                ),
                               ),
                             ),
                             const SizedBox(height: 30),
-                            // Log in Button
                             ElevatedButton(
                               onPressed: () async {
                                 _formKey.currentState?.save();
@@ -190,7 +168,7 @@ class _LoginPageState extends State<LoginPage> {
                                   if (result && mounted) {
                                     Navigator.of(context).pushReplacement(
                                       MaterialPageRoute(
-                                          builder: (context) =>   const MainScreen()),
+                                          builder: (context) => const MainScreen()),
                                     );
                                   } else if (mounted) {
                                     ScaffoldMessenger.of(context)
@@ -207,14 +185,13 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                             const SizedBox(height: 15),
-                            // Forgot Password
                             TextButton(
                               onPressed: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        const ForgotPasswordPage(),
+                                    const ForgotPasswordPage(),
                                   ),
                                 );
                               },
@@ -239,5 +216,4 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
 }

@@ -20,45 +20,21 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormBuilderState>();
   final notificationService = NotificationService();
   late AuthenticationProvider _authenticationProvider;
+  bool _obscureText = true; // Added to toggle password visibility
 
- @override
+  @override
   void initState() {
     super.initState();
     authenticateUserOnInit();
     AuthHelper.checkIsAuthenticated(context);
- }
+  }
 
   // Run authentication process on init
   void authenticateUserOnInit() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Ensure provider is available after initial build
       _authenticationProvider = context.read<AuthenticationProvider>();
-      //authenticateUser();
     });
-  }
-
-  // Method to authenticate user
-  Future<void> authenticateUser() async {
-    var autCodeRequest = AuthCodeRequest(
-      "27topcic.mahir@gmail.com",
-      "Arni1234",
-      "password",
-      "",
-      "",
-    );
-
-    var result = await _authenticationProvider.tokens(autCodeRequest);
-
-    if (!mounted) return; // Ensure the widget is still in the widget tree
-
-    if (result) {
-      // Navigate to Navbar if authentication is successful
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => const Navbar(),
-      ));
-    } else {
-      notificationService.error("Nevalidna lozinka ili email");
-    }
   }
 
   @override
@@ -148,7 +124,7 @@ class _LoginPageState extends State<LoginPage> {
                             // Password Input
                             FormBuilderTextField(
                               name: 'password',
-                              obscureText: true,
+                              obscureText: _obscureText,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return "Lozinka je obavezno polje";
@@ -162,6 +138,19 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                                 prefixIcon:
                                 const Icon(Icons.lock, color: Colors.blue),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscureText
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    color: Colors.blue,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureText = !_obscureText;
+                                    });
+                                  },
+                                ),
                               ),
                             ),
                             const SizedBox(height: 30),
@@ -193,7 +182,8 @@ class _LoginPageState extends State<LoginPage> {
                                           builder: (context) => const Navbar()),
                                     );
                                   } else if (mounted) {
-                                    notificationService.error('Nevalidan email ili lozinka');
+                                    notificationService
+                                        .error('Nevalidan email ili lozinka');
                                     _formKey.currentState?.reset();
                                   }
                                 }
@@ -210,7 +200,7 @@ class _LoginPageState extends State<LoginPage> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        const ForgotPasswordPage(),
+                                    const ForgotPasswordPage(),
                                   ),
                                 );
                               },
@@ -235,5 +225,4 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
 }
