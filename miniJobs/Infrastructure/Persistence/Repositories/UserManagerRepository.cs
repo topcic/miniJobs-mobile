@@ -112,8 +112,6 @@ public class UserManagerRepository(ApplicationDbContext context, IMapper mapper)
                               LastName = u.LastName,
                               Email = u.Email,
                               PhoneNumber = u.PhoneNumber,
-                              Gender = u.Gender,
-                              DateOfBirth = u.DateOfBirth,
                               CityId = u.CityId,
                               Deleted = u.Deleted,
                               AccountConfirmed = u.AccountConfirmed,

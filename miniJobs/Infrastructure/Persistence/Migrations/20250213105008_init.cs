@@ -745,9 +745,6 @@ namespace Infrastructure.Persistence.Migrations
             var sqlFile = Path.Combine(basePath, "add_roles.sql");
             migrationBuilder.Sql(File.ReadAllText(sqlFile));
 
-            sqlFile = Path.Combine(basePath, "add_cantons.sql");
-            migrationBuilder.Sql(File.ReadAllText(sqlFile));
-
             sqlFile = Path.Combine(basePath, "add_default_country.sql");
             migrationBuilder.Sql(File.ReadAllText(sqlFile));
 

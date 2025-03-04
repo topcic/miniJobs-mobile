@@ -4,6 +4,7 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250303190813_removed_cantons")]
+    partial class removed_cantons
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -685,6 +688,10 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("int")
                         .HasColumnName("created_by");
 
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("date_of_birth");
+
                     b.Property<bool>("Deleted")
                         .HasColumnType("bit")
                         .HasColumnName("deleted");
@@ -698,6 +705,10 @@ namespace Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("first_name");
+
+                    b.Property<int?>("Gender")
+                        .HasColumnType("int")
+                        .HasColumnName("gender");
 
                     b.Property<string>("LastName")
                         .IsRequired()

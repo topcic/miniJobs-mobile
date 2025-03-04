@@ -79,7 +79,6 @@ public static class ConfigureServices
     private static void AddRepositories(IServiceCollection services)
     {
         services.AddScoped<IJobRepository, JobRepository>();
-        services.AddScoped<ICantonRepository, CantonRepository>();
         services.AddScoped<IUserManagerRepository, UserManagerRepository>();
         services.AddScoped<IEmployerRepository, EmployerRepository>();
         services.AddScoped<IApplicantRepository, ApplicantRepository>();

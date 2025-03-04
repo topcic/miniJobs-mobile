@@ -24,6 +24,6 @@ public class City : IEntity<int>
     [NotMapped]
     public Country Country { get; set; }
 
-    [Column("canton_id")]
-    public int? CantonId { get; set; }
+    [Column("is_deleted")]
+    public bool IsDeleted { get; set; }
 }

@@ -11,6 +11,7 @@ namespace WebAPI.Controllers;
 public class ReportsController(IJobRepository jobRepository, IJobApplicationRepository jobApplicationRepository, IRatingRepository ratingRepository) : ControllerBase
 {
     [HttpGet("jobs")]
+    [Authorize(Roles = "Administrator")]
     [ProducesResponseType(typeof(IEnumerable<Job>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -20,6 +21,7 @@ public class ReportsController(IJobRepository jobRepository, IJobApplicationRepo
     }
 
     [HttpGet("job-applications")]
+    [Authorize(Roles = "Administrator")]
     [ProducesResponseType(typeof(IEnumerable<JobApplication>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -29,6 +31,7 @@ public class ReportsController(IJobRepository jobRepository, IJobApplicationRepo
     }
 
     [HttpGet("ratings")]
+    [Authorize(Roles = "Administrator")]
     [ProducesResponseType(typeof(IEnumerable<Rating>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]

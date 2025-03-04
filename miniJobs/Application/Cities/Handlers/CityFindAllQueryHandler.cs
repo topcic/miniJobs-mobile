@@ -10,7 +10,7 @@ public class CityFindAllQueryHandler(ICityRepository cityRepository,
 {
     public async Task<IEnumerable<City>> Handle(CityFindAllQuery request, CancellationToken cancellationToken)
     {
-        var cities = await cityRepository.FindAllAsync();
+        var cities =  cityRepository.Find(x=>x.IsDeleted==false);
 
         foreach (var city in cities)
         {

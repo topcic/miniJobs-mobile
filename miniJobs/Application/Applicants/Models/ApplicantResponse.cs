@@ -1,6 +1,4 @@
 ﻿using Domain.Entities;
-using Domain.Enums;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Application.Applicants.Models;
 
@@ -16,8 +14,6 @@ public class ApplicantResponse
     public string LastName { get; set; }
     public string Email { get; set; }
     public string? PhoneNumber { get; set; }
-    public Gender? Gender { get; set; }
-    public DateTime? DateOfBirth { get; set; }
     public int? CityId { get; set; }
     public bool Deleted { get; set; }
     public int? CreatedBy { get; set; }

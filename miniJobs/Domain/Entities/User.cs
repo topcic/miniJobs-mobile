@@ -23,12 +23,6 @@ public class User : IEntity<int>
     [Column("phone_number")]
     public string? PhoneNumber { get; set; }
 
-    [Column("gender")]
-    public Gender? Gender { get; set; }
-
-    [Column("date_of_birth")]
-    public DateTime? DateOfBirth { get; set; }
-
     [Column("city_id")]
     public int? CityId { get; set; }
 

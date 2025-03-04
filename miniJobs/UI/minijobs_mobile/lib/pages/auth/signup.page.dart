@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:minijobs_mobile/enumerations/gender.dart';
 import 'package:minijobs_mobile/enumerations/role.dart';
 import 'package:minijobs_mobile/models/city.dart';
 import 'package:minijobs_mobile/pages/auth/verification_page.dart';
@@ -147,34 +146,6 @@ class _SignupPageState extends State<SignupPage> {
                               ),
                               const SizedBox(height: 20),
 
-                              // Gender Dropdown
-                              rowMethod(
-                                Expanded(
-                                  child: FormBuilderDropdown<String>(
-                                    name: 'gender',
-                                    validator: (value) {
-                                      if (value == null) {
-                                        return "Spol je obavezno polje";
-                                      } else {
-                                        return null;
-                                      }
-                                    },
-                                    decoration: const InputDecoration(
-                                      labelText: "Spol",
-                                    ),
-                                    items: Gender.values.map((gender) {
-                                      return DropdownMenuItem<String>(
-                                        value: gender.name,
-                                        child: Text(gender.name == 'Male'
-                                            ? 'Muški'
-                                            : 'Ženski'),
-                                      );
-                                    }).toList(),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-
                               // City Dropdown
                               rowMethod(
                                 Expanded(
@@ -294,11 +265,6 @@ class _SignupPageState extends State<SignupPage> {
                                                 Map.of(_formKey
                                                     .currentState!.value);
 
-                                            request['gender'] =
-                                                Gender.Male.name ==
-                                                        request['gender']
-                                                    ? 0
-                                                    : 1;
                                             request['roleId'] =
                                                 widget.role.name;
                                             var result =

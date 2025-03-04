@@ -10,4 +10,7 @@ public class JobType : IEntity<int>
     public int Id { get; set; }
     [Column("name")]
     public string Name { get; set; }
+
+    [Column("is_deleted")]
+    public bool IsDeleted { get; set; }
 }

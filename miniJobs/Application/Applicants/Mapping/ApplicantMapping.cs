@@ -12,8 +12,6 @@ public class ApplicantMapping : Profile
             .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.User.LastName))
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
             .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber))
-            .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.User.Gender))
-            .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.User.DateOfBirth))
             .ForMember(dest => dest.CityId, opt => opt.MapFrom(src => src.User.CityId))
             .ForMember(dest => dest.Deleted, opt => opt.MapFrom(src => src.User.Deleted))
             .ForMember(dest => dest.CreatedBy, opt => opt.MapFrom(src => src.User.CreatedBy))

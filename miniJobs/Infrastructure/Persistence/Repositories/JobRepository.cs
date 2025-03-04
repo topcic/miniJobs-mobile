@@ -264,8 +264,6 @@ namespace Infrastructure.Persistence.Repositories
                                        LastName = app.User.LastName,
                                        Email = app.User.Email,
                                        PhoneNumber = app.User.PhoneNumber,
-                                       Gender = app.User.Gender,
-                                       DateOfBirth = app.User.DateOfBirth,
                                        CityId = app.User.CityId,
                                        Deleted = app.User.Deleted,
                                        CreatedBy = app.User.CreatedBy,
