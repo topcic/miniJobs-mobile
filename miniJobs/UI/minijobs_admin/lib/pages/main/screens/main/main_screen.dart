@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:minijobs_admin/pages/countries/countries_view.dart';
 import 'package:minijobs_admin/pages/job-applications/job_applications_view.dart';
+import 'package:minijobs_admin/pages/jobtypes/job_types_view.dart';
 import 'package:minijobs_admin/pages/ratings/rating_view.dart';
 import 'package:minijobs_admin/pages/saved_jobs/saved_jobs_view.dart';
 
@@ -111,6 +112,8 @@ class _MainScreenState extends State<MainScreen> {
             children: [
               _buildMenuItem("Države", FontAwesomeIcons.globe,
                   const CountriesView()),
+              _buildMenuItem("Tipovi posla", FontAwesomeIcons.briefcase ,
+                  const JobTypesView()),
 
             ],
           ),

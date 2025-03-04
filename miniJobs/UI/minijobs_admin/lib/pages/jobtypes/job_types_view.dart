@@ -2,27 +2,27 @@ import 'dart:async';
 import 'package:another_flushbar/flushbar_route.dart';
 import 'package:flutter/material.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
-import 'package:minijobs_admin/models/country.dart';
 import 'package:minijobs_admin/pages/main/constants.dart';
 import 'package:provider/provider.dart';
-import 'package:another_flushbar/flushbar.dart'; // Add this import for Flushbar
-import '../../providers/country_provider.dart';
+import 'package:another_flushbar/flushbar.dart';
+import '../../models/job_type.dart';
+import '../../providers/job_type_provider.dart';
 import '../../widgets/badges.dart';
-import 'country_form.dart';
+import 'job_type_form.dart';
 
-class CountriesView extends StatefulWidget {
-  const CountriesView({super.key});
+class JobTypesView extends StatefulWidget {
+  const JobTypesView({super.key});
 
   @override
-  _CountriesViewState createState() => _CountriesViewState();
+  _JobTypesViewState createState() => _JobTypesViewState();
 }
 
-class _CountriesViewState extends State<CountriesView> {
-  late CountryProvider _countryProvider;
-  List<Country> data = [];
+class _JobTypesViewState extends State<JobTypesView> {
+  late JobTypeProvider jobTypeProvider;
+  List<JobType> data = [];
   bool isLoading = true;
-  bool _showForm = false; // Controls visibility of CountryForm
-  Country? _countryToEdit; // Tracks which country to edit (null for new)
+  bool _showForm = false;
+  JobType? jobTypeToEdit;
 
   Map<String, dynamic> filter = {
     'limit': 10,
@@ -39,16 +39,16 @@ class _CountriesViewState extends State<CountriesView> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _countryProvider = context.read<CountryProvider>();
-    fetchCountries();
+    jobTypeProvider = context.read<JobTypeProvider>();
+    fetchData();
   }
 
-  Future<void> fetchCountries() async {
+  Future<void> fetchData() async {
     setState(() {
       isLoading = true;
     });
 
-    final result = await _countryProvider.searchPublic(filter);
+    final result = await jobTypeProvider.searchPublic(filter);
 
     setState(() {
       data = result.result!;
@@ -63,7 +63,7 @@ class _CountriesViewState extends State<CountriesView> {
         filter['searchText'] = keyword;
         filter['offset'] = 0;
       });
-      fetchCountries();
+      fetchData();
     });
   }
 
@@ -73,14 +73,14 @@ class _CountriesViewState extends State<CountriesView> {
       filter['sortOrder'] = ascending ? 'asc' : 'desc';
       filter['offset'] = 0;
     });
-    fetchCountries();
+    fetchData();
   }
 
   void _changePage(int newPage) {
     setState(() {
       filter['offset'] = newPage * filter['limit'];
     });
-    fetchCountries();
+    fetchData();
   }
 
   void showFlushbarWithRootNavigator(Flushbar flushbar, BuildContext context) {
@@ -91,21 +91,21 @@ class _CountriesViewState extends State<CountriesView> {
     );
   }
 
-  void openCountryForm(Country? country) {
+  void openJobTypeForm(JobType? jobType) {
     setState(() {
       _showForm = true;
-      _countryToEdit = country;
+      jobTypeToEdit = jobType;
     });
   }
 
-  void _closeCountryForm({bool success = false}) {
+  void _closeForm({bool success = false}) {
     setState(() {
       _showForm = false;
-      _countryToEdit = null;
+      jobTypeToEdit = null;
     });
     if (success) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        fetchCountries();
+        fetchData();
       });
     }
   }
@@ -180,15 +180,15 @@ class _CountriesViewState extends State<CountriesView> {
           ),
           if (_showForm)
             GestureDetector(
-              onTap: () => _closeCountryForm(),
+              onTap: () => _closeForm(),
               child: Container(
                 color: Colors.black54,
                 child: Center(
                   child: GestureDetector(
                     onTap: () {},
-                    child: CountryForm(
-                      country: _countryToEdit,
-                      onClose: _closeCountryForm,
+                    child: JobTypeForm(
+                      jobType: jobTypeToEdit,
+                      onClose: _closeForm,
                     ),
                   ),
                 ),
@@ -211,7 +211,7 @@ class _CountriesViewState extends State<CountriesView> {
         padding: const EdgeInsets.only(right: 8),
         child: ElevatedButton.icon(
           onPressed: () {
-            openCountryForm(null); // Open form for adding
+            openJobTypeForm(null); // Open form for adding
           },
           icon: const Icon(Icons.add, size: 16),
           label: const Text('Dodaj'),
@@ -250,7 +250,7 @@ class _CountriesViewState extends State<CountriesView> {
     );
   }
 
-  Widget _buildLeftColumn(BuildContext context, Country country) {
+  Widget _buildLeftColumn(BuildContext context, JobType jobType) {
     return Container(
       width: 150,
       height: 52,
@@ -262,24 +262,24 @@ class _CountriesViewState extends State<CountriesView> {
             child: IconButton(
               icon: const Icon(Icons.edit, color: Colors.blue),
               onPressed: () {
-                openCountryForm(country); // Open form for editing
+                openJobTypeForm(jobType); // Open form for editing
               },
             ),
           ),
           Tooltip(
-            message: country.isDeleted! ? 'Aktiviraj' : 'Deaktiviraj',
+            message: jobType.isDeleted! ? 'Aktiviraj' : 'Deaktiviraj',
             child: IconButton(
               icon: Icon(
-                country.isDeleted! ? Icons.refresh : Icons.delete,
-                color: country.isDeleted! ? Colors.green : Colors.red,
+                jobType.isDeleted! ? Icons.refresh : Icons.delete,
+                color: jobType.isDeleted! ? Colors.green : Colors.red,
               ),
               onPressed: () async {
-                if (country.isDeleted!) {
-                  await _countryProvider.activate(country.id!);
+                if (jobType.isDeleted!) {
+                  await jobTypeProvider.activate(jobType.id!);
                 } else {
-                  await _countryProvider.delete(country.id!);
+                  await jobTypeProvider.delete(jobType.id!);
                 }
-                fetchCountries();
+                fetchData();
               },
             ),
           ),
@@ -288,12 +288,12 @@ class _CountriesViewState extends State<CountriesView> {
     );
   }
 
-  Widget _buildRightColumn(BuildContext context, Country country) {
+  Widget _buildRightColumn(BuildContext context, JobType jobType) {
     return Row(
       children: [
-        _buildCell(Text(country.name ?? '-'), 250),
+        _buildCell(Text(jobType.name ?? '-'), 250),
         _buildCell(
-          RatingBadge(isActive: country.isDeleted!), // Inverted for display logic
+          RatingBadge(isActive: jobType.isDeleted!), // Inverted for display logic
           150,
         ),
       ],

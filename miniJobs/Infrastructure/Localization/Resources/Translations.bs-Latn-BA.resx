@@ -315,4 +315,10 @@
   <data name="COUNTRY_ALREADY_EXIST" xml:space="preserve">
     <value>Država već postoji.</value>
   </data>
+  <data name="CITY_NOT_EXISTS" xml:space="preserve">
+    <value>Tip posla ne postoji.</value>
+  </data>
+  <data name="JOB_TYPE_ALREADY_EXIST" xml:space="preserve">
+    <value>Tip posla već postoji.</value>
+  </data>
 </root>

@@ -6,8 +6,8 @@ namespace Application.JobTypes.Validators;
 
 public class JobTypeInsertCommandValidator : AbstractValidator<JobTypeInsertCommand>
 {
-    private readonly ICityRepository repository;
-    public JobTypeInsertCommandValidator(ICityRepository repository)
+    private readonly IJobTypeRepository repository;
+    public JobTypeInsertCommandValidator(IJobTypeRepository repository)
     {
         RuleFor(x => x.Request.Name).NotEmpty().WithMessage("NAME_IS_REQUIRED");
         this.repository = repository;

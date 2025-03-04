@@ -6,8 +6,9 @@ part 'job_type.g.dart';
 class JobType {
   int? id;
   String? name;
+  bool? isDeleted;
 
-  JobType(this.id, this.name);
+  JobType(this.id, this.name,this.isDeleted);
 
   factory JobType.fromJson(Map<String, dynamic> json) => _$JobTypeFromJson(json);
 
