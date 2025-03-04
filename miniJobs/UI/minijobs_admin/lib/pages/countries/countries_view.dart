@@ -21,6 +21,8 @@ class _CountriesViewState extends State<CountriesView> {
   late CountryProvider _countryProvider;
   List<Country> data = [];
   bool isLoading = true;
+  bool _showForm = false; // Controls visibility of CountryForm
+  Country? _countryToEdit; // Tracks which country to edit (null for new)
 
   Map<String, dynamic> filter = {
     'limit': 10,
@@ -81,14 +83,31 @@ class _CountriesViewState extends State<CountriesView> {
     fetchCountries();
   }
 
-  // Helper function to show flushbar using root navigator
   void showFlushbarWithRootNavigator(Flushbar flushbar, BuildContext context) {
     Navigator.of(context, rootNavigator: true).push(
       FlushbarRoute(
         flushbar: flushbar,
-
       ),
     );
+  }
+
+  void openCountryForm(Country? country) {
+    setState(() {
+      _showForm = true;
+      _countryToEdit = country;
+    });
+  }
+
+  void _closeCountryForm({bool success = false}) {
+    setState(() {
+      _showForm = false;
+      _countryToEdit = null;
+    });
+    if (success) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        fetchCountries();
+      });
+    }
   }
 
   @override
@@ -97,74 +116,84 @@ class _CountriesViewState extends State<CountriesView> {
       appBar: AppBar(
         title: const Text('Države'),
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
+      body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              decoration: const InputDecoration(
-                hintText: 'Pretraži',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
-              ),
-              controller: TextEditingController(
-                text: filter['searchText'],
-              ),
-              onChanged: _debouncedSearch,
-            ),
-          ),
-          Expanded(
-            child: HorizontalDataTable(
-              leftHandSideColumnWidth: 150,
-              rightHandSideColumnWidth: 450,
-              isFixedHeader: true,
-              headerWidgets: _buildHeaders(),
-              leftSideItemBuilder: (context, index) =>
-                  _buildLeftColumn(context, data[index]),
-              rightSideItemBuilder: (context, index) =>
-                  _buildRightColumn(context, data[index]),
-              itemCount: data.length,
-              rowSeparatorWidget:
-              Divider(color: Colors.grey[300], height: 1.0),
-              onScrollControllerReady: (vertical, horizontal) {
-                _verticalScrollController = vertical;
-                _horizontalScrollController = horizontal;
-              },
-              leftHandSideColBackgroundColor: secondaryColor,
-              rightHandSideColBackgroundColor: secondaryColor,
-              itemExtent: 56,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  onPressed: filter['offset'] > 0
-                      ? () => _changePage(
-                      (filter['offset'] / filter['limit']).floor() -
-                          1)
-                      : null,
-                  child: const Text('Prethodna'),
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextField(
+                  decoration: const InputDecoration(
+                    hintText: 'Pretraži',
+                    prefixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(),
+                  ),
+                  controller: TextEditingController(
+                    text: filter['searchText'],
+                  ),
+                  onChanged: _debouncedSearch,
                 ),
-                Text(
-                    'Stranica ${(filter['offset'] / filter['limit']).floor() + 1}'),
-                ElevatedButton(
-                  onPressed:
-                  (filter['offset'] + filter['limit']) < data.length
-                      ? () => _changePage(
-                      (filter['offset'] / filter['limit'])
-                          .floor() +
-                          1)
-                      : null,
-                  child: const Text('Sljedeća'),
+              ),
+              Expanded(
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : HorizontalDataTable(
+                  leftHandSideColumnWidth: 150,
+                  rightHandSideColumnWidth: 450,
+                  isFixedHeader: true,
+                  headerWidgets: _buildHeaders(),
+                  leftSideItemBuilder: (context, index) => _buildLeftColumn(context, data[index]),
+                  rightSideItemBuilder: (context, index) => _buildRightColumn(context, data[index]),
+                  itemCount: data.length,
+                  rowSeparatorWidget: Divider(color: Colors.grey[300], height: 1.0),
+                  onScrollControllerReady: (vertical, horizontal) {
+                    _verticalScrollController = vertical;
+                    _horizontalScrollController = horizontal;
+                  },
+                  leftHandSideColBackgroundColor: secondaryColor,
+                  rightHandSideColBackgroundColor: secondaryColor,
+                  itemExtent: 56,
                 ),
-              ],
-            ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                      onPressed: filter['offset'] > 0
+                          ? () => _changePage((filter['offset'] / filter['limit']).floor() - 1)
+                          : null,
+                      child: const Text('Prethodna'),
+                    ),
+                    Text('Stranica ${(filter['offset'] / filter['limit']).floor() + 1}'),
+                    ElevatedButton(
+                      onPressed: (filter['offset'] + filter['limit']) < data.length
+                          ? () => _changePage((filter['offset'] / filter['limit']).floor() + 1)
+                          : null,
+                      child: const Text('Sljedeća'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
+          if (_showForm)
+            GestureDetector(
+              onTap: () => _closeCountryForm(),
+              child: Container(
+                color: Colors.black54,
+                child: Center(
+                  child: GestureDetector(
+                    onTap: () {}, 
+                    child: CountryForm(
+                      country: _countryToEdit,
+                      onClose: _closeCountryForm,
+                    ),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -182,7 +211,7 @@ class _CountriesViewState extends State<CountriesView> {
         padding: const EdgeInsets.only(right: 8),
         child: ElevatedButton.icon(
           onPressed: () {
-            openCountryForm(context, null, fetchCountries);
+            openCountryForm(null); // Open form for adding
           },
           icon: const Icon(Icons.add, size: 16),
           label: const Text('Dodaj'),
@@ -196,12 +225,10 @@ class _CountriesViewState extends State<CountriesView> {
     ];
   }
 
-  Widget _buildHeaderItem(String label, double width,
-      {bool sortable = false, String? sortField}) {
+  Widget _buildHeaderItem(String label, double width, {bool sortable = false, String? sortField}) {
     return GestureDetector(
       onTap: sortable
-          ? () => _sort(sortField!,
-          filter['sortBy'] != sortField || filter['sortOrder'] == 'desc')
+          ? () => _sort(sortField!, filter['sortBy'] != sortField || filter['sortOrder'] == 'desc')
           : null,
       child: Container(
         width: width,
@@ -213,9 +240,7 @@ class _CountriesViewState extends State<CountriesView> {
             if (sortable)
               Icon(
                 filter['sortBy'] == sortField
-                    ? (filter['sortOrder'] == 'asc'
-                    ? Icons.arrow_upward
-                    : Icons.arrow_downward)
+                    ? (filter['sortOrder'] == 'asc' ? Icons.arrow_upward : Icons.arrow_downward)
                     : Icons.unfold_more,
                 size: 16,
               ),
@@ -237,7 +262,7 @@ class _CountriesViewState extends State<CountriesView> {
             child: IconButton(
               icon: const Icon(Icons.edit, color: Colors.blue),
               onPressed: () {
-                openCountryForm(context, country, fetchCountries);
+                openCountryForm(country); // Open form for editing
               },
             ),
           ),
@@ -268,7 +293,7 @@ class _CountriesViewState extends State<CountriesView> {
       children: [
         _buildCell(Text(country.name ?? '-'), 250),
         _buildCell(
-          RatingBadge(isActive: !country.isDeleted!), // Inverted for display logic
+          RatingBadge(isActive: country.isDeleted!), // Inverted for display logic
           150,
         ),
       ],

@@ -1,14 +1,15 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:minijobs_admin/models/country.dart';
 import 'package:minijobs_admin/providers/country_provider.dart';
 import 'package:provider/provider.dart';
 
-// The CountryForm widget remains unchanged
 class CountryForm extends StatefulWidget {
   final Country? country;
+  final Function({bool success}) onClose;
 
-  const CountryForm({super.key, this.country});
+  const CountryForm({super.key, this.country, required this.onClose});
 
   @override
   _CountryFormState createState() => _CountryFormState();
@@ -17,6 +18,7 @@ class CountryForm extends StatefulWidget {
 class _CountryFormState extends State<CountryForm> {
   final _formKey = GlobalKey<FormBuilderState>();
   late CountryProvider _countryProvider;
+  String? _nameError; // To store the custom error message for the name field
 
   @override
   void didChangeDependencies() {
@@ -46,18 +48,27 @@ class _CountryFormState extends State<CountryForm> {
               children: [
                 FormBuilderTextField(
                   name: 'name',
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Naziv',
-                    labelStyle: TextStyle(fontSize: 14),
-                    border: OutlineInputBorder(),
+                    labelStyle: const TextStyle(fontSize: 14),
+                    border: const OutlineInputBorder(),
+                    errorText: _nameError, // Display custom error message here
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Naziv je obavezno polje';
                     }
-                    return null;
+                    return null; // Default validation; custom error handled separately
                   },
                   style: const TextStyle(fontSize: 12),
+                  onChanged: (_) {
+                    // Clear custom error when user starts typing
+                    if (_nameError != null) {
+                      setState(() {
+                        _nameError = null;
+                      });
+                    }
+                  },
                 ),
               ],
             ),
@@ -66,7 +77,8 @@ class _CountryFormState extends State<CountryForm> {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(context, false),
+          onPressed: () => widget.onClose(success: false),
+          // Close without saving
           child: const Text('Odustani'),
         ),
         ElevatedButton(
@@ -83,46 +95,48 @@ class _CountryFormState extends State<CountryForm> {
                 if (widget.country == null) {
                   var response = await _countryProvider.insert(newCountry);
                   if (response != null && response.id != null) {
-                    Navigator.pop(context, true); // Return true on success
+                    widget.onClose(success: true); // Close with success
                   }
                 } else {
-                  var response = await _countryProvider.update(widget.country!.id!, newCountry);
+                  var response = await _countryProvider.update(
+                      widget.country!.id!, newCountry);
                   if (response != null && response.id != null) {
-                    Navigator.pop(context, true); // Return true on success
+                    widget.onClose(success: true); // Close with success
                   }
                 }
               } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Greška: $e')),
-                );
+                if (e is DioException && e.response != null) {
+                  final responseData = e.response!.data;
+                  if (responseData is Map<String, dynamic>) {
+                    String? errorMessage;
+
+                    // Extract first validation error dynamically
+                    for (var entry in responseData.entries) {
+                      if (entry.value is List && entry.value.isNotEmpty) {
+                        errorMessage = entry.value.first; // Take the first error message
+                        break;
+                      }
+                    }
+
+                    if (errorMessage != null) {
+                      setState(() {
+                        _nameError = errorMessage;
+                        _formKey.currentState?.fields['name']?.invalidate(_nameError!);
+                      });
+                      return;
+                    }
+                  }
+                }
+
+
               }
+
             }
-          },
+            },
+
           child: const Text('Spasi'),
         ),
       ],
     );
   }
-}
-
-// Helper function to open CountryForm without showDialog
-void openCountryForm(BuildContext context, Country? country, Function fetchCountries) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => Scaffold(
-        
-        body: Center(
-          child: CountryForm(country: country),
-        ),
-      ),
-      fullscreenDialog: true, // Makes it behave like a dialog
-    ),
-  ).then((value) {
-    if (value == true) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        fetchCountries();
-      });
-    }
-  });
 }

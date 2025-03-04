@@ -25,7 +25,7 @@ public class CountryUpdateCommandValidator : AbstractValidator<CountryUpdateComm
     private async Task<bool> ValidateExistenceOfEntity(CountryUpdateCommand command)
     {
         var model = await repository.TryFindAsync(command.Request.Id);
-        ExceptionExtension.Validate("COUNTRY_NOT_EXISTS", () => model == null);
+        ExceptionExtension.Validate("M", () => model == null);
 
         return true;
     }

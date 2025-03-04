@@ -314,4 +314,10 @@
   <data name="CAN_NOT_ACTIVATE_ANOTHER_USER" xml:space="preserve">
     <value>Ne možete aktivirati drugog korisnika.</value>
   </data>
+  <data name="COUNTRY_NOT_EXISTS" xml:space="preserve">
+    <value>Država ne postoji</value>
+  </data>
+  <data name="COUNTRY_ALREADY_EXIST" xml:space="preserve">
+    <value>Država već postoji.</value>
+  </data>
 </root>
