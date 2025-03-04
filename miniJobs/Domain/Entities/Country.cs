@@ -11,4 +11,7 @@ public class Country : IEntity<int>
 
     [Column("name")]
     public string Name { get; set; }
+
+    [Column("is_deleted")]
+    public bool IsDeleted { get; set; }
 }

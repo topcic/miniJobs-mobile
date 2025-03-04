@@ -1,9 +1,7 @@
 ﻿using Application.Common.Models;
-using Application.Jobs.Commands;
 using Application.Ratings.Commands;
 using Domain.Entities;
 using Domain.Interfaces;
-using Infrastructure.Persistence.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Application.Cities.Handlers;
 
-internal class CityInsertCommandHandler(ICityRepository repository) : IRequestHandler<CityInsertCommand, City>
+sealed class CityInsertCommandHandler(ICityRepository repository) : IRequestHandler<CityInsertCommand, City>
 {
     public async Task<City> Handle(CityInsertCommand command, CancellationToken cancellationToken)
     {

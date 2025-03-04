@@ -1,6 +1,6 @@
 ﻿using Application.Cities.Commands;
 using Application.Cities.Queries;
-using Application.Jobs.Queries;
+using Application.Common.Models;
 using Domain.Entities;
 using Domain.Interfaces;
 using MediatR;
@@ -12,6 +12,19 @@ namespace WebAPI.Controllers;
 [Route("api/cities")]
 public class CitiesController(IMediator mediator,ICityRepository cityRepository) : ControllerBase
 {
+    [HttpGet("search")]
+    [Authorize(Roles = "Administrator")]
+    [ProducesResponseType(typeof(SearchResponseBase<City>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> SearchAsync([FromQuery] Dictionary<string, string> parammeters)
+    {
+        var results = new SearchResponseBase<City>();
+
+        results.Result = await cityRepository.FindPaginationAsync(parammeters);
+        results.Count = await cityRepository.CountAsync(parammeters);
+        return Ok(results);
+    }
 
     [AllowAnonymous]
     [HttpGet("")]
@@ -37,7 +50,7 @@ public class CitiesController(IMediator mediator,ICityRepository cityRepository)
     [ProducesResponseType(typeof(City), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> ActivateJob([FromRoute] int cityId)
+    public async Task<IActionResult> Activate([FromRoute] int cityId)
     {
         return Ok(await mediator.Send(new CityActivateCommand(cityId)));
     }
@@ -57,7 +70,7 @@ public class CitiesController(IMediator mediator,ICityRepository cityRepository)
     [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> FindJob([FromRoute] int cityId)
+    public async Task<IActionResult> Get([FromRoute] int cityId)
     {
         return Ok(await cityRepository.TryFindAsync(cityId));
     }
@@ -66,7 +79,7 @@ public class CitiesController(IMediator mediator,ICityRepository cityRepository)
     [ProducesResponseType(typeof(City), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UpdateStep1([FromRoute] int cityId, [FromBody] City request)
+    public async Task<IActionResult> Update([FromRoute] int cityId, [FromBody] City request)
     {
         request.Id = cityId;
         return Ok(await mediator.Send(new CityUpdateCommand(request)));

@@ -5,6 +5,7 @@ import 'package:minijobs_admin/pages/main/constants.dart';
 import 'package:minijobs_admin/providers/applicant_provider.dart';
 import 'package:minijobs_admin/providers/authentication_provider.dart';
 import 'package:minijobs_admin/providers/city_provider.dart';
+import 'package:minijobs_admin/providers/country_provider.dart';
 import 'package:minijobs_admin/providers/employer_provider.dart';
 import 'package:minijobs_admin/providers/job_application_provider.dart';
 import 'package:minijobs_admin/providers/job_provider.dart';
@@ -44,6 +45,8 @@ void main() async {
       ChangeNotifierProvider(create: (s) => StatisticProvider()),
       ChangeNotifierProvider(create: (s) => ReportProvider()),
       ChangeNotifierProvider(create: (s) => SavedJobProvider()),
+      ChangeNotifierProvider(create: (s) => CountryProvider()),
+
     ],
     child: const MyApp(),
   ));

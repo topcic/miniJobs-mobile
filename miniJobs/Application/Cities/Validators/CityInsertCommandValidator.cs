@@ -1,5 +1,4 @@
 ﻿using Application.Cities.Commands;
-using Domain.Entities;
 using Domain.Interfaces;
 using FluentValidation;
 
@@ -16,7 +15,7 @@ public class CityInsertCommandValidator : AbstractValidator<CityInsertCommand>
     }
     private async Task<bool> ValidateEntity(CityInsertCommand data)
     {
-            return await repository.FindOneAsync(x => x.Name == data.Request.Name) == null;
+            return await repository.FindOneAsync(x => x.Name == data.Request.Name && x.CountryId==data.Request.CountryId) == null;
 
     }
 }

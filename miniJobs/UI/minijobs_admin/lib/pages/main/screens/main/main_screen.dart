@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:minijobs_admin/pages/countries/countries_view.dart';
 import 'package:minijobs_admin/pages/job-applications/job_applications_view.dart';
 import 'package:minijobs_admin/pages/ratings/rating_view.dart';
 import 'package:minijobs_admin/pages/saved_jobs/saved_jobs_view.dart';
@@ -23,7 +24,8 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   Widget _selectedScreen = const DashboardScreen(); // Default screen
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>(); // Key to control drawer
+  final GlobalKey<ScaffoldState> _scaffoldKey =
+      GlobalKey<ScaffoldState>(); // Key to control drawer
 
   void _setSelectedScreen(Widget screen) {
     setState(() {
@@ -38,7 +40,8 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bool isMobile = MediaQuery.of(context).size.width < 850; // Define breakpoint for mobile
+    bool isMobile =
+        MediaQuery.of(context).size.width < 850; // Define breakpoint for mobile
 
     return Scaffold(
       key: _scaffoldKey,
@@ -79,10 +82,10 @@ class _MainScreenState extends State<MainScreen> {
             IconButton(
               icon: const Icon(Icons.menu, color: Colors.white),
               onPressed: () {
-                _scaffoldKey.currentState?.openDrawer(); // Open drawer on mobile
+                _scaffoldKey.currentState
+                    ?.openDrawer(); // Open drawer on mobile
               },
             ),
-
         ],
       ),
     );
@@ -98,21 +101,44 @@ class _MainScreenState extends State<MainScreen> {
           DrawerHeader(
             child: Image.asset("assets/images/logo.png"),
           ),
-          _buildMenuItem("Dashboard", FontAwesomeIcons.tachometerAlt, const DashboardScreen()),
-          _buildMenuItem("Poslodavci", FontAwesomeIcons.building, const EmployersView()),
-          _buildMenuItem("Aplikanti", FontAwesomeIcons.users, const ApplicantsView()),
-          _buildMenuItem("Poslovi", FontAwesomeIcons.briefcase, const JobsView()),
-          _buildMenuItem("Aplikacije", FontAwesomeIcons.fileAlt, const JobApplicationsView()),
-          _buildMenuItem("Ocjene", FontAwesomeIcons.star, const RatingsView()),
-          _buildMenuItem("Preporuke", FontAwesomeIcons.thumbsUp, const JobRecommendationsView()),
-          _buildMenuItem("Spašeni poslovi", FontAwesomeIcons.bookmark, const SavedJobsView()),
+          _buildMenuItem("Dashboard", FontAwesomeIcons.tachometerAlt,
+              const DashboardScreen()),
           ExpansionTile(
-            leading: const Icon(FontAwesomeIcons.chartBar, color: Colors.white54),
-            title: const Text("Izvještaji", style: TextStyle(color: Colors.white54)),
+            leading:
+                const Icon(FontAwesomeIcons.cogs , color: Colors.white54),
+            title: const Text("Generalne postavke",
+                style: TextStyle(color: Colors.white54)),
             children: [
-              _buildMenuItem("Izvještaj o ocjenama", FontAwesomeIcons.star, const RatingReportsPage()),
-              _buildMenuItem("Izvještaj o aplikacijama", FontAwesomeIcons.fileAlt, const JobApplicationReportsPage()),
-              _buildMenuItem("Izvještaj o poslovima", FontAwesomeIcons.suitcase, const JobReportsPage()),
+              _buildMenuItem("Države", FontAwesomeIcons.globe,
+                  const CountriesView()),
+
+            ],
+          ),
+          _buildMenuItem(
+              "Poslodavci", FontAwesomeIcons.building, const EmployersView()),
+          _buildMenuItem(
+              "Aplikanti", FontAwesomeIcons.users, const ApplicantsView()),
+          _buildMenuItem(
+              "Poslovi", FontAwesomeIcons.briefcase, const JobsView()),
+          _buildMenuItem("Aplikacije", FontAwesomeIcons.fileAlt,
+              const JobApplicationsView()),
+          _buildMenuItem("Ocjene", FontAwesomeIcons.star, const RatingsView()),
+          _buildMenuItem("Preporuke", FontAwesomeIcons.thumbsUp,
+              const JobRecommendationsView()),
+          _buildMenuItem("Spašeni poslovi", FontAwesomeIcons.bookmark,
+              const SavedJobsView()),
+          ExpansionTile(
+            leading:
+                const Icon(FontAwesomeIcons.chartBar, color: Colors.white54),
+            title: const Text("Izvještaji",
+                style: TextStyle(color: Colors.white54)),
+            children: [
+              _buildMenuItem("Izvještaj o ocjenama", FontAwesomeIcons.star,
+                  const RatingReportsPage()),
+              _buildMenuItem("Izvještaj o aplikacijama",
+                  FontAwesomeIcons.fileAlt, const JobApplicationReportsPage()),
+              _buildMenuItem("Izvještaj o poslovima", FontAwesomeIcons.suitcase,
+                  const JobReportsPage()),
             ],
           ),
         ],

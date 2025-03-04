@@ -50,7 +50,15 @@ public abstract class GenericRepository<TEntity, T, TContext> : IGenericReposito
 
     public async Task UpdateAsync(TEntity entity)
     {
-        DbSet.Update(entity);
+        var existingEntry = Context.ChangeTracker.Entries<TEntity>()
+             .FirstOrDefault(e => e.Entity.Id.Equals(entity.Id));
+
+        if (existingEntry != null)
+        {
+            Context.Entry(existingEntry.Entity).State = EntityState.Detached;
+        }
+
+        Context.Entry(entity).State = EntityState.Modified;
         await Context.SaveChangesAsync();
     }
 
@@ -69,9 +77,11 @@ public abstract class GenericRepository<TEntity, T, TContext> : IGenericReposito
     {
         var query = DbSet.AsQueryable();
 
-        if (parameters != null && parameters.TryGetValue("searchText", out string searchText))
+        var queryParameters = _mapper.Map<QueryParametersDto>(parameters);
+
+        if (!string.IsNullOrEmpty(queryParameters.SearchText))
         {
-            query = ApplySearchFilter(query, searchText);
+            query = ApplySearchFilter(query, queryParameters.SearchText);
         }
 
         return await query.CountAsync();

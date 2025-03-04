@@ -9,6 +9,6 @@ public class JobTypeFindAllQueryHandler(IJobTypeRepository jobTypeRepository) : 
 {
     public async Task<IEnumerable<JobType>> Handle(JobTypeFindAllQuery request, CancellationToken cancellationToken)
     {
-        return await jobTypeRepository.FindAllAsync();
+        return  jobTypeRepository.Find(x=>x.IsDeleted==false);
     }
 }
