@@ -12,6 +12,7 @@ City _$CityFromJson(Map<String, dynamic> json) => City(
       (json['countryId'] as num?)?.toInt(),
       json['municipalityCode'] as String?,
       json['postcode'] as String?,
+      json['isDeleted'] as bool?,
       json['countryName'] as String?,
     );
 
@@ -21,4 +22,5 @@ Map<String, dynamic> _$CityToJson(City instance) => <String, dynamic>{
       'countryId': instance.countryId,
       'municipalityCode': instance.municipalityCode,
       'postcode': instance.postcode,
+      'isDeleted': instance.isDeleted,
     };

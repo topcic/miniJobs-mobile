@@ -212,34 +212,39 @@ class _EmployersViewState extends State<EmployersView> {
       alignment: Alignment.center,
       child: Row(
         children: [
-          IconButton(
-            icon: const Icon(Icons.edit, color: Colors.blue),
-            onPressed: () =>
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        EmployerDetailsPage(id: employer.id!),
-                  ),
+          Tooltip(
+            message: "Detalji",
+            child: IconButton(
+              icon: const Icon(Icons.edit, color: Colors.blue),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EmployerDetailsPage(id: employer.id!),
                 ),
-          ),
-          IconButton(
-            icon: Icon(
-              employer.deleted! ? Icons.refresh : Icons.block,
-              color: employer.deleted! ? Colors.green : Colors.red,
+              ),
             ),
-            onPressed: () {
-              if (employer.deleted!) {
-                _showActivateConfirmation(context, employer);
-              } else {
-                _showBlockConfirmation(context, employer);
-              }
-            },
+          ),
+          Tooltip(
+            message: employer.deleted! ? "Aktiviraj" : "Blokiraj",
+            child: IconButton(
+              icon: Icon(
+                employer.deleted! ? Icons.refresh : Icons.block,
+                color: employer.deleted! ? Colors.green : Colors.red,
+              ),
+              onPressed: () {
+                if (employer.deleted!) {
+                  _showActivateConfirmation(context, employer);
+                } else {
+                  _showBlockConfirmation(context, employer);
+                }
+              },
+            ),
           ),
         ],
       ),
     );
   }
+
 
   Widget _buildRightColumn(BuildContext context, Employer employer) {
     final fullName = employer.name?.isNotEmpty == true

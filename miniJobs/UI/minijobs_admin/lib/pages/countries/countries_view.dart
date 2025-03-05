@@ -5,7 +5,7 @@ import 'package:horizontal_data_table/horizontal_data_table.dart';
 import 'package:minijobs_admin/models/country.dart';
 import 'package:minijobs_admin/pages/main/constants.dart';
 import 'package:provider/provider.dart';
-import 'package:another_flushbar/flushbar.dart'; // Add this import for Flushbar
+import 'package:another_flushbar/flushbar.dart';
 import '../../providers/country_provider.dart';
 import '../../widgets/badges.dart';
 import 'country_form.dart';
@@ -23,6 +23,7 @@ class _CountriesViewState extends State<CountriesView> {
   bool isLoading = true;
   bool _showForm = false; // Controls visibility of CountryForm
   Country? _countryToEdit; // Tracks which country to edit (null for new)
+  int totalCount = 0; // To track total number of items from the server
 
   Map<String, dynamic> filter = {
     'limit': 10,
@@ -51,7 +52,8 @@ class _CountriesViewState extends State<CountriesView> {
     final result = await _countryProvider.searchPublic(filter);
 
     setState(() {
-      data = result.result!;
+      data = result.result ?? []; // Use ?? to handle null result
+      totalCount = result.count ?? 0; // Assuming searchPublic returns a count
       isLoading = false;
     });
   }
@@ -61,7 +63,7 @@ class _CountriesViewState extends State<CountriesView> {
     _debounce = Timer(const Duration(milliseconds: 500), () {
       setState(() {
         filter['searchText'] = keyword;
-        filter['offset'] = 0;
+        filter['offset'] = 0; // Reset to first page on search
       });
       fetchCountries();
     });
@@ -111,6 +113,12 @@ class _CountriesViewState extends State<CountriesView> {
   }
 
   @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -128,10 +136,7 @@ class _CountriesViewState extends State<CountriesView> {
                     prefixIcon: Icon(Icons.search),
                     border: OutlineInputBorder(),
                   ),
-                  controller: TextEditingController(
-                    text: filter['searchText'],
-                  ),
-                  onChanged: _debouncedSearch,
+                  onChanged: _debouncedSearch, // Directly use debounced search
                 ),
               ),
               Expanded(
@@ -142,10 +147,13 @@ class _CountriesViewState extends State<CountriesView> {
                   rightHandSideColumnWidth: 450,
                   isFixedHeader: true,
                   headerWidgets: _buildHeaders(),
-                  leftSideItemBuilder: (context, index) => _buildLeftColumn(context, data[index]),
-                  rightSideItemBuilder: (context, index) => _buildRightColumn(context, data[index]),
+                  leftSideItemBuilder: (context, index) =>
+                      _buildLeftColumn(context, data[index]),
+                  rightSideItemBuilder: (context, index) =>
+                      _buildRightColumn(context, data[index]),
                   itemCount: data.length,
-                  rowSeparatorWidget: Divider(color: Colors.grey[300], height: 1.0),
+                  rowSeparatorWidget:
+                  Divider(color: Colors.grey[300], height: 1.0),
                   onScrollControllerReady: (vertical, horizontal) {
                     _verticalScrollController = vertical;
                     _horizontalScrollController = horizontal;
@@ -162,14 +170,17 @@ class _CountriesViewState extends State<CountriesView> {
                   children: [
                     ElevatedButton(
                       onPressed: filter['offset'] > 0
-                          ? () => _changePage((filter['offset'] / filter['limit']).floor() - 1)
+                          ? () => _changePage(
+                          (filter['offset'] / filter['limit']).floor() - 1)
                           : null,
                       child: const Text('Prethodna'),
                     ),
-                    Text('Stranica ${(filter['offset'] / filter['limit']).floor() + 1}'),
+                    Text(
+                        'Stranica ${(filter['offset'] / filter['limit']).floor() + 1} od ${(totalCount / filter['limit']).ceil()}'),
                     ElevatedButton(
-                      onPressed: (filter['offset'] + filter['limit']) < data.length
-                          ? () => _changePage((filter['offset'] / filter['limit']).floor() + 1)
+                      onPressed: (filter['offset'] + filter['limit']) < totalCount
+                          ? () => _changePage(
+                          (filter['offset'] / filter['limit']).floor() + 1)
                           : null,
                       child: const Text('Sljedeća'),
                     ),
@@ -225,10 +236,12 @@ class _CountriesViewState extends State<CountriesView> {
     ];
   }
 
-  Widget _buildHeaderItem(String label, double width, {bool sortable = false, String? sortField}) {
+  Widget _buildHeaderItem(String label, double width,
+      {bool sortable = false, String? sortField}) {
     return GestureDetector(
       onTap: sortable
-          ? () => _sort(sortField!, filter['sortBy'] != sortField || filter['sortOrder'] == 'desc')
+          ? () => _sort(sortField!,
+          filter['sortBy'] != sortField || filter['sortOrder'] == 'desc')
           : null,
       child: Container(
         width: width,
@@ -240,7 +253,9 @@ class _CountriesViewState extends State<CountriesView> {
             if (sortable)
               Icon(
                 filter['sortBy'] == sortField
-                    ? (filter['sortOrder'] == 'asc' ? Icons.arrow_upward : Icons.arrow_downward)
+                    ? (filter['sortOrder'] == 'asc'
+                    ? Icons.arrow_upward
+                    : Icons.arrow_downward)
                     : Icons.unfold_more,
                 size: 16,
               ),
@@ -294,7 +309,7 @@ class _CountriesViewState extends State<CountriesView> {
         _buildCell(Text(country.name ?? '-'), 250),
         _buildCell(
           RatingBadge(isActive: country.isDeleted!), // Inverted for display logic
-          150,
+          100,
         ),
       ],
     );

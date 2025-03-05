@@ -9,11 +9,12 @@ class City {
   int? countryId;
   String? municipalityCode;
   String? postcode;
+  bool? isDeleted;
   String? countryName;
 
 
   City(this.id, this.name, this.countryId, this.municipalityCode,
-      this.postcode,this.countryName);
+      this.postcode,this.isDeleted,this.countryName);
 
   factory City.fromJson(Map<String, dynamic> json) => _$CityFromJson(json);
 

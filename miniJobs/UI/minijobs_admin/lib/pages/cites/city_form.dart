@@ -180,7 +180,7 @@ class _CityFormState extends State<CityForm> {
                    formData['name'],
                    int.parse(formData['countryId']),
                    formData['municipalityCode'],
-                   formData['postcode'],''
+                   formData['postcode'],widget.city?.isDeleted ?? false,''
                 );
 
                 // Assuming you have a CityProvider

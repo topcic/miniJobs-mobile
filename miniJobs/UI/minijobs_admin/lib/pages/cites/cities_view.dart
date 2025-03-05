@@ -7,6 +7,7 @@ import 'package:minijobs_admin/pages/main/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:another_flushbar/flushbar.dart';
 import '../../providers/city_provider.dart';
+import '../../widgets/badges.dart';
 import 'city_form.dart';
 
 class CitiesView extends StatefulWidget {
@@ -22,6 +23,7 @@ class _CitiesViewState extends State<CitiesView> {
   bool isLoading = true;
   bool _showForm = false; // Controls visibility of CityForm
   City? _cityToEdit; // Tracks which city to edit (null for new)
+  int totalCount = 0; // To track total number of items from the server
 
   Map<String, dynamic> filter = {
     'limit': 10,
@@ -51,6 +53,7 @@ class _CitiesViewState extends State<CitiesView> {
 
     setState(() {
       data = result.result ?? [];
+      totalCount = result.count ?? 0; // Assuming searchPublic returns a count
       isLoading = false;
     });
   }
@@ -60,7 +63,7 @@ class _CitiesViewState extends State<CitiesView> {
     _debounce = Timer(const Duration(milliseconds: 500), () {
       setState(() {
         filter['searchText'] = keyword;
-        filter['offset'] = 0;
+        filter['offset'] = 0; // Reset to first page on search
       });
       fetchCities();
     });
@@ -110,6 +113,12 @@ class _CitiesViewState extends State<CitiesView> {
   }
 
   @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -127,10 +136,7 @@ class _CitiesViewState extends State<CitiesView> {
                     prefixIcon: Icon(Icons.search),
                     border: OutlineInputBorder(),
                   ),
-                  controller: TextEditingController(
-                    text: filter['searchText'],
-                  ),
-                  onChanged: _debouncedSearch,
+                  onChanged: _debouncedSearch, // Directly use debounced search
                 ),
               ),
               Expanded(
@@ -138,7 +144,7 @@ class _CitiesViewState extends State<CitiesView> {
                     ? const Center(child: CircularProgressIndicator())
                     : HorizontalDataTable(
                   leftHandSideColumnWidth: 150,
-                  rightHandSideColumnWidth: 650,
+                  rightHandSideColumnWidth: 750,
                   isFixedHeader: true,
                   headerWidgets: _buildHeaders(),
                   leftSideItemBuilder: (context, index) =>
@@ -146,7 +152,8 @@ class _CitiesViewState extends State<CitiesView> {
                   rightSideItemBuilder: (context, index) =>
                       _buildRightColumn(context, data[index]),
                   itemCount: data.length,
-                  rowSeparatorWidget: Divider(color: Colors.grey[300], height: 1.0),
+                  rowSeparatorWidget:
+                  Divider(color: Colors.grey[300], height: 1.0),
                   onScrollControllerReady: (vertical, horizontal) {
                     _verticalScrollController = vertical;
                     _horizontalScrollController = horizontal;
@@ -163,14 +170,17 @@ class _CitiesViewState extends State<CitiesView> {
                   children: [
                     ElevatedButton(
                       onPressed: filter['offset'] > 0
-                          ? () => _changePage((filter['offset'] / filter['limit']).floor() - 1)
+                          ? () => _changePage(
+                          (filter['offset'] / filter['limit']).floor() - 1)
                           : null,
                       child: const Text('Prethodna'),
                     ),
-                    Text('Stranica ${(filter['offset'] / filter['limit']).floor() + 1}'),
+                    Text(
+                        'Stranica ${(filter['offset'] / filter['limit']).floor() + 1} od ${(totalCount / filter['limit']).ceil()}'),
                     ElevatedButton(
-                      onPressed: (filter['offset'] + filter['limit']) < data.length
-                          ? () => _changePage((filter['offset'] / filter['limit']).floor() + 1)
+                      onPressed: (filter['offset'] + filter['limit']) < totalCount
+                          ? () => _changePage(
+                          (filter['offset'] / filter['limit']).floor() + 1)
                           : null,
                       child: const Text('Sljedeća'),
                     ),
@@ -206,6 +216,7 @@ class _CitiesViewState extends State<CitiesView> {
       _buildHeaderItem('Naziv', 250, sortable: true, sortField: 'name'),
       _buildHeaderItem('Država', 200, sortable: true, sortField: 'countryId'),
       _buildHeaderItem('Poštanski broj', 120, sortable: true, sortField: 'postcode'),
+      _buildHeaderItem('Status', 100, sortable: true, sortField: 'isDeleted'),
       Container(
         width: 100,
         height: 56,
@@ -227,10 +238,12 @@ class _CitiesViewState extends State<CitiesView> {
     ];
   }
 
-  Widget _buildHeaderItem(String label, double width, {bool sortable = false, String? sortField}) {
+  Widget _buildHeaderItem(String label, double width,
+      {bool sortable = false, String? sortField}) {
     return GestureDetector(
       onTap: sortable
-          ? () => _sort(sortField!, filter['sortBy'] != sortField || filter['sortOrder'] == 'desc')
+          ? () => _sort(sortField!,
+          filter['sortBy'] != sortField || filter['sortOrder'] == 'desc')
           : null,
       child: Container(
         width: width,
@@ -242,7 +255,9 @@ class _CitiesViewState extends State<CitiesView> {
             if (sortable)
               Icon(
                 filter['sortBy'] == sortField
-                    ? (filter['sortOrder'] == 'asc' ? Icons.arrow_upward : Icons.arrow_downward)
+                    ? (filter['sortOrder'] == 'asc'
+                    ? Icons.arrow_upward
+                    : Icons.arrow_downward)
                     : Icons.unfold_more,
                 size: 16,
               ),
@@ -269,11 +284,18 @@ class _CitiesViewState extends State<CitiesView> {
             ),
           ),
           Tooltip(
-            message: 'Obriši grad',
+            message: city.isDeleted! ? 'Aktiviraj' : 'Deaktiviraj',
             child: IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
+              icon: Icon(
+                city.isDeleted! ? Icons.refresh : Icons.delete,
+                color: city.isDeleted! ? Colors.green : Colors.red,
+              ),
               onPressed: () async {
-                await _cityProvider.delete(city.id!);
+                if (city.isDeleted!) {
+                  await _cityProvider.activate(city.id!);
+                } else {
+                  await _cityProvider.delete(city.id!);
+                }
                 fetchCities();
               },
             ),
@@ -288,7 +310,11 @@ class _CitiesViewState extends State<CitiesView> {
       children: [
         _buildCell(Text(city.name ?? '-'), 250),
         _buildCell(Text(city.countryName ?? '-'), 200),
-        _buildCell(Text(city.postcode ?? '-'), 100),
+        _buildCell(Text(city.postcode ?? '-'), 120),
+        _buildCell(
+          RatingBadge(isActive: city.isDeleted ?? false), // Inverted for display logic
+          100,
+        ),
       ],
     );
   }

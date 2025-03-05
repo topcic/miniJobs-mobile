@@ -223,34 +223,39 @@ class _ApplicantsViewState extends State<ApplicantsView> {
       alignment: Alignment.center,
       child: Row(
         children: [
-          IconButton(
-            icon: const Icon(Icons.edit, color: Colors.blue),
-            onPressed: () =>
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        ApplicantDetailsPage(id: applicant.id!),
-                  ),
+          Tooltip(
+            message: "Detalji",
+            child: IconButton(
+              icon: const Icon(Icons.edit, color: Colors.blue),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ApplicantDetailsPage(id: applicant.id!),
                 ),
-          ),
-          IconButton(
-            icon: Icon(
-              applicant.deleted! ? Icons.refresh : Icons.block,
-              color: applicant.deleted! ? Colors.green : Colors.red,
+              ),
             ),
-            onPressed: () {
-              if (applicant.deleted!) {
-                activateUser(applicant.id!);
-              } else {
-                blockUser(applicant.id!);
-              }
-            },
+          ),
+          Tooltip(
+            message: applicant.deleted! ? "Aktiviraj" : "Blokiraj",
+            child: IconButton(
+              icon: Icon(
+                applicant.deleted! ? Icons.refresh : Icons.block,
+                color: applicant.deleted! ? Colors.green : Colors.red,
+              ),
+              onPressed: () {
+                if (applicant.deleted!) {
+                  activateUser(applicant.id!);
+                } else {
+                  blockUser(applicant.id!);
+                }
+              },
+            ),
           ),
         ],
       ),
     );
   }
+
 
   Widget _buildRightColumn(BuildContext context, Applicant applicant) {
     return Row(
