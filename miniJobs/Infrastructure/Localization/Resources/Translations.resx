@@ -326,4 +326,7 @@
   <data name="JOB_TYPE_ALREADY_EXIST" xml:space="preserve">
     <value>Tip posla već postoji.</value>
   </data>
+  <data name="CITY_ALREADY_EXIST" xml:space="preserve">
+    <value>Grad već postoji.</value>
+  </data>
 </root>

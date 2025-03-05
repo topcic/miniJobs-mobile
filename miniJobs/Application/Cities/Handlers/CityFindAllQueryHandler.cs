@@ -14,8 +14,7 @@ public class CityFindAllQueryHandler(ICityRepository cityRepository,
 
         foreach (var city in cities)
         {
-            if (city.CountryId.HasValue)
-                city.Country = await countryRepository.TryFindAsync(city.CountryId.Value);
+                city.CountryName =( await countryRepository.TryFindAsync(city.CountryId)).Name;
         }
 
         return cities;

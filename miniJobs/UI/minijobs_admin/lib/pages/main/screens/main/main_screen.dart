@@ -7,6 +7,7 @@ import 'package:minijobs_admin/pages/ratings/rating_view.dart';
 import 'package:minijobs_admin/pages/saved_jobs/saved_jobs_view.dart';
 
 import '../../../applicants/applicants_view.dart';
+import '../../../cites/cities_view.dart';
 import '../../../employers/employers_view.dart';
 import '../../../job-recommendations/job-recommendations_view.dart';
 import '../../../jobs/jobs_view.dart';
@@ -112,6 +113,8 @@ class _MainScreenState extends State<MainScreen> {
             children: [
               _buildMenuItem("Države", FontAwesomeIcons.globe,
                   const CountriesView()),
+              _buildMenuItem("Gradovi", FontAwesomeIcons.city  ,
+                  const CitiesView()),
               _buildMenuItem("Tipovi posla", FontAwesomeIcons.briefcase ,
                   const JobTypesView()),
 

@@ -7,12 +7,13 @@ class City {
   int? id;
   String? name;
   int? countryId;
-  int? cantonId;
   String? municipalityCode;
-  String? postCode;
+  String? postcode;
+  String? countryName;
 
-  City(this.id, this.name, this.countryId, this.cantonId, this.municipalityCode,
-      this.postCode);
+
+  City(this.id, this.name, this.countryId, this.municipalityCode,
+      this.postcode,this.countryName);
 
   factory City.fromJson(Map<String, dynamic> json) => _$CityFromJson(json);
 

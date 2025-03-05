@@ -37,7 +37,7 @@ public class CityRepository(ApplicationDbContext context, IMapper mapper) : Gene
                         Postcode = c.Postcode,
                         MunicipalityCode = c.MunicipalityCode,
                         CountryId = c.CountryId,
-                        Country = country
+                        CountryName = country.Name
                     };
 
         // Filtering by search text

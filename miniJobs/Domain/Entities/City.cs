@@ -13,16 +13,16 @@ public class City : IEntity<int>
     public string Name { get; set; }
 
     [Column("postcode")]
-    public string Postcode { get; set; }
+    public string? Postcode { get; set; }
 
     [Column("municipality_code")]
-    public string MunicipalityCode { get; set; }
+    public string? MunicipalityCode { get; set; }
 
     [Column("country_id")]
-    public int? CountryId { get; set; }
+    public int CountryId { get; set; }
 
     [NotMapped]
-    public Country Country { get; set; }
+    public string CountryName { get; set; }
 
     [Column("is_deleted")]
     public bool IsDeleted { get; set; }
