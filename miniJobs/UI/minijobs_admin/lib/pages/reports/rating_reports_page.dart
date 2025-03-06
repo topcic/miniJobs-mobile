@@ -1,8 +1,14 @@
+import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:file_picker/file_picker.dart';
 import 'package:minijobs_admin/pages/reports/rating_info_card.dart';
 import '../../models/rating.dart';
 import '../../providers/report_provider.dart';
+import 'package:flutter/rendering.dart';
 
 class RatingReportsPage extends StatefulWidget {
   const RatingReportsPage({super.key});
@@ -26,6 +32,14 @@ class _RatingReportsPageState extends State<RatingReportsPage> {
   List<Map<String, dynamic>> worstRatedEmployers = [];
   List<Map<String, dynamic>> worstRatedApplicants = [];
 
+  // Global keys for capturing charts
+  final GlobalKey barChartKey = GlobalKey();
+  final GlobalKey pieChartKey = GlobalKey();
+  final GlobalKey topEmployersChartKey = GlobalKey();
+  final GlobalKey topApplicantsChartKey = GlobalKey();
+  final GlobalKey worstEmployersChartKey = GlobalKey();
+  final GlobalKey worstApplicantsChartKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -39,9 +53,9 @@ class _RatingReportsPageState extends State<RatingReportsPage> {
 
       // Average Ratings Calculation
       var employerRatings =
-          activeRatings.where((r) => r.ratedUserRole == 'Employer');
+      activeRatings.where((r) => r.ratedUserRole == 'Employer');
       var applicantRatings =
-          activeRatings.where((r) => r.ratedUserRole == 'Applicant');
+      activeRatings.where((r) => r.ratedUserRole == 'Applicant');
 
       if (employerRatings.isNotEmpty) {
         averageEmployerRating =
@@ -89,7 +103,7 @@ class _RatingReportsPageState extends State<RatingReportsPage> {
     }
 
     List<Map<String, dynamic>> averagedRatings =
-        groupedRatings.entries.map((entry) {
+    groupedRatings.entries.map((entry) {
       double avgRating =
           entry.value.map((r) => r.value).reduce((a, b) => a + b) /
               entry.value.length;
@@ -106,59 +120,183 @@ class _RatingReportsPageState extends State<RatingReportsPage> {
     return averagedRatings.take(5).toList();
   }
 
+  Future<Uint8List?> _captureChart(GlobalKey key) async {
+    try {
+      RenderRepaintBoundary? boundary =
+      key.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      if (boundary == null) return null;
+      var image = await boundary.toImage(pixelRatio: 3.0);
+      ByteData? byteData = await image.toByteData(format: ImageByteFormat.png);
+      return byteData?.buffer.asUint8List();
+    } catch (e) {
+      print("Error capturing chart: $e");
+      return null;
+    }
+  }
+
+  void _exportToPdf() async {
+    final pdf = pw.Document();
+
+    // Capture chart images
+    Uint8List? barChartImage = await _captureChart(barChartKey);
+    Uint8List? pieChartImage = await _captureChart(pieChartKey);
+    Uint8List? topEmployersChartImage = await _captureChart(topEmployersChartKey);
+    Uint8List? topApplicantsChartImage = await _captureChart(topApplicantsChartKey);
+    Uint8List? worstEmployersChartImage = await _captureChart(worstEmployersChartKey);
+    Uint8List? worstApplicantsChartImage = await _captureChart(worstApplicantsChartKey);
+
+    pdf.addPage(
+      pw.MultiPage(
+        build: (context) => [
+          pw.Text(
+            'Izvjestaji - ocjene',
+            style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
+          ),
+          pw.SizedBox(height: 20),
+          pw.Text('Ukupan broj ocjena: ${ratings.length}'),
+          pw.SizedBox(height: 20),
+          pw.Text('Prosjecna ocjena poslodavaca: ${averageEmployerRating.toStringAsFixed(2)}'),
+          pw.SizedBox(height: 10),
+          pw.Text('Prosjecna ocjena aplikanata: ${averageApplicantRating.toStringAsFixed(2)}'),
+          pw.SizedBox(height: 20),
+
+          // Rating Distribution Bar Chart
+          pw.Text('Distribucija ocjena'),
+          if (barChartImage != null)
+            pw.Image(pw.MemoryImage(barChartImage), height: 200),
+          pw.SizedBox(height: 20),
+
+          // Active vs Inactive Pie Chart
+          pw.Text('Omjer aktivnih i neaktivnih ocjena'),
+          if (pieChartImage != null)
+            pw.Image(pw.MemoryImage(pieChartImage), height: 200),
+          pw.SizedBox(height: 20),
+
+          // Top Rated Employers Bar Chart
+          pw.Text('Najbolje ocjenjeni poslodavci'),
+          if (topEmployersChartImage != null)
+            pw.Image(pw.MemoryImage(topEmployersChartImage), height: 200),
+          pw.SizedBox(height: 20),
+
+          // Top Rated Applicants Bar Chart
+          pw.Text('Najbolje ocjenjeni aplikanti'),
+          if (topApplicantsChartImage != null)
+            pw.Image(pw.MemoryImage(topApplicantsChartImage), height: 200),
+          pw.SizedBox(height: 20),
+
+          // Worst Rated Employers Bar Chart
+          pw.Text('Najlosije ocjenjeni poslodavci'),
+          if (worstEmployersChartImage != null)
+            pw.Image(pw.MemoryImage(worstEmployersChartImage), height: 200),
+          pw.SizedBox(height: 20),
+
+          // Worst Rated Applicants Bar Chart
+          pw.Text('Najlosije ocjenjeni aplikanti'),
+          if (worstApplicantsChartImage != null)
+            pw.Image(pw.MemoryImage(worstApplicantsChartImage), height: 200),
+        ],
+      ),
+    );
+
+    final result = await FilePicker.platform.saveFile(
+      dialogTitle: 'Save PDF Report',
+      fileName: 'rating_reports.pdf',
+      allowedExtensions: ['pdf'],
+    );
+
+    if (result != null) {
+      final file = File(result);
+      await file.writeAsBytes(await pdf.save());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Izvještaji o ocjenama')),
+      appBar: AppBar(
+        title: const Text('Izvještaji o ocjenama'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf),
+            onPressed: _exportToPdf,
+            tooltip: 'Export to PDF',
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: isLoading
             ? const Center(child: CircularProgressIndicator())
             : errorMessage != null
-                ? Center(
-                    child: Text(errorMessage!,
-                        style: const TextStyle(color: Colors.red)))
-                : SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        const Text("Prosječne ocjene",
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 20),
-                        _buildAverageRating(context),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        const Text("Ocjene pregled",
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold)),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        _buildBarChart(),
-                        const Padding(
-                          padding: EdgeInsets.only(bottom: 8.0),
-                          child: Text("Omjer aktivnih i nekativnih ocjena",
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        _buildPieChart(),
-                        _buildTopRatedUsersChart(
-                            "Najbolje ocjenjeni poslodavci", topRatedEmployers),
-                        _buildTopRatedUsersChart(
-                            "Najbolje ocjenjeni aplikanti", topRatedApplicants),
-                        _buildTopRatedUsersChart(
-                            "Najlošije ocjenjeni poslodavci",
-                            worstRatedEmployers),
-                        _buildTopRatedUsersChart(
-                            "Najlošije ocjenjeni aplikanti",
-                            worstRatedApplicants),
-                      ],
-                    ),
+            ? Center(
+            child: Text(errorMessage!,
+                style: const TextStyle(color: Colors.red)))
+            : SingleChildScrollView(
+          child: Column(
+            children: [
+              const Text(
+                "Prosječne ocjene",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue, // Blue header
+                ),
+              ),
+              const SizedBox(height: 20),
+              _buildAverageRating(context),
+              const SizedBox(height: 20),
+              const Text(
+                "Ocjene pregled",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue, // Blue header
+                ),
+              ),
+              const SizedBox(height: 20),
+              RepaintBoundary(
+                key: barChartKey,
+                child: _buildBarChart(),
+              ),
+              const Padding(
+                padding: EdgeInsets.only(top: 8.0),
+                child: Text(
+                  "Omjer aktivnih i neaktivnih ocjena",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue, // Blue header
                   ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              RepaintBoundary(
+                key: pieChartKey,
+                child: _buildPieChart(),
+              ),
+              RepaintBoundary(
+                key: topEmployersChartKey,
+                child: _buildTopRatedUsersChart(
+                    "Najbolje ocjenjeni poslodavci", topRatedEmployers),
+              ),
+              RepaintBoundary(
+                key: topApplicantsChartKey,
+                child: _buildTopRatedUsersChart(
+                    "Najbolje ocjenjeni aplikanti", topRatedApplicants),
+              ),
+              RepaintBoundary(
+                key: worstEmployersChartKey,
+                child: _buildTopRatedUsersChart(
+                    "Najlošije ocjenjeni poslodavci", worstRatedEmployers),
+              ),
+              RepaintBoundary(
+                key: worstApplicantsChartKey,
+                child: _buildTopRatedUsersChart(
+                    "Najlošije ocjenjeni aplikanti", worstRatedApplicants),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -169,36 +307,36 @@ class _RatingReportsPageState extends State<RatingReportsPage> {
 
     return isDesktop
         ? Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              RatingInfoCard(
-                title: "Prosj. ocjena poslodavaca",
-                rating: averageEmployerRating,
-                icon: Icons.star,
-              ),
-              const SizedBox(width: 16),
-              RatingInfoCard(
-                title: "Prosječna ocjena aplikanata",
-                rating: averageApplicantRating,
-                icon: Icons.star,
-              ),
-            ],
-          )
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        RatingInfoCard(
+          title: "Prosj. ocjena poslodavaca",
+          rating: averageEmployerRating,
+          icon: Icons.star,
+        ),
+        const SizedBox(width: 16),
+        RatingInfoCard(
+          title: "Prosječna ocjena aplikanata",
+          rating: averageApplicantRating,
+          icon: Icons.star,
+        ),
+      ],
+    )
         : Column(
-            children: [
-              RatingInfoCard(
-                title: "Prosječna ocjena poslodavaca",
-                rating: averageEmployerRating,
-                icon: Icons.star,
-              ),
-              const SizedBox(height: 16),
-              RatingInfoCard(
-                title: "Prosj. ocjena aplikanata",
-                rating: averageApplicantRating,
-                icon: Icons.star,
-              ),
-            ],
-          );
+      children: [
+        RatingInfoCard(
+          title: "Prosječna ocjena poslodavaca",
+          rating: averageEmployerRating,
+          icon: Icons.star,
+        ),
+        const SizedBox(height: 16),
+        RatingInfoCard(
+          title: "Prosj. ocjena aplikanata",
+          rating: averageApplicantRating,
+          icon: Icons.star,
+        ),
+      ],
+    );
   }
 
   Widget _buildBarChart() {
@@ -211,10 +349,57 @@ class _RatingReportsPageState extends State<RatingReportsPage> {
               x: entry.key,
               barRods: [
                 BarChartRodData(
-                    toY: entry.value.toDouble(), color: Colors.blue, width: 20)
+                  toY: entry.value.toDouble(),
+                  color: Colors.blue,
+                  width: 20,
+                ),
               ],
             );
           }).toList(),
+          titlesData: FlTitlesData(
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 40,
+                getTitlesWidget: (double value, TitleMeta meta) {
+                  return SideTitleWidget(
+                    axisSide: meta.axisSide,
+                    child: Text(
+                      value.toInt().toString(),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.blue, // Blue labels
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (double value, TitleMeta meta) {
+                  int rating = value.toInt();
+                  if (rating >= 1 && rating <= 5) {
+                    return SideTitleWidget(
+                      axisSide: meta.axisSide,
+                      child: Text(
+                        rating.toString(),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.blue, // Blue labels
+                        ),
+                      ),
+                    );
+                  }
+                  return Container();
+                },
+                reservedSize: 40,
+              ),
+            ),
+            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          ),
         ),
       ),
     );
@@ -230,6 +415,12 @@ class _RatingReportsPageState extends State<RatingReportsPage> {
               title: '${entry.key} (${entry.value.toInt()})',
               value: entry.value,
               color: entry.key == "Aktivne" ? Colors.green : Colors.red,
+              radius: 60,
+              titleStyle: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue, // Blue labels
+              ),
             );
           }).toList(),
         ),
@@ -237,27 +428,45 @@ class _RatingReportsPageState extends State<RatingReportsPage> {
     );
   }
 
-  Widget _buildTopRatedUsersChart(
-      String title, List<Map<String, dynamic>> users) {
+  Widget _buildTopRatedUsersChart(String title, List<Map<String, dynamic>> users) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
-          child: Text(title,
-              style:
-                  const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          padding: const EdgeInsets.only(top: 8.0),
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.blue, // Blue header
+            ),
+          ),
         ),
-        const SizedBox(
-          height: 30,
-        ),
+        const SizedBox(height: 30),
         SizedBox(
           height: 250,
           child: BarChart(
             BarChartData(
               titlesData: FlTitlesData(
-                leftTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: true, reservedSize: 40)),
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 40,
+                    getTitlesWidget: (double value, TitleMeta meta) {
+                      return SideTitleWidget(
+                        axisSide: meta.axisSide,
+                        child: Text(
+                          value.toStringAsFixed(1),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.blue, // Blue labels
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
                 bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
@@ -268,7 +477,10 @@ class _RatingReportsPageState extends State<RatingReportsPage> {
                           angle: -0.5, // Slight rotation for better readability
                           child: Text(
                             users[index]["fullName"],
-                            style: const TextStyle(fontSize: 12),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.blue, // Blue labels
+                            ),
                           ),
                         );
                       }
@@ -277,19 +489,18 @@ class _RatingReportsPageState extends State<RatingReportsPage> {
                     reservedSize: 100, // Ensures space for rotated names
                   ),
                 ),
-                topTitles:
-                    const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles:
-                    const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               ),
               barGroups: users.asMap().entries.map((entry) {
                 return BarChartGroupData(
                   x: entry.key,
                   barRods: [
                     BarChartRodData(
-                        toY: entry.value["averageRating"],
-                        color: Colors.orange,
-                        width: 20)
+                      toY: entry.value["averageRating"],
+                      color: Colors.orange,
+                      width: 20,
+                    ),
                   ],
                 );
               }).toList(),
