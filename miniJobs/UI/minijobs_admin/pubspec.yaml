@@ -68,6 +68,7 @@ dependencies:
   horizontal_data_table: ^4.3.1
   google_fonts: ^6.2.1
   fl_chart: ^0.68.0
+  pdf: ^3.11.3
 
 dev_dependencies:
   flutter_test:
