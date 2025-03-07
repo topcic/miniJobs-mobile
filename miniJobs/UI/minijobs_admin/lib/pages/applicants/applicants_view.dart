@@ -250,13 +250,14 @@ class _ApplicantsViewState extends State<ApplicantsView> {
               ),
               onPressed: () {
                 if (applicant.deleted!) {
-                  activateUser(applicant.id!);
+                  _showActivateConfirmation(context, applicant);
                 } else {
-                  blockUser(applicant.id!);
+                  _showBlockConfirmation(context, applicant);
                 }
               },
             ),
           ),
+
         ],
       ),
     );
@@ -285,6 +286,53 @@ class _ApplicantsViewState extends State<ApplicantsView> {
       height: 52,
       alignment: Alignment.centerLeft,
       child: content,
+    );
+  }
+  void _showBlockConfirmation(BuildContext context,Applicant user) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Blokiraj'),
+        content: Text(
+            'Da li ste sigurni da želite blokirati ${user.firstName} ${user.lastName}?'),
+        actions: [
+          TextButton(
+            child: const Text('Odustani'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          TextButton(
+            child: const Text('Blokiraj'),
+            onPressed: () {
+              blockUser(user.id!);
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showActivateConfirmation(BuildContext context, Applicant user) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Aktiviraj'),
+        content: Text(
+            'Da li ste sigurni da želite aktivirati ${user.firstName} ${user.lastName}?'),
+        actions: [
+          TextButton(
+            child: const Text('Odustani'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          TextButton(
+            child: const Text('Aktiviraj'),
+            onPressed: () {
+              activateUser(user.id!);
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
     );
   }
 }

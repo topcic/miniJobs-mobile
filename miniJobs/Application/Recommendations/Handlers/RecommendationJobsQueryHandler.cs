@@ -1,7 +1,6 @@
 ﻿using Application.Common.Interfaces;
 using Application.Recommendations.Queries;
 using Domain.Dtos;
-using Domain.Entities;
 using MediatR;
 
 sealed class RecommendationJobsQueryHandler(IRecommendationService recommendationService) : IRequestHandler<RecommendationJobsQuery, IEnumerable<JobCardDTO>>

@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:minijobs_mobile/enumerations/job_statuses.dart';
 import 'package:minijobs_mobile/enumerations/role.dart';
@@ -10,6 +11,7 @@ import 'package:minijobs_mobile/providers/job_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../../../providers/job_application_provider.dart';
+import '../employer_profile_page.dart';
 
 class JobModal extends StatefulWidget {
   final int jobId;
@@ -209,10 +211,24 @@ class _JobModalState extends State<JobModal> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          "${job.employerFullName} - ${job.city!.name}, ${job.streetAddressAndNumber}",
+                          "${job.employerFullName} - ${job.city!.name}, ${job.streetAddressAndNumber} }",
                           style: const TextStyle(fontSize: 14),
                         ),
                       ),
+                      if (GetStorage().read('role') == 'Applicant') // Show info icon only for applicants
+                        IconButton(
+                          icon: const Icon(Icons.info_outline),
+                          onPressed: () {
+                            // Navigate to EmployerDetailsPage with employerId (assuming job has employerId)
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => EmployerProfilePage(
+                                  userId: job.createdBy!, // Replace with actual employer ID field from your Job model
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                     ],
                   ),
                   const SizedBox(height: 10),

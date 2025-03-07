@@ -1,11 +1,11 @@
 ﻿BEGIN TRANSACTION;
 
--- Declare variables
+
 DECLARE @UserId INT;
 DECLARE @ApplicantId INT;
 DECLARE @EmployerId INT;
 
--- Create 10 Applicants
+
 DECLARE @i INT = 1;
 WHILE @i <= 10
 BEGIN
@@ -19,7 +19,7 @@ BEGIN
             CONCAT('Applicant', @i), 
             CONCAT('User', @i), 
             @ApplicantEmail, 
-            CONVERT(VARCHAR(32), HASHBYTES('MD5', CAST(NEWID() AS VARCHAR(36))), 2), -- Random password hash
+            CONVERT(VARCHAR(32), HASHBYTES('MD5', CAST(NEWID() AS VARCHAR(36))), 2), 
             0, 0, 1, GETUTCDATE(), 
             CONCAT('+387 6', ABS(CHECKSUM(NEWID())) % 1000000), 
             ABS(CHECKSUM(NEWID())) % 50 + 1
@@ -36,7 +36,7 @@ BEGIN
     SET @i = @i + 1;
 END
 
--- Create 10 Employers
+
 SET @i = 1;
 WHILE @i <= 10
 BEGIN
@@ -77,19 +77,13 @@ SELECT
     ABS(CHECKSUM(NEWID())) % 5 AS status, -- Random 0 to 4
     ABS(CHECKSUM(NEWID())) % 10 + 1 AS required_employees,
     DATEADD(DAY, -ABS(CHECKSUM(NEWID())) % 10, GETUTCDATE()) AS created, -- Random date within last 10 days
-    e.id AS created_by, -- Randomly pick from all employers for each job
+    14 + (ABS(CHECKSUM(NEWID())) % 10) AS created_by, -- Random ID between 14 and 23
     CASE WHEN RAND() > 0.3 THEN ABS(CHECKSUM(NEWID())) % 100 + 1 ELSE NULL END AS wage,
     ABS(CHECKSUM(NEWID())) % 50 + 1 AS city_id,
     ABS(CHECKSUM(NEWID())) % 20 + 1 AS job_type_id,
     0
-FROM (SELECT TOP 50 ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS n FROM master..spt_values a CROSS JOIN master..spt_values b) n
-CROSS APPLY (
-    SELECT TOP 1 u.id
-    FROM users u
-    JOIN user_roles ur ON u.id = ur.user_id
-    WHERE ur.role_id = 'Employer'
-    ORDER BY NEWID() -- Random employer for each job
-) e;
+FROM (SELECT TOP 50 ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS n FROM master..spt_values a CROSS JOIN master..spt_values b) n;
+
 
 -- Insert Job Questions for all 50 jobs (3 questions per job: IDs 1, 2, 3)
 INSERT INTO job_questions (question_id, job_id)
