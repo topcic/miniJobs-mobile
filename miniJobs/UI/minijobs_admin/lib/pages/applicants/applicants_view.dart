@@ -22,6 +22,7 @@ class _ApplicantsViewState extends State<ApplicantsView> {
   late UserProvider userProvider;
   List<Applicant> data = [];
   bool isLoading = true;
+  int totalCount = 0; // Added to track total number of items
 
   // Pagination and filtering parameters
   Map<String, dynamic> filter = {
@@ -55,6 +56,7 @@ class _ApplicantsViewState extends State<ApplicantsView> {
 
     setState(() {
       data = result.result!;
+      totalCount = result.count ?? 0; // Assuming searchPublic returns a count
       isLoading = false;
     });
   }
@@ -136,12 +138,13 @@ class _ApplicantsViewState extends State<ApplicantsView> {
               rightSideItemBuilder: (context, index) =>
                   _buildRightColumn(context, data[index]),
               itemCount: data.length,
-              rowSeparatorWidget: Divider(color: Colors.grey[300], height: 1.0),
+              rowSeparatorWidget:
+              Divider(color: Colors.grey[300], height: 1.0),
               onScrollControllerReady: (vertical, horizontal) {
                 _verticalScrollController = vertical;
                 _horizontalScrollController = horizontal;
               },
-              leftHandSideColBackgroundColor:secondaryColor,
+              leftHandSideColBackgroundColor: secondaryColor,
               rightHandSideColBackgroundColor: secondaryColor,
               itemExtent: 56,
             ),
@@ -154,19 +157,20 @@ class _ApplicantsViewState extends State<ApplicantsView> {
               children: [
                 ElevatedButton(
                   onPressed: filter['offset'] > 0
-                      ? () =>
-                      _changePage(
-                          (filter['offset'] / filter['limit']).floor() - 1)
+                      ? () => _changePage(
+                      (filter['offset'] / filter['limit']).floor() -
+                          1)
                       : null,
                   child: const Text('Prethodna'),
                 ),
                 Text(
-                    'Stranica ${(filter['offset'] / filter['limit']).floor() + 1}'),
+                    'Stranica ${(filter['offset'] / filter['limit']).floor() + 1} od ${(totalCount / filter['limit']).ceil()}'), // Updated to show total pages
                 ElevatedButton(
-                  onPressed: (filter['offset'] + filter['limit']) < data.length
-                      ? () =>
-                      _changePage(
-                          (filter['offset'] / filter['limit']).floor() + 1)
+                  onPressed: (filter['offset'] + filter['limit']) <
+                      totalCount // Fixed condition
+                      ? () => _changePage(
+                      (filter['offset'] / filter['limit']).floor() +
+                          1)
                       : null,
                   child: const Text('Sljedeća'),
                 ),
@@ -181,9 +185,10 @@ class _ApplicantsViewState extends State<ApplicantsView> {
   List<Widget> _buildHeaders() {
     return [
       _buildHeaderItem('Akcije', 150),
-      _buildHeaderItem('Ime i Prezime', 200, sortable: true, sortField: 'firstName'),
+      _buildHeaderItem('Ime i Prezime', 200,
+          sortable: true, sortField: 'firstName'),
       _buildHeaderItem('Email', 300, sortable: true, sortField: 'email'),
-      _buildHeaderItem('Broj Telefona', 150,),
+      _buildHeaderItem('Broj Telefona', 150),
       _buildHeaderItem('Status', 150, sortable: true, sortField: 'deleted'),
     ];
   }
@@ -192,8 +197,8 @@ class _ApplicantsViewState extends State<ApplicantsView> {
       {bool sortable = false, String? sortField}) {
     return GestureDetector(
       onTap: sortable
-          ? () =>
-          _sort(sortField!, filter['sortBy'] != sortField || filter['sortOrder'] == 'desc')
+          ? () => _sort(sortField!,
+          filter['sortBy'] != sortField || filter['sortOrder'] == 'desc')
           : null,
       child: Container(
         width: width,
@@ -205,7 +210,9 @@ class _ApplicantsViewState extends State<ApplicantsView> {
             if (sortable)
               Icon(
                 filter['sortBy'] == sortField
-                    ? (filter['sortOrder'] == 'asc' ? Icons.arrow_upward : Icons.arrow_downward)
+                    ? (filter['sortOrder'] == 'asc'
+                    ? Icons.arrow_upward
+                    : Icons.arrow_downward)
                     : Icons.unfold_more,
                 size: 16,
               ),
@@ -214,7 +221,6 @@ class _ApplicantsViewState extends State<ApplicantsView> {
       ),
     );
   }
-
 
   Widget _buildLeftColumn(BuildContext context, Applicant applicant) {
     return Container(
@@ -256,7 +262,6 @@ class _ApplicantsViewState extends State<ApplicantsView> {
     );
   }
 
-
   Widget _buildRightColumn(BuildContext context, Applicant applicant) {
     return Row(
       children: [
@@ -270,7 +275,6 @@ class _ApplicantsViewState extends State<ApplicantsView> {
         _buildCell(Text(applicant.email ?? '-'), 300),
         _buildCell(Text(applicant.phoneNumber ?? '-'), 150),
         _buildCell(UserStatusBadge(isBlocked: applicant.deleted!), 150),
-        // Pass the badge widget
       ],
     );
   }
@@ -280,7 +284,7 @@ class _ApplicantsViewState extends State<ApplicantsView> {
       width: width,
       height: 52,
       alignment: Alignment.centerLeft,
-      child: content, // Directly use the widget here
+      child: content,
     );
   }
 }

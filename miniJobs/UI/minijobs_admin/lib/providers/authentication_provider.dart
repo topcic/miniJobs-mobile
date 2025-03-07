@@ -17,7 +17,7 @@ class AuthenticationProvider extends BaseProvider<AuthTokenResponse> {
     return AuthTokenResponse.fromJson(data);
   }
 
-  Future<bool> tokens(AuthCodeRequest request) async {
+  Future<bool?> tokens(AuthCodeRequest request) async {
     try {
       var url = "${baseUrl}tokens";
       var dio = Dio();
@@ -49,6 +49,21 @@ class AuthenticationProvider extends BaseProvider<AuthTokenResponse> {
 
       var tokenDecoded = JwtDecoder.decode(result.accessToken!);
 
+      // Check the role before proceeding
+      String? role;
+      tokenDecoded.forEach((key, value) {
+        if (key.endsWith('claims/role')) {
+          role = value;
+        }
+      });
+
+      // If role is not "Administrator," return null without writing to storage
+      if (role != "Administrator") {
+        print('Access denied: Role is not Administrator');
+        return null;
+      }
+
+      // If role is "Administrator," proceed with writing to storage
       tokenDecoded.forEach((key, value) {
         if (key.endsWith('claims/role')) {
           GetStorage().write('role', value);

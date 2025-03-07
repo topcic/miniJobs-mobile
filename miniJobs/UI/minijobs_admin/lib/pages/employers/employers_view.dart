@@ -22,6 +22,7 @@ class _EmployersViewState extends State<EmployersView> {
   late UserProvider userProvider;
   List<Employer> data = [];
   bool isLoading = true;
+  int totalCount = 0; // Added to track total number of items
 
   Map<String, dynamic> filter = {
     'limit': 10,
@@ -52,6 +53,7 @@ class _EmployersViewState extends State<EmployersView> {
 
     setState(() {
       data = result.result!;
+      totalCount = result.count ?? 0; // Assuming searchPublic returns a count
       isLoading = false;
     });
   }
@@ -132,13 +134,14 @@ class _EmployersViewState extends State<EmployersView> {
               rightSideItemBuilder: (context, index) =>
                   _buildRightColumn(context, data[index]),
               itemCount: data.length,
-              rowSeparatorWidget: Divider(color: Colors.grey[300], height: 1.0),
+              rowSeparatorWidget:
+              Divider(color: Colors.grey[300], height: 1.0),
               onScrollControllerReady: (vertical, horizontal) {
                 _verticalScrollController = vertical;
                 _horizontalScrollController = horizontal;
               },
               leftHandSideColBackgroundColor: secondaryColor,
-              rightHandSideColBackgroundColor:secondaryColor,
+              rightHandSideColBackgroundColor: secondaryColor,
               itemExtent: 56,
             ),
           ),
@@ -149,14 +152,20 @@ class _EmployersViewState extends State<EmployersView> {
               children: [
                 ElevatedButton(
                   onPressed: filter['offset'] > 0
-                      ? () => _changePage((filter['offset'] / filter['limit']).floor() - 1)
+                      ? () => _changePage(
+                      (filter['offset'] / filter['limit']).floor() -
+                          1)
                       : null,
                   child: const Text('Prethodna'),
                 ),
-                Text('Stranica ${(filter['offset'] / filter['limit']).floor() + 1}'),
+                Text(
+                    'Stranica ${(filter['offset'] / filter['limit']).floor() + 1} od ${(totalCount / filter['limit']).ceil()}'), // Updated to show total pages
                 ElevatedButton(
-                  onPressed: (filter['offset'] + filter['limit']) < data.length
-                      ? () => _changePage((filter['offset'] / filter['limit']).floor() + 1)
+                  onPressed: (filter['offset'] + filter['limit']) <
+                      totalCount // Fixed condition
+                      ? () => _changePage(
+                      (filter['offset'] / filter['limit']).floor() +
+                          1)
                       : null,
                   child: const Text('Sljedeća'),
                 ),
@@ -183,7 +192,8 @@ class _EmployersViewState extends State<EmployersView> {
       {bool sortable = false, String? sortField}) {
     return GestureDetector(
       onTap: sortable
-          ? () => _sort(sortField!, filter['sortBy'] != sortField || filter['sortOrder'] == 'desc')
+          ? () => _sort(sortField!,
+          filter['sortBy'] != sortField || filter['sortOrder'] == 'desc')
           : null,
       child: Container(
         width: width,
@@ -195,7 +205,9 @@ class _EmployersViewState extends State<EmployersView> {
             if (sortable)
               Icon(
                 filter['sortBy'] == sortField
-                    ? (filter['sortOrder'] == 'asc' ? Icons.arrow_upward : Icons.arrow_downward)
+                    ? (filter['sortOrder'] == 'asc'
+                    ? Icons.arrow_upward
+                    : Icons.arrow_downward)
                     : Icons.unfold_more,
                 size: 16,
               ),
@@ -244,7 +256,6 @@ class _EmployersViewState extends State<EmployersView> {
       ),
     );
   }
-
 
   Widget _buildRightColumn(BuildContext context, Employer employer) {
     final fullName = employer.name?.isNotEmpty == true
