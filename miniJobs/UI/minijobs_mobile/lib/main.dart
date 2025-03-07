@@ -3,6 +3,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:minijobs_mobile/pages/auth/login_sign_up_page.dart';
 import 'package:minijobs_mobile/providers/applicant_provider.dart';
 import 'package:minijobs_mobile/providers/authentication_provider.dart';
+import 'package:minijobs_mobile/providers/base_provider.dart';
 import 'package:minijobs_mobile/providers/city_provider.dart';
 import 'package:minijobs_mobile/providers/employer_provider.dart';
 import 'package:minijobs_mobile/providers/job_application_provider.dart';
@@ -14,11 +15,14 @@ import 'package:minijobs_mobile/providers/rating_provider.dart';
 import 'package:minijobs_mobile/providers/recommendation_provider.dart';
 import 'package:minijobs_mobile/providers/user_registration_provider.dart';
 import 'package:minijobs_mobile/providers/user_provider.dart';
+import 'package:minijobs_mobile/services/config_service.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
+  await ConfigService().init();           // Initialize ConfigService
+  await BaseProvider.initializeBaseUrl(); // Initialize BaseProvider base URL
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => AuthenticationProvider()),
@@ -33,7 +37,7 @@ void main() async {
       ChangeNotifierProvider(create: (s) => RatingProvider()),
       ChangeNotifierProvider(create: (s) => JobApplicationProvider()),
       ChangeNotifierProvider(create: (s) => JobRecommendationProvider()),
-      ChangeNotifierProvider(create: (s) => RecommendationProvider())
+      ChangeNotifierProvider(create: (s) => RecommendationProvider()),
     ],
     child: const MyApp(),
   ));

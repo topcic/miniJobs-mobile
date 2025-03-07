@@ -4,6 +4,7 @@ import 'package:minijobs_admin/pages/auth/login_page.dart';
 import 'package:minijobs_admin/pages/main/constants.dart';
 import 'package:minijobs_admin/providers/applicant_provider.dart';
 import 'package:minijobs_admin/providers/authentication_provider.dart';
+import 'package:minijobs_admin/providers/base_provider.dart';
 import 'package:minijobs_admin/providers/city_provider.dart';
 import 'package:minijobs_admin/providers/country_provider.dart';
 import 'package:minijobs_admin/providers/employer_provider.dart';
@@ -19,6 +20,7 @@ import 'package:minijobs_admin/providers/saved_job_provider.dart';
 import 'package:minijobs_admin/providers/statistic_provider.dart';
 import 'package:minijobs_admin/providers/user_registration_provider.dart';
 import 'package:minijobs_admin/providers/user_provider.dart';
+import 'package:minijobs_admin/services/config_service.dart';
 import 'package:minijobs_admin/services/notification.service.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -26,32 +28,32 @@ import 'package:google_fonts/google_fonts.dart';
 import 'controllers/menu_app_controller.dart';
 void main() async {
   await GetStorage.init();
+  await ConfigService().init();
+  await BaseProvider.initializeBaseUrl();
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => AuthenticationProvider()),
-      ChangeNotifierProvider(create: (s) => UserProvider()),
-      ChangeNotifierProvider(create: (s) => CityProvider()),
-      ChangeNotifierProvider(create: (s) => UserRegistrationProvider()),
-      ChangeNotifierProvider(create: (s) => JobTypeProvider()),
-      ChangeNotifierProvider(create: (s) => ProposedAnswerProvider()),
-      ChangeNotifierProvider(create: (s) => JobProvider()),
-      ChangeNotifierProvider(create: (s) => ApplicantProvider()),
-      ChangeNotifierProvider(create: (s) => EmployerProvider()),
-      ChangeNotifierProvider(create: (s) => RatingProvider()),
-      ChangeNotifierProvider(create: (s) => JobApplicationProvider()),
-      ChangeNotifierProvider(create: (s) => JobRecommendationProvider()),
-      ChangeNotifierProvider(create: (s) => RecommendationProvider()),
-      ChangeNotifierProvider(create: (s) => MenuAppController()),
-      ChangeNotifierProvider(create: (s) => StatisticProvider()),
-      ChangeNotifierProvider(create: (s) => ReportProvider()),
-      ChangeNotifierProvider(create: (s) => SavedJobProvider()),
-      ChangeNotifierProvider(create: (s) => CountryProvider()),
-
+      ChangeNotifierProvider(create: (_) => UserProvider()),
+      ChangeNotifierProvider(create: (_) => CityProvider()),
+      ChangeNotifierProvider(create: (_) => UserRegistrationProvider()),
+      ChangeNotifierProvider(create: (_) => JobTypeProvider()),
+      ChangeNotifierProvider(create: (_) => ProposedAnswerProvider()),
+      ChangeNotifierProvider(create: (_) => JobProvider()),
+      ChangeNotifierProvider(create: (_) => ApplicantProvider()),
+      ChangeNotifierProvider(create: (_) => EmployerProvider()),
+      ChangeNotifierProvider(create: (_) => RatingProvider()),
+      ChangeNotifierProvider(create: (_) => JobApplicationProvider()),
+      ChangeNotifierProvider(create: (_) => JobRecommendationProvider()),
+      ChangeNotifierProvider(create: (_) => RecommendationProvider()),
+      ChangeNotifierProvider(create: (_) => MenuAppController()),
+      ChangeNotifierProvider(create: (_) => StatisticProvider()),
+      ChangeNotifierProvider(create: (_) => ReportProvider()),
+      ChangeNotifierProvider(create: (_) => SavedJobProvider()),
+      ChangeNotifierProvider(create: (_) => CountryProvider()),
     ],
     child: const MyApp(),
   ));
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

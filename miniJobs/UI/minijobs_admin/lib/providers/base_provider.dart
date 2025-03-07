@@ -1,29 +1,27 @@
-
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-
+import '../services/config_service.dart';
 import '../services/notification.service.dart';
 
 abstract class BaseProvider<T> with ChangeNotifier {
   static String? _baseUrl;
   String _endpoint = "";
   final GetStorage _getStorage = GetStorage();
-  final notificationService = NotificationService();
+  final NotificationService notificationService = NotificationService();
   late final Dio _dio;
 
   BaseProvider(String endpoint) {
     _endpoint = endpoint;
-    _baseUrl = const String.fromEnvironment(//10.0.2.2 //http://localhost:5020/
-      "baseUrl",
-      defaultValue: "http://localhost:7126/api/",
-    );
-
+    // Check if _baseUrl is null and throw an exception if it is
+    if (_baseUrl == null) {
+      throw Exception('Base URL is not initialized. Ensure BaseProvider.initializeBaseUrl() is called in main.dart.');
+    }
     _dio = Dio(BaseOptions(
       baseUrl: _baseUrl!,
       responseType: ResponseType.json,
-      contentType: "application/json"
+      contentType: "application/json",
     ));
     _dio.options.headers["Accept-Language"] = "bs";
 
@@ -36,7 +34,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
         if (token != null) {
           options.headers["Authorization"] = "Bearer $token";
         }
-        handler.next(options); // ensure the request continues
+        handler.next(options); // Ensure the request continues
       },
       onError: (error, handler) async {
         if (error.response?.statusCode == 401) {
@@ -62,6 +60,15 @@ abstract class BaseProvider<T> with ChangeNotifier {
     ));
   }
 
+  // Static method to initialize _baseUrl globally
+  static Future<void> initializeBaseUrl() async {
+    if (_baseUrl == null) {
+      final config = ConfigService();
+      await config.init();
+      _baseUrl = config.getBaseUrl();
+    }
+  }
+
   Dio get dio => _dio;
 
   Future<String?> refreshToken() async {
@@ -77,7 +84,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
       return newAccessToken;
     } catch (err) {
       _getStorage.erase();
-      // Get.offAllNamed(Route.login);
+      // Get.offAllNamed(Route.login); // Uncomment if using GetX navigation
     }
     return null;
   }
@@ -89,6 +96,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
       List<T> dataList = responseData.map((item) => fromJson(item)).toList();
       return dataList;
     } catch (err) {
+      handleError(err);
       throw Exception(err.toString());
     }
   }
@@ -99,23 +107,34 @@ abstract class BaseProvider<T> with ChangeNotifier {
       var response = await _dio.get(url);
       return fromJson(response.data);
     } catch (err) {
+      handleError(err);
       throw Exception(err.toString());
     }
   }
 
   Future<T?> insert(dynamic request) async {
     var jsonRequest = jsonEncode(request);
-    var response = await _dio.post(_endpoint, data: jsonRequest);
-    notificationService.success("Uspješno ste dodali.");
-    return fromJson(response.data);
+    try {
+      var response = await _dio.post(_endpoint, data: jsonRequest);
+      notificationService.success("Uspješno ste dodali.");
+      return fromJson(response.data);
+    } catch (err) {
+      handleError(err);
+      throw Exception(err.toString());
+    }
   }
 
   Future<T> update(int id, [dynamic request]) async {
     var url = "$_endpoint/$id";
     var jsonRequest = jsonEncode(request);
-    var response = await _dio.put(url, data: jsonRequest);
-    notificationService.success("Uspješno ste spasili promjene.");
-    return fromJson(response.data);
+    try {
+      var response = await _dio.put(url, data: jsonRequest);
+      notificationService.success("Uspješno ste spasili promjene.");
+      return fromJson(response.data);
+    } catch (err) {
+      handleError(err);
+      throw Exception(err.toString());
+    }
   }
 
   Future<void> delete(int id) async {
@@ -124,9 +143,11 @@ abstract class BaseProvider<T> with ChangeNotifier {
       await _dio.delete(url);
       notificationService.success("Uspješno ste izbrisali.");
     } catch (err) {
+      handleError(err);
       throw Exception(err.toString());
     }
   }
+
   T fromJson(data) {
     throw Exception("Method not implemented");
   }
@@ -136,9 +157,8 @@ abstract class BaseProvider<T> with ChangeNotifier {
     String bearerAuth = "Bearer $token";
     var headers = {
       "Content-Type": "application/json",
-      "Authorization": bearerAuth
+      "Authorization": token != null ? bearerAuth : ""
     };
-
     return headers;
   }
 
@@ -180,18 +200,16 @@ abstract class BaseProvider<T> with ChangeNotifier {
       }
     }
   }
+
   Map<String, dynamic> buildHttpParams(Map<String, dynamic> data) {
     final Map<String, dynamic> queryParams = {};
 
     data.forEach((key, value) {
       if (value is DateTime) {
-        // Convert DateTime to ISO string
         queryParams[key] = value.toIso8601String();
       } else if (value is List) {
-        // Append each value in the list
         queryParams[key] = value.join(',');
       } else {
-        // Add other types directly
         queryParams[key] = value;
       }
     });
@@ -199,4 +217,3 @@ abstract class BaseProvider<T> with ChangeNotifier {
     return queryParams;
   }
 }
-
