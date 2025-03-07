@@ -8,7 +8,7 @@ EXPOSE 7126
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY "./WebAPI/WebAPI.csproj"  # Ispravljena putanja
+COPY "WebAPI/WebAPI.csproj"  # Ispravljena putanja
 RUN dotnet restore "./WebAPI/WebAPI.csproj"
 COPY . . 
 WORKDIR "/src/WebAPI"
