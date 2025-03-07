@@ -58,7 +58,7 @@ services:
       - RABBITMQ_PASSWORD=guest
       - RABBITMQ_HOST=amqp://minijobs-queue:5672  
       - DOTNET_USE_POLLING_FILE_WATCHER=1 
-      - ASPNETCORE_URLS=http://+:7126;https://+:7127
+      - ASPNETCORE_URLS=http://+:7126
     ports:
      - 7126:7126
 
