@@ -1,0 +1,2 @@
+C:/source_code/miniJobs-mobile/miniJobs/UI/minijobs_mobile/android/app/.cxx/RelWithDebInfo/6d6ly3i3/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/source_code/miniJobs-mobile/miniJobs/UI/minijobs_mobile/android/app/.cxx/RelWithDebInfo/6d6ly3i3/armeabi-v7a/CMakeFiles/rebuild_cache.dir
