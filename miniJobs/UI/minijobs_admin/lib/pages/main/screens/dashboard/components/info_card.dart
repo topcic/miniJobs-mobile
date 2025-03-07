@@ -12,7 +12,7 @@ class InfoCard extends StatelessWidget {
   });
 
   final String title;
-  final int total;
+  final String total;
   final IconData icon;
   final Color color;
 

@@ -70,12 +70,12 @@ class FileInfoCardGridView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<DemoData> demoData = [
-      DemoData(title: "Poslodavci", total: stats.totalEmployers, icon: FontAwesomeIcons.building),
-      DemoData(title: "Aplikanti", total: stats.totalApplicants, icon: FontAwesomeIcons.users),
-      DemoData(title: "Objavljeni poslovi", total: stats.totalJobs, icon: FontAwesomeIcons.briefcase),
-      DemoData(title: "Aktivni poslovi", total: stats.totalActiveJobs, icon: Icons.check_circle),
-      DemoData(title: "Prosj. ocjena aplikanta", total: stats.averageApplicantRating.toInt(), icon: Icons.star),
-      DemoData(title: "Prosj. ocjena poslodavca", total: stats.averageEmployerRating.toInt(), icon: Icons.star),
+      DemoData(title: "Poslodavci", total: stats.totalEmployers.toString(), icon: FontAwesomeIcons.building),
+      DemoData(title: "Aplikanti", total: stats.totalApplicants.toString(), icon: FontAwesomeIcons.users),
+      DemoData(title: "Objavljeni poslovi", total: stats.totalJobs.toString(), icon: FontAwesomeIcons.briefcase),
+      DemoData(title: "Aktivni poslovi", total: stats.totalActiveJobs.toString(), icon: Icons.check_circle),
+      DemoData(title: "Prosj. ocjena aplikanta", total: stats.averageApplicantRating.toString(), icon: Icons.star),
+      DemoData(title: "Prosj. ocjena poslodavca", total: stats.averageEmployerRating.toString(), icon: Icons.star),
     ];
 
     return GridView.builder(
@@ -90,7 +90,7 @@ class FileInfoCardGridView extends StatelessWidget {
       ),
       itemBuilder: (context, index) => InfoCard(
         title: demoData[index].title,
-        total: demoData[index].total,
+        total: demoData[index].total.toString(),
         icon: demoData[index].icon,
       ),
     );
@@ -99,7 +99,7 @@ class FileInfoCardGridView extends StatelessWidget {
 
 class DemoData {
   final String title;
-  final int total;
+  final String total;
   final IconData icon;
 
   DemoData({required this.title, required this.total, required this.icon});

@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:minijobs_admin/models/rating.dart';
+import 'package:minijobs_admin/pages/applicants/applicant_details.page.dart';
+import 'package:minijobs_admin/pages/employers/employer_details_page.dart';
 import 'package:minijobs_admin/providers/rating_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
@@ -137,7 +139,7 @@ class _RatingsViewState extends State<RatingsView> {
         children: [
           Expanded(
             child: HorizontalDataTable(
-              leftHandSideColumnWidth: 50,
+              leftHandSideColumnWidth: 150,
               rightHandSideColumnWidth: 1400,
               isFixedHeader: true,
               headerWidgets: _getTitleWidgets(),
@@ -181,7 +183,7 @@ class _RatingsViewState extends State<RatingsView> {
 
   List<Widget> _getTitleWidgets() {
     return [
-      _getTitleItemWidget('Akcije', 50),
+      _getTitleItemWidget('Akcije', 200),
       _getTitleItemWidget('Ocjenio', 150),
       _getTitleItemWidget('Ocjenjeni', 150),
       _getTitleItemWidget('Ocjena', 100),
@@ -209,7 +211,7 @@ class _RatingsViewState extends State<RatingsView> {
       width: 100,
       height: 52,
       alignment: Alignment.center,
-      child:   _buildActionsCell(context, data[index], 150),
+      child:   _buildActionsCell(context, data[index], 200),
     );
   }
 
@@ -244,14 +246,42 @@ class _RatingsViewState extends State<RatingsView> {
       width: width,
       height: 52,
       alignment: Alignment.center,
-      child: Tooltip(
-        message: 'Obriši',
-        preferBelow: false, // Ensures the tooltip appears above
-        child: IconButton(
-          icon: const Icon(Icons.block, color: Colors.red),
-          onPressed: () => _showDeleteConfirmation(context, rating),
-          tooltip: '', // Ensures Flutter doesn't show the default label behavior
-        ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Detalji ocjenjivača
+          Tooltip(
+            message: 'Detalji ocjenjivača',
+            preferBelow: false,
+            child: IconButton(
+              icon: const Icon(Icons.person_outline, color: Colors.blue),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => rating.createdByRole=='Applicant'? ApplicantDetailsPage(id: rating.createdBy):EmployerDetailsPage(id: rating.createdBy),
+                ),
+              ),
+              tooltip: '',
+            ),
+          ),
+          const SizedBox(width: 8), // Space between buttons
+          // Detalji ocjenjenog
+          Tooltip(
+            message: 'Detalji ocjenjenog',
+            preferBelow: false,
+            child: IconButton(
+              icon: const Icon(Icons.person, color: Colors.green),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => rating.ratedUserRole=='Applicant'? ApplicantDetailsPage(id: rating.ratedUserId):EmployerDetailsPage(id: rating.ratedUserId),
+                ),
+              ),
+              tooltip: '',
+            ),
+          ),
+
+        ],
       ),
     );
   }
