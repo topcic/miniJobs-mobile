@@ -6,7 +6,6 @@ import 'package:minijobs_mobile/pages/employer/employer_info.dart';
 import 'package:minijobs_mobile/pages/user-profile/active_jobs_view.dart';
 import 'package:minijobs_mobile/pages/user-profile/finished_job_view.dart';
 import 'package:minijobs_mobile/pages/user-profile/user_ratings_view.dart';
-
 import '../../providers/authentication_provider.dart';
 import '../../providers/employer_provider.dart';
 import '../../utils/photo_view.dart';
@@ -24,14 +23,14 @@ class _EmployerProfilePageState extends State<EmployerProfilePage> {
   late int userId;
   Employer? employer;
   bool isLoading = true;
-  bool isAbleTodoEdit=false;
+  bool isAbleTodoEdit = false;
   late AuthenticationProvider _authenticationProvider;
 
   @override
   void initState() {
     super.initState();
-    userId=widget.userId;
-    isAbleTodoEdit=userId==int.parse(GetStorage().read('userId'));
+    userId = widget.userId;
+    isAbleTodoEdit = userId == int.parse(GetStorage().read('userId'));
     _authenticationProvider = context.read<AuthenticationProvider>();
     fetchUserData();
   }
@@ -45,29 +44,43 @@ class _EmployerProfilePageState extends State<EmployerProfilePage> {
         isLoading = false;
       });
     } catch (error) {
-      // Handle error
       setState(() {
         isLoading = false;
       });
     }
   }
-  void  _handleLogout(BuildContext context)  {
+
+  void _handleLogout(BuildContext context) {
     _authenticationProvider.logout(context);
   }
-  void _handleChangePassword(BuildContext context)  {
+
+  void _handleChangePassword(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const UserChangePassword()),
     );
   }
+
   @override
   Widget build(BuildContext context) {
+    // Check the role from GetStorage
+    final String? role = GetStorage().read('role');
+    final bool showBackButton = role != 'Employer'; // Show back button only if role is not 'Employer'
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: DefaultTabController(
         length: 3,
         child: Scaffold(
           appBar: AppBar(
+            leading: showBackButton // Conditionally show back button
+                ? IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pop(context); // Navigate back to previous screen
+              },
+            )
+                : null, // No back button if role is 'Employer'
             title: const Text('Profile'),
             actions: isAbleTodoEdit
                 ? [
@@ -98,19 +111,16 @@ class _EmployerProfilePageState extends State<EmployerProfilePage> {
               ? const Center(child: CircularProgressIndicator())
               : Column(
             children: [
-              // Info section
               Container(
                 padding: const EdgeInsets.all(20.0),
-                color: Colors.grey[200], // Optional background color for the info section
+                color: Colors.grey[200],
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Profile photo
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.center, // Center the row horizontally
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const SizedBox(width: 35),
-
                         PhotoView(
                           key: ValueKey(employer?.photo?.hashCode),
                           photo: employer?.photo,
@@ -123,32 +133,34 @@ class _EmployerProfilePageState extends State<EmployerProfilePage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => EmployerInfo(employerId: userId,onBack: () => fetchUserData(),),
+                                  builder: (context) => EmployerInfo(
+                                    employerId: userId,
+                                    onBack: () => fetchUserData(),
+                                  ),
                                 ),
                               );
                             },
                             child: const Padding(
-                              padding: EdgeInsets.only(left: 8.0), // Add space between PhotoView and icon
+                              padding: EdgeInsets.only(left: 8.0),
                               child: Icon(
                                 Icons.edit,
-                                color: Colors.blue, // Blue color for the icon
-                                size: 24.0, // Adjust icon size as needed
+                                color: Colors.blue,
+                                size: 24.0,
                               ),
                             ),
                           ),
                       ],
                     ),
                     const SizedBox(height: 10),
-                    // Name
                     Text(
-                      employer?.name ?? '${employer?.firstName ?? ''} ${employer?.lastName ?? ''}',
+                      employer?.name ??
+                          '${employer?.firstName ?? ''} ${employer?.lastName ?? ''}',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 5),
-                    // Average rating
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -156,16 +168,13 @@ class _EmployerProfilePageState extends State<EmployerProfilePage> {
                         const SizedBox(width: 5),
                         Text(
                           employer?.averageRating?.toStringAsFixed(1) ?? 'N/A',
-                          style: const TextStyle(
-                            fontSize: 16,
-                          ),
+                          style: const TextStyle(fontSize: 16),
                         ),
                       ],
                     ),
                   ],
                 ),
               ),
-              // Tabs section
               const TabBar(
                 tabs: [
                   Tab(text: 'Aktivni'),
@@ -173,15 +182,11 @@ class _EmployerProfilePageState extends State<EmployerProfilePage> {
                   Tab(text: 'Utisci'),
                 ],
               ),
-              // Expanded tab bar view
               Expanded(
                 child: TabBarView(
                   children: [
-                    // Aktivni poslovi tab
                     ActiveJobsView(userId: userId),
-                    // Završeni poslovi tab
                     FinishedJobsView(userId: userId),
-                    // Utisci tab
                     UserRatingsView(userId: userId),
                   ],
                 ),

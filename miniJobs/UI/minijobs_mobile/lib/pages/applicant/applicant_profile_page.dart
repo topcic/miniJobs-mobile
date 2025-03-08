@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:minijobs_mobile/models/applicant/applicant.dart';
@@ -15,12 +14,10 @@ import 'applicant_info_view.dart';
 
 class ApplicantProfilePage extends StatefulWidget {
   final int userId;
-  final bool showBackButton; // Add this parameter
 
   const ApplicantProfilePage({
     super.key,
     required this.userId,
-    this.showBackButton = false, // Default to false if not provided
   });
 
   @override
@@ -34,6 +31,7 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
   bool isAbleTodoEdit = false;
   late AuthenticationProvider _authenticationProvider;
   final GlobalKey<ApplicantInfoViewState> _applicantInfoViewKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -54,47 +52,54 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
       });
       _applicantInfoViewKey.currentState?.refresh();
     } catch (error) {
-      // Handle error
       setState(() {
         isLoading = false;
       });
     }
   }
-  void  _handleLogout(BuildContext context)  {
+
+  void _handleLogout(BuildContext context) {
     _authenticationProvider.logout(context);
   }
-  void _handleChangePassword(BuildContext context)  {
+
+  void _handleChangePassword(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const UserChangePassword()),
     );
   }
+
   void _updatePhoto(Uint8List? newPhoto) {
     setState(() {
-      if(newPhoto!=null) {
-        applicant?.photo = Uint8List.fromList(newPhoto); // Ensure new reference
+      if (newPhoto != null) {
+        applicant?.photo = Uint8List.fromList(newPhoto);
       }
     });
   }
+
   @override
   Widget build(BuildContext context) {
+    // Check the role from GetStorage
+    final String? role = GetStorage().read('role');
+    final bool showBackButton = role != 'Applicant'; // Show back button only if role is not 'Applicant'
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: DefaultTabController(
         length: 3,
         child: Scaffold(
           appBar: AppBar(
-            leading: widget.showBackButton
+            leading: showBackButton // Conditionally show back button
                 ? IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // Navigate back to previous screen
               },
             )
-                : null,
+                : null, // No back button if role is 'Applicant'
             title: const Text('Profile'),
             actions: isAbleTodoEdit
-            ? [
+                ? [
               PopupMenuButton<String>(
                 onSelected: (String value) {
                   if (value == 'logout') {
@@ -122,19 +127,16 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
               ? const Center(child: CircularProgressIndicator())
               : Column(
             children: [
-              // Info section
               Container(
                 padding: const EdgeInsets.all(20.0),
-                color: Colors.grey[200], // Optional background color for the info section
+                color: Colors.grey[200],
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Profile photo and edit icon
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.center, // Center the row horizontally
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const SizedBox(width: 35),
-
                         PhotoView(
                           key: ValueKey(applicant?.photo?.hashCode),
                           photo: applicant?.photo,
@@ -149,24 +151,23 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
                                 MaterialPageRoute(
                                   builder: (context) => ApplicantInfo(
                                     applicantId: userId,
-                                    onBack: () => fetchUserData(), // Pass the callback to call fetchUserData
+                                    onBack: () => fetchUserData(),
                                   ),
                                 ),
                               );
                             },
                             child: const Padding(
-                              padding: EdgeInsets.only(left: 8.0), // Add space between PhotoView and icon
+                              padding: EdgeInsets.only(left: 8.0),
                               child: Icon(
                                 Icons.edit,
-                                color: Colors.blue, // Blue color for the icon
-                                size: 24.0, // Adjust icon size as needed
+                                color: Colors.blue,
+                                size: 24.0,
                               ),
                             ),
                           ),
                       ],
                     ),
                     const SizedBox(height: 10),
-                    // Name
                     Text(
                       '${applicant?.firstName ?? ''} ${applicant?.lastName ?? ''}',
                       style: const TextStyle(
@@ -175,7 +176,6 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
                       ),
                     ),
                     const SizedBox(height: 5),
-                    // Average rating
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -183,17 +183,13 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
                         const SizedBox(width: 5),
                         Text(
                           applicant?.averageRating?.toStringAsFixed(1) ?? 'N/A',
-                          style: const TextStyle(
-                            fontSize: 16,
-                          ),
+                          style: const TextStyle(fontSize: 16),
                         ),
                       ],
                     ),
                   ],
                 ),
               ),
-
-              // Tabs section
               const TabBar(
                 tabs: [
                   Tab(text: 'Info'),
@@ -201,10 +197,9 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
                   Tab(text: 'Utisci'),
                 ],
               ),
-              // Expanded tab bar view
               Expanded(
                 child: KeyedSubtree(
-                  key: ValueKey(applicant?.hashCode), // Forces rebuild when applicant changes
+                  key: ValueKey(applicant?.hashCode),
                   child: TabBarView(
                     children: [
                       ApplicantInfoView(
