@@ -14,13 +14,13 @@ Koristi sljedeće testne naloge za prijavu:
 
 ### **Admin aplikacija**
 - ✉️ Email: `admin@minijobs.ba`
-- 🔑 Lozinka: `Minijbos1234!`
+- 🔑 Lozinka: `Minijobs1234!`
 
 ### **Mobilna aplikacija**
 #### **Aplikant**
 - ✉️ Email: `applicant@minijobs.ba`
-- 🔑 Lozinka: `Minijbos1234!`
+- 🔑 Lozinka: `Minijobs1234!`
 
 #### **Poslodavac**
 - ✉️ Email: `employer@minijobs.ba`
-- 🔑 Lozinka: `Minijbos1234!`
+- 🔑 Lozinka: `Minijobs1234!`
