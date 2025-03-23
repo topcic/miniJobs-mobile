@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/models/job/job_card_dto.dart';
 import 'package:minijobs_mobile/pages/employer/job/job_modal.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
@@ -42,7 +41,7 @@ class _JobCardState extends State<JobCard> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              job.name!,
+              job.name,
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -89,21 +88,17 @@ class _JobCardState extends State<JobCard> {
             const SizedBox(height: 8),
             ElevatedButton(
               onPressed: () async {
-                if (job.id != null) {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return JobModal(
-                        jobId: job.id!,
-                        role: GetStorage().read('role'),
-                          isInSavedJobs: widget.isInSavedJobs
-                      );
-                    },
-                  );
-                } else {
-                  notificationService.success('Detalji posla nisu dostupni');
-                }
-              },
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return JobModal(
+                      jobId: job.id,
+                      role: GetStorage().read('role'),
+                        isInSavedJobs: widget.isInSavedJobs
+                    );
+                  },
+                );
+                            },
               child: const Text('Pogledaj', style: TextStyle(fontSize: 14)),
             ),
           ],

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/models/job/job_card_dto.dart';
 import 'package:minijobs_mobile/pages/employer/job/job_card.dart';
 import 'package:minijobs_mobile/providers/user_provider.dart';

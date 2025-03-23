@@ -2,7 +2,6 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/models/job_recommendation/job_recommendation.dart';
 import 'package:minijobs_mobile/models/rating.dart';
 import 'package:minijobs_mobile/models/user/user.dart';
