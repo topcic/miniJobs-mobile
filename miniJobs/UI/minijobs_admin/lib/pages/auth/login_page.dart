@@ -165,7 +165,7 @@ class _LoginPageState extends State<LoginPage> {
                                   var result = await _authenticationProvider
                                       .tokens(authCodeRequest);
 
-                                  if (result!=null && mounted) {
+                                  if (result!=null && result!=false && mounted) {
                                     Navigator.of(context).pushReplacement(
                                       MaterialPageRoute(
                                           builder: (context) => const MainScreen()),
