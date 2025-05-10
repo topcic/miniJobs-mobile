@@ -133,12 +133,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       if (!showPasswordReset)
                         FormBuilderTextField(
                           name: 'email',
+                          style: const TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             labelText: "Unesite email",
-                            prefixIcon: const Icon(Icons.email),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.0),
                             ),
+                            prefixIcon: const Icon(Icons.email, color: Colors.blue),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -156,6 +157,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         Column(
                           children: [
                             FormBuilderTextField(
+                              style: const TextStyle(color: Colors.black),
                               name: 'password',
                               obscureText: true,
                               decoration: InputDecoration(
@@ -180,6 +182,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             ),
                             const SizedBox(height: 20),
                             FormBuilderTextField(
+                              style: const TextStyle(color: Colors.black),
                               name: 'repeatPassword',
                               obscureText: true,
                               decoration: InputDecoration(
@@ -205,6 +208,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             ),
                             const SizedBox(height: 20),
                             FormBuilderTextField(
+                              style: const TextStyle(color: Colors.black),
                               name: 'kod',
                               decoration: InputDecoration(
                                 labelText: "Kod",
