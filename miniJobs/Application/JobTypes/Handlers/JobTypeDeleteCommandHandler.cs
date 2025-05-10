@@ -5,9 +5,9 @@ using MediatR;
 
 namespace Application.JobTypes.Handlers;
 
-public class JobTypeDeleteCommandHandler(IJobTypeRepository repository) : IRequestHandler<JobTypeActivateCommand, JobType>
+public class JobTypeDeleteCommandHandler(IJobTypeRepository repository) : IRequestHandler<JobTypeDeleteCommand, JobType>
 {
-    public async Task<JobType> Handle(JobTypeActivateCommand command, CancellationToken cancellationToken)
+    public async Task<JobType> Handle(JobTypeDeleteCommand command, CancellationToken cancellationToken)
     {
         var model = await repository.TryFindAsync(command.Id);
 
