@@ -93,7 +93,7 @@ class _VerificationPageState extends State<VerificationPage> {
                         var result =
                         await _authenticationProvider.tokens(authCodeRequest);
 
-                        if (result!=null) {
+                        if (result!=null  && result!=false) {
                           notificationService.success("Uspješno ste potvrdili Vaš email. Molimo Vas prijavite se.");
                           Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => const LoginPage(),
