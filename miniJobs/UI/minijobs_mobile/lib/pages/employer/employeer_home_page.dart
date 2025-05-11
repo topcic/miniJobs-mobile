@@ -49,21 +49,30 @@ class _EmployerHomePageState extends State<EmployerHomePage> {
     getJobTypes();
     searchApplicant();
   }
-
   Future<void> getCities() async {
-    cities = await _cityProvider.getAll();
-    setState(() {});
+    final result = await _cityProvider.getAll();
+    if (mounted) {
+      setState(() {
+        cities = result;
+      });
+    }
   }
 
   Future<void> getJobTypes() async {
-    jobTypes = await _jobTypeProvider.getAll();
-    setState(() {});
+    final result = await _jobTypeProvider.getAll();
+    if (mounted) {
+      setState(() {
+        jobTypes = result;
+      });
+    }
   }
 
   Future<void> searchApplicant() async {
-    setState(() {
-      isLoading = true;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+      });
+    }
 
     String searchTerm = _searchController.text;
     City? city;
@@ -73,19 +82,22 @@ class _EmployerHomePageState extends State<EmployerHomePage> {
 
     JobType? jobType;
     if (selectedJobType != null) {
-      jobType =
-          jobTypes.firstWhere((jobType) => jobType.name == selectedJobType);
+      jobType = jobTypes.firstWhere((jobType) => jobType.name == selectedJobType);
     }
     SortOrder sortOrder = sort == 'Najnovije' ? SortOrder.DESC : SortOrder.ASC;
-    applicants = await _applicantProvider.searchApplicants(
-        searchText: searchTerm,
-        cityId: city?.id,
-        sort: sortOrder,
-        jobTypeId: jobType?.id);
+    final result = await _applicantProvider.searchApplicants(
+      searchText: searchTerm,
+      cityId: city?.id,
+      sort: sortOrder,
+      jobTypeId: jobType?.id,
+    );
 
-    setState(() {
-      isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        applicants = result;
+        isLoading = false;
+      });
+    }
   }
 
   @override

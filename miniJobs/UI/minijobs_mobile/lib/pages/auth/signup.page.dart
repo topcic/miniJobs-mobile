@@ -204,7 +204,8 @@ class _SignupPageState extends State<SignupPage> {
                                   child: FormBuilderTextField(
                                     name: 'password',
                                     obscureText: true,
-                                    validator: ((value) {
+                                    style: const TextStyle(color: Colors.black),
+                                    validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return "Lozinka je obavezno polje";
                                       } else if (value.length < 8 ||
@@ -215,9 +216,14 @@ class _SignupPageState extends State<SignupPage> {
                                       } else {
                                         return null;
                                       }
-                                    }),
-                                    decoration: const InputDecoration(
-                                      label: Text("Lozinka"),
+                                    },
+                                    decoration: InputDecoration(
+                                      label: const Text("Lozinka"),
+                                      errorStyle: const TextStyle(
+                                        fontSize: 12,
+                                      ),
+                                      errorMaxLines: 2,
+
                                     ),
                                   ),
                                 ),

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
@@ -95,7 +97,7 @@ class _VerificationPageState extends State<VerificationPage> {
                         var result =
                         await _authenticationProvider.tokens(authCodeRequest);
 
-                        if (result !=  null) {
+                        if (result !=  null && result) {
                           notificationService.success("Uspješno ste potvrdili Vaš email. Molimo Vas prijavite se.");
                           Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => const LoginPage(),

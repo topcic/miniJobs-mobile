@@ -21,8 +21,8 @@ class _JobPreviewState extends State<JobPreview> {
     super.initState();
     // Initialize job status
     final jobProvider = Provider.of<JobProvider>(context, listen: false);
-    final Job job = jobProvider.getCurrentJob()!;
-    if (job.status == JobStatus.Zavrsen) {
+    final Job? job = jobProvider.getCurrentJob();
+    if (job?.status == JobStatus.Zavrsen) {
       setState(() {
         isJobCompleted = true;
       });
@@ -32,10 +32,12 @@ class _JobPreviewState extends State<JobPreview> {
   @override
   Widget build(BuildContext context) {
     final jobProvider = Provider.of<JobProvider>(context);
-    final Job job = jobProvider.getCurrentJob()!;
+    final Job? job = jobProvider.getCurrentJob();
     final userName =
         '${GetStorage().read('givenname')} ${GetStorage().read('surname')}';
-
+    if (job == null) {
+      return const SizedBox.shrink(); // Returns an empty widget
+    }
     Future<void> finishJob() async {
       final confirmed = await showDialog<bool>(
         context: context,

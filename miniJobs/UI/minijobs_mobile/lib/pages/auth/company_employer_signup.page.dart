@@ -279,8 +279,13 @@ class _CompanyEmployerSignupPageState extends State<CompanyEmployerSignupPage> {
                                         return null;
                                       }
                                     }),
-                                    decoration: const InputDecoration(
-                                      label: Text("Lozinka"),
+                                    decoration:InputDecoration(
+                                      label: const Text("Lozinka"),
+                                      errorStyle: const TextStyle(
+                                        fontSize: 12,
+                                      ),
+                                      errorMaxLines: 2,
+
                                     ),
                                   ),
                                 ),
