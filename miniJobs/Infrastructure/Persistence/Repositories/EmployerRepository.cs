@@ -13,7 +13,7 @@ public class EmployerRepository(ApplicationDbContext _context, IMapper mapper) :
         var query = from j in _context.Jobs
                     join c in _context.Cities on j.CityId equals c.Id
                     where j.Status == JobStatus.Active &&
-                          (requestedBy == userId ? j.CreatedBy == userId : true)
+                         j.CreatedBy == userId
                     select new JobCardDTO
                     {
                         Id = j.Id,

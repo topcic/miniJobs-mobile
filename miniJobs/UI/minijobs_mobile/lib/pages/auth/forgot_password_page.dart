@@ -166,6 +166,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
+                                errorMaxLines: 2,
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
