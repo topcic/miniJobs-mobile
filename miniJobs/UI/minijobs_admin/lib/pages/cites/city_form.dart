@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -36,7 +38,18 @@ class _CityFormState extends State<CityForm> {
     try {
       var countryList = await countryProvider.getAll();
       setState(() {
-        countries = countryList ?? [];
+        countries = countryList.where((x) => !x.isDeleted!).toList() ?? [];
+
+        if (widget.city != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _formKey.currentState?.patchValue({
+              'name': widget.city!.name,
+              'countryId': widget.city!.countryId.toString(),
+              'municipalityCode': widget.city!.municipalityCode,
+              'postcode': widget.city!.postcode,
+            });
+          });
+        }
       });
     } catch (e) {
       // Handle error if needed
@@ -46,16 +59,6 @@ class _CityFormState extends State<CityForm> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (widget.city != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _formKey.currentState?.patchValue({
-          'name': widget.city!.name,
-          'countryId': widget.city!.countryId.toString(),
-          'municipalityCode': widget.city!.municipalityCode,
-          'postcode': widget.city!.postcode,
-        });
-      });
-    }
   }
 
   @override

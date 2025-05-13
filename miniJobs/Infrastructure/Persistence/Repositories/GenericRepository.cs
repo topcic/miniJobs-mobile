@@ -39,7 +39,7 @@ public abstract class GenericRepository<TEntity, T, TContext> : IGenericReposito
 
     public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>>? condition = null)
     {
-        return condition != null ? DbSet.Where(condition).AsEnumerable() : DbSet.AsEnumerable();
+        return condition != null ? DbSet.Where(condition).ToList() : DbSet.ToList();
     }
 
     public async Task InsertAsync(TEntity entity)

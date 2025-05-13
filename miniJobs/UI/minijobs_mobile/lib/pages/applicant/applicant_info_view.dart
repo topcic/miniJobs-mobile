@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:decimal/decimal.dart';
 import 'package:file_saver/file_saver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -93,7 +94,7 @@ class ApplicantInfoViewState extends State<ApplicantInfoView> {
               _buildInfoSection('Opis', applicant!.description!),
             if (applicant?.experience != null)
               _buildInfoSection('Iskustvo', applicant!.experience!),
-            if (applicant?.wageProposal != null)
+            if (applicant?.wageProposal != null && applicant!.wageProposal!>Decimal.fromInt(0) )
               _buildInfoSection('Plata (KM)', applicant!.wageProposal.toString()),
             if (applicant?.jobTypes != null && applicant!.jobTypes!.isNotEmpty)
               _buildInfoSection(
