@@ -329,4 +329,7 @@
   <data name="CITY_ALREADY_EXIST" xml:space="preserve">
     <value>Grad već postoji.</value>
   </data>
+  <data name="JOB_NEED_APPLICANTS" xml:space="preserve">
+    <value />
+  </data>
 </root>

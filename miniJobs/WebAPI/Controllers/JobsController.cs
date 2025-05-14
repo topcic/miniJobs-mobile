@@ -92,7 +92,7 @@ public class JobsController(IMediator mediator, IJobRepository
     public async Task<IActionResult> ActivateJob([FromRoute] int jobId, [FromBody] int request)
     {
         return Ok(await mediator.Send(new JobActivateCommand(jobId, request)));
-    } 
+    }
 
     [HttpPut("{jobId}/finish")]
     [Authorize(Roles = "Employer")]
@@ -102,6 +102,17 @@ public class JobsController(IMediator mediator, IJobRepository
     public async Task<IActionResult> FinishJob([FromRoute] int jobId)
     {
         return Ok(await mediator.Send(new JobFinishCommand(jobId)));
+    }
+
+
+    [HttpPut("{jobId}/complete-applications")]
+    [Authorize(Roles = "Employer")]
+    [ProducesResponseType(typeof(Job), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> CompleteJobApplications([FromRoute] int jobId)
+    {
+        return Ok(await mediator.Send(new JobCompleteApplicationsCommand(jobId)));
     }
 
     [HttpGet("search")]

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -94,17 +96,21 @@ class _JobStep3State extends State<JobStep3> {
     if (_job != null) {
       if (_job!.additionalPaymentOptions != null) {
         selectedAdditionalPayments = _job!.additionalPaymentOptions!
+            .where((option) => option.id != null)
             .map((option) => option.id!)
             .toList();
       }
-      if (_job!.paymentQuestion != null) {
+
+      if (_job!.paymentQuestion?.id != null) {
         paymentChoice = _job!.paymentQuestion!.id!;
       }
+
     }
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Container(
       padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
@@ -149,6 +155,7 @@ class _JobStep3State extends State<JobStep3> {
                                     setState(() {
                                       if (selected) {
                                         paymentChoice = option.id!;
+                                        _formKey.currentState?.fields['wage']?.setValue('0');
                                       } else {
                                         paymentChoice = null;
                                       }
@@ -163,9 +170,15 @@ class _JobStep3State extends State<JobStep3> {
                 ),
               ),
               if (paymentChoice != null &&
-                  paymentOptions!
-                      .firstWhere((option) =>
-                  option.id.toString() == paymentChoice.toString())
+                  paymentOptions != null &&
+                  paymentOptions?.isNotEmpty == true &&
+                  paymentOptions?.any((option) =>
+                  option.id.toString() == paymentChoice.toString()) == true &&
+                  paymentOptions
+                      ?.firstWhere(
+                        (option) => option.id.toString() == paymentChoice.toString(),
+                    orElse: () => ProposedAnswer(1,'',1), // Use ProposedAnswer
+                  )
                       .answer !=
                       "po dogovoru")
                 FormBuilderTextField(
@@ -244,7 +257,10 @@ class _JobStep3State extends State<JobStep3> {
   bool validateAndSave() {
     _formKey.currentState?.save();
     bool isFormValid = _formKey.currentState!.validate();
-
+    bool isPoDogovoru = paymentChoice != null &&
+        paymentOptions != null &&
+        paymentOptions!.any((option) =>
+        option.id == paymentChoice && option.answer == "po dogovoru");
     // Validate 'Način plaćanja'
     if (paymentChoice == null) {
       setState(() {
@@ -260,9 +276,15 @@ class _JobStep3State extends State<JobStep3> {
     if (isFormValid) {
       final Map<String, dynamic> formValues = _formKey.currentState!.value;
       saveAnswersToPaymentQuestions();
+      int wage = isPoDogovoru
+          ? 0
+          : (formValues['wage'] != null ? int.tryParse(formValues['wage']) : 0) ?? 0;
+    if(isPoDogovoru)
+      _formKey.currentState!.fields['wage']?.setValue('0');
+
       var saveRequest = JobStep3Request(
-          answersToPaymentQuestions,
-          formValues['wage'] != null ? int.tryParse(formValues['wage']) : 0
+        answersToPaymentQuestions,
+        wage,
       );
 
       setState(() {

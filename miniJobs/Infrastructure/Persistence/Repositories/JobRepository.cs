@@ -62,6 +62,8 @@ namespace Infrastructure.Persistence.Repositories
             result.Schedules = schedules;
             result.PaymentQuestion = paymentQuestion;
             result.AdditionalPaymentOptions = additionalPaymentOptions;
+            result.NumberOfApplications = await context.JobApplications
+        .CountAsync(ja => ja.JobId == id && ja.IsDeleted == false);
             if (isApplicant)
             {
                 var hasApplied = await context.JobApplications.AnyAsync(ja => ja.JobId == id && ja.CreatedBy == userId && ja.IsDeleted == false);

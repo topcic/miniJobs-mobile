@@ -7,29 +7,24 @@ using FluentValidation;
 
 namespace Application.Jobs.Validators;
 
-public class JobFinishCommandValidator : AbstractValidator<JobFinishCommand>
+public class JobCompleteApplicationsCommandValidator : AbstractValidator<JobCompleteApplicationsCommand>
 {
     private readonly IJobRepository jobRepository;
-    public JobFinishCommandValidator(IJobRepository jobRepository)
+    public JobCompleteApplicationsCommandValidator(IJobRepository jobRepository)
     {
         RuleFor(x => x).MustAsync(async (x, cancellation) => await ValidateEntity(x));
         this.jobRepository = jobRepository;
     }
 
-    private async Task<bool> ValidateEntity(JobFinishCommand command)
+    private async Task<bool> ValidateEntity(JobCompleteApplicationsCommand command)
     {
         Job job = await jobRepository.TryFindAsync(command.JobId);
         ExceptionExtension.Validate("JOB_NOT_EXISTS", () => job == null);
         ExceptionExtension.Validate("NO_ACTIONS_POSSIBLE_BECAUSE_HAS_BEEN_DELETED_BY_ADMIN", () => job.DeletedByAdmin);
 
         var applicants = (await jobRepository.GetApplicants(command.JobId, command.RoleId)).ToList();
-        if (applicants.Count() == 0)
-            return true;
 
-        var acceptedApplicants = (await jobRepository.GetApplicants(command.JobId, command.RoleId))
-        .Where(x => x.ApplicationStatus == JobApplicationStatus.Accepted)
-        .ToList();
-        ExceptionExtension.Validate("JOB_NEED_ACCEPTED_APPLICANTS", () => acceptedApplicants.Count() == 0);
+        ExceptionExtension.Validate("JOB_NEED_APPLICANTS", () => applicants.Count() == 0);
 
         return true;
     }

@@ -30,7 +30,6 @@ abstract class BaseProvider<T> with ChangeNotifier {
         options.headers["Accept"] = "application/json";
         options.headers["Accept-Language"] = "bs";
         String? token = _getStorage.read('accessToken');
-        print("Access Token in onRequest: $token"); // Debug statement
         if (token != null) {
           options.headers["Authorization"] = "Bearer $token";
         }

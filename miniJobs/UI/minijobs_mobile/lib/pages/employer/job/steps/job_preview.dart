@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
@@ -72,224 +74,289 @@ class _JobPreviewState extends State<JobPreview> {
       }
     }
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 8,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              job.name!,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                color: Colors.deepPurple[800],
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              '$userName - ${job.city?.name??''}',
-              style: TextStyle(fontSize: 16, color: Colors.deepPurple[300]),
-            ),
-            Divider(color: Colors.grey[400], height: 20),
-            Text(
-              'Opis posla:',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.deepPurple[700],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              job.description!,
-              style: TextStyle(fontSize: 15, color: Colors.grey[700]),
-            ),
-            const SizedBox(height: 12),
-            Row(
+    Future<void> completeApplicationsJob() async {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Završi aplikacije'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text("Jeste li sigurni da želite završiti aplikacije?"),
+                SizedBox(height: 8),
+                Text("- Nakon ovoga niko neće moći da aplicira.",
+                    style: TextStyle(fontSize: 14)),
                 Text(
-                  'Tip posla:',
-                  style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.deepPurple[700]),
-                ),
-                const SizedBox(width: 4),
+                    "- Ova opcija je za slučaj da ste se dogovorili sa radnikom.",
+                    style: TextStyle(fontSize: 14)),
+                SizedBox(height: 8),
                 Text(
-                  job.jobType?.name??'',
-                  style: TextStyle(fontSize: 15, color: Colors.grey[700]),
-                ),
+                    "Ako niste sigurni, možete sačekati ili se vratiti kasnije.",
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600])),
               ],
             ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Text(
-                  'Potrebno radnika:',
-                  style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.deepPurple[700]),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  job.requiredEmployees?.toString()??'0',
-                  style: TextStyle(fontSize: 15, color: Colors.grey[700]),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Text(
-                  'Plaćanje:',
-                  style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.deepPurple[700]),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                    job.paymentQuestion?.answer ?? '',
-                  style: TextStyle(fontSize: 15, color: Colors.grey[700]),
-                ),
-                if (job.wage != null && job.wage! > 0)
-                  Text(
-                    ': ${job.wage!} KM',
-                    style: TextStyle(fontSize: 15, color: Colors.grey[700]),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Raspored posla:',
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: Colors.deepPurple[700],
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Ne'),
               ),
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8.0,
-              runSpacing: 4.0,
-              children: job.schedules?.map((schedule) {
-                return Text(
-                  schedule.answer ?? '', // Provide a default value in case 'answer' is null
-                  style: TextStyle(fontSize: 15, color: Colors.grey[700]),
-                );
-              }).toList() ?? [],
-            ),
-            if (job.additionalPaymentOptions != null &&
-                job.additionalPaymentOptions!.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              Text(
-                'Dodatno plaća:',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.deepPurple[700],
-                ),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8.0,
-                runSpacing: 4.0,
-                children: job.additionalPaymentOptions!.map((option) {
-                  return Text(
-                    option.answer!,
-                    style: TextStyle(fontSize: 15, color: Colors.grey[700]),
-                  );
-                }).toList(),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Da'),
               ),
             ],
-            const SizedBox(height: 12),
-            if (isJobCompleted) ...[
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.red[50],
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.red),
+          );
+        },
+      );
+
+      if (confirmed ?? false) {
+        var response = await jobProvider.completeApplications(job.id!);
+
+        if (response != null && response.id != null) {
+          setState(() {
+            job.status = JobStatus.AplikacijeZavrsene;
+          });
+        }
+      }
+    }
+
+    return SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 8,
+                  offset: Offset(0, 4),
+                  spreadRadius: 0, // Add spreadRadius to control shadow size
                 ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(Icons.check_circle, color: Colors.red[800]),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Posao je završen',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.red[800],
-                        ),
-                      ),
-                    ),
-                  ],
+              ],
+            ),
+            clipBehavior: Clip.antiAlias,
+            // Ensure shadow is not clipped
+            margin: const EdgeInsets.all(8.0),
+            // Add margin to prevent clipping by parent
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  job.name!,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: Colors.deepPurple[800],
+                  ),
                 ),
-              ),
-            ] else ...[
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.blue[50],
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.blue),
+                const SizedBox(height: 12),
+                Text(
+                  '$userName - ${job.city?.name ?? ''}',
+                  style: TextStyle(fontSize: 16, color: Colors.deepPurple[300]),
                 ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Divider(color: Colors.grey[400], height: 20),
+                Text(
+                  'Opis posla:',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.deepPurple[700],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  job.description!,
+                  style: TextStyle(fontSize: 15, color: Colors.grey[700]),
+                ),
+                const SizedBox(height: 12),
+                Row(
                   children: [
                     Text(
-                      'Aplikacije traju do:',
+                      'Tip posla:',
                       style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.blue[800],
-                      ),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.deepPurple[700]),
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      DateFormat('dd.MM.yyyy').format(job.status ==
-                              JobStatus.Kreiran
-                          ? DateTime.now()
-                          : job.applicationsStart!
-                              .add(Duration(days: job.applicationsDuration!))),
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.blue[800],
-                      ),
+                      job.jobType?.name ?? '',
+                      style: TextStyle(fontSize: 15, color: Colors.grey[700]),
                     ),
                   ],
                 ),
-              ),
-            ],
-            const SizedBox(height: 16.0),
-            if (job.status == JobStatus.AplikacijeZavrsene && !isJobCompleted)
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: finishJob,
-                  child: const Text('Završi posao'),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Text(
+                      'Potrebno radnika:',
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.deepPurple[700]),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      job.requiredEmployees?.toString() ?? '0',
+                      style: TextStyle(fontSize: 15, color: Colors.grey[700]),
+                    ),
+                  ],
                 ),
-              ),
-          ],
-        ),
-      ),
-    );
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Text(
+                      'Plaćanje:',
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.deepPurple[700]),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      job.paymentQuestion?.answer ?? '',
+                      style: TextStyle(fontSize: 15, color: Colors.grey[700]),
+                    ),
+                    if (job.wage != null && job.wage! > 0)
+                      Text(
+                        ': ${job.wage!} KM',
+                        style: TextStyle(fontSize: 15, color: Colors.grey[700]),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Raspored posla:',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.deepPurple[700],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8.0,
+                  runSpacing: 4.0,
+                  children: job.schedules?.map((schedule) {
+                        return Text(
+                          schedule.answer ?? '',
+                          style:
+                              TextStyle(fontSize: 15, color: Colors.grey[700]),
+                        );
+                      }).toList() ??
+                      [],
+                ),
+                if (job.additionalPaymentOptions != null &&
+                    job.additionalPaymentOptions!.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    'Dodatno plaća:',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.deepPurple[700],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8.0,
+                    runSpacing: 4.0,
+                    children: job.additionalPaymentOptions!.map((option) {
+                      return Text(
+                        option.answer!,
+                        style: TextStyle(fontSize: 15, color: Colors.grey[700]),
+                      );
+                    }).toList(),
+                  ),
+                ],
+                const SizedBox(height: 12),
+                if (isJobCompleted) ...[
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.red[50],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.red),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.red[800]),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Posao je završen',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.red[800],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ] else ...[
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[50],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.blue),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Aplikacije traju do:',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.blue[800],
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          DateFormat('dd.MM.yyyy').format(job.status ==
+                                  JobStatus.Kreiran
+                              ? DateTime.now()
+                              : job.applicationsStart!.add(
+                                  Duration(days: job.applicationsDuration!))),
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.blue[800],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 16.0),
+                if (job.status == JobStatus.Aktivan &&
+                    !isJobCompleted &&
+                    job.numberOfApplications! > 0)
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: completeApplicationsJob,
+                      child: const Text('Završi aplikacije'),
+                    ),
+                  ),
+                const SizedBox(height: 16.0),
+                if (job.status == JobStatus.AplikacijeZavrsene &&
+                    !isJobCompleted)
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: finishJob,
+                      child: const Text('Završi posao'),
+                    ),
+                  ),
+              ],
+            )));
   }
 }

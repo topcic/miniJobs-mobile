@@ -175,8 +175,7 @@ class _ApplicantCardState extends State<ApplicantCard> {
                     ],
                   ),
                   const Divider(height: 24),
-                  if ((widget.jobStatus == JobStatus.Aktivan ||
-                          widget.jobStatus == JobStatus.AplikacijeZavrsene) &&
+                  if (widget.jobStatus == JobStatus.AplikacijeZavrsene &&
                       widget.applicant.applicationStatus ==
                           JobApplicationStatus.Poslano)
                     _buildApplicationStatusButtons(),

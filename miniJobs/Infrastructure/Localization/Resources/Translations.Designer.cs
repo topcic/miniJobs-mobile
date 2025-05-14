@@ -162,6 +162,15 @@ namespace Infrastructure.Localization.Resources {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        internal static string AUTH_CODE_IS_REQURED {
+            get {
+                return ResourceManager.GetString("AUTH_CODE_IS_REQURED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         internal static string AUTH_CODE_NOT_VALID {
             get {
                 return ResourceManager.GetString("AUTH_CODE_NOT_VALID", resourceCulture);
@@ -174,6 +183,15 @@ namespace Infrastructure.Localization.Resources {
         internal static string BAD_REQUEST {
             get {
                 return ResourceManager.GetString("BAD_REQUEST", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ne možete aktivirati drugog korisnika..
+        /// </summary>
+        internal static string CAN_NOT_ACTIVATE_ANOTHER_USER {
+            get {
+                return ResourceManager.GetString("CAN_NOT_ACTIVATE_ANOTHER_USER", resourceCulture);
             }
         }
         
@@ -196,6 +214,15 @@ namespace Infrastructure.Localization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Grad već postoji..
+        /// </summary>
+        internal static string CITY_ALREADY_EXIST {
+            get {
+                return ResourceManager.GetString("CITY_ALREADY_EXIST", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
         internal static string CITY_IS_REQUIRED {
@@ -214,11 +241,38 @@ namespace Infrastructure.Localization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Tip posla ne postoji..
+        /// </summary>
+        internal static string CITY_NOT_EXISTS {
+            get {
+                return ResourceManager.GetString("CITY_NOT_EXISTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
         internal static string COMPANY_PHONE_NUMBER_IS_REQUIRED {
             get {
                 return ResourceManager.GetString("COMPANY_PHONE_NUMBER_IS_REQUIRED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Država već postoji..
+        /// </summary>
+        internal static string COUNTRY_ALREADY_EXIST {
+            get {
+                return ResourceManager.GetString("COUNTRY_ALREADY_EXIST", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Država ne postoji.
+        /// </summary>
+        internal static string COUNTRY_NOT_EXISTS {
+            get {
+                return ResourceManager.GetString("COUNTRY_NOT_EXISTS", resourceCulture);
             }
         }
         
@@ -387,6 +441,15 @@ namespace Infrastructure.Localization.Resources {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        internal static string JOB_NEED_APPLICANTS {
+            get {
+                return ResourceManager.GetString("JOB_NEED_APPLICANTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         internal static string JOB_NOT_COMPLETED {
             get {
                 return ResourceManager.GetString("JOB_NOT_COMPLETED", resourceCulture);
@@ -457,6 +520,15 @@ namespace Infrastructure.Localization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Tip posla već postoji..
+        /// </summary>
+        internal static string JOB_TYPE_ALREADY_EXIST {
+            get {
+                return ResourceManager.GetString("JOB_TYPE_ALREADY_EXIST", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
         internal static string JOB_TYPE_IS_REQUIRED {
@@ -504,6 +576,15 @@ namespace Infrastructure.Localization.Resources {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        internal static string NOT_VALID_EMAIL_ADDRESS {
+            get {
+                return ResourceManager.GetString("NOT_VALID_EMAIL_ADDRESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         internal static string NOT_VALID_STRING_LENGHT {
             get {
                 return ResourceManager.GetString("NOT_VALID_STRING_LENGHT", resourceCulture);
@@ -525,6 +606,16 @@ namespace Infrastructure.Localization.Resources {
         internal static string PHONE_NUMBER_IS_REQUIRED {
             get {
                 return ResourceManager.GetString("PHONE_NUMBER_IS_REQUIRED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Object.
+        /// </summary>
+        internal static object PHOTO_IS_REQUIRED {
+            get {
+                object obj = ResourceManager.GetObject("PHOTO_IS_REQUIRED", resourceCulture);
+                return ((object)(obj));
             }
         }
         
@@ -570,6 +661,15 @@ namespace Infrastructure.Localization.Resources {
         internal static string STREETADDRESSANDNUMBER_IS_REQUIRED {
             get {
                 return ResourceManager.GetString("STREETADDRESSANDNUMBER_IS_REQUIRED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string USER_NOT_EXISTS {
+            get {
+                return ResourceManager.GetString("USER_NOT_EXISTS", resourceCulture);
             }
         }
         

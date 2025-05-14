@@ -393,6 +393,10 @@ class JobStep2State extends State<JobStep2> {
       );
 
       setState(() {
+        if(_job!.status == JobStatus.Aktivan)
+          {
+            _formKey.currentState?.patchValue({'extendApplicationsDuration': '0'});
+          }
         _jobStep2Request = saveRequest;
       });
       widget.onNextButton(true,_job!.id!,1, _jobStep2Request!);

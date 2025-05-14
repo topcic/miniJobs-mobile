@@ -128,7 +128,19 @@ class JobProvider extends BaseProvider<Job> {
       return null;
     }
   }
+  Future<Job?> completeApplications(int id) async {
+    try {
+      var url = "${baseUrl}jobs/$id/complete-applications";
 
+      var response = await dio.put(url);
+      Job responseData = Job.fromJson(response.data);
+      notificationService.success("Uspješno završene applikacije");
+      return responseData;
+    } catch (err) {
+      handleError(err);
+      return null;
+    }
+  }
   Future<List<Applicant>> getApplicantsForJob(int jobId) async {
     try {
       var url = "${baseUrl}jobs/$jobId/applicants";

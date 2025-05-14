@@ -143,6 +143,22 @@ class _JobListState extends State<JobList> {
                                 title: Text('Obriši'),
                               ),
                             ),
+                          if (job.status == JobStatus.AplikacijeZavrsene)
+                            const PopupMenuItem<String>(
+                              value: 'finish',
+                              child: ListTile(
+                                leading: Icon(Icons.check_circle, color: Colors.green),
+                                title: Text('Završi posao'),
+                              ),
+                            ),
+                          if (job.status == JobStatus.Aktivan && job.numberOfApplications! > 0)
+                            const PopupMenuItem<String>(
+                              value: 'complete_applications',
+                              child: ListTile(
+                                leading: Icon(Icons.done_all, color: Colors.blue),
+                                title: Text('Završi aplikacije'),
+                              ),
+                            ),
                         ];
                         return menuItems;
                       },
@@ -171,6 +187,12 @@ class _JobListState extends State<JobList> {
                               ),
                             ),
                           );
+                        }
+                        else if (value == 'finish') {
+                          finishJob(job);
+                        }
+                        else if (value == 'complete_applications') {
+                          completeApplicationsJob(job); // Call completeApplicationsJob for "Završi aplikacije"
                         }
                       },
                     ),
@@ -219,7 +241,82 @@ class _JobListState extends State<JobList> {
       },
     );
   }
+  Future<void> finishJob(Job job) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Završi posao'),
+          content: const Text(
+            'Jeste li sigurni da želite završiti posao? Provjerite jeste li odabrali sve aplikante koji su sudjelovali.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Ne'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Da'),
+            ),
+          ],
+        );
+      },
+    );
 
+    if (confirmed ?? false) {
+      var response = await jobProvider.finish(job.id!);
+
+      if (response != null && response.id != null) {
+        setState(() {
+          jobsFuture = getJobs(); // Refresh the job list
+        });
+      }
+    }
+  }
+  Future<void> completeApplicationsJob(Job job) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Završi aplikacije'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Jeste li sigurni da želite završiti aplikacije?"),
+              SizedBox(height: 8),
+              Text("- Nakon ovoga niko neće moći da aplicira.", style: TextStyle(fontSize: 14)),
+              Text("- Ova opcija je za slučaj da ste se dogovorili sa radnikom.", style: TextStyle(fontSize: 14)),
+              SizedBox(height: 8),
+              Text("Ako niste sigurni, možete sačekati ili se vratiti kasnije.", style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Ne'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Da'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed ?? false) {
+      var response = await jobProvider.completeApplications(job.id!);
+
+      if (response != null && response.id != null) {
+        setState(() {
+          job.status = JobStatus.AplikacijeZavrsene;
+          jobsFuture = getJobs(); // Refresh the job list
+        });
+      }
+    }
+  }
   void _showActionDialog(BuildContext context, Job job) {
     showDialog(
       context: context,

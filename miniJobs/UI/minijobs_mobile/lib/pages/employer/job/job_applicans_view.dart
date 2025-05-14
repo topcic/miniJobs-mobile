@@ -81,8 +81,8 @@ class _JobApplicantsViewState extends State<JobApplicantsView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Instructional Header
-          const Padding(
-            padding: EdgeInsets.all(16.0),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -90,10 +90,29 @@ class _JobApplicantsViewState extends State<JobApplicantsView> {
                   'Izaberite aplikanta/e sa kojima ste surađivali na poslu',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 8),
-                Text(
-                  'Ovdje možete odabrati aplikante s kojima ste surađivali. Pregledajte listu ispod i označite odgovarajuće aplikante.',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                SizedBox(height: 12),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.info_outline, size: 20, color: Colors.grey[600]),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Ovdje možete odabrati aplikante s kojima ste surađivali. Pregledajte listu ispod i označite odgovarajuće aplikante. ',
+                              style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                            ),
+                            TextSpan(
+                              text: 'Nakon završetka aplikacija, odobrite ili odbijte aplikacije.',
+                              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
