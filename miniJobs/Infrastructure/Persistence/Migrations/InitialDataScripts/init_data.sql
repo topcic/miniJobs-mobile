@@ -237,14 +237,30 @@ AND NOT EXISTS (
 ); -- Only insert if applicant hasn’t rated employer yet
 
 -- Create Saved Jobs (random applicants saving jobs)
+WITH ApplicantPool AS (
+    SELECT u.id
+    FROM users u
+    JOIN user_roles ur ON u.id = ur.user_id
+    WHERE ur.role_id = 'Applicant'
+),
+SelectedJobs AS (
+    SELECT j.id AS job_id
+    FROM jobs j
+    WHERE j.created > DATEADD(DAY, -10, GETUTCDATE())
+    AND RAND() > 0.4
+)
 INSERT INTO saved_jobs (created_by, job_id, is_deleted, created)
 SELECT 
-    (SELECT TOP 1 u.id FROM users u JOIN user_roles ur ON u.id = ur.user_id WHERE ur.role_id = 'Applicant' ORDER BY NEWID()) AS created_by,
-    j.id AS job_id,
+    (SELECT TOP 1 id FROM ApplicantPool ORDER BY NEWID()) AS created_by,
+    job_id,
     ROUND(RAND(), 0) AS is_deleted,
     GETUTCDATE() AS created
-FROM jobs j
-WHERE j.created > DATEADD(DAY, -10, GETUTCDATE())
-AND RAND() > 0.4; -- 60% chance of saving a job
+FROM SelectedJobs
+WHERE NOT EXISTS (
+    SELECT 1 
+    FROM saved_jobs sj 
+    WHERE sj.job_id = SelectedJobs.job_id 
+    AND sj.created_by = (SELECT TOP 1 id FROM ApplicantPool ORDER BY NEWID())
+);
 
 COMMIT TRANSACTION;

@@ -1,8 +1,9 @@
 ﻿using Application.Common.Interfaces;
 using Domain.Dtos;
+using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Infrastructure.Services;
 
@@ -19,11 +20,11 @@ public class RecommendationService : IRecommendationService
     {
 
         var userProfile = await GetUserProfileVector(userId);
-        var jobs = await GetJobFeatureVectors();
+        var jobs = await GetJobFeatureVectors(userId);
         var contentBasedScores = CalculateContentBasedScores(userProfile, jobs);
 
         var similarUsers = await FindSimilarUsers(userId);
-        var collaborativeJobs = await GetCollaborativeJobs(similarUsers);
+        var collaborativeJobs = await GetCollaborativeJobs(similarUsers,userId);
 
         var employerRatings = await GetEmployerRatings(jobs.Select(j => j.Id));
         var employeeRating = await GetEmployeeRating(userId);
@@ -63,11 +64,12 @@ public class RecommendationService : IRecommendationService
         return preferences ?? new UserProfileVector();
     }
 
-    private async Task<List<JobFeatureVector>> GetJobFeatureVectors()
+    private async Task<List<JobFeatureVector>> GetJobFeatureVectors(int userId)
     {
         return await _context.Jobs
-            .Where(j => j.Status == JobStatus.Active)
-            .Select(j => new JobFeatureVector
+            .Where(j => j.Status == JobStatus.Active && !_context.JobApplications.Any(ja => ja.JobId == j.Id && ja.CreatedBy == userId && !ja.IsDeleted)
+            && !_context.SavedJobs.Any(sj => sj.JobId == j.Id && sj.CreatedBy == userId && !sj.IsDeleted))
+        .Select(j => new JobFeatureVector
             {
                 Id = j.Id,
                 CityId = j.CityId,
@@ -181,7 +183,7 @@ public class RecommendationService : IRecommendationService
     }
 
     private async Task<List<(int JobId, double Score)>> GetCollaborativeJobs(
-    List<(int UserId, double Similarity)> similarUsers)
+    List<(int UserId, double Similarity)> similarUsers, int userId)
     {
         if (!similarUsers.Any())
             return new List<(int JobId, double Score)>();
@@ -190,8 +192,13 @@ public class RecommendationService : IRecommendationService
         var similarUserIds = similarUserDict.Keys.ToList();
 
         var jobApplications = await _context.JobApplications
-            .Where(ja => !ja.IsDeleted && ja.CreatedBy.HasValue && similarUserIds.Contains(ja.CreatedBy.Value))
-            .ToListAsync();
+     .Where(ja => !ja.IsDeleted
+         && ja.CreatedBy.HasValue
+         && similarUserIds.Contains(ja.CreatedBy.Value)
+         && !_context.JobApplications.Any(ja2 => ja2.JobId == ja.JobId && ja2.CreatedBy == userId && !ja2.IsDeleted)
+         && !_context.SavedJobs.Any(sj => sj.JobId == ja.JobId && sj.CreatedBy == userId && !sj.IsDeleted))
+     .ToListAsync();
+
 
         var grouped = jobApplications
             .GroupBy(ja => ja.JobId)
