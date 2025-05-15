@@ -239,12 +239,12 @@ AND NOT EXISTS (
 -- Create Saved Jobs (random applicants saving jobs)
 INSERT INTO saved_jobs (created_by, job_id, is_deleted, created)
 SELECT 
-    FLOOR(RAND() * 12) + 2 AS created_by, -- Random number between 2 and 13
+    FLOOR(RAND(CHECKSUM(NEWID())) * 12) + 2 AS created_by,
     j.id AS job_id,
-    ROUND(RAND(), 0) AS is_deleted,
+    ROUND(RAND(CHECKSUM(NEWID())), 0) AS is_deleted,
     GETUTCDATE() AS created
 FROM jobs j
 WHERE j.created > DATEADD(DAY, -10, GETUTCDATE())
-AND RAND() > 0.4; -- 60% chance of saving a job
+  AND RAND(CHECKSUM(NEWID())) > 0.4;
 
 COMMIT TRANSACTION;
