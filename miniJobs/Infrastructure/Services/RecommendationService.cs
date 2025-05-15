@@ -17,20 +17,26 @@ public class RecommendationService : IRecommendationService
 
     public async Task<IEnumerable<JobCardDTO>> GetRecommendationJobsAsync(int userId)
     {
+
         var userProfile = await GetUserProfileVector(userId);
         var jobs = await GetJobFeatureVectors();
         var contentBasedScores = CalculateContentBasedScores(userProfile, jobs);
+
         var similarUsers = await FindSimilarUsers(userId);
         var collaborativeJobs = await GetCollaborativeJobs(similarUsers);
+
         var employerRatings = await GetEmployerRatings(jobs.Select(j => j.Id));
         var employeeRating = await GetEmployeeRating(userId);
+
         var finalRecommendations = CombineAndRankRecommendations(
             contentBasedScores,
             collaborativeJobs,
             employerRatings,
             employeeRating
         );
+
         return MapToJobCardDTOs(finalRecommendations);
+
     }
 
     private async Task<UserProfileVector> GetUserProfileVector(int userId)
@@ -175,29 +181,29 @@ public class RecommendationService : IRecommendationService
     }
 
     private async Task<List<(int JobId, double Score)>> GetCollaborativeJobs(
-        List<(int UserId, double Similarity)> similarUsers)
+    List<(int UserId, double Similarity)> similarUsers)
     {
         if (!similarUsers.Any())
             return new List<(int JobId, double Score)>();
 
-        var similarUserIds = similarUsers.Select(u => u.UserId).ToList();
+        var similarUserDict = similarUsers.ToDictionary(x => x.UserId, x => x.Similarity);
+        var similarUserIds = similarUserDict.Keys.ToList();
 
-        var collaborativeJobs = await _context.JobApplications
-            .Where(ja => !ja.IsDeleted &&
-                        similarUserIds.Contains(ja.CreatedBy.Value))
-            .GroupBy(ja => ja.JobId)
-            .Select(g => new
-            {
-                JobId = g.Key,
-                Score = g.Select(ja => similarUsers
-                    .First(u => u.UserId == ja.CreatedBy).Similarity)
-                    .Sum()
-            })
+        var jobApplications = await _context.JobApplications
+            .Where(ja => !ja.IsDeleted && ja.CreatedBy.HasValue && similarUserIds.Contains(ja.CreatedBy.Value))
             .ToListAsync();
 
-        return collaborativeJobs
-            .Select(j => (j.JobId, j.Score))
+        var grouped = jobApplications
+            .GroupBy(ja => ja.JobId)
+            .Select(g => (
+                JobId: g.Key,
+                Score: g
+                    .Where(ja => ja.CreatedBy.HasValue)
+                    .Sum(ja => similarUserDict.TryGetValue(ja.CreatedBy.Value, out var sim) ? sim : 0)
+            ))
             .ToList();
+
+        return grouped;
     }
 
     private async Task<Dictionary<int, double>> GetEmployerRatings(IEnumerable<int> jobIds)
