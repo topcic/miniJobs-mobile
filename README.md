@@ -63,6 +63,7 @@ MiniJobs je platforma koja povezuje poslodavce i aplikante, omogućavajući brzo
   - **Obriši**: Dostupno za poslove u statusu **Kreiran** ili **Aktivan**.
   - **Završi aplikacije**: Dostupno za poslove u statusu **Aktivan** ako postoji barem jedan aplikant.
   - **Završi posao**: Dostupno za poslove u statusu **Aplikacije završene** ako je barem jedan aplikant prihvaćen alebo ako niko nije aplicirao, a vrijeme je isteklo.
+  - **Upravljanje aplikantima**
 
 ### 6. Upravljanje aplikantima
 - **Prikaz aplikanta**:
