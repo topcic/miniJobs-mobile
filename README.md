@@ -1,78 +1,98 @@
-MiniJobs
-MiniJobs je platforma koja povezuje poslodavce i aplikante, omogućavajući brzo postavljanje poslova i jednostavno apliciranje. Aplikacija se sastoji od:
+# MiniJobs Platforma
 
-Mobilne aplikacije (za poslodavce i aplikante)
-Desktop aplikacije (za administraciju i upravljanje)
+MiniJobs je platforma koja povezuje poslodavce i aplikante, omogućavajući brzo postavljanje poslova i jednostavno apliciranje. Sastoji se od:
 
-🚀 Ključne funkcionalnosti
+- **Mobilne aplikacije** (za poslodavce i aplikante)
+- **Desktop aplikacije** (za administraciju i upravljanje)
 
-Poslodavci mogu kreirati i upravljati poslovima.
-Aplikanti mogu pretraživati poslove i aplicirati.
-Admin panel omogućava upravljanje korisnicima i poslovima.
+---
 
-📋 Proces upravljanja poslovima
-Kreiranje posla
+## 🚀 Ključne funkcionalnosti
 
-Korak 1: Unos osnovnih informacija o poslu (naziv, opis, itd.).
-Korak 2: Definisanje detalja (tip posla, rok za apliciranje, itd.).
-Korak 3: Način plaćanja.
-Korak 4: Pregled unosa i objava posla.
+- **Poslodavci**: Kreiranje, uređivanje i upravljanje poslovima, uključujući pregled i upravljanje aplikantima.
+- **Aplikanti**: Pretraživanje poslova, apliciranje i ocjenjivanje poslodavaca za završene poslove.
+- **Admin panel**: Upravljanje korisnicima i poslovima.
 
-Uređivanje posla
+---
 
-Posao se može uređivati dok nije u statusu Obrisan, Aplikacije završene ili Završen.
+## 📋 Proces upravljanja poslovima
 
-Brisanje posla
+### 1. Kreiranje posla
+1. **Unos osnovnih informacija**: Naziv, opis posla, itd.
+2. **Definisanje detalja**: Tip posla, rok za apliciranje, itd.
+3. **Način plaćanja**: Odabir metode plaćanja.
+4. **Pregled i objava**: Provera unosa i objavljivanje posla.
 
-Posao se može obrisati dok je u statusu Kreiran ili Aktivan.
+### 2. Uređivanje posla
+- Posao se može uređivati dok je u statusu:
+  - **Kreiran**
+  - **Aktivan**
+- **Napomena**: Uređivanje nije moguće ako je posao u statusu **Obrisan**, **Aplikacije završene** ili **Završen**.
 
-Statusi posla
+### 3. Brisanje posla
+- Posao se može obrisati samo ako je u statusu:
+  - **Kreiran**
+  - **Aktivan**
 
-Aktivan:
+### 4. Statusi posla
 
-Aplikanti mogu aplicirati na posao.
-Prelaz u Aplikacije završene na dva načina:
-Automatski: Kada istekne vrijeme za apliciranje (postavljeno od strane poslodavca).
-Ručno: Poslodavac može prebaciti posao u ovaj status ako:
-Postoji barem jedan aplikant.
-Poslodavac je dogovorio posao s aplikantom.
+#### **Aktivan**
+- Aplikanti mogu aplicirati na posao.
+- Prelaz u status **Aplikacije završene** na dva načina:
+  - **Automatski**: Kada istekne vrijeme za apliciranje (definisan rok).
+  - **Ručno**: Poslodavac prebacuje posao u ovaj status ako:
+    - Postoji barem jedan aplikant.
+    - Poslodavac je dogovorio posao s aplikantom.
 
+#### **Aplikacije završene**
+- Poslodavac može:
+  - Prihvatiti ili odbiti aplikante.
+- Posao prelazi u status **Završen** u sljedećim slučajevima:
+  - Niko se nije prijavio, a vrijeme je isteklo.
+  - Poslodavac je prihvatio barem jednog aplikanta.
 
+#### **Završen**
+- Ako je aplikacija odobrena:
+  - Poslodavac može ocijeniti odobrenog aplikanta.
+  - Aplikant može ocijeniti poslodavca (vidjeti *Upravljanje aplikantima* i *Pregled poslova aplikanta*).
 
+### 5. Meni posla
+- Kada poslodavac pregleda svoje poslove, svaki posao ima svoj meni sa akcijama koje zavise od statusa posla.
+- **Detalji posla**: Uvijek su prikazani.
+- **Akcije u meniju** (u zavisnosti od statusa):
+  - **Obriši**: Dostupno za poslove u statusu **Kreiran** ili **Aktivan**.
+  - **Završi aplikacije**: Dostupno za poslove u statusu **Aktivan** ako postoji barem jedan aplikant.
+  - **Završi posao**: Dostupno za poslove u statusu **Aplikacije završene** ako je barem jedan aplikant prihvaćen alebo ako niko nije aplicirao, a vrijeme je isteklo.
 
+### 6. Upravljanje aplikantima
+- **Prikaz aplikanta**:
+  - Aplikanti su prikazani samo ako postoje kandidati koji su aplicirali na posao.
+  - Klikom na opciju "Aplikanti" otvara se prikaz sa listom svih aplikanta koji su aplicirali.
+  - Poslodavac može pregledati profile aplikanta.
+- **Akcije nad aplikantima** (u zavisnosti od statusa posla):
+  - **Status Aplikacije završene**:
+    - Poslodavac može **odobriti** ili **odbiti** svakog aplikanta.
+  - **Status Završen**:
+    - Ako je aplikant odobren, poslodavac može **ocijeniti** aplikanta.
 
+### 7. Pregled poslova aplikanta
+- Kada aplikant pregleda svoje poslove, za poslove u statusu **Završen** gdje je aplikant odobren:
+  - Aplikant ima opciju da **ocjeni poslodavca**.
 
-Aplikacije završene:
+---
 
-Poslodavac može prihvatiti ili odbiti aplikante.
-Posao se može završiti u dva slučaja:
-Niko se nije prijavio, a vrijeme je isteklo.
-Poslodavac je prihvatio barem jednog aplikanta.
+## 📲 Prijava u sistem
 
+Koristite sljedeće testne naloge za prijavu:
 
+### Admin aplikacija
+- **Email**: `admin@minijobs.ba`
+- **Lozinka**: `Minijobs1234!`
 
+### Aplikant (mobilna aplikacija)
+- **Email**: `applicant@minijobs.ba`
+- **Lozinka**: `Minijobs1234!`
 
-Završen:
-
-Ako je aplikacija odobrena, poslodavac i aplikant mogu ocijeniti jedan drugog.
-
-
-
-📲 Prijava u sistem
-Koristi sljedeće testne naloge za prijavu:
-Admin aplikacija
-
-✉️ Email: admin@minijobs.ba
-🔑 Lozinka: Minijobs1234!
-
-Mobilna aplikacija
-Aplikant
-
-✉️ Email: applicant@minijobs.ba
-🔑 Lozinka: Minijobs1234!
-
-Poslodavac
-
-✉️ Email: employer@minijobs.ba
-🔑 Lozinka: Minijobs1234!
-
+### Poslodavac (mobilna aplikacija)
+- **Email**: `employer@minijobs.ba`
+- **Lozinka**: `Minijobs1234!`

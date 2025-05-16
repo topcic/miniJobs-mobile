@@ -30,7 +30,6 @@ class _JobModalState extends State<JobModal> {
   late JobApplicationProvider jobApplicationProvider;
   late Future<Job?> jobFuture; // Future to hold job fetch
   late Future<JobApplication?> jobApplicationFuture; // Future to hold job fetch
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -48,7 +47,7 @@ class _JobModalState extends State<JobModal> {
   bool canUserApply(Job job) {
     return job.status != JobStatus.Zavrsen &&
         !job.isApplied &&
-        widget.role != Role.Employer &&
+        widget.role != 'Employer' &&
         job.created!
             .add(Duration(days: job.applicationsDuration!))
             .isAfter(DateTime.now());
@@ -56,7 +55,7 @@ class _JobModalState extends State<JobModal> {
 
   bool canUserSaveJob(Job job) {
     return job.status != JobStatus.Zavrsen &&
-        widget.role != Role.Employer &&
+        widget.role !='Employer' &&
         !(job.isSaved ?? false);
   }
   bool canUserDeleteApplication(Job job) {

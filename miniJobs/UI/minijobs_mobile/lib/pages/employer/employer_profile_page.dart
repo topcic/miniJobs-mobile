@@ -160,6 +160,22 @@ class _EmployerProfilePageState extends State<EmployerProfilePage> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    const SizedBox(height: 5,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.location_on,
+                            size: 16, color: Colors.grey[600]),
+                        const SizedBox(width: 4),
+                        Text(
+                          employer?.city?.name ?? 'No City',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 5),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,

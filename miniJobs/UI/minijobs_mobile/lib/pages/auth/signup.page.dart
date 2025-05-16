@@ -27,6 +27,7 @@ class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormBuilderState>();
   List<City>? cities;
   bool isLoading = true;
+
   late final String title = widget.role == Role.Applicant
       ? "Registruj se kao aplikant"
       : "Registruj se kao poslodavac";
