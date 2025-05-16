@@ -1,9 +1,7 @@
 ﻿using Application.Common.Interfaces;
 using Domain.Dtos;
-using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Persistence;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Infrastructure.Services;
 

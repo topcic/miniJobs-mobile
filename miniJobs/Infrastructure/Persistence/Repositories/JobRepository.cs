@@ -113,19 +113,20 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<IEnumerable<JobCardDTO>> SearchAsync(string searchText, int limit, int offset, int? cityId, Domain.Enums.SortOrder sort)
         {
-            var query = context.Jobs
-                .Where(j => (string.IsNullOrEmpty(searchText) || j.Name.Contains(searchText))
-                             && (!cityId.HasValue || j.CityId == cityId)
-                             && j.Status == JobStatus.Active
-                             && !j.DeletedByAdmin)
-                .Select(j => new JobCardDTO
-                {
-                    Id = j.Id,
-                    Name = j.Name,
-                    CityName = j.City.Name,
-                    Wage = j.Wage,
-                    Created = j.Created
-                });
+            var query = from j in context.Jobs
+                        join c in context.Cities on j.CityId equals c.Id
+                        where (string.IsNullOrEmpty(searchText) || j.Name.Contains(searchText))
+                              && (!cityId.HasValue || j.CityId == cityId)
+                              && j.Status == JobStatus.Active
+                              && !j.DeletedByAdmin
+                        select new JobCardDTO
+                        {
+                            Id = j.Id,
+                            Name = j.Name,
+                            CityName = c.Name,
+                            Wage = j.Wage,
+                            Created = j.Created
+                        };
 
             var jobList = sort == Domain.Enums.SortOrder.DESC
                 ? await query.OrderByDescending(j => j.Created)

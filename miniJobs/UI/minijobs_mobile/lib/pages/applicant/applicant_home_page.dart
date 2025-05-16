@@ -43,9 +43,12 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
     _cityProvider = context.read<CityProvider>();
     _recommendationProvider = context.read<RecommendationProvider>();
 
-    getCities();
-    searchJobs();
-    getRecommendedJobs();
+    // Load cities and recommended jobs sequentially, then search jobs
+    getCities().then((_) {
+      getRecommendedJobs().then((_) {
+        searchJobs();
+      });
+    });
   }
 
   Future<void> getCities() async {
@@ -57,12 +60,14 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
     }
   }
 
-
   Future<void> getRecommendedJobs() async {
     recommendedJobs = await _recommendationProvider.getRecommendatios();
     print(recommendedJobs);
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
+
   Future<void> searchJobs() async {
     if (mounted) {
       setState(() {
@@ -74,19 +79,22 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
     City? city;
     if (selectedCity != null) {
       city = cities.firstWhere(
-              (city) => city.name == selectedCity
+            (city) => city.name == selectedCity,
       );
     }
-    SortOrder sortOrder= sort=='Najnovije'?SortOrder.DESC:SortOrder.ASC;
+    SortOrder sortOrder = sort == 'Najnovije' ? SortOrder.DESC : SortOrder.ASC;
     jobs = await _jobProvider.search(
       searchText: searchTerm,
       cityId: city?.id,
-        sort: sortOrder
+      sort: sortOrder,
     );
+
+    // Filter out recommended jobs only if there are 4 or more
     if (recommendedJobs.length >= 4) {
       final recommendedJobIds = recommendedJobs.map((job) => job.id).toSet();
       jobs.result!.removeWhere((job) => recommendedJobIds.contains(job.id));
     }
+
     if (mounted) {
       setState(() {
         isLoading = false;
