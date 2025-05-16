@@ -147,11 +147,10 @@ class _ApplicantCardState extends State<ApplicantCard> {
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.star,
-                                        size: 14, color: Colors.amber),
+                                    const Icon(Icons.check_circle, size: 14, color: Colors.green), // Better icon for "completed jobs"
                                     const SizedBox(width: 4),
                                     Text(
-                                      '${widget.applicant.numberOfFinishedJobs}',
+                                      '${widget.applicant.numberOfFinishedJobs} poslova', // Add "jobs" for clarity
                                       style: TextStyle(
                                         color: Colors.grey[700],
                                         fontSize: 12,

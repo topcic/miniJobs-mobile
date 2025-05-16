@@ -99,7 +99,7 @@ public class ApplicantRepository(ApplicationDbContext context, IMapper mapper) :
                                     .Average() ?? 0,
             NumberOfFinishedJobs = (from ja in _context.JobApplications
                                     join j in _context.Jobs on ja.JobId equals j.Id
-                                    where ja.CreatedBy == a.Id && j.Status == JobStatus.Completed
+                                    where ja.CreatedBy == a.Id && j.Status == JobStatus.Completed && ja.Status==JobApplicationStatus.Accepted
                                     select ja)
                                       .Count()
         })

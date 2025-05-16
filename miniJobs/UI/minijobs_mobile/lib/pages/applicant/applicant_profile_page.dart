@@ -175,15 +175,36 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    const SizedBox(height: 5,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.location_on,
+                            size: 16, color: Colors.grey[600]),
+                        const SizedBox(width: 4),
+                        Text(
+                          applicant?.city?.name ?? 'No City',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 5),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.star, color: Colors.yellow),
+                        const Icon(Icons.star, color: Colors.amber, size: 16), // Match color with other views
                         const SizedBox(width: 5),
                         Text(
-                          applicant?.averageRating?.toStringAsFixed(1) ?? 'N/A',
-                          style: const TextStyle(fontSize: 16),
+                          applicant?.averageRating != null
+                              ? '${applicant!.averageRating!.toStringAsFixed(1)}' // Add scale
+                              : 'N/A',
+                          style: const TextStyle(
+                            fontSize: 14, // Slightly smaller for balance
+                            color: Colors.black, // Consistent color
+                          ),
                         ),
                       ],
                     ),
