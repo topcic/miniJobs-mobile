@@ -137,104 +137,54 @@ AND NOT EXISTS (
     WHERE ja.job_id = ap.job_id 
     AND ja.created_by = ap.applicant_id
 ); -- Ensure no duplicate applications
+-- Generate missing ratings bidirectionally (no duplicates), for job_application.status=1 and job.status=3
 
--- Create Ratings with bidirectional enforcement for job applications with status = 1
--- Step 1: Insert Applicant-to-Employer ratings (70% chance)
+-- Step 1: Union all required missing pairs with direction flags
+WITH potential_ratings AS (
+    SELECT 
+        ja.id AS job_application_id,
+        ja.created_by AS applicant_id,
+        j.created_by AS employer_id
+    FROM job_applications ja
+    JOIN jobs j ON ja.job_id = j.id
+    WHERE ja.status = 1 AND j.status = 3
+),
+missing_ratings AS (
+    SELECT
+        pr.job_application_id,
+        pr.applicant_id AS created_by,
+        pr.employer_id AS rated_user_id
+    FROM potential_ratings pr
+    WHERE NOT EXISTS (
+        SELECT 1 FROM ratings r
+        WHERE r.job_application_id = pr.job_application_id
+          AND r.created_by = pr.applicant_id
+          AND r.rated_user_id = pr.employer_id
+    )
+    UNION ALL
+    SELECT
+        pr.job_application_id,
+        pr.employer_id AS created_by,
+        pr.applicant_id AS rated_user_id
+    FROM potential_ratings pr
+    WHERE NOT EXISTS (
+        SELECT 1 FROM ratings r
+        WHERE r.job_application_id = pr.job_application_id
+          AND r.created_by = pr.employer_id
+          AND r.rated_user_id = pr.applicant_id
+    )
+)
+-- Step 2: Insert the non-duplicate ratings randomly
 INSERT INTO ratings (value, comment, job_application_id, rated_user_id, is_active, created_by, created)
 SELECT 
-    CAST(RAND(CHECKSUM(NEWID())) * 5 + 1 AS INT) AS value, -- Random rating 1-5
-    CONCAT('Review by applicant for employer ', ABS(CHECKSUM(NEWID())) % 1000) AS comment,
-    ja.id AS job_application_id,
-    j.created_by AS rated_user_id, -- Applicant rates the employer
-    1 AS is_active, -- Always active initially
-    ja.created_by AS created_by, -- Applicant who applied
-    GETUTCDATE() AS created
-FROM job_applications ja
-JOIN jobs j ON ja.job_id = j.id
-WHERE ja.status = 1 and j.status=2
-AND NOT EXISTS (
-    SELECT 1 
-    FROM ratings r 
-    WHERE r.job_application_id = ja.id 
-    AND r.created_by = ja.created_by 
-    AND r.rated_user_id = j.created_by
-); -- Avoid duplicates
-
--- Step 2: Insert Employer-to-Applicant ratings for every Applicant-to-Employer rating
-INSERT INTO ratings (value, comment, job_application_id, rated_user_id, is_active, created_by, created)
-SELECT 
-    CAST(RAND(CHECKSUM(NEWID())) * 5 + 1 AS INT) AS value, -- Random rating 1-5
-    CONCAT('Review by employer for applicant ', ABS(CHECKSUM(NEWID())) % 1000) AS comment,
-    r.job_application_id,
-    r.created_by AS rated_user_id, -- Employer rates the applicant who rated them
-    1 AS is_active, -- Always active to match
-    j.created_by AS created_by, -- Employer who created the job
-    GETUTCDATE() AS created
-FROM ratings r
-JOIN job_applications ja ON r.job_application_id = ja.id
-JOIN jobs j ON ja.job_id = j.id
-WHERE r.is_active = 1
-AND r.rated_user_id = j.created_by -- Applicant rated employer
-AND NOT EXISTS (
-    SELECT 1 
-    FROM ratings r2 
-    WHERE r2.job_application_id = r.job_application_id 
-    AND r2.created_by = j.created_by 
-    AND r2.rated_user_id = r.created_by
-); -- Only insert if employer hasn’t rated applicant yet
-
--- Step 3: Insert Employer-to-Applicant ratings (70% chance) where no Applicant-to-Employer rating exists
-INSERT INTO ratings (value, comment, job_application_id, rated_user_id, is_active, created_by, created)
-SELECT 
-    CAST(RAND(CHECKSUM(NEWID())) * 5 + 1 AS INT) AS value, -- Random rating 1-5
-    CONCAT('Review by employer for applicant ', ABS(CHECKSUM(NEWID())) % 1000) AS comment,
-    ja.id AS job_application_id,
-    ja.created_by AS rated_user_id, -- Employer rates the applicant
-    1 AS is_active, -- Always active initially
-    j.created_by AS created_by, -- Employer who created the job
-    GETUTCDATE() AS created
-FROM job_applications ja
-JOIN jobs j ON ja.job_id = j.id
-WHERE ja.status = 1
-AND RAND() > 0.3 -- 70% chance of a rating
-AND NOT EXISTS (
-    SELECT 1 
-    FROM ratings r 
-    WHERE r.job_application_id = ja.id 
-    AND r.created_by = j.created_by 
-    AND r.rated_user_id = ja.created_by
-) -- Avoid duplicates
-AND NOT EXISTS (
-    SELECT 1 
-    FROM ratings r 
-    WHERE r.job_application_id = ja.id 
-    AND r.created_by = ja.created_by 
-    AND r.rated_user_id = j.created_by
-); -- Only insert if no Applicant-to-Employer rating exists
-
--- Step 4: Insert Applicant-to-Employer ratings for every Employer-to-Applicant rating
-INSERT INTO ratings (value, comment, job_application_id, rated_user_id, is_active, created_by, created)
-SELECT 
-    CAST(RAND(CHECKSUM(NEWID())) * 5 + 1 AS INT) AS value, -- Random rating 1-5
-    CONCAT('Review by applicant for employer ', ABS(CHECKSUM(NEWID())) % 1000) AS comment,
-    r.job_application_id,
-    j.created_by AS rated_user_id, -- Applicant rates the employer who rated them
-    1 AS is_active, -- Always active to match
-    r.created_by AS created_by, -- Applicant who was rated
-    GETUTCDATE() AS created
-FROM ratings r
-JOIN job_applications ja ON r.job_application_id = ja.id
-JOIN jobs j ON ja.job_id = j.id
-WHERE r.is_active = 1
-AND r.rated_user_id = ja.created_by -- Employer rated applicant
-AND NOT EXISTS (
-    SELECT 1 
-    FROM ratings r2 
-    WHERE r2.job_application_id = r.job_application_id 
-    AND r2.created_by = ja.created_by 
-    AND r2.rated_user_id = j.created_by
-); -- Only insert if applicant hasn’t rated employer yet
-
+    CAST(RAND(CHECKSUM(NEWID())) * 5 + 1 AS INT) AS value,
+    CONCAT('Auto-generated review ', ABS(CHECKSUM(NEWID())) % 100000) AS comment,
+    mr.job_application_id,
+    mr.rated_user_id,
+    1 AS is_active,
+    mr.created_by,
+    GETUTCDATE()
+FROM missing_ratings mr;
 -- Create Saved Jobs (random applicants saving jobs)
 INSERT INTO saved_jobs (created_by, job_id, is_deleted, created)
 SELECT 
