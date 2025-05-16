@@ -83,7 +83,7 @@ public class ApplicantRepository(ApplicationDbContext context, IMapper mapper) :
             query = query.Where(a => a.ApplicantJobTypes.Any(ajt => ajt.JobTypeId == jobTypeId.Value));
         }
 
-        query = query.Skip(offset).Take(limit);
+        //query = query.Skip(offset).Take(limit);
 
         query = query.Include(a => a.User)
                      .Include(a => a.User.City)

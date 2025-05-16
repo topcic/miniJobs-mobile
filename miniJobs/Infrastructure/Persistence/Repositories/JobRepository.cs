@@ -129,12 +129,8 @@ namespace Infrastructure.Persistence.Repositories
 
             var jobList = sort == Domain.Enums.SortOrder.DESC
                 ? await query.OrderByDescending(j => j.Created)
-                             .Skip(offset)
-                             .Take(limit)
                              .ToListAsync()
                 : await query.OrderBy(j => j.Created)
-                             .Skip(offset)
-                             .Take(limit)
                              .ToListAsync();
 
             return jobList;

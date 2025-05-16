@@ -1,10 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:minijobs_mobile/models/user/user_change_password_request.dart';
 import 'package:minijobs_mobile/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../../helpers/auth_helper.dart';
 import '../../services/notification.service.dart';
 import 'login_sign_up_page.dart';
 class ForgotPasswordPage extends StatefulWidget {
@@ -24,11 +25,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   void initState() {
     super.initState();
     _userProvider = context.read<UserProvider>();
-    AuthHelper.checkIsAuthenticated(context);
   }
 
   Future<void> sendEmail(String email) async {
     try {
+      debugger();
       // Call the forgotPassword method
       bool? result = await _userProvider.forgotPassword(email);
 
