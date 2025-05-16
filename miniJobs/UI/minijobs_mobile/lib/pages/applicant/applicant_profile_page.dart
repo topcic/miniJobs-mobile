@@ -199,7 +199,7 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
                         const SizedBox(width: 5),
                         Text(
                           applicant?.averageRating != null
-                              ? '${applicant!.averageRating!.toStringAsFixed(1)}' // Add scale
+                              ? applicant!.averageRating!.toStringAsFixed(1) // Add scale
                               : 'N/A',
                           style: const TextStyle(
                             fontSize: 14, // Slightly smaller for balance

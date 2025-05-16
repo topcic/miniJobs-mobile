@@ -83,10 +83,10 @@ class _JobApplicationCardState extends State<JobApplicationCard> {
                       _handleRating(context);
                     },
                     child: Container(
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: Colors.white,
                         shape: BoxShape.circle,
-                        boxShadow: const [
+                        boxShadow: [
                           BoxShadow(
                             color: Colors.black12,
                             blurRadius: 8,

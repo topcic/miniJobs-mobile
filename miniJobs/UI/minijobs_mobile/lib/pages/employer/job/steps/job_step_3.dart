@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -278,8 +277,9 @@ class _JobStep3State extends State<JobStep3> {
       int wage = isPoDogovoru
           ? 0
           : (formValues['wage'] != null ? int.tryParse(formValues['wage']) : 0) ?? 0;
-    if(isPoDogovoru)
+    if(isPoDogovoru) {
       _formKey.currentState!.fields['wage']?.setValue('0');
+    }
 
       var saveRequest = JobStep3Request(
         answersToPaymentQuestions,

@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
@@ -92,14 +91,14 @@ class _JobPreviewState extends State<JobPreview> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Jeste li sigurni da želite završiti aplikacije?"),
-                SizedBox(height: 8),
-                Text("- Nakon ovoga niko neće moći da aplicira.",
+                const Text("Jeste li sigurni da želite završiti aplikacije?"),
+                const SizedBox(height: 8),
+                const Text("- Nakon ovoga niko neće moći da aplicira.",
                     style: TextStyle(fontSize: 14)),
-                Text(
+                const Text(
                     "- Ova opcija je za slučaj da ste se dogovorili sa radnikom.",
                     style: TextStyle(fontSize: 14)),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
                     "Ako niste sigurni, možete sačekati ili se vratiti kasnije.",
                     style: TextStyle(fontSize: 12, color: Colors.grey[600])),
@@ -136,7 +135,7 @@ class _JobPreviewState extends State<JobPreview> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(
                   color: Colors.black12,
                   blurRadius: 8,

@@ -1,5 +1,4 @@
 
-import 'dart:developer';
 
 import '../models/job/job.dart';
 import '../models/job/job_card_dto.dart';

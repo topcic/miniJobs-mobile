@@ -29,7 +29,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   Future<void> sendEmail(String email) async {
     try {
-      debugger();
       // Call the forgotPassword method
       bool? result = await _userProvider.forgotPassword(email);
 
