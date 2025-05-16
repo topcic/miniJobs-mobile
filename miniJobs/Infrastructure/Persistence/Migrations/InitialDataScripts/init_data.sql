@@ -138,7 +138,7 @@ AND NOT EXISTS (
     AND ja.created_by = ap.applicant_id
 ); -- Ensure no duplicate applications
 
--- Create Ratings with bidirectional enforcement for job applications with status = 2
+-- Create Ratings with bidirectional enforcement for job applications with status = 1
 -- Step 1: Insert Applicant-to-Employer ratings (70% chance)
 INSERT INTO ratings (value, comment, job_application_id, rated_user_id, is_active, created_by, created)
 SELECT 
@@ -152,7 +152,6 @@ SELECT
 FROM job_applications ja
 JOIN jobs j ON ja.job_id = j.id
 WHERE ja.status = 1 and j.status=2
-AND RAND() > 0.3 -- 70% chance of a rating
 AND NOT EXISTS (
     SELECT 1 
     FROM ratings r 
