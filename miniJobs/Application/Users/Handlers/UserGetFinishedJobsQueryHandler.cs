@@ -10,7 +10,7 @@ public class UserGetFinishedJobsQueryHandler(IUserManagerRepository userReposito
     public async Task<IEnumerable<JobCardDTO>> Handle(UserGetFinishedJobsQuery request, CancellationToken cancellationToken)
     {
         var user = await userRepository.TryFindAsync(request.Id);
-        var isApplicant = request.RoleId == "Applicant";
+        var isApplicant = user.Role == "Applicant";
         return await userRepository.GetFinishedJobs(request.Id, isApplicant);
     }
 }
