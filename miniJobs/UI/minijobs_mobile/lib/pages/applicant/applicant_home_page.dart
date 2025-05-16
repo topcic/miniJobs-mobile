@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:minijobs_mobile/enumerations/sort_order.dart';
 import 'package:minijobs_mobile/models/city.dart';
@@ -48,18 +50,26 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
   }
 
   Future<void> getCities() async {
-    cities = await _cityProvider.getAll();
-    setState(() {});
+    final result = await _cityProvider.getAll();
+    if (mounted) {
+      setState(() {
+        cities = result;
+      });
+    }
   }
+
 
   Future<void> getRecommendedJobs() async {
     recommendedJobs = await _recommendationProvider.getRecommendatios();
+    print(recommendedJobs);
     setState(() {});
   }
   Future<void> searchJobs() async {
-    setState(() {
-      isLoading = true;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+      });
+    }
 
     String searchTerm = _searchController.text;
     City? city;
@@ -78,9 +88,11 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
       final recommendedJobIds = recommendedJobs.map((job) => job.id).toSet();
       jobs.result!.removeWhere((job) => recommendedJobIds.contains(job.id));
     }
-    setState(() {
-      isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override

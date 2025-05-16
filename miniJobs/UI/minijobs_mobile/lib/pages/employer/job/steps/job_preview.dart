@@ -30,7 +30,15 @@ class _JobPreviewState extends State<JobPreview> {
       });
     }
   }
-
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final jobProvider = Provider.of<JobProvider>(context, listen: false);
+    final Job? job = jobProvider.getCurrentJob();
+    setState(() {
+      isJobCompleted = job?.status == JobStatus.Zavrsen;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     final jobProvider = Provider.of<JobProvider>(context);
