@@ -151,7 +151,7 @@ SELECT
     GETUTCDATE() AS created
 FROM job_applications ja
 JOIN jobs j ON ja.job_id = j.id
-WHERE ja.status = 1
+WHERE ja.status = 1 and j.status=2
 AND RAND() > 0.3 -- 70% chance of a rating
 AND NOT EXISTS (
     SELECT 1 
