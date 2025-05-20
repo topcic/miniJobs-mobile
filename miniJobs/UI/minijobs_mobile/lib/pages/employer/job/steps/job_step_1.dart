@@ -1,13 +1,16 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:flutter_quill/quill_delta.dart' as quill show Delta;
 import 'package:minijobs_mobile/models/city.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/providers/city_provider.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
 import 'package:minijobs_mobile/utils/util_widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
 
 class JobStep1 extends StatefulWidget {
   const JobStep1({super.key});
@@ -23,6 +26,14 @@ class JobStep1State extends State<JobStep1> {
   late JobProvider _jobProvider;
   Job? _job;
   bool isLoading = true;
+
+  // Initialize _quillController with a default value to avoid late initialization error
+  final quill.QuillController _quillController = quill.QuillController(
+    document: quill.Document(),
+    selection: const TextSelection.collapsed(offset: 0),
+  );
+  final FocusNode _editorFocusNode = FocusNode();
+  final ScrollController _editorScrollController = ScrollController();
 
   @override
   void didChangeDependencies() {
@@ -50,7 +61,6 @@ class JobStep1State extends State<JobStep1> {
         });
       }
     } catch (e) {
-      // Handle errors properly
       log('Error fetching cities: $e');
       setState(() {
         isLoading = false;
@@ -63,18 +73,36 @@ class JobStep1State extends State<JobStep1> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _formKey.currentState?.patchValue({
           'name': _job!.name,
-          'description': _job!.description,
           'cityId': _job!.cityId?.toString(),
           'streetAddressAndNumber': _job!.streetAddressAndNumber,
         });
+
+        // Set the initial description in the Quill editor if it exists
+        if (_job!.description != null && _job!.description!.isNotEmpty) {
+          try {
+            // Decode the JSON string and load it as a Delta
+            final delta = quill.Delta.fromJson(jsonDecode(_job!.description!));
+            _quillController.document = quill.Document.fromDelta(delta);
+          } catch (e) {
+            log('Error setting Quill description: $e');
+            // Fallback: Treat as plain text if JSON parsing fails
+            final delta = quill.Delta()..insert(_job!.description! + '\n');
+            _quillController.document = quill.Document.fromDelta(delta);
+          }
+        }
       });
     }
   }
+
   @override
   void dispose() {
     _formKey.currentState?.dispose();
+    _quillController.dispose();
+    _editorFocusNode.dispose();
+    _editorScrollController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return isLoading
@@ -92,24 +120,46 @@ class JobStep1State extends State<JobStep1> {
                 CrossAxisAlignment.center,
               ),
               const SizedBox(height: 20),
+              // Rich Text Editor for Description
               rowMethod(
                 Expanded(
-                  child: FormBuilderTextField(
-                    maxLines: 8,
-                    keyboardType: TextInputType.multiline,
-                    name: 'description',
-                    decoration: const InputDecoration(
-                      labelText: "Opis",
-                      hintText: "Unesite opis ovdje",
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Opis je obavezno polje";
-                      }
-                      return null;
-                    },
-                    style: const TextStyle(fontSize: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Toolbar for formatting options
+                      quill.QuillSimpleToolbar(
+                        controller: _quillController,
+                        config: const quill.QuillSimpleToolbarConfig(
+                          showAlignmentButtons: true,
+                          showListBullets: true,
+                          showListNumbers: true,
+                          showBoldButton: true,
+                          showItalicButton: true,
+                          showUnderLineButton: true,
+                          showLink: true,
+                          showHeaderStyle: false,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      // Editor area
+                      Container(
+                        height: 200,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: quill.QuillEditor(
+                          controller: _quillController,
+                          focusNode: _editorFocusNode,
+                          scrollController: _editorScrollController,
+                          config: const quill.QuillEditorConfig(
+                            placeholder: 'Unesite opis ovdje',
+                            padding: EdgeInsets.all(8),
+                            expands: false,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 CrossAxisAlignment.center,
@@ -177,6 +227,17 @@ class JobStep1State extends State<JobStep1> {
     _formKey.currentState?.save();
     if (_formKey.currentState!.validate()) {
       final formData = Map<String, dynamic>.from(_formKey.currentState!.value);
+
+      // Get the description from the Quill editor as Delta JSON
+      final descriptionJson = jsonEncode(_quillController.document.toDelta().toJson());
+      if (descriptionJson == '[{"insert":"\\n"}]') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Opis je obavezno polje")),
+        );
+        return false;
+      }
+
+      formData['description'] = descriptionJson;
       formData['cityId'] = int.tryParse(formData['cityId']);
 
       setState(() {
@@ -194,9 +255,14 @@ class JobStep1State extends State<JobStep1> {
     }
     return false;
   }
-  bool isValidForm(){
+
+  bool isValidForm() {
     _formKey.currentState?.save();
     if (_formKey.currentState!.validate()) {
+      final description = _quillController.document.toPlainText().trim();
+      if (description.isEmpty) {
+        return false;
+      }
       return true;
     }
     return false;

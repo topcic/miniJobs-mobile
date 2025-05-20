@@ -17,6 +17,8 @@ import 'package:minijobs_mobile/providers/user_registration_provider.dart';
 import 'package:minijobs_mobile/providers/user_provider.dart';
 import 'package:minijobs_mobile/services/config_service.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,13 +50,32 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Check if the user is logged in (this would typically use AuthenticationProvider)
+    bool isLoggedIn = false; // Replace with actual logic from AuthenticationProvider
+
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'MiniJobs App',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
         useMaterial3: true,
+        textTheme: const TextTheme(
+          displayLarge: TextStyle(
+            fontSize: 72,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
-      home: const MyMaterialApp(),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        quill.FlutterQuillLocalizations.delegate, // Add this for flutter_quill localization
+      ],
+      supportedLocales: const [
+        Locale('en', ''), // English
+        // Add other supported locales (e.g., Locale('sr', '') for Serbian) as needed
+      ],
+      home: isLoggedIn ? const Placeholder() : const LoginSignupPage(), // Replace Placeholder with your logged-in home screen
     );
   }
 }
@@ -66,31 +87,5 @@ class MyAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(title);
-  }
-}
-
-class MyMaterialApp extends StatelessWidget {
-  const MyMaterialApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    // Check if the user is logged in
-    bool isLoggedIn = false;
-
-    return MaterialApp(
-      title: "My app",
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue,
-        ),
-        textTheme: const TextTheme(
-          displayLarge: TextStyle(
-            fontSize: 72,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-      home: const LoginSignupPage() ,
-    );
   }
 }

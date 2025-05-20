@@ -1,14 +1,14 @@
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:minijobs_mobile/enumerations/job_statuses.dart';
-import 'package:minijobs_mobile/enumerations/role.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
 import 'package:minijobs_mobile/models/job/job_application.dart';
 import 'package:minijobs_mobile/providers/applicant_provider.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
 
 import '../../../providers/job_application_provider.dart';
 import '../employer_profile_page.dart';
@@ -18,7 +18,13 @@ class JobModal extends StatefulWidget {
   final String role;
   final bool isInSavedJobs;
   final bool isInAppliedJobs;
-  const JobModal({super.key, required this.jobId, required this.role,this.isInSavedJobs = false,this.isInAppliedJobs = false});
+
+  const JobModal(
+      {super.key,
+      required this.jobId,
+      required this.role,
+      this.isInSavedJobs = false,
+      this.isInAppliedJobs = false});
 
   @override
   State<JobModal> createState() => _JobModalState();
@@ -28,8 +34,9 @@ class _JobModalState extends State<JobModal> {
   late JobProvider jobProvider;
   late ApplicantProvider applicantProvider;
   late JobApplicationProvider jobApplicationProvider;
-  late Future<Job?> jobFuture; // Future to hold job fetch
-  late Future<JobApplication?> jobApplicationFuture; // Future to hold job fetch
+  late Future<Job?> jobFuture;
+  late Future<JobApplication?> jobApplicationFuture;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -55,17 +62,19 @@ class _JobModalState extends State<JobModal> {
 
   bool canUserSaveJob(Job job) {
     return job.status != JobStatus.Zavrsen &&
-        widget.role !='Employer' &&
+        widget.role != 'Employer' &&
         !(job.isSaved ?? false);
   }
+
   bool canUserDeleteApplication(Job job) {
     return job.status != JobStatus.Zavrsen &&
         job.isApplied &&
-        widget.role != Role.Employer &&
+        widget.role != 'Employer' &&
         job.created!
             .add(Duration(days: job.applicationsDuration!))
             .isAfter(DateTime.now());
   }
+
   Future<void> saveJob(int jobId) async {
     setState(() {
       jobFuture = applicantProvider.saveJob(jobId);
@@ -93,6 +102,7 @@ class _JobModalState extends State<JobModal> {
       }
     });
   }
+
   Future<void> applyToJob(int jobId) async {
     setState(() {
       jobApplicationFuture = jobApplicationProvider.apply(jobId);
@@ -106,13 +116,11 @@ class _JobModalState extends State<JobModal> {
         setState(() {
           jobFuture = jobFuture.then((job) {
             if (job != null) {
-              // Update the job's isApplied field
               job.isApplied = true;
             }
             return job;
           });
         });
-
       }
     });
   }
@@ -130,7 +138,6 @@ class _JobModalState extends State<JobModal> {
         setState(() {
           jobFuture = jobFuture.then((job) {
             if (job != null) {
-              // Update the job's isApplied field
               job.isApplied = false;
             }
             return job;
@@ -140,26 +147,19 @@ class _JobModalState extends State<JobModal> {
     });
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Job?>(
       future: jobFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          // Show loading indicator while waiting for data
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          // Show error message if the fetch fails
           return const Center(child: Text('Failed to load job details'));
         } else if (!snapshot.hasData) {
-          // Show empty state if no job data is available
           return const Center(child: Text('No job data available'));
         }
 
-        // Job data successfully fetched
         final job = snapshot.data!;
 
         return Dialog(
@@ -210,19 +210,18 @@ class _JobModalState extends State<JobModal> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          "${job.employerFullName} - ${job.city!.name}, ${job.streetAddressAndNumber} }",
+                          "${job.employerFullName} - ${job.city!.name}, ${job.streetAddressAndNumber}",
                           style: const TextStyle(fontSize: 14),
                         ),
                       ),
-                      if (GetStorage().read('role') == 'Applicant') // Show info icon only for applicants
+                      if (GetStorage().read('role') == 'Applicant')
                         IconButton(
                           icon: const Icon(Icons.info_outline),
                           onPressed: () {
-                            // Navigate to EmployerDetailsPage with employerId (assuming job has employerId)
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) => EmployerProfilePage(
-                                  userId: job.createdBy!, // Replace with actual employer ID field from your Job model
+                                  userId: job.createdBy!,
                                 ),
                               ),
                             );
@@ -238,14 +237,38 @@ class _JobModalState extends State<JobModal> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Text(
-                    job.description!,
-                    style: const TextStyle(fontSize: 14),
+                  // Render rich text using QuillRenderer
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    child: SizedBox(
+                      child: IgnorePointer(
+                        child: quill.QuillEditor(
+                          controller: quill.QuillController(
+                            document: job.description != null
+                                ? quill.Document.fromJson(
+                                    jsonDecode(job.description!))
+                                : quill.Document(),
+                            selection: const TextSelection.collapsed(offset: 0),
+                          ),
+                          focusNode: FocusNode(),
+                          scrollController: ScrollController(),
+                        ),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 10),
-                  Text(
-                    'Tip posla: ${job.jobType!.name}',
-                    style: const TextStyle(fontSize: 14),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.work, size: 20), // Icon for job type
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          'Tip posla: ${job.jobType!.name}',
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 10),
                   Row(
@@ -262,36 +285,64 @@ class _JobModalState extends State<JobModal> {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  const Text(
-                    'Raspored posla:',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.schedule, size: 20), // Icon for schedule
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Raspored posla:',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              job.schedules
+                                      ?.map((option) => option.answer)
+                                      .join(', ') ??
+                                  '',
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
+
                   const SizedBox(height: 10),
-                  Text(
-                    job.schedules?.map((option) => option.answer).join(', ') ??
-                        '',
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                  const SizedBox(height: 10),
+
                   if (job.additionalPaymentOptions != null &&
                       job.additionalPaymentOptions!.isNotEmpty)
-                    Column(
+                    Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Dodatno plaća:',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                        const Icon(Icons.add_circle, size: 20),
+                        // Icon for additional payment
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Dodatno plaća:',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                job.additionalPaymentOptions!
+                                    .map((option) => option.answer)
+                                    .join(', '),
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ],
                           ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          job.additionalPaymentOptions!
-                              .map((option) => option.answer)
-                              .join(', '),
-                          style: const TextStyle(fontSize: 14),
                         ),
                       ],
                     ),
@@ -305,14 +356,41 @@ class _JobModalState extends State<JobModal> {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Icon(Icons.date_range),
-                      const SizedBox(width: 10),
-                      Text(DateFormat('dd.MM.yyyy.').format(job.created!
-                          .add(Duration(days: job.applicationsDuration!)))),
-                    ],
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.1), // Subtle background highlight
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.blueAccent, width: 1),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(Icons.event, size: 20, color: Colors.blueAccent), // Calendar icon
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Rok za prijavu:',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  color: Colors.blueAccent,
+                                ),
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                DateFormat('dd.MM.yyyy.').format(job.created!
+                                    .add(Duration(days: job.applicationsDuration!))),
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   if (job.status == JobStatus.Zavrsen)
                     const Text(
@@ -347,10 +425,12 @@ class _JobModalState extends State<JobModal> {
                           },
                           child: const Padding(
                             padding: EdgeInsets.symmetric(horizontal: 20),
-                            child: Text('Poništi aplikaciju',
+                            child: Text(
+                              'Poništi aplikaciju',
                               style: TextStyle(
-                                color: Colors.red, // Set text color to red
-                              ),),
+                                color: Colors.red,
+                              ),
+                            ),
                           ),
                         ),
                       ],
