@@ -1,13 +1,14 @@
-
 import 'package:flutter/material.dart';
 import 'package:minijobs_mobile/enumerations/sort_order.dart';
 import 'package:minijobs_mobile/models/city.dart';
+import 'package:minijobs_mobile/models/job_type.dart';
 import 'package:minijobs_mobile/models/search_result.dart';
 import 'package:minijobs_mobile/providers/city_provider.dart';
 import 'package:minijobs_mobile/providers/job_provider.dart';
+import 'package:minijobs_mobile/providers/job_type_provider.dart';
+import 'package:minijobs_mobile/providers/recommendation_provider.dart';
 import 'package:provider/provider.dart';
 import '../../models/job/job_card_dto.dart';
-import '../../providers/recommendation_provider.dart';
 import '../employer/job/job_card.dart';
 
 class ApplicantHomePage extends StatefulWidget {
@@ -23,12 +24,15 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
   late JobProvider _jobProvider;
   late RecommendationProvider _recommendationProvider;
   late CityProvider _cityProvider;
-  SearchResult<JobCardDTO> jobs = SearchResult(0, []); // Initialize jobs directly here
-  List<JobCardDTO> recommendedJobs=[];
+  late JobTypeProvider _jobTypeProvider;
+  SearchResult<JobCardDTO> jobs = SearchResult(0, []);
+  List<JobCardDTO> recommendedJobs = [];
   String? recommendedJobsReason;
   List<City> cities = [];
+  List<JobType> jobTypes = [];
   String? selectedCity;
-  String sort="Najnovije";
+  String? selectedJobType;
+  String sort = "Najnovije";
   bool isLoading = false;
 
   @override
@@ -36,18 +40,20 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
     super.initState();
   }
 
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _jobProvider = context.read<JobProvider>();
     _cityProvider = context.read<CityProvider>();
+    _jobTypeProvider = context.read<JobTypeProvider>();
     _recommendationProvider = context.read<RecommendationProvider>();
 
-    // Load cities and recommended jobs sequentially, then search jobs
+    // Load cities, job types, and recommended jobs sequentially, then search jobs
     getCities().then((_) {
-      getRecommendedJobs().then((_) {
-        searchJobs();
+      getJobTypes().then((_) {
+        getRecommendedJobs().then((_) {
+          searchJobs();
+        });
       });
     });
   }
@@ -57,6 +63,15 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
     if (mounted) {
       setState(() {
         cities = result;
+      });
+    }
+  }
+
+  Future<void> getJobTypes() async {
+    final result = await _jobTypeProvider.getAll();
+    if (mounted) {
+      setState(() {
+        jobTypes = result;
       });
     }
   }
@@ -85,16 +100,28 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
     String searchTerm = _searchController.text;
     City? city;
     if (selectedCity != null) {
-      city = cities.firstWhere(
-            (city) => city.name == selectedCity,
-      );
+      city = cities.firstWhere((city) => city.name == selectedCity);
+    }
+    JobType? jobType;
+    if (selectedJobType != null) {
+      jobType = jobTypes.firstWhere((type) => type.name == selectedJobType);
     }
     SortOrder sortOrder = sort == 'Najnovije' ? SortOrder.DESC : SortOrder.ASC;
     jobs = await _jobProvider.search(
       searchText: searchTerm,
       cityId: city?.id,
+      jobTypeId: jobType?.id,
       sort: sortOrder,
     );
+
+    // Clear recommended jobs if any search filters are applied
+    bool isFilterApplied = searchTerm.isNotEmpty || city != null || jobType != null;
+    if (isFilterApplied) {
+      recommendedJobs = [];
+    } else {
+      // Reload recommended jobs if no filters are applied
+      await getRecommendedJobs();
+    }
 
     // Filter out recommended jobs only if there are 4 or more
     if (recommendedJobs.length >= 4) {
@@ -122,21 +149,37 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
           SearchBarWidget(
             searchController: _searchController,
             cities: cities,
+            jobTypes: jobTypes,
             selectedCity: selectedCity,
+            selectedJobType: selectedJobType,
             onCityChanged: (String? value) {
               setState(() {
                 selectedCity = value;
               });
               searchJobs();
             },
+            onJobTypeChanged: (String? value) {
+              setState(() {
+                selectedJobType = value;
+              });
+              searchJobs();
+            },
             onSearch: searchJobs,
+            onClearFilters: () {
+              setState(() {
+                _searchController.clear();
+                selectedCity = null;
+                selectedJobType = null;
+              });
+              searchJobs();
+            },
             sort: sort,
-            onSortChanged:(String value){
-             setState(() {
-               sort=value;
-             });
-             searchJobs();
-            }
+            onSortChanged: (String value) {
+              setState(() {
+                sort = value;
+              });
+              searchJobs();
+            },
           ),
           JobListWidget(
             isLoading: isLoading,
@@ -177,11 +220,7 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
     );
   }
 
-
   List<Widget> _buildRecommendedJobs() {
-    // Placeholder for recommendation explanation
-
-
     return [
       Container(
         margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -197,26 +236,26 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
               ),
             ),
             Text(
-              recommendedJobsReason!,
+              recommendedJobsReason ?? 'Preporučeno na osnovu vaših interesa',
               style: const TextStyle(
                 fontSize: 14.0,
                 color: Colors.black54,
               ),
-              softWrap: true, // Allow text to wrap to the next line
+              softWrap: true,
             ),
             const SizedBox(height: 8.0),
           ],
         ),
       ),
-      // Recommended jobs as part of the main column
       ...recommendedJobs.asMap().entries.map((entry) {
         final index = entry.key;
         final job = entry.value;
-        return JobCard(job: job, isRecommended: true); // Mark as recommended
+        return JobCard(job: job, isRecommended: true);
       }).toList(),
     ];
   }
 }
+
 class HeaderWidget extends StatelessWidget {
   const HeaderWidget({super.key});
 
@@ -249,13 +288,16 @@ class HeaderWidget extends StatelessWidget {
   }
 }
 
-
 class SearchBarWidget extends StatefulWidget {
   final TextEditingController searchController;
   final List<City> cities;
+  final List<JobType> jobTypes;
   final String? selectedCity;
+  final String? selectedJobType;
   final ValueChanged<String?> onCityChanged;
+  final ValueChanged<String?> onJobTypeChanged;
   final VoidCallback onSearch;
+  final VoidCallback onClearFilters;
   final String sort;
   final ValueChanged<String> onSortChanged;
 
@@ -263,11 +305,15 @@ class SearchBarWidget extends StatefulWidget {
     super.key,
     required this.searchController,
     required this.cities,
+    required this.jobTypes,
     required this.selectedCity,
+    required this.selectedJobType,
     required this.onCityChanged,
+    required this.onJobTypeChanged,
     required this.onSearch,
+    required this.onClearFilters,
     required this.sort,
-    required this.onSortChanged
+    required this.onSortChanged,
   });
 
   @override
@@ -277,14 +323,23 @@ class SearchBarWidget extends StatefulWidget {
 class _SearchBarWidgetState extends State<SearchBarWidget> {
   String? selectedSortOption;
   String? selectedFilterCity;
+  String? selectedFilterJobType;
 
   @override
   void initState() {
-    selectedSortOption=widget.sort;
+    selectedSortOption = widget.sort;
+    selectedFilterCity = widget.selectedCity;
+    selectedFilterJobType = widget.selectedJobType;
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
+    // Check if any filters are applied
+    bool hasFilters = widget.searchController.text.isNotEmpty ||
+        widget.selectedCity != null ||
+        widget.selectedJobType != null;
+
     return Positioned(
       top: 82,
       left: 0,
@@ -332,6 +387,42 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                   },
                 ),
               ],
+            ),
+            const SizedBox(height: 8), // Add some spacing between Row and Clear Filters button
+            // Clear Filters button below the Row, always visible but disabled when no filters
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0, top: 4.0), // Align with search bar padding
+                child: ElevatedButton.icon(
+                  onPressed: hasFilters
+                      ? () {
+                    widget.onClearFilters();
+                  }
+                      : null, // Disabled when no filters are applied
+                  icon: const Icon(
+                    Icons.clear,
+                    size: 18, // Slightly smaller icon for better proportion
+                  ),
+                  label: const Text(
+                    'Obriši filtere',
+                    style: TextStyle(fontSize: 14), // Slightly smaller font for compactness
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: hasFilters ? Colors.blue : Colors.grey, // Text/icon color
+                    backgroundColor: hasFilters ? Colors.blue.withOpacity(0.1) : Colors.grey.withOpacity(0.1), // Subtle background
+                    elevation: 0, // Flat design to match the search bar style
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Compact padding
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20), // Rounded corners for a modern look
+                      side: BorderSide(
+                        color: hasFilters ? Colors.blue.withOpacity(0.3) : Colors.grey.withOpacity(0.3),
+                        width: 1,
+                      ), // Subtle border
+                    ),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -423,7 +514,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Izaberi grad',
+                    'Filteri',
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -431,6 +522,14 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                     ),
                   ),
                   const Divider(),
+                  const Text(
+                    'Izaberi grad',
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
                       Expanded(
@@ -467,7 +566,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                               : widget.cities
                               .map((city) => DropdownMenuItem<String>(
                             value: city.name,
-                            child: Text(city.name!),
+                            child: Text(city.name ?? ''),
                           ))
                               .toList(),
                           onChanged: (value) {
@@ -475,6 +574,67 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                               selectedFilterCity = value;
                             });
                             widget.onCityChanged(value);
+                            widget.onSearch();
+                          },
+                          isDense: true,
+                          isExpanded: true,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Izaberi tip posla',
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButtonFormField<String>(
+                          value: selectedFilterJobType,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12.0,
+                              vertical: 8.0,
+                            ),
+                            suffixIcon: selectedFilterJobType != null
+                                ? IconButton(
+                              icon: const Icon(Icons.clear, color: Colors.grey),
+                              onPressed: () {
+                                setModalState(() {
+                                  selectedFilterJobType = null;
+                                });
+                                widget.onJobTypeChanged(null);
+                                widget.onSearch();
+                              },
+                            )
+                                : null,
+                          ),
+                          icon: const Icon(Icons.arrow_drop_down),
+                          items: widget.jobTypes.isEmpty
+                              ? [
+                            const DropdownMenuItem<String>(
+                              value: null,
+                              child: Text('Učitavanje tipova posla...'),
+                            ),
+                          ]
+                              : widget.jobTypes
+                              .map((jobType) => DropdownMenuItem<String>(
+                            value: jobType.name,
+                            child: Text(jobType.name ?? ''),
+                          ))
+                              .toList(),
+                          onChanged: (value) {
+                            setModalState(() {
+                              selectedFilterJobType = value;
+                            });
+                            widget.onJobTypeChanged(value);
                             widget.onSearch();
                           },
                           isDense: true,
@@ -506,7 +666,7 @@ class JobListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: 180,
+      top: 230,
       left: 0,
       right: 0,
       bottom: 0,
@@ -515,6 +675,4 @@ class JobListWidget extends StatelessWidget {
           : jobs,
     );
   }
-
-
 }

@@ -157,16 +157,18 @@ class JobProvider extends BaseProvider<Job> {
   Future<SearchResult<JobCardDTO>> search({
     String? searchText,
     int? cityId,
+    int? jobTypeId,
     required SortOrder sort,
-    int limit = 10,
-    int offset = 0,
   }) async {
     try {
       var url =
-          "${baseUrl}jobs/search?SearchText=$searchText&Limit=$limit&Offset=$offset";
+          "${baseUrl}jobs/search?SearchText=$searchText";
 
       if (cityId != null) {
         url += "&CityId=$cityId";
+      }
+      if (jobTypeId != null) {
+        url += "&JobTypeId=$jobTypeId";
       }
 
       url += "&SortOrder=${sort.name}";

@@ -111,12 +111,13 @@ namespace Infrastructure.Persistence.Repositories
             return result;
         }
 
-        public async Task<IEnumerable<JobCardDTO>> SearchAsync(string searchText, int limit, int offset, int? cityId, Domain.Enums.SortOrder sort)
+        public async Task<IEnumerable<JobCardDTO>> SearchAsync(string searchText, int? jobTypeId, int? cityId, Domain.Enums.SortOrder sort)
         {
             var query = from j in context.Jobs
                         join c in context.Cities on j.CityId equals c.Id
                         where (string.IsNullOrEmpty(searchText) || j.Name.Contains(searchText))
                               && (!cityId.HasValue || j.CityId == cityId)
+                                && (!jobTypeId.HasValue || j.JobTypeId == jobTypeId)
                               && j.Status == JobStatus.Active
                               && !j.DeletedByAdmin
                         select new JobCardDTO

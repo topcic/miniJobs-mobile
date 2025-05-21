@@ -13,8 +13,8 @@ sealed class JobSearchQueryHandler(IJobRepository jobRepository) : IRequestHandl
     {
         SearchResponseBase<JobCardDTO> result = new SearchResponseBase<JobCardDTO>();
         result.Count = await jobRepository.SearchCountAsync(request.SearchRequest.SearchText, request.SearchRequest.CityId);
-        result.Result = await jobRepository.SearchAsync(request.SearchRequest.SearchText, request.SearchRequest.Limit,
-            request.SearchRequest.Offset, request.SearchRequest.CityId, request.SearchRequest.SortOrder);
+        result.Result = await jobRepository.SearchAsync(request.SearchRequest.SearchText, 
+            request.SearchRequest.JobTypeId, request.SearchRequest.CityId, request.SearchRequest.SortOrder);
         return result;
     }
 }
