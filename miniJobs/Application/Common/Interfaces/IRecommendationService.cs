@@ -5,5 +5,5 @@ namespace Application.Common.Interfaces;
 
 public interface IRecommendationService
 {
-    Task<IEnumerable<JobCardDTO>> GetRecommendationJobsAsync(int userId);
+    Task<RecommendationJobsDTO> GetRecommendationJobsAsync(int userId);
 }

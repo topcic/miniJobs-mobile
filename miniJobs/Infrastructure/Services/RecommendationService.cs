@@ -14,7 +14,7 @@ public class RecommendationService : IRecommendationService
         _context = context;
     }
 
-    public async Task<IEnumerable<JobCardDTO>> GetRecommendationJobsAsync(int userId)
+    public async Task<RecommendationJobsDTO> GetRecommendationJobsAsync(int userId)
     {
 
         var userProfile = await GetUserProfileVector(userId);
@@ -22,7 +22,7 @@ public class RecommendationService : IRecommendationService
         var contentBasedScores = CalculateContentBasedScores(userProfile, jobs);
 
         var similarUsers = await FindSimilarUsers(userId);
-        var collaborativeJobs = await GetCollaborativeJobs(similarUsers,userId);
+        var collaborativeJobs = await GetCollaborativeJobs(similarUsers, userId);
 
         var employerRatings = await GetEmployerRatings(jobs.Select(j => j.Id));
         var employeeRating = await GetEmployeeRating(userId);
@@ -34,9 +34,112 @@ public class RecommendationService : IRecommendationService
             employeeRating
         );
 
-        return MapToJobCardDTOs(finalRecommendations);
+        string reason = BuildRecommendationReason(
+       contentBasedScores,
+       collaborativeJobs,
+       employerRatings,
+       employeeRating,
+       userProfile,
+       finalRecommendations.Select(x => x.JobId).ToList()
+   );
+
+        return new RecommendationJobsDTO
+        {
+            Jobs = MapToJobCardDTOs(finalRecommendations),
+            Reason = reason
+        };
 
     }
+    private string BuildRecommendationReason(
+    List<(int JobId, double Score)> contentBased,
+    List<(int JobId, double Score)> collaborative,
+    Dictionary<int, double> employerRatings,
+    double employeeRating,
+    UserProfileVector userProfile,
+    List<int> recommendedJobIds)
+    {
+        // Provjeri postoje li definirani interesi
+        bool hasInterests = userProfile.PreferredCities.Any() && userProfile.PreferredJobTypes.Any();
+
+        // Provjeri ima li poslova koji odgovaraju i gradu i tipu posla
+        bool hasFullMatch = false;
+        int fullMatchCount = 0;
+        int partialMatchCount = 0;
+        int noMatchCount = 0;
+        if (hasInterests)
+        {
+            foreach (var jobId in recommendedJobIds)
+            {
+                var job = _context.Jobs
+                    .Where(j => j.Id == jobId)
+                    .Select(j => new { j.CityId, j.JobTypeId })
+                    .FirstOrDefault();
+
+                if (job != null)
+                {
+                    bool cityMatch = userProfile.PreferredCities.Contains(job.CityId);
+                    bool jobTypeMatch = userProfile.PreferredJobTypes.Contains(job.JobTypeId ?? 0);
+                    if (cityMatch && jobTypeMatch)
+                    {
+                        hasFullMatch = true;
+                        fullMatchCount++;
+                    }
+                    else if (cityMatch || jobTypeMatch)
+                    {
+                        partialMatchCount++;
+                    }
+                    else
+                    {
+                        noMatchCount++;
+                    }
+                }
+            }
+        }
+
+        // Izračunaj doprinose CBF-a i CF-a
+        double totalContent = contentBased
+            .Where(j => recommendedJobIds.Contains(j.JobId))
+            .Sum(x => x.Score * 0.35);
+        double totalCollab = collaborative
+            .Where(j => recommendedJobIds.Contains(j.JobId))
+            .Sum(x => x.Score * 0.25);
+
+        // Odredi poruku na temelju stvarnog stanja
+        if (!hasInterests)
+        {
+            return "Na osnovu aktivnosti korisnika sličnih vama.";
+        }
+        else if (hasFullMatch && noMatchCount == 0 && totalContent >= totalCollab)
+        {
+            // Samo puni i parcijalni pogodci, CBF dominira
+            var cityNames = _context.Cities
+                .Where(c => userProfile.PreferredCities.Contains(c.Id))
+                .Select(c => c.Name)
+                .ToList();
+            var jobTypes = _context.JobTypes
+                .Where(j => userProfile.PreferredJobTypes.Contains(j.Id))
+                .Select(j => j.Name)
+                .ToList();
+
+            return $"Bazirano na vašim interesima za: {string.Join(", ", cityNames)}, {string.Join(", ", jobTypes)}.";
+        }
+        else if (totalCollab > totalContent && noMatchCount == 0)
+        {
+            // Samo puni i parcijalni pogodci, CF dominira
+            return "Na osnovu aktivnosti korisnika sličnih vama.";
+        }
+        else if (noMatchCount > 0)
+        {
+            // Postoje nepovezani poslovi, implicira hibridni pristup
+            return "Kombinacija vaših interesa i aktivnosti korisnika sličnih vama.";
+        }
+        else
+        {
+            // Puni i parcijalni pogodci s balansiranim doprinosom
+            return "Kombinacija vaših interesa i aktivnosti korisnika sličnih vama.";
+        }
+    }
+
 
     private async Task<UserProfileVector> GetUserProfileVector(int userId)
     {
@@ -68,12 +171,12 @@ public class RecommendationService : IRecommendationService
             .Where(j => j.Status == JobStatus.Active && !_context.JobApplications.Any(ja => ja.JobId == j.Id && ja.CreatedBy == userId && !ja.IsDeleted)
             && !_context.SavedJobs.Any(sj => sj.JobId == j.Id && sj.CreatedBy == userId && !sj.IsDeleted))
         .Select(j => new JobFeatureVector
-            {
-                Id = j.Id,
-                CityId = j.CityId,
-                JobTypeId = j.JobTypeId ?? 0,
-                EmployerId = j.CreatedBy.Value
-            })
+        {
+            Id = j.Id,
+            CityId = j.CityId,
+            JobTypeId = j.JobTypeId ?? 0,
+            EmployerId = j.CreatedBy.Value
+        })
             .ToListAsync();
     }
 
@@ -190,12 +293,18 @@ public class RecommendationService : IRecommendationService
         var similarUserIds = similarUserDict.Keys.ToList();
 
         var jobApplications = await _context.JobApplications
-     .Where(ja => !ja.IsDeleted
-         && ja.CreatedBy.HasValue
-         && similarUserIds.Contains(ja.CreatedBy.Value)
-         && !_context.JobApplications.Any(ja2 => ja2.JobId == ja.JobId && ja2.CreatedBy == userId && !ja2.IsDeleted)
-         && !_context.SavedJobs.Any(sj => sj.JobId == ja.JobId && sj.CreatedBy == userId && !sj.IsDeleted))
-     .ToListAsync();
+         .Join(_context.Jobs, // Join with Jobs table to filter by status
+             ja => ja.JobId,
+             j => j.Id,
+             (ja, j) => new { JobApplication = ja, Job = j })
+         .Where(ja => !ja.JobApplication.IsDeleted
+             && ja.JobApplication.CreatedBy.HasValue
+             && similarUserIds.Contains(ja.JobApplication.CreatedBy.Value)
+             && ja.Job.Status == JobStatus.Active // Ensure job is active
+             && !_context.JobApplications.Any(ja2 => ja2.JobId == ja.JobApplication.JobId && ja2.CreatedBy == userId && !ja2.IsDeleted)
+             && !_context.SavedJobs.Any(sj => sj.JobId == ja.JobApplication.JobId && sj.CreatedBy == userId && !sj.IsDeleted))
+         .Select(ja => ja.JobApplication) // Select only the JobApplication data
+         .ToListAsync();
 
 
         var grouped = jobApplications

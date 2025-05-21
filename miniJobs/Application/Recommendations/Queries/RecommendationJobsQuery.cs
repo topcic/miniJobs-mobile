@@ -4,6 +4,6 @@ using Domain.Entities;
 
 namespace Application.Recommendations.Queries;
 
-public class RecommendationJobsQuery : QueryBase<IEnumerable<JobCardDTO>>
+public class RecommendationJobsQuery : QueryBase<RecommendationJobsDTO>
 {
 }

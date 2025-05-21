@@ -10,7 +10,13 @@ import '../../../services/notification.service.dart';
 class JobCard extends StatefulWidget {
   final JobCardDTO job;
   final bool isInSavedJobs;
-  const JobCard({super.key, required this.job,this.isInSavedJobs = false});
+  final bool isRecommended;
+  const JobCard({
+    super.key,
+    required this.job,
+    this.isInSavedJobs = false,
+    this.isRecommended = false,
+  });
 
   @override
   State<JobCard> createState() => _JobCardState();
@@ -25,26 +31,52 @@ class _JobCardState extends State<JobCard> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     jobProvider = context.read<JobProvider>();
-    job=widget.job;
+    job = widget.job;
   }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+
     return Card(
       margin: const EdgeInsets.all(10.0),
-      color: Colors.blue[50],
+      color: widget.isRecommended ? Colors.blue[50] : Colors.white, // Light blue for recommended
+      elevation: widget.isRecommended ? 4.0 : 2.0, // Slightly higher elevation for recommended
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8.0),
+        side: widget.isRecommended
+            ? BorderSide(color: Colors.blueAccent, width: 1.0)
+            : BorderSide.none,
+      ),
       child: Container(
         alignment: Alignment.center,
         padding: const EdgeInsets.all(10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            if (widget.isRecommended) // Add "Preporučeno" badge for recommended jobs
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                margin: const EdgeInsets.only(bottom: 8.0),
+                decoration: BoxDecoration(
+                  color: Colors.blueAccent,
+                  borderRadius: BorderRadius.circular(4.0),
+                ),
+                child: const Text(
+                  'Preporučeno',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             Text(
-              job.name,
+              job.name ?? 'Unnamed Job',
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
+              softWrap: true, // Allow wrapping within maxLines
               style: TextStyle(
                 fontSize: screenWidth * 0.045,
                 fontWeight: FontWeight.bold,
@@ -59,11 +91,12 @@ class _JobCardState extends State<JobCard> {
               children: [
                 const Icon(Icons.location_on, size: 16),
                 Text(
-                  job.cityName,
+                  job.cityName ?? 'Unknown City',
                   style: TextStyle(
                     fontSize: screenWidth * 0.035,
                     color: Colors.grey[700],
                   ),
+                  softWrap: true, // Allow wrapping for city name
                 ),
               ],
             ),
@@ -82,6 +115,7 @@ class _JobCardState extends State<JobCard> {
                     fontSize: screenWidth * 0.035,
                     color: Colors.green[800],
                   ),
+                  softWrap: true, // Allow wrapping for wage
                 ),
               ],
             ),
@@ -94,11 +128,11 @@ class _JobCardState extends State<JobCard> {
                     return JobModal(
                       jobId: job.id,
                       role: GetStorage().read('role'),
-                        isInSavedJobs: widget.isInSavedJobs
+                      isInSavedJobs: widget.isInSavedJobs,
                     );
                   },
                 );
-                            },
+              },
               child: const Text('Pogledaj', style: TextStyle(fontSize: 14)),
             ),
           ],

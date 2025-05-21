@@ -25,6 +25,7 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
   late CityProvider _cityProvider;
   SearchResult<JobCardDTO> jobs = SearchResult(0, []); // Initialize jobs directly here
   List<JobCardDTO> recommendedJobs=[];
+  String? recommendedJobsReason;
   List<City> cities = [];
   String? selectedCity;
   String sort="Najnovije";
@@ -61,8 +62,14 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
   }
 
   Future<void> getRecommendedJobs() async {
-    recommendedJobs = await _recommendationProvider.getRecommendatios();
-    print(recommendedJobs);
+    var result = await _recommendationProvider.getRecommendatios();
+    if (result != null) {
+      recommendedJobs = result.jobs ?? [];
+      recommendedJobsReason = result.reason;
+    } else {
+      recommendedJobs = [];
+      recommendedJobsReason = null;
+    }
     if (mounted) {
       setState(() {});
     }
@@ -147,70 +154,69 @@ class _ApplicantHomePageState extends State<ApplicantHomePage> {
   }
 
   Widget _buildJobs() {
-    return Column(
-      children: [
-        // Display recommended jobs if >=4
-        if (recommendedJobs.length >= 4) _buildRecommendedJobs(),
-        Expanded(
-          child: jobs.result == null || jobs.result!.isEmpty
-              ? const Center(child: Text('Nema pronađenih poslova'))
-              : ListView.builder(
-            itemCount: jobs.result!.length,
-            itemBuilder: (context, index) {
-              final job = jobs.result![index];
-             return JobCard(job:job);
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-
-  Widget _buildRecommendedJobs() {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 16.0),
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      decoration: BoxDecoration(
-        color: Colors.blue.shade100,
-        borderRadius: BorderRadius.circular(8.0),
-      ),
+    return SingleChildScrollView(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Preporučeni poslovi',
-            style: TextStyle(
-              fontSize: 18.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.blueAccent,
-            ),
-          ),
-          const SizedBox(height: 8.0),
-          SizedBox(
-            height: 200,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: recommendedJobs.length,
-              itemBuilder: (context, index) {
-                final job = recommendedJobs[index];
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: SizedBox(
-                    width: 250,
-                    child: JobCard(job:job)
-                  ),
-                );
-              },
-            ),
+          // Display recommended jobs if >=4
+          if (recommendedJobs.length >= 4) ..._buildRecommendedJobs(),
+          // Main job list
+          jobs.result == null || jobs.result!.isEmpty
+              ? const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Center(child: Text('Nema pronađenih poslova')),
+          )
+              : Column(
+            children: jobs.result!.asMap().entries.map((entry) {
+              final index = entry.key;
+              final job = entry.value;
+              return JobCard(job: job);
+            }).toList(),
           ),
         ],
       ),
     );
   }
 
-}
 
+  List<Widget> _buildRecommendedJobs() {
+    // Placeholder for recommendation explanation
+
+
+    return [
+      Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Preporučeni poslovi',
+              style: TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.blueAccent,
+              ),
+            ),
+            Text(
+              recommendedJobsReason!,
+              style: const TextStyle(
+                fontSize: 14.0,
+                color: Colors.black54,
+              ),
+              softWrap: true, // Allow text to wrap to the next line
+            ),
+            const SizedBox(height: 8.0),
+          ],
+        ),
+      ),
+      // Recommended jobs as part of the main column
+      ...recommendedJobs.asMap().entries.map((entry) {
+        final index = entry.key;
+        final job = entry.value;
+        return JobCard(job: job, isRecommended: true); // Mark as recommended
+      }).toList(),
+    ];
+  }
+}
 class HeaderWidget extends StatelessWidget {
   const HeaderWidget({super.key});
 
