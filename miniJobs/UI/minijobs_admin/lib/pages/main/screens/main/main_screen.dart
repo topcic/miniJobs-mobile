@@ -14,6 +14,7 @@ import '../../../jobs/jobs_view.dart';
 import '../../../reports/job_application_reports_page.dart';
 import '../../../reports/job_reports_page.dart';
 import '../../../reports/rating_reports_page.dart';
+import '../../../user.details.dart';
 import '../../constants.dart';
 import '../dashboard/dashboard_screen.dart';
 
@@ -105,6 +106,8 @@ class _MainScreenState extends State<MainScreen> {
           ),
           _buildMenuItem("Dashboard", FontAwesomeIcons.tachometerAlt,
               const DashboardScreen()),
+          _buildMenuItem("Postavke računa", FontAwesomeIcons.user,
+              const UserDetailsPage(userId:1)),
           ExpansionTile(
             leading:
                 const Icon(FontAwesomeIcons.cogs , color: Colors.white54),

@@ -72,6 +72,20 @@ public class UsersController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(new UserTryFindQuery(userId)));
     }
 
+
+    
+    [HttpPut("{userId}")]
+    [Authorize(Roles = "Administrator")]
+    [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UpdateUser([FromRoute] int userId, [FromBody] User user)
+    {
+        user.Id = userId;
+        return Ok(await mediator.Send(new UserUpdateCommand(user)));
+    }
+
+
     [HttpGet("{userId}/job-recommendations")]
     [Authorize(Roles = "Applicant")]
     [ProducesResponseType(typeof(JobRecommendation), StatusCodes.Status200OK)]
