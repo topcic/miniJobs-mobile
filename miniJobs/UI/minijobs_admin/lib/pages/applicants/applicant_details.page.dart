@@ -30,6 +30,7 @@ class _ApplicantDetailsPageState extends State<ApplicantDetailsPage> {
   bool isLoading = true;
   Uint8List? cvBytes;
   String? cvFileName;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -53,6 +54,7 @@ class _ApplicantDetailsPageState extends State<ApplicantDetailsPage> {
       setState(() => isLoading = false);
     }
   }
+
   String _getFileExtension(Uint8List bytes) {
     final mimeType = lookupMimeType('', headerBytes: bytes);
 
@@ -80,6 +82,7 @@ class _ApplicantDetailsPageState extends State<ApplicantDetailsPage> {
 
     return '';
   }
+
   Future<void> blockUser() async {
     setState(() => isLoading = true);
     await _userProvider.delete(applicant!.id!);
@@ -88,9 +91,11 @@ class _ApplicantDetailsPageState extends State<ApplicantDetailsPage> {
       isLoading = false;
     });
   }
+
   Future<void> _downloadCVFile() async {
     if (cvBytes != null && cvFileName != null) {
-      String? path = await FileSaver.instance.saveFile(name: cvFileName!, bytes: cvBytes!, ext: "");
+      String? path = await FileSaver.instance
+          .saveFile(name: cvFileName!, bytes: cvBytes!, ext: "");
       OpenFile.open(path);
     }
   }
@@ -136,35 +141,43 @@ class _ApplicantDetailsPageState extends State<ApplicantDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(applicant != null ? '${applicant!.firstName} ${applicant!.lastName}' : 'Korisnik'),
+        title: Text(applicant != null
+            ? '${applicant!.firstName} ${applicant!.lastName}'
+            : 'Korisnik'),
         centerTitle: true,
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : LayoutBuilder(
-        builder: (context, constraints) {
-          final isSmallScreen = constraints.maxWidth < 800;
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: isSmallScreen
-                ? ListView(
-              children: [
-                _buildApplicantDetailsCard(context),
-                const SizedBox(height: 16),
-                _buildAdditionalDetailsCard(),
-              ],
-            )
-                : Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(flex: 1, child: _buildApplicantDetailsCard(context)),
-                const SizedBox(width: 16),
-                Expanded(flex: 2, child: _buildAdditionalDetailsCard()),
-              ],
+              builder: (context, constraints) {
+                final isSmallScreen = constraints.maxWidth < 1000;
+
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: isSmallScreen
+                      ? ListView(
+                          children: [
+                            _buildApplicantDetailsCard(context),
+                            const SizedBox(height: 16),
+                            _buildAdditionalDetailsCard(),
+                          ],
+                        )
+                      : Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                                flex: 2,
+                                child: _buildApplicantDetailsCard(context)),
+                            const SizedBox(width: 16),
+                            Expanded(
+                                flex: 3,
+                                child: _buildAdditionalDetailsCard(
+                                    fullHeight: true)),
+                          ],
+                        ),
+                );
+              },
             ),
-          );
-        },
-      ),
     );
   }
 
@@ -238,32 +251,39 @@ class _ApplicantDetailsPageState extends State<ApplicantDetailsPage> {
                 onPressed: isLoading
                     ? null
                     : () {
-                  if (applicant!.deleted!) {
-                    _showConfirmationDialog(
-                      context: parentContext,
-                      title: 'Aktiviraj',
-                      content: 'Da li ste sigurni da želite aktivirati ${applicant!.firstName} ${applicant!.lastName}?',
-                      onConfirm: activateUser,
-                    );
-                  } else {
-                    _showConfirmationDialog(
-                      context: parentContext,
-                      title: 'Blokiraj',
-                      content: 'Da li ste sigurni da želite blokirati ${applicant!.firstName} ${applicant!.lastName}?',
-                      onConfirm: blockUser,
-                    );
-                  }
-                },
+                        if (applicant!.deleted!) {
+                          _showConfirmationDialog(
+                            context: parentContext,
+                            title: 'Aktiviraj',
+                            content:
+                                'Da li ste sigurni da želite aktivirati ${applicant!.firstName} ${applicant!.lastName}?',
+                            onConfirm: activateUser,
+                          );
+                        } else {
+                          _showConfirmationDialog(
+                            context: parentContext,
+                            title: 'Blokiraj',
+                            content:
+                                'Da li ste sigurni da želite blokirati ${applicant!.firstName} ${applicant!.lastName}?',
+                            onConfirm: blockUser,
+                          );
+                        }
+                      },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: applicant!.deleted! ? Colors.greenAccent[700] : Colors.redAccent[700],
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  backgroundColor: applicant!.deleted!
+                      ? Colors.greenAccent[700]
+                      : Colors.redAccent[700],
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
                 icon: Icon(
                   applicant!.deleted! ? Icons.refresh : Icons.block,
                   color: Colors.white,
                 ),
                 label: Text(
-                  applicant!.deleted! ? 'Aktiviraj korisnika' : 'Blokiraj korisnika',
+                  applicant!.deleted!
+                      ? 'Aktiviraj korisnika'
+                      : 'Blokiraj korisnika',
                   style: const TextStyle(color: Colors.white),
                 ),
               ),
@@ -273,6 +293,7 @@ class _ApplicantDetailsPageState extends State<ApplicantDetailsPage> {
       ),
     );
   }
+
   Widget _buildDetailRow({
     required IconData icon,
     required String label,
@@ -314,89 +335,98 @@ class _ApplicantDetailsPageState extends State<ApplicantDetailsPage> {
       ],
     );
   }
-  Widget _buildAdditionalDetailsCard() {
-    return Card(
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView( // Wrap the entire content in a SingleChildScrollView
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Dodatni detalji',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const Divider(),
-              _buildDetailRow(
-                icon: Icons.description,
-                label: 'Opis',
-                value: applicant!.description ?? '-',
-              ),
-              const SizedBox(height: 12),
 
-              _buildDetailRow(
-                icon: Icons.work,
-                label: 'Iskustvo',
-                value: applicant!.experience ?? '-',
-              ),
-              const SizedBox(height: 12),
-
-              _buildDetailRow(
-                icon: Icons.attach_money,
-                label: 'Predložena plata',
-                value: applicant!.wageProposal != null && applicant!.wageProposal!> Decimal.zero ? '${applicant!.wageProposal} KM' : '-',
-              ),
-              const SizedBox(height: 12),
-
-              _buildDetailRow(
-                icon: Icons.work_outline, // Icon for job types
-                label: 'Tipovi posla',
-                value: applicant!.jobTypes != null && applicant!.jobTypes!.isNotEmpty
-                    ? applicant!.jobTypes!.map((jobType) => jobType.name).join(', ')
-                    : '-',
-              ),
-              if (applicant!.cv != null)
-                Container(
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.download),
-                    label: const Text('Preuzmi CV'),
-                    onPressed: () {
-                      _downloadCVFile();
-                    },
+  Widget _buildAdditionalDetailsCard({bool fullHeight = false}) {
+    return SizedBox(
+        height: fullHeight ? double.infinity : 600,
+        // Define explicit height for the card
+        width: double.infinity,
+        // Use full available width
+        child: Card(
+          elevation: 6,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SingleChildScrollView(
+              // Wrap the entire content in a SingleChildScrollView
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Dodatni detalji',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                ),
-              const Divider(),
-              DefaultTabController(
-                length: 3,
-                child: Column(
-                  children: [
-                    const TabBar(
-                      tabs: [
-                        Tab(text: 'Završeni'),
-                        Tab(text: 'Utisci'),
-                      ],
-                    ),
-                    // SizedBox for responsiveness, adjusting the TabBarView's height
-                    SizedBox(
-                      height: 300,
-                      child: TabBarView(
-                        children: [
-                          FinishedJobsView(userId: applicant!.id!),
-                          UserRatingsView(userId: applicant!.id!),
-                        ],
+                  const Divider(),
+                  _buildDetailRow(
+                    icon: Icons.description,
+                    label: 'Opis',
+                    value: applicant!.description ?? '-',
+                  ),
+                  const SizedBox(height: 12),
+                  _buildDetailRow(
+                    icon: Icons.work,
+                    label: 'Iskustvo',
+                    value: applicant!.experience ?? '-',
+                  ),
+                  const SizedBox(height: 12),
+                  _buildDetailRow(
+                    icon: Icons.attach_money,
+                    label: 'Predložena plata',
+                    value: applicant!.wageProposal != null &&
+                            applicant!.wageProposal! > Decimal.zero
+                        ? '${applicant!.wageProposal} KM'
+                        : '-',
+                  ),
+                  const SizedBox(height: 12),
+                  _buildDetailRow(
+                    icon: Icons.work_outline, // Icon for job types
+                    label: 'Tipovi posla',
+                    value: applicant!.jobTypes != null &&
+                            applicant!.jobTypes!.isNotEmpty
+                        ? applicant!.jobTypes!
+                            .map((jobType) => jobType.name)
+                            .join(', ')
+                        : '-',
+                  ),
+                  if (applicant!.cv != null)
+                    Container(
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.download),
+                        label: const Text('Preuzmi CV'),
+                        onPressed: () {
+                          _downloadCVFile();
+                        },
                       ),
                     ),
-                  ],
-                ),
+                  const Divider(),
+                  DefaultTabController(
+                    length: 3,
+                    child: Column(
+                      children: [
+                        const TabBar(
+                          tabs: [
+                            Tab(text: 'Završeni'),
+                            Tab(text: 'Utisci'),
+                          ],
+                        ),
+                        // SizedBox for responsiveness, adjusting the TabBarView's height
+                        SizedBox(
+                          height: 300,
+                          child: TabBarView(
+                            children: [
+                              FinishedJobsView(userId: applicant!.id!),
+                              UserRatingsView(userId: applicant!.id!),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-
-            ],
+            ),
           ),
-        ),
-      ),
-    );
+        ));
   }
-
 }

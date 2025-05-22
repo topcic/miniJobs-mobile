@@ -68,6 +68,7 @@ public class UserManagerRepository(ApplicationDbContext context, IMapper mapper)
         if (isApplicant)
         {
             query = from j in context.Jobs
+                    join c in context.Cities on j.CityId equals c.Id
                     join a in context.JobApplications on j.Id equals a.JobId
                     where a.Status == JobApplicationStatus.Accepted
                           && a.CreatedBy == userId
@@ -76,19 +77,20 @@ public class UserManagerRepository(ApplicationDbContext context, IMapper mapper)
                     {
                         Id = j.Id,
                         Name = j.Name,
-                        CityName = j.City.Name,
+                        CityName = c.Name,
                         Wage = j.Wage,
                     };
         }
         else
         {
             query = from j in context.Jobs
+                    join c in context.Cities on j.CityId equals c.Id
                     where j.Status == JobStatus.Completed && j.CreatedBy == userId
                     select new JobCardDTO
                     {
                         Id = j.Id,
                         Name = j.Name,
-                        CityName = j.City.Name,
+                        CityName = c.Name,
                         Wage = j.Wage,
                     };
         }

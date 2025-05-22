@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:minijobs_admin/pages/countries/countries_view.dart';
 import 'package:minijobs_admin/pages/job-applications/job_applications_view.dart';
 import 'package:minijobs_admin/pages/jobtypes/job_types_view.dart';
@@ -46,7 +47,7 @@ class _MainScreenState extends State<MainScreen> {
 
     return Scaffold(
       key: _scaffoldKey,
-      drawer: isMobile ? _buildSideMenu() : null,
+      drawer: isMobile ? _buildSideMenu() : null, // Use drawer only on mobile
       body: SafeArea(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,7 +57,7 @@ class _MainScreenState extends State<MainScreen> {
               flex: 5,
               child: Column(
                 children: [
-                  Header(),
+                  _buildHeader(isMobile), // Replaced Header() with _buildHeader
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.all(defaultPadding),
@@ -72,6 +73,28 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
+  // Header with menu button for mobile
+  Widget _buildHeader(bool isMobile) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
+      color: secondaryColor,
+      child: Row(
+        children: [
+          if (isMobile)
+            IconButton(
+              icon: const Icon(Icons.menu, color: Colors.white),
+              onPressed: () {
+                _scaffoldKey.currentState?.openDrawer(); // Open drawer on mobile
+              },
+            ),
+          Expanded(
+            child: Header(), // Integrate the Header widget
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSideMenu() {
     return Container(
       width: 250,
@@ -82,7 +105,7 @@ class _MainScreenState extends State<MainScreen> {
             child: Image.asset("assets/images/logo.png"),
           ),
           _buildMenuItem("Dashboard", FontAwesomeIcons.tachometerAlt, const DashboardScreen()),
-          _buildMenuItem("Postavke računa", FontAwesomeIcons.user, const UserDetailsPage(userId: 1)),
+          _buildMenuItem("Postavke računa", FontAwesomeIcons.user, UserDetailsPage(userId:int.parse(GetStorage().read('userId')))),
           ExpansionTile(
             leading: const Icon(FontAwesomeIcons.cogs, color: Colors.white54),
             title: const Text("Generalne postavke", style: TextStyle(color: Colors.white54)),

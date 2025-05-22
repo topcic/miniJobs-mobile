@@ -17,25 +17,28 @@ class ActiveJobsView extends StatefulWidget {
 
 class _ActiveJobsViewState extends State<ActiveJobsView> {
   late EmployerProvider employerProvider;
-List<JobCardDTO> jobs=[];
-@override
+  List<JobCardDTO> jobs = [];
+
+  @override
   void initState() {
     // TODO: implement initState
     super.initState();
   }
+
   @override
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    employerProvider=context.read<EmployerProvider>();
+    employerProvider = context.read<EmployerProvider>();
     getFinishedJobs();
   }
-    getFinishedJobs()async{
-      jobs=await employerProvider.getActiveJobs(widget.userId);
-      setState(() {
-        
-      });
-    }
+
+  getFinishedJobs() async {
+    jobs = await employerProvider.getActiveJobs(widget.userId);
+    setState(() {
+
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,35 +50,50 @@ List<JobCardDTO> jobs=[];
         ),
       );
     }
-    return Responsive(
+
+    return  Responsive(
       mobile: ListView.builder(
         itemCount: jobs.length,
         itemBuilder: (context, index) {
           final job = jobs[index];
           return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(
+                vertical: 8.0, horizontal: 16.0),
             child: JobCard(job: job),
           );
         },
       ),
-      desktop: SingleChildScrollView( // Make the content scrollable on desktop
-        child: Container(
-          child: GridView.builder(
-            shrinkWrap: true, // Prevents the GridView from taking more space than necessary
-            padding: const EdgeInsets.all(16.0),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 16.0,
-              mainAxisSpacing: 16.0,
-              childAspectRatio: 2, // Height is double the width
+      desktop: LayoutBuilder(
+        builder: (context, constraints) {
+          // Determine crossAxisCount based on width
+          final width = constraints.maxWidth;
+          final crossAxisCount = width > 1100
+              ? 3
+              : width > 700
+              ? 2
+              : 1;
+
+          return SingleChildScrollView(
+            child: Container(
+              padding: const EdgeInsets.all(16.0),
+              child: GridView.builder(
+                shrinkWrap: true,
+                // Prevents GridView from taking infinite height
+                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 600, // Matches JobCard's maxWidth
+                  mainAxisExtent: 200, // Matches JobCard's maxHeight
+                  crossAxisSpacing: 10.0, // Space between cards horizontally
+                  mainAxisSpacing: 10.0, // Space between cards vertically
+                ),
+                itemCount: jobs.length,
+                itemBuilder: (context, index) {
+                  final job = jobs[index];
+                  return JobCard(job: job);
+                },
+              ),
             ),
-            itemCount: jobs.length,
-            itemBuilder: (context, index) {
-              final job = jobs[index];
-              return JobCard(job: job);
-            },
-          ),
-        ),
+          );
+        },
       ),
     );
   }
