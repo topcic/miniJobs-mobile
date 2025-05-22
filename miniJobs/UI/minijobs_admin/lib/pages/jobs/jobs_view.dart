@@ -38,6 +38,7 @@ class _JobsViewState extends State<JobsView> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    super.didChangeDependencies();
     jobProvider = context.read<JobProvider>();
     search();
   }
@@ -219,7 +220,6 @@ class _JobsViewState extends State<JobsView> {
     return [
       _getTitleItemWidget('Akcije', 50),
       _getTitleItemWidget('Naziv', 200),
-      _getTitleItemWidget('Opis', 300),
       _getTitleItemWidget('Tip posla', 150),
       _getTitleItemWidget('Grad', 150),
       _getTitleItemWidget('Broj radnika', 100),
@@ -254,7 +254,6 @@ class _JobsViewState extends State<JobsView> {
     return Row(
       children: [
         _buildTableCell(job.name ?? '-', 200),
-        _buildTableCell(job.description ?? '-', 300),
         _buildTableCell(job.jobTypeName ?? '-', 150),
         _buildTableCell(job.cityName ?? '-', 150),
         _buildTableCell(job.requiredEmployees?.toString() ?? '-', 100),

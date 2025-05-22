@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'dart:convert';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
+
 
 import '../../models/job/job.dart';
+import '../../widgets/badges.dart';
 import '../employers/employer_details_page.dart';
 import '../main/constants.dart';
 import 'job_details.dart';
@@ -25,8 +29,14 @@ class JobDetailsContent extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(job.name ?? 'Nema naziva',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: primaryColor)),
+          Text(
+            job.name ?? 'Nema naziva',
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              color: primaryColor,
+            ),
+          ),
           const SizedBox(height: defaultPadding),
           RichText(
             text: TextSpan(
@@ -69,30 +79,107 @@ class JobDetailsContent extends StatelessWidget {
                           ),
                         ),
                       ],
-                    )
-
-
+                    ),
                   ),
                 ),
                 TextSpan(
                   text: ' - ${job.city?.name ?? ''}',
                   style: const TextStyle(color: Colors.blue, fontSize: 16),
                 ),
+                WidgetSpan(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 10), // Mimics SizedBox(width: 10)
+                    child: JobBadge(status: job.status!), // Add JobBadge
+                  ),
+                ),
+
               ],
             ),
           ),
           const Divider(color: Colors.white24, height: defaultPadding),
-
-          _buildDetailSection('Opis posla:', job.description),
-          _buildDetailSection('Tip posla:', job.jobType?.name),
-          _buildDetailSection('Potrebno radnika:', job.requiredEmployees?.toString()),
-          _buildDetailSection('Plaća:', _getPaymentDetails(job)),
-          _buildDetailSection('Datum završetka:', _getJobEndDate(job)),
-
-          if (job.schedules != null && job.schedules!.isNotEmpty) _buildScheduleSection(job),
-          if (job.additionalPaymentOptions != null && job.additionalPaymentOptions!.isNotEmpty)
-            _buildAdditionalPaymentOptions(job),
-
+          _buildDetailRow(
+            icon: Icons.description,
+            label: 'Opis posla:',
+            value: '',
+            customChild: Container(
+              padding: const EdgeInsets.all(8),
+              child: SizedBox(
+                child: IgnorePointer(
+                  child: quill.QuillEditor(
+                    controller: quill.QuillController(
+                      document: job.description != null
+                          ? quill.Document.fromJson(
+                          jsonDecode(job.description!))
+                          : quill.Document(),
+                      selection: const TextSelection.collapsed(offset: 0),
+                    ),
+                    focusNode: FocusNode(),
+                    scrollController: ScrollController(),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: defaultPadding),
+          _buildDetailRow(
+            icon: Icons.work,
+            label: 'Tip posla:',
+            value: job.jobType?.name ?? 'Nepoznato',
+          ),
+          const SizedBox(height: defaultPadding),
+          _buildDetailRow(
+            icon: Icons.supervisor_account,
+            label: 'Potrebno radnika:',
+            value: job.requiredEmployees?.toString() ?? 'Nepoznato',
+          ),
+          const SizedBox(height: defaultPadding),
+          _buildDetailRow(
+            icon: Icons.money,
+            label: 'Plaća:',
+            value: _getPaymentDetails(job),
+          ),
+          const SizedBox(height: defaultPadding),
+          _buildDetailRow(
+            icon: Icons.event,
+            label: 'Rok za prijavu:',
+            value: _getJobEndDate(job)
+          ),
+          if (job.schedules != null && job.schedules!.isNotEmpty) ...[
+            const SizedBox(height: defaultPadding),
+            _buildDetailRow(
+              icon: Icons.schedule,
+              label: 'Raspored posla:',
+              value: '',
+              customChild: Wrap(
+                spacing: 8,
+                children: job.schedules!
+                    .where((schedule) => schedule.answer != null)
+                    .map((schedule) => Chip(
+                  label: Text(schedule.answer!),
+                  backgroundColor: primaryColor.withOpacity(0.1),
+                ))
+                    .toList(),
+              ),
+            ),
+          ],
+          if (job.additionalPaymentOptions != null && job.additionalPaymentOptions!.isNotEmpty) ...[
+            const SizedBox(height: defaultPadding),
+            _buildDetailRow(
+              icon: Icons.add_circle,
+              label: 'Dodatno plaća:',
+              value: '',
+              customChild: Wrap(
+                spacing: 8,
+                children: job.additionalPaymentOptions!
+                    .where((option) => option.answer != null)
+                    .map((option) => Chip(
+                  label: Text(option.answer!),
+                  backgroundColor: Colors.green.withOpacity(0.1),
+                ))
+                    .toList(),
+              ),
+            ),
+          ],
           const SizedBox(height: defaultPadding),
           JobActions(job: job),
         ],
@@ -100,53 +187,48 @@ class JobDetailsContent extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailSection(String title, String? value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+  Widget _buildDetailRow({
+    required IconData icon,
+    required String label,
+    required String value,
+    Widget? customChild
+  }) {
+    return Container(
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('$title ', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: primaryColor)),
+          Icon(
+            icon,
+            color:  primaryColor,
+            size: 20,
+          ),
+          const SizedBox(width: 8),
           Expanded(
-            child: Text(value ?? 'Nepoznato', style: const TextStyle(fontSize: 15, color: Colors.white70)),
+            flex: 2,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: primaryColor,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: customChild ??
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white70,
+                  ),
+                  textAlign: TextAlign.start,
+                ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildScheduleSection(Job job) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: defaultPadding),
-        const Text('Raspored posla:', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: primaryColor)),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          children: job.schedules!
-              .where((schedule) => schedule.answer != null)
-              .map((schedule) => Chip(label: Text(schedule.answer!), backgroundColor: primaryColor.withOpacity(0.1)))
-              .toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAdditionalPaymentOptions(Job job) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: defaultPadding),
-        const Text('Dodatno plaća:', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: primaryColor)),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          children: job.additionalPaymentOptions!
-              .where((option) => option.answer != null)
-              .map((option) => Chip(label: Text(option.answer!), backgroundColor: Colors.green.withOpacity(0.1)))
-              .toList(),
-        ),
-      ],
     );
   }
 
