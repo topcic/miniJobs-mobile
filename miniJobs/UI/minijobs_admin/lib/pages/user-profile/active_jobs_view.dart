@@ -39,6 +39,14 @@ List<JobCardDTO> jobs=[];
 
   @override
   Widget build(BuildContext context) {
+    if (jobs.isEmpty) {
+      return const Center(
+        child: Text(
+          'Korisnik nema aktivnih poslova',
+          style: TextStyle(fontSize: 16),
+        ),
+      );
+    }
     return Responsive(
       mobile: ListView.builder(
         itemCount: jobs.length,

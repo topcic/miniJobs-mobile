@@ -1,8 +1,10 @@
 import 'dart:typed_data';
 
+import 'package:decimal/decimal.dart';
 import 'package:file_saver/file_saver.dart';
 import 'package:flutter/material.dart';
 import 'package:mime/mime.dart';
+import 'package:minijobs_admin/pages/main/constants.dart';
 import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
 import '../../models/applicant/applicant.dart';
@@ -51,33 +53,33 @@ class _ApplicantDetailsPageState extends State<ApplicantDetailsPage> {
       setState(() => isLoading = false);
     }
   }
-String _getFileExtension(Uint8List bytes) {
-  final mimeType = lookupMimeType('', headerBytes: bytes);
+  String _getFileExtension(Uint8List bytes) {
+    final mimeType = lookupMimeType('', headerBytes: bytes);
 
-  if (mimeType != null) {
-    final extension = mimeType.split('/').last;
-    return extension;
+    if (mimeType != null) {
+      final extension = mimeType.split('/').last;
+      return extension;
+    }
+
+    final signatures = {
+      '25504446': 'pdf',
+      '504B0304': 'docx',
+      'D0CF11E0': 'doc',
+    };
+
+    final headerBytes = bytes
+        .take(4)
+        .map((byte) => byte.toRadixString(16).padLeft(2, '0'))
+        .join()
+        .toUpperCase();
+    final extension = signatures[headerBytes];
+
+    if (extension != null) {
+      return extension;
+    }
+
+    return '';
   }
-
-  final signatures = {
-    '25504446': 'pdf',
-    '504B0304': 'docx',
-    'D0CF11E0': 'doc',
-  };
-
-  final headerBytes = bytes
-      .take(4)
-      .map((byte) => byte.toRadixString(16).padLeft(2, '0'))
-      .join()
-      .toUpperCase();
-  final extension = signatures[headerBytes];
-
-  if (extension != null) {
-    return extension;
-  }
-
-  return '';
-}
   Future<void> blockUser() async {
     setState(() => isLoading = true);
     await _userProvider.delete(applicant!.id!);
@@ -188,13 +190,48 @@ String _getFileExtension(Uint8List bytes) {
               ),
             ),
             const SizedBox(height: 16),
-            _detailRow('Ime i prezime:', '${applicant!.firstName} ${applicant!.lastName}'),
-            _detailRow('Email:', applicant!.email ?? '-'),
-            _detailRow('Broj telefona:', applicant!.phoneNumber ?? '-'),
-            _detailRow('Grad:', applicant!.city?.name ?? '-'),
-            _detailRow('Račun potvrđen:', applicant!.accountConfirmed == true ? 'Da' : 'Ne'),
-            _detailRow('Broj završenih poslova:', applicant!.numberOfFinishedJobs?.toString() ?? '0'),
-            _detailRow('Prosječna ocjena:', applicant!.averageRating?.toString() ?? '-'),
+            // Two-column layout for details with icons
+            _buildDetailRow(
+              icon: Icons.person,
+              label: 'Ime i prezime',
+              value: '${applicant!.firstName} ${applicant!.lastName}',
+            ),
+            const SizedBox(height: 12),
+            _buildDetailRow(
+              icon: Icons.email,
+              label: 'Email',
+              value: applicant!.email ?? '-',
+            ),
+            const SizedBox(height: 12),
+            _buildDetailRow(
+              icon: Icons.phone,
+              label: 'Broj telefona',
+              value: applicant!.phoneNumber ?? '-',
+            ),
+            const SizedBox(height: 12),
+            _buildDetailRow(
+              icon: Icons.location_city,
+              label: 'Grad',
+              value: applicant!.city?.name ?? '-',
+            ),
+            const SizedBox(height: 12),
+            _buildDetailRow(
+              icon: Icons.verified_user,
+              label: 'Račun potvrđen',
+              value: applicant!.accountConfirmed == true ? 'Da' : 'Ne',
+            ),
+            const SizedBox(height: 12),
+            _buildDetailRow(
+              icon: Icons.work,
+              label: 'Broj završenih poslova',
+              value: applicant!.numberOfFinishedJobs?.toString() ?? '0',
+            ),
+            const SizedBox(height: 12),
+            _buildDetailRow(
+              icon: Icons.star,
+              label: 'Prosječna ocjena',
+              value: applicant!.averageRating?.toString() ?? '-',
+            ),
             const SizedBox(height: 16),
             Center(
               child: ElevatedButton.icon(
@@ -203,14 +240,14 @@ String _getFileExtension(Uint8List bytes) {
                     : () {
                   if (applicant!.deleted!) {
                     _showConfirmationDialog(
-                      context: context,
+                      context: parentContext,
                       title: 'Aktiviraj',
                       content: 'Da li ste sigurni da želite aktivirati ${applicant!.firstName} ${applicant!.lastName}?',
                       onConfirm: activateUser,
                     );
                   } else {
                     _showConfirmationDialog(
-                      context: context,
+                      context: parentContext,
                       title: 'Blokiraj',
                       content: 'Da li ste sigurni da želite blokirati ${applicant!.firstName} ${applicant!.lastName}?',
                       onConfirm: blockUser,
@@ -236,7 +273,47 @@ String _getFileExtension(Uint8List bytes) {
       ),
     );
   }
-
+  Widget _buildDetailRow({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Icon
+        Icon(
+          icon,
+          color: primaryColor,
+          size: 20,
+        ),
+        const SizedBox(width: 8),
+        // Label column
+        Expanded(
+          flex: 2,
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        // Value column
+        Expanded(
+          flex: 3,
+          child: Text(
+            value,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+            ),
+            textAlign: TextAlign.start,
+          ),
+        ),
+      ],
+    );
+  }
   Widget _buildAdditionalDetailsCard() {
     return Card(
       elevation: 6,
@@ -252,12 +329,32 @@ String _getFileExtension(Uint8List bytes) {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const Divider(),
-              _detailRow('Opis:', applicant!.description ?? '-'),
-              _detailRow('Iskustvo:', applicant!.experience ?? '-'),
-              _detailRow(
-                'Predložena plata:',
-                applicant!.wageProposal != null
-                    ? '${applicant!.wageProposal.toString()} KM'
+              _buildDetailRow(
+                icon: Icons.description,
+                label: 'Opis',
+                value: applicant!.description ?? '-',
+              ),
+              const SizedBox(height: 12),
+
+              _buildDetailRow(
+                icon: Icons.work,
+                label: 'Iskustvo',
+                value: applicant!.experience ?? '-',
+              ),
+              const SizedBox(height: 12),
+
+              _buildDetailRow(
+                icon: Icons.attach_money,
+                label: 'Predložena plata',
+                value: applicant!.wageProposal != null && applicant!.wageProposal!> Decimal.zero ? '${applicant!.wageProposal} KM' : '-',
+              ),
+              const SizedBox(height: 12),
+
+              _buildDetailRow(
+                icon: Icons.work_outline, // Icon for job types
+                label: 'Tipovi posla',
+                value: applicant!.jobTypes != null && applicant!.jobTypes!.isNotEmpty
+                    ? applicant!.jobTypes!.map((jobType) => jobType.name).join(', ')
                     : '-',
               ),
               if (applicant!.cv != null)
@@ -302,24 +399,4 @@ String _getFileExtension(Uint8List bytes) {
     );
   }
 
-
-  Widget _detailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(color: Colors.grey),
-              softWrap: true,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

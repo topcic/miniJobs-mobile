@@ -49,6 +49,7 @@ public class ApplicantRepository(ApplicationDbContext context, IMapper mapper) :
             PhoneNumber = applicant.User.PhoneNumber,
             CityId = applicant.User.CityId,
             Deleted = applicant.User.Deleted,
+            AccountConfirmed= applicant.User.AccountConfirmed,
             CreatedBy = applicant.User.CreatedBy,
             Photo = applicant.User.Photo,
             Role = applicant.User.Role,

@@ -9,7 +9,11 @@ sealed class UserUpdateCommandHandler(IUserManagerRepository repository) : IRequ
 {
     public async Task<User> Handle(UserUpdateCommand command, CancellationToken cancellationToken)
     {
-        await repository.UpdateAsync(command.User);
-        return command.User;
+        var user = await repository.TryFindAsync(command.User.Id);
+        user.FirstName = command.User.FirstName;
+        user.LastName = command.User.LastName;
+        user.PhoneNumber = command.User.PhoneNumber;
+        await repository.UpdateAsync(user);
+        return user;
     }
 }

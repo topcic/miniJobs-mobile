@@ -15,6 +15,8 @@ public class EmployerDTO
     public string? PhoneNumber { get; set; }
     public int? CityId { get; set; }
     public bool Deleted { get; set; }
+    public bool AccountConfirmed { get; set; }
+
     public int? CreatedBy { get; set; }
     public byte[]? Photo { get; set; }
     public string Role { get; set; }

@@ -17,6 +17,7 @@ public class ApplicantDTO
     public string? PhoneNumber { get; set; }
     public int? CityId { get; set; }
     public bool Deleted { get; set; }
+    public bool AccountConfirmed { get; set; }
     public int? CreatedBy { get; set; }
     public byte[]? Photo { get; set; }
     public string Role { get; set; }
@@ -28,4 +29,5 @@ public class ApplicantDTO
     public bool IsRated { get; set; }
     public JobApplicationStatus ApplicationStatus { get; set; }
     public IEnumerable<JobType> JobTypes { get; set; }
+
 }

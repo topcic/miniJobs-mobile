@@ -62,6 +62,7 @@ public class EmployerRepository(ApplicationDbContext _context, IMapper mapper) :
             PhoneNumber = employerWithUser.User.PhoneNumber,
             CityId = employerWithUser.User.CityId,
             Deleted = employerWithUser.User.Deleted,
+            AccountConfirmed = employerWithUser.User.AccountConfirmed,
             CreatedBy = employerWithUser.User.CreatedBy,
             Photo = employerWithUser.User.Photo,
             Role = employerWithUser.User.Role,

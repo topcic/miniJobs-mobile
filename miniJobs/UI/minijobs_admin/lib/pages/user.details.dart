@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:minijobs_admin/pages/user-profile/user_change_password.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/user/user.dart';
@@ -75,7 +76,12 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
       }
     }
   }
-
+  void _handleChangePassword(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const UserChangePassword()),
+    );
+  }
   @override
   void dispose() {
     _firstNameController.dispose();
@@ -94,11 +100,11 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
     if (_formKey.currentState!.saveAndValidate()) {
       try {
         // Assuming _userProvider.update exists to save the updated user details
-        await _userProvider.update(widget.userId, {
-          'firstName': _firstNameController.text,
-          'lastName': _lastNameController.text,
-          'phoneNumber': _phoneNumberController.text,
-        });
+        user!.firstName=_firstNameController.text;
+        user!.lastName=_lastNameController.text;
+        user!.phoneNumber=_phoneNumberController.text;
+
+        await _userProvider.update(widget.userId,user);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Podaci uspješno ažurirani')),
@@ -305,21 +311,39 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                     textInputAction: TextInputAction.done,
                   ),
                   const SizedBox(height: 40),
-                  Center(
-                    child: ElevatedButton(
-                      onPressed: isLoading ? null : _saveUserDetails,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start, // Align items to the left
+                    children: [
+                      ElevatedButton(
+                        onPressed: isLoading ? null : _saveUserDetails,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green, // Green background for "Sačuvaj promjene"
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                        ),
+                        child: const Text(
+                          'Sačuvaj promjene',
+                          style: TextStyle(color: Colors.white),
                         ),
                       ),
-                      child: const Text(
-                        'Sačuvaj promjene',
-                        style: TextStyle(color: Colors.white),
+                      const SizedBox(width: 16), // Space between buttons
+                      ElevatedButton(
+                        onPressed: isLoading ? null : () => _handleChangePassword(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor, // Use primaryColor for "Promijeni lozinku"
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                        ),
+                        child: const Text(
+                          'Promijeni lozinku',
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ],
               ),

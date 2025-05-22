@@ -4,6 +4,7 @@ import '../../models/employer/employer.dart';
 import '../../providers/employer_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../utils/photo_view.dart';
+import '../main/constants.dart';
 import '../user-profile/active_jobs_view.dart';
 import '../user-profile/finished_job_view.dart';
 import '../user-profile/user_ratings_view.dart';
@@ -143,6 +144,7 @@ class _EmployerDetailsPageState extends State<EmployerDetailsPage> {
     );
   }
 
+
   Widget _buildEmployerDetailsCard(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -171,23 +173,84 @@ class _EmployerDetailsPageState extends State<EmployerDetailsPage> {
                   ),
                   const SizedBox(height: 16),
                   if (employer.name != null) ...[
-                    _detailRow('Naziv firme:', employer.name!),
-                    _detailRow('Adresa:', employer.streetAddressAndNumber ?? '-'),
-                    _detailRow('ID broj:', employer.idNumber ?? '-'),
-                    _detailRow('Kontakt telefon:', employer.companyPhoneNumber ?? '-'),
+                    _buildDetailRow(
+                      icon: Icons.business,
+                      label: 'Naziv firme',
+                      value: employer.name!,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildDetailRow(
+                      icon: Icons.location_on,
+                      label: 'Adresa',
+                      value: employer.streetAddressAndNumber ?? '-',
+                    ),
+                    const SizedBox(height: 12),
+                    _buildDetailRow(
+                      icon: Icons.badge,
+                      label: 'ID broj',
+                      value: employer.idNumber ?? '-',
+                    ),
+                    const SizedBox(height: 12),
+                    _buildDetailRow(
+                      icon: Icons.phone,
+                      label: 'Kontakt telefon',
+                      value: employer.companyPhoneNumber ?? '-',
+                    ),
                     const Divider(height: 24),
-                    _detailRow('Zadužena osoba:', '${employer.firstName} ${employer.lastName}'),
-                    _detailRow('Email:', employer.email ?? '-'),
-                    _detailRow('Broj telefona:', employer.phoneNumber ?? '-'),
+                    _buildDetailRow(
+                      icon: Icons.person,
+                      label: 'Zadužena osoba',
+                      value: '${employer.firstName} ${employer.lastName}',
+                    ),
+                    const SizedBox(height: 12),
+                    _buildDetailRow(
+                      icon: Icons.email,
+                      label: 'Email',
+                      value: employer.email ?? '-',
+                    ),
+                    const SizedBox(height: 12),
+                    _buildDetailRow(
+                      icon: Icons.phone,
+                      label: 'Broj telefona',
+                      value: employer.phoneNumber ?? '-',
+                    ),
                   ] else ...[
-                    _detailRow('Ime i prezime:', '${employer.firstName} ${employer.lastName}'),
-                    _detailRow('Email:', employer.email ?? '-'),
-                    _detailRow('Broj telefona:', employer.phoneNumber ?? '-'),
+                    _buildDetailRow(
+                      icon: Icons.person,
+                      label: 'Ime i prezime',
+                      value: '${employer.firstName} ${employer.lastName}',
+                    ),
+                    const SizedBox(height: 12),
+                    _buildDetailRow(
+                      icon: Icons.email,
+                      label: 'Email',
+                      value: employer.email ?? '-',
+                    ),
+                    const SizedBox(height: 12),
+                    _buildDetailRow(
+                      icon: Icons.phone,
+                      label: 'Broj telefona',
+                      value: employer.phoneNumber ?? '-',
+                    ),
                   ],
                   const Divider(height: 24),
-                  _detailRow('Grad:', employer.city?.name ?? '-'),
-                  _detailRow('Račun potvrđen:', employer.accountConfirmed == true ? 'Da' : 'Ne'),
-                  _detailRow('Prosječna ocjena:', employer.averageRating?.toString() ?? '-'),
+                  _buildDetailRow(
+                    icon: Icons.location_city,
+                    label: 'Grad',
+                    value: employer.city?.name ?? '-',
+                  ),
+                  const SizedBox(height: 12),
+                  _buildDetailRow(
+                    icon: Icons.verified_user,
+                    label: 'Račun potvrđen',
+                    value: employer.accountConfirmed == true ? 'Da' : 'Ne',
+                  ),
+                  const SizedBox(height: 12),
+                  _buildDetailRow(
+                    icon: Icons.star,
+                    label: 'Prosječna ocjena',
+                    value: employer.averageRating?.toString() ?? '-',
+                  ),
                   const SizedBox(height: 24),
                   Center(
                     child: ElevatedButton.icon(
@@ -236,26 +299,6 @@ class _EmployerDetailsPageState extends State<EmployerDetailsPage> {
   }
 
 
-  Widget _detailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(color: Colors.grey),
-              softWrap: true,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildAdditionalDetailsCard() {
     return Card(
       elevation: 6,
@@ -292,4 +335,45 @@ class _EmployerDetailsPageState extends State<EmployerDetailsPage> {
       ),
     );
   }
+}
+Widget _buildDetailRow({
+  required IconData icon,
+  required String label,
+  required String value,
+}) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Icon
+      Icon(
+        icon,
+        color: primaryColor,
+        size: 20,
+      ),
+      const SizedBox(width: 8),
+      // Label column
+      Expanded(
+        flex: 2,
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+      // Value column
+      Expanded(
+        flex: 3,
+        child: Text(
+          value,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+          ),
+          textAlign: TextAlign.start,
+        ),
+      ),
+    ],
+  );
 }

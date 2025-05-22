@@ -44,60 +44,60 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
       ),
       body: isLoading
           ? const SpinKitRing(color: Colors.brown)
-          : SingleChildScrollView( 
-              child: FormBuilder(
-                key: _formKey,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(45, 20, 45, 20),
-                  child: Card(
-                    elevation: 4,
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        children: [
-                          rowMethod(
-                            _textField('firstName', "Ime"),
-                            CrossAxisAlignment.center,
+          : SingleChildScrollView(
+        child: FormBuilder(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(45, 20, 45, 20),
+            child: Card(
+              elevation: 4,
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  children: [
+                    rowMethod(
+                      _textField('firstName', "Ime"),
+                      CrossAxisAlignment.center,
+                    ),
+                    const SizedBox(height: 20),
+                    rowMethod(
+                      _textField('lastName', "Prezime"),
+                      CrossAxisAlignment.center,
+                    ),
+                    const SizedBox(height: 20),
+                    rowMethod(
+                      _textField('phoneNumber', "Broj telefona"),
+                      CrossAxisAlignment.center,
+                    ),
+                    const SizedBox(height: 20),
+                    rowMethod(
+                      Expanded(
+                        child: FormBuilderTextField(
+                          name: 'email',
+                          validator: ((value) {
+                            if (value == null || value.isEmpty) {
+                              return "Email je obavezno polje";
+                            } else if (!RegExp(
+                                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                .hasMatch(value)) {
+                              return "Nevalidan format";
+                            } else {
+                              return null;
+                            }
+                          }),
+                          decoration: const InputDecoration(
+                            label: Text('Email'),
                           ),
-                          const SizedBox(height: 20),
-                          rowMethod(
-                            _textField('lastName', "Prezime"),
-                            CrossAxisAlignment.center,
-                          ),
-                          const SizedBox(height: 20),
-                          rowMethod(
-                            _textField('phoneNumber', "Broj telefona"),
-                            CrossAxisAlignment.center,
-                          ),
-                          const SizedBox(height: 20),
-                          rowMethod(
-                            Expanded(
-                              child: FormBuilderTextField(
-                                name: 'email',
-                                validator: ((value) {
-                                  if (value == null || value.isEmpty) {
-                                    return "Email je obavezno polje";
-                                  } else if (!RegExp(
-                                          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                                      .hasMatch(value)) {
-                                    return "Nevalidan format";
-                                  } else {
-                                    return null;
-                                  }
-                                }),
-                                decoration: const InputDecoration(
-                                  label: Text('Email'),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),
+          ),
+        ),
+      ),
     );
   }
 

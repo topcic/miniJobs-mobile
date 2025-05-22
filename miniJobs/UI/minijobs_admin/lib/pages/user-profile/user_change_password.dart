@@ -27,24 +27,22 @@ class _UserChangePasswordState extends State<UserChangePassword> {
     super.initState();
     _userProvider = context.read<UserProvider>();
     _authenticationProvider = context.read<AuthenticationProvider>();
+    sendEmail();
 
   }
   Future<void> sendEmail() async {
-    try {
-      // Call the forgotPassword method
-      bool? result = await _userProvider.forgotPassword(GetStorage().read('emailaddress') ?? '');
+    // Call the forgotPassword method
+    bool? result = await _userProvider.forgotPassword(GetStorage().read('emailaddress') ?? '');
 
-      if (result == true) {
-        // Show success notification if the API call is successful
-        notificationService.success(
-            'Molimo Vas provjerite Vaš email. Poslali smo Vam kod za promjenu lozinke.');
-        setState(() {
-          showPasswordFields = true; // Update UI if needed
-        });
-      }
-    } catch (err) {
-
+    if (result == true) {
+      // Show success notification if the API call is successful
+      notificationService.success(
+          'Molimo Vas provjerite Vaš email. Poslali smo Vam kod za promjenu lozinke.');
+      setState(() {
+        showPasswordFields = true; // Update UI if needed
+      });
     }
+
   }
   Future<void> handleChangePassword(String password, String code) async{
     try {
@@ -72,42 +70,6 @@ class _UserChangePasswordState extends State<UserChangePassword> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            if (!showPasswordFields) ...[
-              const Text(
-                "Da li želite da promijenite lozinku?",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  sendEmail();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF00A6FF),
-                  padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 36.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24.0),
-                  ),
-                  elevation: 8.0, // Adds a slight shadow for depth
-                  shadowColor: Colors.black26,
-                ),
-                child: const Text(
-                  "Promijeni lozinku",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    letterSpacing: 1.2, // Slightly increase spacing for readability
-                  ),
-                ),
-              ),
-
-            ],
             if (showPasswordFields)
               FormBuilder(
                 key: _formKey,

@@ -36,7 +36,8 @@ class _ApplicantProfilePageState extends State<ApplicantProfilePage> {
   void initState() {
     super.initState();
     userId = widget.userId;
-    isAbleTodoEdit = userId == [[int.parse(GetStorage().read('userId'))]];
+    isAbleTodoEdit = userId == int.parse(GetStorage().read('userId'));
+
     _authenticationProvider = context.read<AuthenticationProvider>();
     fetchUserData();
   }
