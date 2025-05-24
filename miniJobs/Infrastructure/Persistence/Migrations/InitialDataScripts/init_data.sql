@@ -22,7 +22,7 @@ BEGIN
             CONVERT(VARCHAR(32), HASHBYTES('MD5', CAST(NEWID() AS VARCHAR(36))), 2), 
             0, 0, 1, GETUTCDATE(), 
             CONCAT('+387 6', ABS(CHECKSUM(NEWID())) % 1000000), 
-            ABS(CHECKSUM(NEWID())) % 50 + 1,
+            ABS(CHECKSUM(NEWID())) % 50 + 1
         );
         
         SET @ApplicantId = SCOPE_IDENTITY();
@@ -53,7 +53,7 @@ BEGIN
             CONVERT(VARCHAR(32), HASHBYTES('MD5', CAST(NEWID() AS VARCHAR(36))), 2), -- Random password hash
             0, 0, 1, GETUTCDATE(), 
             CONCAT('+387 6', ABS(CHECKSUM(NEWID())) % 1000000), 
-            ABS(CHECKSUM(NEWID())) % 50 + 1,
+            ABS(CHECKSUM(NEWID())) % 50 + 1
         );
         
         SET @EmployerId = SCOPE_IDENTITY();
