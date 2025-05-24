@@ -71,7 +71,7 @@ END
 INSERT INTO jobs (name, description, street_address_and_number, applications_duration, status, required_employees, created, created_by, wage, city_id, job_type_id, deleted_by_admin)
 SELECT 
     CONCAT('Job ', n.n) AS name,
-    CONCAT('[{"insert":"Description for job', n.n, '"}]') AS description,
+   CONCAT('[{"insert":"Description for job ', n.n, '\\n"}]') AS description,
     CONCAT('Street ', CAST(ABS(CHECKSUM(NEWID())) % 100 + 1 AS VARCHAR)) AS street_address_and_number,
     ABS(CHECKSUM(NEWID())) % 30 + 1 AS applications_duration,
     ABS(CHECKSUM(NEWID())) % 5 AS status, -- Random 0 to 4
