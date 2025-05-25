@@ -1,15 +1,23 @@
+# Build stage
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
-COPY ["ConsumerService/ConsumerService.csproj", "."]
-COPY ["/Infrastructure/Infrastructure.csproj", "Infrastructure/"]
-RUN dotnet restore "ConsumerService/ConsumerService.csproj"
-COPY . .
-COPY ["/Infrastructure", "Infrastructure/"]
-WORKDIR "/src"
-RUN dotnet restore "Infrastructure/Infrastructure.csproj"
-RUN dotnet build "ConsumerService/ConsumerService.csproj" -c Release -o /app/build
 
+# Copy the project files for ConsumerService and Infrastructure
+COPY ["ConsumerService/ConsumerService.csproj", "ConsumerService/"]
+COPY ["Infrastructure/Infrastructure.csproj", "Infrastructure/"]
+
+# Restore dependencies for ConsumerService (which may reference Infrastructure)
+WORKDIR /src/ConsumerService
+RUN dotnet restore "ConsumerService.csproj"
+
+# Copy the rest of the source code
+COPY . .
+
+# Build the application
+RUN dotnet build "ConsumerService.csproj" -c Release -o /app/build
+
+# Final stage
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
 COPY --from=build /app/build .
-ENTRYPOINT ["dotnet", "ConsumerService/ConsumerService.dll"]
+ENTRYPOINT ["dotnet", "ConsumerService.dll"]
