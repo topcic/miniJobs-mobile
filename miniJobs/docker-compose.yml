@@ -82,7 +82,7 @@ services:
       - miniJobs_network
     depends_on:
       - rabbitmq
-      - db
+
 
 networks:
   miniJobs_network:
