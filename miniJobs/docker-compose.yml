@@ -71,7 +71,7 @@ services:
   consumer:
     build:
      context: .
-     dockerfile: Dockerfile.consumer
+     dockerfile: ConsumerService/Dockerfile
     container_name: consumer_container
     restart: unless-stopped
     environment:
