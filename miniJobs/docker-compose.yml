@@ -46,7 +46,7 @@ services:
   webapi:
     build:
       context: .
-      dockerfile: WebApi/Dockerfile
+      dockerfile: Dockerfile
     container_name: webapi_container
     restart: unless-stopped
     environment:
