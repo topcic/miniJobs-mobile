@@ -1,9 +1,7 @@
 ﻿using Application.Common.Interfaces;
-using Application.JobRecommendations.Models;
 using Hangfire;
 using Infrastructure.Authentication;
 using Infrastructure.Common.Interfaces;
-using Infrastructure.Consumers;
 using Infrastructure.MailSenders;
 using Infrastructure.OptionsSetup;
 using Infrastructure.Persistence;
@@ -56,11 +54,27 @@ public static class ConfigureServices
     }
     private static void AddMassTransitAndRabbitMq(IServiceCollection services, IConfiguration configuration)
     {
+        //services.AddMassTransit(configure =>
+        //{
+        //    configure.SetKebabCaseEndpointNameFormatter();
+        //    configure.AddConsumer<ApplicationExpiryEmailConsumer>();
+        //    configure.AddConsumer<JobRecommendationEmailConsumer>();
+        //    configure.UsingRabbitMq((context, cfg) =>
+        //    {
+        //        cfg.Host(new Uri(configuration["RabbitMQ:Host"]!), h =>
+        //        {
+        //            h.Username(configuration["RabbitMQ:Username"]!);
+        //            h.Password(configuration["RabbitMQ:Password"]!);
+        //        });
+
+        //        cfg.ConfigureEndpoints(context);
+        //        Console.WriteLine("MassTransit RabbitMQ endpoints configured.");
+        //    });
+        //});
+
         services.AddMassTransit(configure =>
         {
             configure.SetKebabCaseEndpointNameFormatter();
-            configure.AddConsumer<ApplicationExpiryEmailConsumer>();
-            configure.AddConsumer<JobRecommendationEmailConsumer>();
             configure.UsingRabbitMq((context, cfg) =>
             {
                 cfg.Host(new Uri(configuration["RabbitMQ:Host"]!), h =>
@@ -68,9 +82,7 @@ public static class ConfigureServices
                     h.Username(configuration["RabbitMQ:Username"]!);
                     h.Password(configuration["RabbitMQ:Password"]!);
                 });
-
-                cfg.ConfigureEndpoints(context);
-                Console.WriteLine("MassTransit RabbitMQ endpoints configured.");
+                Console.WriteLine("MassTransit RabbitMQ configured for publishing.");
             });
         });
 

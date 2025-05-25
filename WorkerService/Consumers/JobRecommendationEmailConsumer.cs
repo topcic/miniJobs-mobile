@@ -1,9 +1,8 @@
 ﻿using Application.Common.Interfaces;
 using Application.JobRecommendations.Models;
 using MassTransit;
-using Microsoft.Extensions.Logging;
 
-namespace Infrastructure.Consumers;
+namespace WorkerService.Consumers;
 
 public class JobRecommendationEmailConsumer(IEmailSender emailSender) : IConsumer<JobRecommendationMail>
 {

@@ -2,7 +2,7 @@
 using Infrastructure.Mails;
 using MassTransit;
 
-namespace Infrastructure.Consumers;
+namespace WorkerService.Consumers;
 
 public class ApplicationExpiryEmailConsumer(IEmailSender emailSender) : IConsumer<ApplicationExpiryMail>
 {

@@ -1,7 +1,7 @@
 version: '3.8'
 
 volumes:
-  sql_data:  # Declare the sql_data volume here
+  sql_data:
 
 services:
   rabbitmq:
@@ -34,19 +34,19 @@ services:
       interval: 10s
       timeout: 30s
       retries: 5
-      start_period: 60s 
+      start_period: 60s
     networks:
       - miniJobs_network
     volumes:
-      - sql_data:/var/opt/mssql  
+      - sql_data:/var/opt/mssql
       - ./Infrastructure/Persistence/Migrations/InitialDataScripts:/docker-entrypoint-initdb.d/
     depends_on:
       - rabbitmq
 
   webapi:
     build:
-     context: .  
-     dockerfile: Dockerfile
+      context: .
+      dockerfile: WebApi/Dockerfile
     container_name: webapi_container
     restart: unless-stopped
     environment:
@@ -56,12 +56,10 @@ services:
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_USERNAME=guest
       - RABBITMQ_PASSWORD=guest
-      - RABBITMQ_HOST=amqp://minijobs-queue:5672  
-      - DOTNET_USE_POLLING_FILE_WATCHER=1 
+      - DOTNET_USE_POLLING_FILE_WATCHER=1
       - ASPNETCORE_URLS=http://+:7126
     ports:
-     - 7126:7126
-
+      - "7126:7126"
     networks:
       - miniJobs_network
     depends_on:
@@ -69,6 +67,22 @@ services:
       - rabbitmq
     volumes:
       - ./Infrastructure/Persistence/Migrations/InitialDataScripts:/app/Infrastructure/Persistence/Migrations/InitialDataScripts
+
+  worker:
+    build:
+      context: .
+      dockerfile: WorkerService/Dockerfile
+    container_name: worker_container
+    restart: unless-stopped
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+    networks:
+      - miniJobs_network
+    depends_on:
+      - rabbitmq
+      - db
 
 networks:
   miniJobs_network:
