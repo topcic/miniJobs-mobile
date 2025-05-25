@@ -1,19 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="MassTransit" Version="8.3.1" />
+		<PackageReference Include="MassTransit.RabbitMQ" Version="8.3.1" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="MassTransit" Version="8.3.1" />
-	  <PackageReference Include="MassTransit.RabbitMQ" Version="8.3.1" />
-	  <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\miniJobs\Infrastructure\Infrastructure.csproj" />
-  </ItemGroup>
-
+	<ItemGroup>
+		<ProjectReference Include="Infrastructure/Infrastructure.csproj" />
+	</ItemGroup>
 </Project>

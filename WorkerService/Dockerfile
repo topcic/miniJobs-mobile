@@ -1,11 +1,11 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-# Copy project files, adjusting paths for the new context
+# Copy project files
 COPY WorkerService/WorkerService.csproj ./WorkerService/
 COPY miniJobs/Infrastructure/Infrastructure.csproj ./Infrastructure/
 
-# Restore dependencies
+# Restore dependencies (this will handle the project reference once paths are correct)
 RUN dotnet restore ./WorkerService/WorkerService.csproj
 
 # Copy source
