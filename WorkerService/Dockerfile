@@ -1,18 +1,16 @@
-# WorkerService/Dockerfile
-
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-# Copy project files
+# Copy project files, adjusting the path for Infrastructure
 COPY WorkerService/WorkerService.csproj ./WorkerService/
-COPY Infrastructure/Infrastructure.csproj ./Infrastructure/
+COPY ../miniJobs/Infrastructure/Infrastructure.csproj ./Infrastructure/
 
 # Restore dependencies
 RUN dotnet restore ./WorkerService/WorkerService.csproj
 
-# Copy source
+# Copy source, adjusting the path for Infrastructure
 COPY WorkerService/. ./WorkerService/
-COPY Infrastructure/. ./Infrastructure/
+COPY ../miniJobs/Infrastructure/. ./Infrastructure/
 
 # Build
 WORKDIR /src/WorkerService
