@@ -5,6 +5,7 @@ WORKDIR /src
 # Copy the project files for ConsumerService and Infrastructure
 COPY ["ConsumerService/ConsumerService.csproj", "ConsumerService/"]
 COPY ["Infrastructure/Infrastructure.csproj", "Infrastructure/"]
+COPY ["Application/Application.csproj", "Application/"]
 
 # Restore dependencies for ConsumerService (which may reference Infrastructure)
 WORKDIR /src/ConsumerService
