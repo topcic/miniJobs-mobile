@@ -68,11 +68,11 @@ services:
     volumes:
       - ./Infrastructure/Persistence/Migrations/InitialDataScripts:/app/Infrastructure/Persistence/Migrations/InitialDataScripts
 
-  worker:
+  consumer:
     build:
-     context: ..
-     dockerfile: WorkerService/Dockerfile
-    container_name: worker_container
+     context: .
+     dockerfile: Dockerfile.consumer
+    container_name: consumer_container
     restart: unless-stopped
     environment:
       - RABBITMQ_HOST=rabbitmq
