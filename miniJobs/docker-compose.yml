@@ -68,20 +68,20 @@ services:
     volumes:
       - ./Infrastructure/Persistence/Migrations/InitialDataScripts:/app/Infrastructure/Persistence/Migrations/InitialDataScripts
 
-  # consumer:
-  #   build:
-  #    context: .
-  #    dockerfile: ConsumerService/Dockerfile
-  #   container_name: consumer_container
-  #   restart: unless-stopped
-  #   environment:
-  #     - RABBITMQ_HOST=rabbitmq
-  #     - RABBITMQ_USERNAME=guest
-  #     - RABBITMQ_PASSWORD=guest
-  #   networks:
-  #     - miniJobs_network
-  #   depends_on:
-  #     - rabbitmq
+  consumer:
+    build:
+     context: .
+     dockerfile: ConsumerService/Dockerfile
+    container_name: consumer_container
+    restart: unless-stopped
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+    networks:
+      - miniJobs_network
+    depends_on:
+      - rabbitmq
 
 
 networks:
