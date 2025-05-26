@@ -68,16 +68,21 @@ services:
     volumes:
       - ./Infrastructure/Persistence/Migrations/InitialDataScripts:/app/Infrastructure/Persistence/Migrations/InitialDataScripts
 
-  consumer:
+  subscriber:
     build:
      context: .
-     dockerfile: ConsumerService/Dockerfile
-    container_name: consumer_container
+     dockerfile: Subscriber/Dockerfile
+    container_name: subscriber_container
     restart: unless-stopped
     environment:
       - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
       - RABBITMQ_USERNAME=guest
       - RABBITMQ_PASSWORD=guest
+      - EMAILSENDER_PROVIDER_EMAIL=smtp.gmail.com
+      - EMAILSENDER_PORT=587
+      - EMAILSENDER_MAIL_ADDRESS=minijobs2023@gmail.com
+      - EMAILSENDER_KEY=mqpeirblrthovtjd
     networks:
       - miniJobs_network
     depends_on:

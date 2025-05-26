@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "eCar.Subsrciber": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}
