@@ -71,7 +71,7 @@ services:
   subscriber:
     build:
      context: .
-     dockerfile: Subscriber/Dockerfile
+     dockerfile: SubscriberService/Dockerfile
     container_name: subscriber_container
     restart: unless-stopped
     environment:
