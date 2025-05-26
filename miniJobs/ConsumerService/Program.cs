@@ -1,57 +1,27 @@
-﻿using Application.Common.Interfaces;
-using ConsumerService.Consumers;
-using Infrastructure.MailSenders;
+﻿using ConsumerService.Consumers;
 using MassTransit;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace WorkerService
-{
-    public class Program
+var host = Host.CreateDefaultBuilder(args)
+    .ConfigureServices((context, services) =>
     {
-        public static async Task Main(string[] args)
+        services.AddMassTransit(configure =>
         {
-            var builder = Host.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration((hostingContext, config) =>
+            configure.AddConsumer<ApplicationExpiryEmailConsumer>();
+            configure.AddConsumer<JobRecommendationEmailConsumer>();
+            configure.SetKebabCaseEndpointNameFormatter();
+            configure.UsingRabbitMq((ctx, cfg) =>
+            {
+                cfg.Host(new Uri(context.Configuration["RabbitMQ:Host"]!), h =>
                 {
-                    config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                          .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true)
-                          .AddEnvironmentVariables();
-                    if (args != null)
-                    {
-                        config.AddCommandLine(args);
-                    }
-                })
-                .ConfigureServices((hostContext, services) =>
-                {
-                    // Registracija aplikacionih i infrastrukture servisa
-                    services.AddApplicationServices();
-                    services.AddInfrastructureServices(hostContext.Configuration);
-
-                    // Konfiguracija MassTransit-a sa RabbitMQ-om
-                    services.AddMassTransit(configure =>
-                    {
-                        configure.SetKebabCaseEndpointNameFormatter();
-                        configure.AddConsumer<ApplicationExpiryEmailConsumer>();
-                        configure.AddConsumer<JobRecommendationEmailConsumer>();
-                        configure.UsingRabbitMq((context, cfg) =>
-                        {
-                            cfg.Host(new Uri(hostContext.Configuration["RabbitMQ:Host"]!), h =>
-                            {
-                                h.Username(hostContext.Configuration["RabbitMQ:Username"]!);
-                                h.Password(hostContext.Configuration["RabbitMQ:Password"]!);
-                            });
-                            cfg.ConfigureEndpoints(context);
-                            Console.WriteLine("MassTransit RabbitMQ endpoints configured in Worker.");
-                        });
-                    });
-
-                    // Registracija email sender-a
-                    services.AddSingleton<IEmailSender, EmailSender>();
+                    h.Username(context.Configuration["RabbitMQ:Username"]!);
+                    h.Password(context.Configuration["RabbitMQ:Password"]!);
                 });
+                cfg.ReceiveEndpoint("application-expiry-email-queue", e => e.ConfigureConsumer<ApplicationExpiryEmailConsumer>(ctx));
+                cfg.ReceiveEndpoint("job-recommendation-email-queue", e => e.ConfigureConsumer<JobRecommendationEmailConsumer>(ctx));
+            });
+        });
+    })
+    .Build();
 
-            await builder.Build().RunAsync();
-        }
-    }
-}
+host.Run();

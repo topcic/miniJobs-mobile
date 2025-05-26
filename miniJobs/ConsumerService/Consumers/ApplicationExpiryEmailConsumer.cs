@@ -1,12 +1,10 @@
-﻿using Application.Common.Interfaces;
-using Infrastructure.Mails;
+﻿using ConsumerService.Mails;
 using MassTransit;
 
 namespace ConsumerService.Consumers;
 
-public class ApplicationExpiryEmailConsumer(IEmailSender emailSender) : IConsumer<ApplicationExpiryMail>
+public class ApplicationExpiryEmailConsumer(EmailSender emailSender) : IConsumer<ApplicationExpiryMail>
 {
-    private readonly IEmailSender emailSender = emailSender;
 
     public async Task Consume(ConsumeContext<ApplicationExpiryMail> context)
     {
