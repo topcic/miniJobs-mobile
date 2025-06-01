@@ -75,7 +75,7 @@ services:
     container_name: subscriber_container
     restart: unless-stopped
     environment:
-      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_HOST=rabbitmq_container
       - RABBITMQ_PORT=5672
       - RABBITMQ_USERNAME=guest
       - RABBITMQ_PASSWORD=guest
