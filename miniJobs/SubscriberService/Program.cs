@@ -1,8 +1,8 @@
 ﻿using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
-
-using SubscribeService; 
+using System.Threading;
+using SubscribeService;
 
 var factory = new ConnectionFactory
 {
@@ -13,7 +13,31 @@ var factory = new ConnectionFactory
     ClientProvidedName = "Rabbit Test Consumer"
 };
 
-using var connection = factory.CreateConnection();
+IConnection connection = null;
+int retryCount = 5;
+int retryDelayMs = 5000; // 5 seconds
+
+for (int i = 0; i < retryCount; i++)
+{
+    try
+    {
+        connection = factory.CreateConnection();
+        Console.WriteLine("Connected to RabbitMQ successfully!");
+        break;
+    }
+    catch (RabbitMQ.Client.Exceptions.BrokerUnreachableException ex)
+    {
+        Console.WriteLine($"Connection attempt {i + 1} failed: {ex.Message}. Retrying in {retryDelayMs / 1000} seconds...");
+        Thread.Sleep(retryDelayMs);
+    }
+}
+
+if (connection == null)
+{
+    Console.WriteLine("Failed to connect to RabbitMQ after retries. Exiting...");
+    return;
+}
+
 using var channel = connection.CreateModel();
 
 string exchangeName = "EmailExchange";
@@ -31,7 +55,7 @@ string recommendationRoutingKey = "job-recommendation-email";
 channel.QueueDeclare(recommendationQueueName, true, false, false, null);
 channel.QueueBind(recommendationQueueName, exchangeName, recommendationRoutingKey, null);
 
-// Create EmailService instance (ideally this should come from DI)
+// Create EmailService instance
 var emailService = new EmailService();
 var emailSender = new EmailSender(emailService);
 
@@ -60,7 +84,6 @@ expiryConsumer.Received += async (sender, args) =>
     catch (Exception ex)
     {
         Console.WriteLine($" [!] Error processing expiry message: {ex.Message}");
-        // Optionally implement retry logic or move to dead-letter queue
         channel.BasicNack(args.DeliveryTag, false, true);
     }
 };
@@ -91,7 +114,6 @@ recommendationConsumer.Received += async (sender, args) =>
     catch (Exception ex)
     {
         Console.WriteLine($" [!] Error processing recommendation message: {ex.Message}");
-        // Optionally implement retry logic or move to dead-letter queue
         channel.BasicNack(args.DeliveryTag, false, true);
     }
 };

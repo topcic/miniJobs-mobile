@@ -13,11 +13,16 @@ services:
     ports:
       - "8050:15672"
       - "5672:5672"
-    hostname: minijobs-queue
     volumes:
       - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
     networks:
       - miniJobs_network
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   db:
     image: mcr.microsoft.com/mssql/server:2017-latest
@@ -41,7 +46,8 @@ services:
       - sql_data:/var/opt/mssql
       - ./Infrastructure/Persistence/Migrations/InitialDataScripts:/docker-entrypoint-initdb.d/
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
 
   webapi:
     build:
@@ -63,19 +69,21 @@ services:
     networks:
       - miniJobs_network
     depends_on:
-      - db
-      - rabbitmq
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     volumes:
       - ./Infrastructure/Persistence/Migrations/InitialDataScripts:/app/Infrastructure/Persistence/Migrations/InitialDataScripts
 
   subscriber:
     build:
-     context: .
-     dockerfile: SubscriberService/Dockerfile
+      context: .
+      dockerfile: SubscriberService/Dockerfile
     container_name: subscriber_container
     restart: unless-stopped
     environment:
-      - RABBITMQ_HOST=rabbitmq_container
+      - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
       - RABBITMQ_USERNAME=guest
       - RABBITMQ_PASSWORD=guest
@@ -86,8 +94,8 @@ services:
     networks:
       - miniJobs_network
     depends_on:
-      - rabbitmq
-
+      rabbitmq:
+        condition: service_healthy
 
 networks:
   miniJobs_network:
