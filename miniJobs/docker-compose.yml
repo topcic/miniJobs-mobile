@@ -6,10 +6,11 @@ volumes:
 services:
   rabbitmq:
     image: rabbitmq:3-management
-    container_name: rabbitmq_container
+    restart: unless-stopped
+    hostname: rabbitmq
     environment:
-      - RABBITMQ_DEFAULT_USER=guest
-      - RABBITMQ_DEFAULT_PASS=guest
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
     ports:
       - "8050:15672"
       - "5672:5672"
@@ -17,12 +18,6 @@ services:
       - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
     networks:
       - miniJobs_network
-    healthcheck:
-      test: ["CMD", "rabbitmqctl", "status"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
 
   db:
     image: mcr.microsoft.com/mssql/server:2017-latest
@@ -46,8 +41,7 @@ services:
       - sql_data:/var/opt/mssql
       - ./Infrastructure/Persistence/Migrations/InitialDataScripts:/docker-entrypoint-initdb.d/
     depends_on:
-      rabbitmq:
-        condition: service_healthy
+      - rabbitmq
 
   webapi:
     build:
@@ -69,19 +63,17 @@ services:
     networks:
       - miniJobs_network
     depends_on:
-      db:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
+      - db
+      - rabbitmq
     volumes:
       - ./Infrastructure/Persistence/Migrations/InitialDataScripts:/app/Infrastructure/Persistence/Migrations/InitialDataScripts
 
   subscriber:
+    restart: unless-stopped
     build:
       context: .
       dockerfile: SubscriberService/Dockerfile
     container_name: subscriber_container
-    restart: unless-stopped
     environment:
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
@@ -91,11 +83,11 @@ services:
       - EMAILSENDER_PORT=587
       - EMAILSENDER_MAIL_ADDRESS=minijobs2023@gmail.com
       - EMAILSENDER_KEY=mqpeirblrthovtjd
+    depends_on:
+      - rabbitmq
     networks:
       - miniJobs_network
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
+
 
 networks:
   miniJobs_network:
