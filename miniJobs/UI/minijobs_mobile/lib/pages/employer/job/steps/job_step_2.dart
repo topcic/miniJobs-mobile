@@ -49,7 +49,7 @@ class JobStep2State extends State<JobStep2> {
   bool isClickedBtnNext = false;
   late JobTypeProvider _jobTypeProvider = JobTypeProvider();
   late ProposedAnswerProvider _proposedAnswerProvider =
-      ProposedAnswerProvider();
+  ProposedAnswerProvider();
   late JobProvider _jobProvider = JobProvider();
   final TextEditingController _jobTypeController = TextEditingController();
 
@@ -90,7 +90,7 @@ class JobStep2State extends State<JobStep2> {
   void _setInitialFormValues() {
     _formKey.currentState?.patchValue({
       'requiredEmployees': _job?.requiredEmployees?.toString() ?? '',
-      'jobType': _job?.jobType?.name ?? '',
+      'jobTypeId': _job!.jobTypeId?.toString() ?? '',
     });
 
     selectedJobSchedules =
@@ -98,25 +98,17 @@ class JobStep2State extends State<JobStep2> {
 
     if (_job?.applicationsDuration != null) {
       applicationsEndTo = durationOptions.firstWhere(
-        (option) => option['days'] == _job!.applicationsDuration,
+            (option) => option['days'] == _job!.applicationsDuration,
         orElse: () => {},
       );
     }
 
-    JobType? selectedJobType;
-    if (_jobTypes != null && _job?.jobTypeId != null) {
-      selectedJobType =
-          _jobTypes!.firstWhere((jobType) => jobType.id == _job!.jobTypeId);
-    }
-    if (selectedJobType != null) {
-      _jobTypeController.text = selectedJobType.name!;
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     List<ProposedAnswer>? displayedSchedules =
-        showAllSchedules ? _jobSchedules : _jobSchedules?.take(6).toList();
+    showAllSchedules ? _jobSchedules : _jobSchedules?.take(6).toList();
     return Container(
       child: FormBuilder(
         key: _formKey,
@@ -127,71 +119,28 @@ class JobStep2State extends State<JobStep2> {
             children: [
               rowMethod(
                 Expanded(
-                  child: Autocomplete<String>(
-                    optionsBuilder: (TextEditingValue textEditingValue) {
-                      if (textEditingValue.text.isEmpty) {
-                        return const Iterable<String>.empty();
+                  child: FormBuilderDropdown<String>(
+                    name: 'jobTypeId',
+                    validator: (value) {
+                      if (value == null) {
+                        return "Tip posla je obavezno polje";
                       }
-                      return _jobTypes
-                          ?.where((element) => element.name != null && element.name!.toLowerCase().contains(textEditingValue.text.toLowerCase()))
-                          .map((e) => e.name!)
-                          .toList() ?? [];
+                      return null;
                     },
-                    onSelected: (String selection) {
-                      final selectedJobType = _jobTypes!
-                          .firstWhere((jobType) => jobType.name == selection);
-                      _formKey.currentState?.fields['jobTypeId']
-                          ?.didChange(selectedJobType.id.toString());
-                      _jobTypeController.text = selection;
-                    },
-                    optionsViewBuilder: (context, Function(String) onSelected,
-                        Iterable<String> options) {
-                      return Align(
-                        alignment: Alignment.topLeft,
-                        child: Material(
-                          elevation: 4,
-                          child: SizedBox(
-                            height: 200,
-                            width: 200,
-                            child: ListView(
-                              children: options
-                                  .map((option) => ListTile(
-                                title: Text(option,
-                                    style: const TextStyle(fontSize: 12)),
-                                onTap: () => onSelected(option),
-                              ))
-                                  .toList(),
-                            ),
-                          ),
+                    decoration: const InputDecoration(
+                      labelText: "Tip posla",
+                      labelStyle: TextStyle(fontSize: 14),
+                    ),
+                    items: _jobTypes?.map((jobType) {
+                      return DropdownMenuItem(
+                        value: jobType.id.toString(),
+                        child: Text(
+                          jobType.name ?? '',
+                          style: const TextStyle(fontSize: 12),
                         ),
                       );
-                    },
-                    fieldViewBuilder:
-                        (context, controller, focusNode, onEditingComplete) {
-                      return FormBuilderTextField(
-                        controller: controller,
-                        focusNode: focusNode,
-                        style: const TextStyle(fontSize: 12),
-                        validator: ((value) {
-                          if (value == null || value.isEmpty) {
-                            return "Tip posla je obavezno polje";
-                          }
-                          final isValid = _jobTypes!
-                              .any((jobType) => jobType.name == value);
-                          if (!isValid) {
-                            controller.clear(); // Clear the invalid input
-                            return "Molimo odaberite validan tip posla";
-                          }
-                          return null;
-                        }),
-                        name: 'jobType',
-                        decoration: const InputDecoration(
-                          labelText: 'Tip posla',
-                          labelStyle: TextStyle(fontSize: 14),
-                        ),
-                        onChanged: (_) => onEditingComplete(),
-                      );
-                    },
+                    }).toList() ?? [],
+
                   ),
                 ),
               ),
@@ -203,28 +152,28 @@ class JobStep2State extends State<JobStep2> {
                   child: Wrap(
                     spacing: 8.0,
                     children: displayedSchedules
-                            ?.map(
-                              (schedule) => Padding(
-                                padding: const EdgeInsets.all(2),
-                                child: FilterChip(
-                                  label: Text(schedule.answer ?? '',
-                                      style: const TextStyle(fontSize: 10)),
-                                  selected: selectedJobSchedules!
-                                      .contains(schedule.id),
-                                  onSelected: (bool selected) {
-                                    setState(() {
-                                      if (selected) {
-                                        selectedJobSchedules!.add(schedule.id!);
-                                      } else {
-                                        selectedJobSchedules!
-                                            .remove(schedule.id);
-                                      }
-                                    });
-                                  },
-                                ),
-                              ),
-                            )
-                            .toList() ??
+                        ?.map(
+                          (schedule) => Padding(
+                        padding: const EdgeInsets.all(2),
+                        child: FilterChip(
+                          label: Text(schedule.answer ?? '',
+                              style: const TextStyle(fontSize: 10)),
+                          selected: selectedJobSchedules!
+                              .contains(schedule.id),
+                          onSelected: (bool selected) {
+                            setState(() {
+                              if (selected) {
+                                selectedJobSchedules!.add(schedule.id!);
+                              } else {
+                                selectedJobSchedules!
+                                    .remove(schedule.id);
+                              }
+                            });
+                          },
+                        ),
+                      ),
+                    )
+                        .toList() ??
                         [],
                   ),
                 ),
@@ -308,20 +257,20 @@ class JobStep2State extends State<JobStep2> {
                       children: durationOptions
                           .map(
                             (option) => Padding(
-                              padding: const EdgeInsets.all(2),
-                              child: FilterChip(
-                                label: Text(option['label'],
-                                    style: const TextStyle(fontSize: 10)),
-                                selected: applicationsEndTo == option,
-                                onSelected: (bool selected) {
-                                  setState(() {
-                                    applicationsEndTo =
-                                        selected ? option : null;
-                                  });
-                                },
-                              ),
-                            ),
-                          )
+                          padding: const EdgeInsets.all(2),
+                          child: FilterChip(
+                            label: Text(option['label'],
+                                style: const TextStyle(fontSize: 10)),
+                            selected: applicationsEndTo == option,
+                            onSelected: (bool selected) {
+                              setState(() {
+                                applicationsEndTo =
+                                selected ? option : null;
+                              });
+                            },
+                          ),
+                        ),
+                      )
                           .toList(),
                     ),
                   ),
@@ -372,11 +321,9 @@ class JobStep2State extends State<JobStep2> {
         selectedJobSchedules!.isNotEmpty &&
         applicationsEndTo != null) {
       final Map<String, dynamic> formValues = _formKey.currentState!.value;
-      var selectedJobTypeName = formValues['jobType'];
-      var selectedJobType = _jobTypes!
-          .firstWhere((jobType) => jobType.name == selectedJobTypeName);
+
       var jobScheduleInfo =
-          JobScheduleInfo(_jobSchedules![0].questionId, selectedJobSchedules);
+      JobScheduleInfo(_jobSchedules![0].questionId, selectedJobSchedules);
       var extendApplicationsDurationValue =
       formValues['extendApplicationsDuration'] != null
           ? int.tryParse(formValues['extendApplicationsDuration'].toString()) ?? 0
@@ -386,7 +333,7 @@ class JobStep2State extends State<JobStep2> {
           ? _job!.applicationsDuration! + extendApplicationsDurationValue
           : applicationsEndTo!['days']!;
       var saveRequest = JobStep2Request(
-        selectedJobType.id,
+          int.tryParse(formValues['jobTypeId']),
         int.tryParse(formValues['requiredEmployees']),
         jobScheduleInfo,
         applicationsEndToDays,
@@ -394,9 +341,9 @@ class JobStep2State extends State<JobStep2> {
 
       setState(() {
         if(_job!.status == JobStatus.Aktivan)
-          {
-            _formKey.currentState?.patchValue({'extendApplicationsDuration': '0'});
-          }
+        {
+          _formKey.currentState?.patchValue({'extendApplicationsDuration': '0'});
+        }
         _jobStep2Request = saveRequest;
       });
       widget.onNextButton(true,_job!.id!,1, _jobStep2Request!);

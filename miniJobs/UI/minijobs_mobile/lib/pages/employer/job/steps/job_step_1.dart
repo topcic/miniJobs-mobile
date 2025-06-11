@@ -123,7 +123,17 @@ class JobStep1State extends State<JobStep1> {
               // Rich Text Editor for Description
               rowMethod(
                 Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.grey[400]!, // Match typical InputDecoration border color
+                        width: 1.0,
+                      ),
+                      borderRadius: BorderRadius.circular(4), // Match typical field border radius
+                    ),
+                    padding: const EdgeInsets.all(8),
                   child: Column(
+
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Toolbar for formatting options
@@ -161,6 +171,7 @@ class JobStep1State extends State<JobStep1> {
                       ),
                     ],
                   ),
+                ),
                 ),
                 CrossAxisAlignment.center,
               ),
