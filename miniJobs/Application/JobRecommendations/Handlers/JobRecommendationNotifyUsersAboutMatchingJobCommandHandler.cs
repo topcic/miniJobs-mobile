@@ -1,4 +1,4 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.Common;
 using Application.JobRecommendations.Commands;
 using Application.JobRecommendations.Models;
 using Domain.Interfaces;
@@ -6,7 +6,8 @@ using MediatR;
 
 namespace Application.JobRecommendations.Handlers;
 
-sealed class JobRecommendationNotifyUsersAboutMatchingJobCommandHandler(IJobRecommendationRepository jobRecommendationRepository, IMessagePublisher<JobRecommendationMail> messagePublisher) : IRequestHandler<JobRecommendationNotifyUsersAboutMatchingJobCommand, bool>
+sealed class JobRecommendationNotifyUsersAboutMatchingJobCommandHandler(IJobRecommendationRepository jobRecommendationRepository,
+    IRabbitMQProducer rabbitMQProducer) : IRequestHandler<JobRecommendationNotifyUsersAboutMatchingJobCommand, bool>
 {
     public async Task<bool> Handle(JobRecommendationNotifyUsersAboutMatchingJobCommand command, CancellationToken cancellationToken)
     {
@@ -20,7 +21,7 @@ sealed class JobRecommendationNotifyUsersAboutMatchingJobCommandHandler(IJobReco
                 Mail = user.Email,
                 JobName = command.JobName
             };
-            await messagePublisher.PublishAsync(mail);
+            rabbitMQProducer.SendMessage(mail);
         }
         return true;
 

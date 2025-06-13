@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsumerService", "Consumer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Subsrciber", "..\..\..\Users\Mahir\Desktop\adi\eCar\eCar\eCar.Subsrciber\Subsrciber.csproj", "{10F23A29-32AC-3984-9D76-C195A4B42A52}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubscriberService", "SubscriberService\SubscriberService.csproj", "{6D40BB1B-0EB6-45EE-B90D-6087C5D1DA7A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{10F23A29-32AC-3984-9D76-C195A4B42A52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10F23A29-32AC-3984-9D76-C195A4B42A52}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{10F23A29-32AC-3984-9D76-C195A4B42A52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D40BB1B-0EB6-45EE-B90D-6087C5D1DA7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D40BB1B-0EB6-45EE-B90D-6087C5D1DA7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D40BB1B-0EB6-45EE-B90D-6087C5D1DA7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D40BB1B-0EB6-45EE-B90D-6087C5D1DA7A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

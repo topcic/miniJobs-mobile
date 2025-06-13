@@ -6,14 +6,14 @@ volumes:
 services:
   rabbitmq:
     image: rabbitmq:3-management
-    container_name: rabbitmq_container
+    restart: unless-stopped
+    hostname: rabbitmq
     environment:
-      - RABBITMQ_DEFAULT_USER=guest
-      - RABBITMQ_DEFAULT_PASS=guest
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
     ports:
       - "8050:15672"
       - "5672:5672"
-    hostname: minijobs-queue
     volumes:
       - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
     networks:
@@ -69,11 +69,11 @@ services:
       - ./Infrastructure/Persistence/Migrations/InitialDataScripts:/app/Infrastructure/Persistence/Migrations/InitialDataScripts
 
   subscriber:
-    build:
-     context: .
-     dockerfile: Subscriber/Dockerfile
-    container_name: subscriber_container
     restart: unless-stopped
+    build:
+      context: .
+      dockerfile: SubscriberService/Dockerfile
+    container_name: subscriber_container
     environment:
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
@@ -83,10 +83,10 @@ services:
       - EMAILSENDER_PORT=587
       - EMAILSENDER_MAIL_ADDRESS=minijobs2023@gmail.com
       - EMAILSENDER_KEY=mqpeirblrthovtjd
-    networks:
-      - miniJobs_network
     depends_on:
       - rabbitmq
+    networks:
+      - miniJobs_network
 
 
 networks:

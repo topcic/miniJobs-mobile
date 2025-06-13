@@ -1,4 +1,5 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.Common;
+using Application.Common.Interfaces;
 using Hangfire;
 using Infrastructure.Authentication;
 using Infrastructure.Common.Interfaces;
@@ -7,7 +8,6 @@ using Infrastructure.OptionsSetup;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
 using Infrastructure.Services;
-using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -40,9 +40,7 @@ public static class ConfigureServices
         AddMailSenders(services);
 
         AddBackgroundJobs(services,configuration);
-        AddMassTransitAndRabbitMq(services, configuration);
-
-        //AddConsumers(services);
+       
         return services;
     }
 
@@ -51,41 +49,6 @@ public static class ConfigureServices
         string connectionString = configuration.GetConnectionString("DefaultConnectionHangfire");
         services.AddHangfire(config => config.UseSqlServerStorage(connectionString));
         services.AddHangfireServer(options=> options.SchedulePollingInterval=TimeSpan.FromSeconds(1));
-    }
-    private static void AddMassTransitAndRabbitMq(IServiceCollection services, IConfiguration configuration)
-    {
-        //services.AddMassTransit(configure =>
-        //{
-        //    configure.SetKebabCaseEndpointNameFormatter();
-        //    configure.AddConsumer<ApplicationExpiryEmailConsumer>();
-        //    configure.AddConsumer<JobRecommendationEmailConsumer>();
-        //    configure.UsingRabbitMq((context, cfg) =>
-        //    {
-        //        cfg.Host(new Uri(configuration["RabbitMQ:Host"]!), h =>
-        //        {
-        //            h.Username(configuration["RabbitMQ:Username"]!);
-        //            h.Password(configuration["RabbitMQ:Password"]!);
-        //        });
-
-        //        cfg.ConfigureEndpoints(context);
-        //        Console.WriteLine("MassTransit RabbitMQ endpoints configured.");
-        //    });
-        //});
-
-        services.AddMassTransit(configure =>
-        {
-            configure.SetKebabCaseEndpointNameFormatter();
-            configure.UsingRabbitMq((context, cfg) =>
-            {
-                cfg.Host(new Uri(configuration["RabbitMQ:Host"]!), h =>
-                {
-                    h.Username(configuration["RabbitMQ:Username"]!);
-                    h.Password(configuration["RabbitMQ:Password"]!);
-                });
-                Console.WriteLine("MassTransit RabbitMQ configured for publishing.");
-            });
-        });
-
     }
 
     private static void AddRepositories(IServiceCollection services)
@@ -119,11 +82,6 @@ public static class ConfigureServices
         services.AddSingleton<IEmailSender, EmailSender>();
     }
 
-
-    //private static void AddConsumers(IServiceCollection services)
-    //{
-    //    services.AddScoped<IConsumer<ApplicationExpiryMail>, ApplicationExpiryEmailConsumer>();
-    //}
     private static void AddOptionSetups(IServiceCollection services)
     {
         services.ConfigureOptions<JwtOptionsSetup>();
@@ -143,8 +101,8 @@ public static class ConfigureServices
         services.AddTransient<IEmailService, EmailService>();
         services.AddSingleton<ILocalizationService, LocalizationService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddTransient(typeof(IMessagePublisher<>), typeof(MessagePublisher<>));
         services.AddScoped<IRecommendationService, RecommendationService>();
+        services.AddTransient<IRabbitMQProducer, RabbitMQProducer>();
     }
 
     public static void ExecuteMigrations(this WebApplication webApplication)
