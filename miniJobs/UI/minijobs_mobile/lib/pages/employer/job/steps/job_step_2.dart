@@ -238,7 +238,7 @@ class JobStep2State extends State<JobStep2> {
                         if (value != null && value.isNotEmpty) {
                           final parsedValue = int.tryParse(value);
                           // Validate only if the input is not null and is <= 0
-                          if (parsedValue == null || parsedValue <= 0) {
+                          if (parsedValue == null || parsedValue < 0) {
                             return "Unesite validan broj dana";
                           }
                         }

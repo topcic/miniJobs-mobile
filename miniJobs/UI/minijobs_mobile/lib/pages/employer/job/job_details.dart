@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:minijobs_mobile/enumerations/job_statuses.dart';
 import 'package:minijobs_mobile/models/job/job.dart';
@@ -106,7 +105,7 @@ class _JobDetailsState extends State<JobDetails> {
         setState(() {
           isCalledCanAccessStep = true;
         });
-        var x=_validateAndSaveStep3Callback();
+        var x = _validateAndSaveStep3Callback();
         return x;
       }
       return false;
@@ -121,7 +120,7 @@ class _JobDetailsState extends State<JobDetails> {
     _initializeJob(widget.jobId);
   }
 
-  void _onNextButton(bool isValid,int id,int step, [dynamic request]) async {
+  void _onNextButton(bool isValid, int id, int step, [dynamic request]) async {
     if (isValid) {
       if (!isCalledCanAccessStep) {
         Job? job;
@@ -132,11 +131,11 @@ class _JobDetailsState extends State<JobDetails> {
         }
         _jobProvider.setCurrentJob(job!);
         setState(() {
-          if(_currentStep<3) {
+          if (_currentStep < 3) {
             _currentStep += 1;
           }
         });
-      } else if(requestedStep-1==step){
+      } else if (requestedStep - 1 == step) {
         setState(() {
           isCalledCanAccessStep = false;
           _currentStep = requestedStep;
@@ -163,78 +162,110 @@ class _JobDetailsState extends State<JobDetails> {
       body: isCompleted
           ? buildCompleted()
           : isJobCompleted()
-              ? const JobPreview() // Show only job preview if the job is completed
-              : Stepper(
-                  type: StepperType.horizontal,
-                  steps: getSteps(),
-                  currentStep: _currentStep,
-                  onStepContinue: () async {
-                    setState(() {
-                      isCalledCanAccessStep = false;
-                    });
-                    await nextStep();
-                  },
-                  onStepTapped: (step) async {
-                    setState(() {
-                      requestedStep = step;
-                      isCalledCanAccessStep = true;
-                    });
-                    var canAccess=await canAccessStep(step);
-                    if (canAccess) {
-                      setState(() {
-                        isCalledCanAccessStep = false;
-                        _currentStep = requestedStep;
-                      });
-                    }
-                  },
-                  onStepCancel: _currentStep == 0
-                      ? null
-                      : () {
-                          setState(() {
-                            _currentStep -= 1;
-                          });
-                        },
-                  controlsBuilder: (context, details) {
-                    final isLastStep = _currentStep == getSteps().length - 1;
-                    return Container(
-                      margin: const EdgeInsets.only(top: 50),
-                      child: Row(
-                        children: [
-                          if (_currentStep != 0)
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: details.onStepCancel,
-                                child: const Text('Nazad'),
-                              ),
+          ? const JobPreview() // Show only job preview if the job is completed
+          : Stepper(
+        type: StepperType.horizontal,
+        steps: getSteps(),
+        currentStep: _currentStep,
+        onStepContinue: () async {
+          setState(() {
+            isCalledCanAccessStep = false;
+          });
+          await nextStep();
+        },
+        onStepTapped: (step) async {
+          setState(() {
+            requestedStep = step;
+            isCalledCanAccessStep = true;
+          });
+          var canAccess = await canAccessStep(step);
+          if (canAccess) {
+            setState(() {
+              isCalledCanAccessStep = false;
+              _currentStep = requestedStep;
+            });
+          }
+        },
+        onStepCancel: _currentStep == 0
+            ? null
+            : () {
+          setState(() {
+            _currentStep -= 1;
+          });
+        },
+        controlsBuilder: (context, details) {
+          final isLastStep = _currentStep == getSteps().length - 1;
+          return Container(
+            margin: const EdgeInsets.only(top: 50),
+            child: Row(
+              children: [
+                if (_currentStep != 0 && _job.status != JobStatus.Aktivan )
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: details.onStepCancel,
+                      child: const Text('Nazad'),
+                    ),
+                  ),
+                const SizedBox(width: 10),
+                if (_job.status == JobStatus.Aktivan && _currentStep == 3)
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Posao je trenutno aktivan. Ako želite izmijeniti podatke, kliknite dugme ispod.',
+                          style: TextStyle(
+                            color: Colors.orange,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          child: FilledButton.icon(
+                            onPressed: details.onStepCancel,
+                            icon: const Icon(Icons.edit),
+                            label: const Text('Ažuriraj posao'),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: Colors.deepOrangeAccent,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              textStyle: const TextStyle(fontSize: 16),
                             ),
-                          const SizedBox(width: 10),
-                          if (_job.status == JobStatus.Kreiran && isLastStep)
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: details.onStepContinue,
-                                child: const Text('Objavi posao'),
-                              ),
-                            ),
-                          if (_job.id == 0 ||
-                              _job.id == null ||
-                              ((_job.status == JobStatus.Kreiran ||
-                                      _job.status == JobStatus.Aktivan) &&
-                                  !isLastStep))
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: details.onStepContinue,
-                                child: const Text('Dalje'),
-                              ),
-                            ),
-                        ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                else
+                  if (_job.status == JobStatus.Kreiran && isLastStep)
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: details.onStepContinue,
+                        child: const Text('Objavi posao'),
                       ),
-                    );
-                  },
-                ),
+                    )
+                  else
+                    if (_job.id == 0 ||
+                        _job.id == null ||
+                        ((_job.status == JobStatus.Kreiran ||
+                            _job.status == JobStatus.Aktivan) && !isLastStep))
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: details.onStepContinue,
+                          child: const Text('Dalje'),
+                        ),
+                      ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
-  List<Step> getSteps() => [
+  List<Step> getSteps() =>
+      [
         Step(
           title: const Text(''),
           content: JobStep1(key: _jobStep1Key),
@@ -242,8 +273,8 @@ class _JobDetailsState extends State<JobDetails> {
           state: _currentStep == 0
               ? StepState.editing
               : _currentStep > 0
-                  ? StepState.complete
-                  : StepState.indexed,
+              ? StepState.complete
+              : StepState.indexed,
         ),
         Step(
           title: const Text(''),
@@ -256,8 +287,8 @@ class _JobDetailsState extends State<JobDetails> {
           state: _currentStep == 1
               ? StepState.editing
               : _currentStep > 1
-                  ? StepState.complete
-                  : StepState.indexed,
+              ? StepState.complete
+              : StepState.indexed,
         ),
         Step(
           title: const Text(''),
@@ -270,8 +301,8 @@ class _JobDetailsState extends State<JobDetails> {
           state: _currentStep == 2
               ? StepState.editing
               : _currentStep > 2
-                  ? StepState.complete
-                  : StepState.indexed,
+              ? StepState.complete
+              : StepState.indexed,
         ),
         Step(
           title: const Text(''),
@@ -280,8 +311,8 @@ class _JobDetailsState extends State<JobDetails> {
           state: _currentStep == 3
               ? StepState.editing
               : _currentStep > 0
-                  ? StepState.complete
-                  : StepState.indexed,
+              ? StepState.complete
+              : StepState.indexed,
         ),
       ];
 
@@ -308,7 +339,9 @@ class _JobDetailsState extends State<JobDetails> {
           });
         } else {
           updateJobForStep1(currentJob);
-          var saveRequest = JobStep1Request(_job.name,_job.description,_job.streetAddressAndNumber,_job.cityId);
+          var saveRequest = JobStep1Request(
+              _job.name, _job.description, _job.streetAddressAndNumber,
+              _job.cityId);
           var job = await _jobProvider.updateStep1(_job.id!, saveRequest);
           _jobProvider.setCurrentJob(job);
           setState(() {
@@ -320,7 +353,7 @@ class _JobDetailsState extends State<JobDetails> {
     } else if (_currentStep == 1 && !isCalledCanAccessStep) {
       _validateAndSaveStep2Callback();
     } else if (_currentStep == 2 && !isCalledCanAccessStep) {
-      if (_validateAndSaveStep3Callback() && _currentStep==2) {
+      if (_validateAndSaveStep3Callback() && _currentStep == 2) {
         setState(() {
           _currentStep += 1;
         });
