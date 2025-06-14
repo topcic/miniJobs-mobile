@@ -49,6 +49,7 @@ List<JobCardDTO> jobs=[];
       crossAxisCount: 2, // Broj kartica u redu
       crossAxisSpacing: 10.0, // Razmak između kartica u redu
       mainAxisSpacing: 10.0, // Razmak između redova kartica
+      childAspectRatio: 7 / 8,
     ),
     itemCount: jobs.length, // Zamijenite ovu vrijednost s vašim brojem poslova
     itemBuilder: (BuildContext context, int index) {

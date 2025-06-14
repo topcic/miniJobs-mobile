@@ -152,23 +152,53 @@ class JobStep1State extends State<JobStep1> {
                       ),
                       const SizedBox(height: 8),
                       // Editor area
-                      Container(
-                        height: 200,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(4),
+                      FormBuilderField<String>(
+                        name: 'description',
+                        validator: (value) {
+                          final plainText = _quillController.document.toPlainText().trim();
+                          if (plainText.isEmpty) return "Opis je obavezno polje";
+                          return null;
+                        },
+                        builder: (field) => Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            quill.QuillSimpleToolbar(controller: _quillController, config: const quill.QuillSimpleToolbarConfig(
+                              showAlignmentButtons: true,
+                              showListBullets: true,
+                              showListNumbers: true,
+                              showBoldButton: true,
+                              showItalicButton: true,
+                              showUnderLineButton: true,
+                              showLink: true,
+                              showHeaderStyle: false,
+                            )),
+                            const SizedBox(height: 8),
+                            Container(
+                              height: 200,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: field.hasError ? Colors.red : Colors.grey),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: quill.QuillEditor(
+                                controller: _quillController,
+                                focusNode: _editorFocusNode,
+                                scrollController: _editorScrollController,
+                                config: const quill.QuillEditorConfig(
+                                  placeholder: 'Unesite opis ovdje',
+                                  padding: EdgeInsets.all(8),
+                                  expands: false,
+                                ),
+                              ),
+                            ),
+                            if (field.hasError)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4.0, left: 8),
+                                child: Text(field.errorText ?? '',
+                                    style: const TextStyle(color: Colors.red, fontSize: 12)),
+                              ),
+                          ],
                         ),
-                        child: quill.QuillEditor(
-                          controller: _quillController,
-                          focusNode: _editorFocusNode,
-                          scrollController: _editorScrollController,
-                          config: const quill.QuillEditorConfig(
-                            placeholder: 'Unesite opis ovdje',
-                            padding: EdgeInsets.all(8),
-                            expands: false,
-                          ),
-                        ),
-                      ),
+                      )
                     ],
                   ),
                 ),
@@ -241,12 +271,6 @@ class JobStep1State extends State<JobStep1> {
 
       // Get the description from the Quill editor as Delta JSON
       final descriptionJson = jsonEncode(_quillController.document.toDelta().toJson());
-      if (descriptionJson == '[{"insert":"\\n"}]') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Opis je obavezno polje")),
-        );
-        return false;
-      }
 
       formData['description'] = descriptionJson;
       formData['cityId'] = int.tryParse(formData['cityId']);
