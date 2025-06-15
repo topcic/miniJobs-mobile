@@ -16,7 +16,8 @@ abstract class BaseProvider<T> with ChangeNotifier {
     _endpoint = endpoint;
     // Check if _baseUrl is null and throw an exception if it is
     if (_baseUrl == null) {
-      throw Exception('Base URL is not initialized. Ensure BaseProvider.initializeBaseUrl() is called in main.dart.');
+       throw Exception(
+          'Base URL is not initialized. Ensure BaseProvider.initializeBaseUrl() is called in main.dart.');
     }
     _dio = Dio(BaseOptions(
       baseUrl: _baseUrl!,
@@ -119,8 +120,18 @@ abstract class BaseProvider<T> with ChangeNotifier {
       notificationService.success("Uspješno ste dodali.");
       return fromJson(response.data);
     } catch (err) {
-      handleError(err);
-      throw Exception(err.toString());
+        handleError(err);
+    }
+  }
+
+  void handleError2(Object err) {
+    if (err is DioException) {
+      if (err.response != null) {
+        if (err.response!.data != null)
+          throw err.response!.data;
+        else
+          notificationService.error(err.response!.toString());
+      }
     }
   }
 
@@ -162,7 +173,8 @@ abstract class BaseProvider<T> with ChangeNotifier {
     return headers;
   }
 
-  String getQueryString(Map params, {String prefix = '&', bool inRecursion = false}) {
+  String getQueryString(Map params,
+      {String prefix = '&', bool inRecursion = false}) {
     String query = '';
     params.forEach((key, value) {
       if (inRecursion) {
@@ -185,7 +197,8 @@ abstract class BaseProvider<T> with ChangeNotifier {
       } else if (value is List || value is Map) {
         if (value is List) value = value.asMap();
         value.forEach((k, v) {
-          query += getQueryString({k: v}, prefix: '$prefix$key', inRecursion: true);
+          query +=
+              getQueryString({k: v}, prefix: '$prefix$key', inRecursion: true);
         });
       }
     });
@@ -193,10 +206,17 @@ abstract class BaseProvider<T> with ChangeNotifier {
   }
 
   String get baseUrl => _baseUrl!;
+
   void handleError(Object err) {
     if (err is DioException) {
       if (err.response != null) {
-        notificationService.error(err.response!.data);
+        if (err.response!.data != null) if (err.response!.data
+            is Map<String, dynamic>)
+          throw err.response!.data;
+        else
+          notificationService.error(err.response!.data);
+        else
+          notificationService.error(err.response!.toString());
       }
     }
   }

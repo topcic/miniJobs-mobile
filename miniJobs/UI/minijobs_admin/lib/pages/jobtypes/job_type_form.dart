@@ -40,7 +40,8 @@ class _JobTypeFormState extends State<JobTypeForm> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.jobType == null ? 'Dodaj tip posla' : 'Uredi tip posla'),
+      title:
+          Text(widget.jobType == null ? 'Dodaj tip posla' : 'Uredi tip posla'),
       content: SizedBox(
         width: 400,
         child: FormBuilder(
@@ -108,35 +109,20 @@ class _JobTypeFormState extends State<JobTypeForm> {
                   }
                 }
               } catch (e) {
-                if (e is DioException && e.response != null) {
-                  final responseData = e.response!.data;
-                  if (responseData is Map<String, dynamic>) {
-                    String? errorMessage;
+                final nameMessages = (e as Map<String, dynamic>)['Name'];
+                final message =
+                    (nameMessages is List && nameMessages.isNotEmpty)
+                        ? nameMessages.first
+                        : '';
 
-                    // Extract first validation error dynamically
-                    for (var entry in responseData.entries) {
-                      if (entry.value is List && entry.value.isNotEmpty) {
-                        errorMessage = entry.value.first; // Take the first error message
-                        break;
-                      }
-                    }
-
-                    if (errorMessage != null) {
-                      setState(() {
-                        _nameError = errorMessage;
-                        _formKey.currentState?.fields['name']?.invalidate(_nameError!);
-                      });
-                      return;
-                    }
-                  }
-                }
-
-
+                setState(() {
+                  _nameError = message;
+                  _formKey.currentState?.fields['name']?.invalidate(message!);
+                });
+                return;
               }
-
             }
           },
-
           child: const Text('Spasi'),
         ),
       ],

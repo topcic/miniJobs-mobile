@@ -113,9 +113,9 @@ class _CityFormState extends State<CityForm> {
                   },
                   items: countries
                       .map((country) => DropdownMenuItem(
-                    value: country.id.toString(),
-                    child: Text(country.name ?? ''),
-                  ))
+                            value: country.id.toString(),
+                            child: Text(country.name ?? ''),
+                          ))
                       .toList(),
                   onChanged: (_) {
                     if (_countryError != null) {
@@ -179,12 +179,13 @@ class _CityFormState extends State<CityForm> {
               final formData = _formKey.currentState!.value;
               try {
                 City newCity = City(
-                   widget.city?.id ?? 0,
-                   formData['name'],
-                   int.parse(formData['countryId']),
-                   formData['municipalityCode'],
-                   formData['postcode'],widget.city?.isDeleted ?? false,''
-                );
+                    widget.city?.id ?? 0,
+                    formData['name'],
+                    int.parse(formData['countryId']),
+                    formData['municipalityCode'],
+                    formData['postcode'],
+                    widget.city?.isDeleted ?? false,
+                    '');
 
                 // Assuming you have a CityProvider
                 var cityProvider = context.read<CityProvider>();
@@ -194,34 +195,24 @@ class _CityFormState extends State<CityForm> {
                     widget.onClose(success: true);
                   }
                 } else {
-                  var response = await cityProvider.update(widget.city!.id!, newCity);
+                  var response =
+                      await cityProvider.update(widget.city!.id!, newCity);
                   if (response != null && response.id != null) {
                     widget.onClose(success: true);
                   }
                 }
               } catch (e) {
-                if (e is DioException && e.response != null) {
-                  final responseData = e.response!.data;
-                  if (responseData is Map<String, dynamic>) {
-                    String? errorMessage;
+                final nameMessages = (e as Map<String, dynamic>)['Name'];
+                final message =
+                    (nameMessages is List && nameMessages.isNotEmpty)
+                        ? nameMessages.first
+                        : '';
 
-                    // Extract first validation error dynamically
-                    for (var entry in responseData.entries) {
-                      if (entry.value is List && entry.value.isNotEmpty) {
-                        errorMessage = entry.value.first; // Take the first error message
-                        break;
-                      }
-                    }
-
-                    if (errorMessage != null) {
-                      setState(() {
-                        _nameError = errorMessage;
-                        _formKey.currentState?.fields['name']?.invalidate(_nameError!);
-                      });
-                      return;
-                    }
-                  }
-                }
+                setState(() {
+                  _nameError = message;
+                  _formKey.currentState?.fields['name']?.invalidate(message!);
+                });
+                return;
               }
             }
           },
